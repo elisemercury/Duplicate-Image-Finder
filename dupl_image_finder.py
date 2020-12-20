@@ -13,10 +13,10 @@ Outputs the number of found similar/duplucate image pairs with a list of the fil
 def compare_images(directory, show_imgs=True, similarity="high", compression=50):
     """
     directory (str).........folder to search for duplicate/similar images
-    similarity (str)........high = finds duplicate images
-                            low = finds similar images
     show_imgs (bool)........True = shows the similar/duplicate images found in output
                             False = doesn't show found images
+    similarity (str)........high = finds duplicate images
+                            low = finds similar images
     compression (int).......recommended not to change default value
                             compression rate in px of the images before being compared
                             the higher the compression, the more computational ressources needed
