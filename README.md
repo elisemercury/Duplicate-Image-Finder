@@ -1,17 +1,31 @@
-# Face Recognition on Pi
-Train a machine learning model for real-time face recognition on the Raspberry Pi 4. As soon as the model recognizes an unknown person, it sends a notification including date, time and a picture of the person via Cisco Webex Teams. 
+# Duplicate Image Finder (DIF)
+Tired of going through all images in a folder and comparing them manually to find if they are duplicates?
+The Duplicate Image Finder (DIF) Python script automates this task for you!
+
+Select which file folder the DIF should search through, and it will will compare all images in that folder whether these are duplicates, or not. 
+It outputs all images it classifies as duplicates including the filename of the image having the lowest resolution of both, so you know which of the two images is safe to be deleted.
 
 <p align="center">
-  <img src="alert_bot_webex.png" width="350" title="Webex Teams Alert Notification">
+  <img src="example_output.PNG" width="350" title="Example Output: Duplicate Image Finder">
 </p>
-
-No Raspberry Pi cam required, it worked for me with a Logitech webcam.
 
 ## Usage
 
-For training the model, you will need a folder "dataset" containing at least two folders with images of faces. 
-One folder should be renamed to your first name, the second folder should be renamed to "unknown".
-The folders should contain at least 5 unknown images, and 10 images of you.
+```ruby
+require 'redcarpet'
+markdown = Redcarpet.new("Hello World!")
+puts markdown.to_html
+```
+
+Use 
+```python
+compare_images("C:/Path/to/Folder/")
+``` 
+to make DIF search for duplicate images in the folder.
+
+## Additionnal Parameters
+
+```compare_images(directory, show_imgs=True, similarity=)```
 
 Change ```YOUR_NAME``` in line 91 in the file pi_face_recognition.py to your name, the same name as the subfolder with your images in the dataset folder.
 
