@@ -1,48 +1,47 @@
 # Duplicate Image Finder (DIF)
-Tired of going through all images in a folder and comparing them manually to find if they are duplicates?
-The Duplicate Image Finder (DIF) Python script automates this task for you!
+**Tired of going through all images in a folder and comparing them manually to check if they are duplicates?**
 
-Select which file folder the DIF should search through, and it will will compare all images in that folder whether these are duplicates, or not. 
-It outputs all images it classifies as duplicates including the filename of the image having the lowest resolution of both, so you know which of the two images is safe to be deleted.
+:white_check_mark: The Duplicate Image Finder (DIF) Python script **automates** this task for you!
+
+## Description
+The DIF searches for images in a specified target folder. It then compares the images it found and checks whether these are duplicates. The DIF then outputs the **image files classified as duplicates** and the **filenames of the images having the lowest resolution**, so you know which of the duplicate images are safe to be deleted.
 
 <p align="center">
-  <img src="example_output.PNG" width="350" title="Example Output: Duplicate Image Finder">
+  <img src="example_output.png" width="600" title="Example Output: Duplicate Image Finder">
 </p>
 
-## Usage
+## Basic Usage
+Use the following function to make DIF search for duplicates in the specified folder:
 
-```ruby
-require 'redcarpet'
-markdown = Redcarpet.new("Hello World!")
-puts markdown.to_html
-```
-
-Use 
 ```python
 compare_images("C:/Path/to/Folder/")
 ``` 
-to make DIF search for duplicate images in the folder.
-
+Folder path must be specified as a Python string.
 ## Additionnal Parameters
 
-```compare_images(directory, show_imgs=True, similarity=)```
+```python
+compare_images(directory, show_imgs=True, similarity="high", compression=50)
+```
 
-Change ```YOUR_NAME``` in line 91 in the file pi_face_recognition.py to your name, the same name as the subfolder with your images in the dataset folder.
+### show_imgs (bool)
+Per default, DIF outputs a sample of the duplicate/similar images it found.
 
-Change ```TEAMS-TOKEN``` in line 5 in the file alert_teams.py to the token of your Webex Teams bot created [here](https://developer.webex.com/my-apps/new/bot). 
+```True``` = shows the duplicate/similar images DIF found in output
 
-Change ```EMAIL``` in line 9 in the file alert_teams.py to the email adress to which the Webex Teams alert notification is sent to.
+```False```= doesn't show found images
 
-Train model with with 
+### similarity (str)
 
-```encode_faces.py --dataset dataset --encodings encodings.pickle --detection-method hog```
+Depending on the use-case, DIF can search for duplicate images or images that look similar (but are not necessarily duplicates).
 
-Run the model with real time face recognition and alerting with
+```"high"``` = searches for duplicate images
+                           
+```"low"``` = searches for similar images
 
-```python3 pi_face_recognition.py --cascade haarcascade_frontalface_default.xml --encodings encodings.pickle```
+### compression (int)
 
-## Sources
+**Recommended not to change default value**
 
-[Face Recognition on the Raspberry Pi](https://www.pyimagesearch.com/2018/06/25/raspberry-pi-face-recognition/) by Adrian Rosebrock 
-
-[Cisco Webex for Developers](https://developer.webex.com/docs/bots)
+Absolute compression in px (width x height) of the images before being compared.
+The higher the compression, the more computational ressources and time required.     
+                           
