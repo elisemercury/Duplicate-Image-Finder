@@ -7,7 +7,7 @@
 The DIF searches for images in a specified target folder. It then compares the images it found and checks whether these are duplicates. The DIF then outputs the **image files classified as duplicates** and the **filenames of the images having the lowest resolution**, so you know which of the duplicate images are safe to be deleted.
 
 <p align="center">
-  <img src="example_output2.png" width="500" title="Example Output: Duplicate Image Finder">
+  <img src="example_output2.png" width="600" title="Example Output: Duplicate Image Finder">
 </p>
 
 ## Basic Usage
@@ -16,7 +16,7 @@ Use the following function to make DIF search for duplicates in the specified fo
 ```python
 compare_images("C:/Path/to/Folder/")
 ``` 
-Folder path must be specifies as a Python string.
+Folder path must be specified as a Python string.
 ## Additionnal Parameters
 
 ```python
