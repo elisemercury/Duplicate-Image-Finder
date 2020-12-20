@@ -16,7 +16,7 @@ Use the following function to make DIF search for duplicates in the specified fo
 ```python
 compare_images("C:/Path/to/Folder/")
 ``` 
-
+Folder path must be specifies as a Python string.
 ## Additionnal Parameters
 
 ```python
