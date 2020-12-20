@@ -23,6 +23,7 @@ def compare_images(directory, show_imgs=True, similarity="high", compression=50)
     """
     # list where the found similar/duplicate images are stored
     duplicates = []
+    lower_res = []
     
     imgs_matrix = create_imgs_matrix(directory, compression)
 
@@ -33,24 +34,24 @@ def compare_images(directory, show_imgs=True, similarity="high", compression=50)
     else:
         ref = 200
 
-    main_img, compared_img = 1, 1
+    main_img = 0
+    compared_img = 1
     nrows, ncols = compression, compression
     srow_A = 0
     erow_A = nrows
     srow_B = erow_A
     erow_B = srow_B + nrows       
-
-    while erow_B < imgs_matrix.shape[0]:
-        while compared_img < (len(image_files)-main_img):
+    
+    while erow_B <= imgs_matrix.shape[0]:
+        while compared_img < (len(image_files)):
             # select two images from imgs_matrix
             imgA = imgs_matrix[srow_A : erow_A, # rows
                                0      : ncols]  # columns
             imgB = imgs_matrix[srow_B : erow_B, # rows
                                0      : ncols]  # columns
-        
             # compare the images
             rotations = 0
-            while image_files[main_img-1] not in duplicates and image_files[compared_img] not in duplicates and rotations <= 4:
+            while image_files[main_img] not in duplicates and rotations <= 3:
                 if rotations != 0:
                     imgB = rotate_img(imgB)
                 err = mse(imgA, imgB)
@@ -58,30 +59,30 @@ def compare_images(directory, show_imgs=True, similarity="high", compression=50)
                     if show_imgs == True:
                         show_img_figs(imgA, imgB, err)
                         show_file_info(compared_img, main_img)
-                    check_img_quality(directory, image_files[main_img-1], image_files[compared_img], duplicates)
+                    add_to_list(image_files[main_img], duplicates)
+                    check_img_quality(directory, image_files[main_img], image_files[compared_img], lower_res)
                 rotations += 1
-
             srow_B += nrows
             erow_B += nrows
             compared_img += 1
-
+        
         srow_A += nrows
         erow_A += nrows
         srow_B = erow_A
         erow_B = srow_B + nrows
         main_img += 1
-        compared_img = main_img
+        compared_img = main_img + 1
 
-    msg = "\n***\n DONE: found " + str(len(duplicates)) + " duplicate image pairs in " + str(len(image_files)) + " total images.\n The following files have lower resolution:"
+    msg = "\n***\n DONE: found " + str(len(duplicates))  + " duplicate image pairs in " + str(len(image_files)) + " total images.\n The following files have lower resolution:"
     print(msg)
-    return duplicates
+    return lower_res
 
 # Function that searches the folder for image files, converts them to a matrix
 def create_imgs_matrix(directory, compression):
     global image_files   
     image_files = []
     # create list of all files in directory     
-    folder_files = [filename for filename in os.listdir(directory)]       
+    folder_files = [filename for filename in os.listdir(directory)]  
     
     # create images matrix   
     counter = 0
@@ -128,7 +129,7 @@ def rotate_img(image):
 
 # Function for printing filename info of plotted image files
 def show_file_info(compared_img, main_img):
-    print("Duplicate file: " + image_files[main_img-1] + " and " + image_files[compared_img])
+    print("Duplicate file: " + image_files[main_img] + " and " + image_files[compared_img])
 
 # Function for appending items to a list
 def add_to_list(filename, list):
