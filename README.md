@@ -6,7 +6,7 @@ Select which file folder the DIF should search through, and it will will compare
 It outputs all images it classifies as duplicates including the filename of the image having the lowest resolution of both, so you know which of the two images is safe to be deleted.
 
 <p align="center">
-  <img src="example_output.png" width="350" title="Example Output: Duplicate Image Finder">
+  <img src="example_output.PNG" width="350" title="Example Output: Duplicate Image Finder">
 </p>
 
 ## Usage
@@ -17,8 +17,10 @@ markdown = Redcarpet.new("Hello World!")
 puts markdown.to_html
 ```
 
-Use ```python
-compare_images("C:/Path/to/Folder/")``` 
+Use 
+```python
+compare_images("C:/Path/to/Folder/")
+``` 
 to make DIF search for duplicate images in the folder.
 
 ## Additionnal Parameters
