@@ -22,17 +22,25 @@ compare_images("C:/Path/to/Folder/")
 compare_images(directory, show_imgs=True, similarity="high", compression=50)
 ```
 
-```python
-directory (str)..... folder to search for duplicate/similar images
+### show_imgs (bool)
+Per default, DIF outputs a sample of the duplicate/similar images it found.
 
-show_imgs (bool).... True = shows the duplicate/similar images DIF found in output
-                           False = doesn't show found images
+```True``` = shows the duplicate/similar images DIF found in output
+
+```False```= doesn't show found images
+
+### similarity (str)
+
+Depending on the use-case, DIF can search for duplicate images or images that look similar (but are not necessarily duplicates).
+
+```"high"``` = searches for duplicate images
                            
-similarity (str).... "high" = searches for duplicate images
+```"low"``` = searches for similar images
+
+### compression (int)
+
+**Recommended not to change default value**
+
+Absolute compression in px (width x height) of the images before being compared.
+The higher the compression, the more computational ressources and time required.     
                            
-                           "low" = searches for similar images
-                           
-compression (int)... recommended not to change default value
-                           compression rate in px of the images before being compared
-                           the higher the compression, the more computational ressources and time required     
-```                           
