@@ -6,22 +6,22 @@ import os
 import imghdr
 
 """ 
-Function that searches a given directory for images and finds similar/duplicate images among them.
-Outputs the number of found similar/duplucate image pairs with a list of the filenames having lower resolution.
+Duplicate Image Finder (DIF): function that searches a given directory for images and finds duplicate/similar images among them.
+Outputs the number of found duplicate/similar image pairs with a list of the filenames having lower resolution.
 """
 
 def compare_images(directory, show_imgs=True, similarity="high", compression=50):
     """
     directory (str).........folder to search for duplicate/similar images
-    show_imgs (bool)........True = shows the similar/duplicate images found in output
+    show_imgs (bool)........True = shows the duplicate/similar images found in output
                             False = doesn't show found images
-    similarity (str)........high = finds duplicate images
-                            low = finds similar images
+    similarity (str)........"high" = searches for duplicate images, more precise
+                            "low" = finds similar images
     compression (int).......recommended not to change default value
                             compression rate in px of the images before being compared
-                            the higher the compression, the more computational ressources needed
+                            the higher the compression, the more computational ressources and time required                 
     """
-    # list where the found similar/duplicate images are stored
+    # list where the found duplicate/similar images are stored
     duplicates = []
     lower_res = []
     
