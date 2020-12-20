@@ -15,7 +15,7 @@ def compare_images(directory, show_imgs=True, similarity="high", compression=50)
     directory (str).........folder to search for duplicate/similar images
     similarity (str)........high = finds duplicate images
                             low = finds similar images
-    show_imgs (bool)........True = shows a low resolution sample of the similar/duplicate images found in output
+    show_imgs (bool)........True = shows the similar/duplicate images found in output
                             False = doesn't show found images
     compression (int).......recommended not to change default value
                             compression rate in px of the images before being compared
@@ -75,7 +75,7 @@ def compare_images(directory, show_imgs=True, similarity="high", compression=50)
 
     msg = "\n***\n DONE: found " + str(len(duplicates))  + " duplicate image pairs in " + str(len(image_files)) + " total images.\n The following files have lower resolution:"
     print(msg)
-    return lower_res
+    return set(lower_res)
 
 # Function that searches the folder for image files, converts them to a matrix
 def create_imgs_matrix(directory, compression):
@@ -139,7 +139,7 @@ def add_to_list(filename, list):
 def check_img_quality(directory, imageA, imageB, list):
     size_imgA = os.stat(directory + imageA).st_size
     size_imgB = os.stat(directory + imageB).st_size
-    if size_imgA >= size_imgB:
+    if size_imgA > size_imgB:
         add_to_list(imageB, list)
     else:
         add_to_list(imageA, list)
