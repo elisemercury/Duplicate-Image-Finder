@@ -22,7 +22,8 @@ compare_images("C:/Path/to/Folder/")
 compare_images(directory, show_imgs=True, similarity="high", compression=50)
 ```
 
-```directory``` (str)..... folder to search for duplicate/similar images
+```python
+directory``` (str)..... folder to search for duplicate/similar images
 
 ```show_imgs``` (bool).... True = shows the duplicate/similar images DIF found in output
                            False = doesn't show found images
@@ -33,4 +34,5 @@ compare_images(directory, show_imgs=True, similarity="high", compression=50)
                            
 ```compression``` (int)....recommended not to change default value
                            compression rate in px of the images before being compared
-                           the higher the compression, the more computational ressources and time required                          
+                           the higher the compression, the more computational ressources and time required     
+```                           
