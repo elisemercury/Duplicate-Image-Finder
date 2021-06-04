@@ -18,8 +18,8 @@ def compare_images(directory, show_imgs=True, similarity="high", compression=50)
     similarity (str)........"high" = searches for duplicate images, more precise
                             "low" = finds similar images
     compression (int).......recommended not to change default value
-                            compression rate in px of the images before being compared
-                            the higher the compression, the more computational ressources and time required                 
+                            compression in px (height x width) of the images before being compared
+                            the higher the compression i.e. the higher the pixel size, the more computational ressources and time required                 
     """
     # list where the found duplicate/similar images are stored
     duplicates = []
