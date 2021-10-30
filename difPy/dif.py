@@ -12,7 +12,7 @@ Outputs the number of found duplicate/similar image pairs with a list of the fil
 """
 
 class dif:
-    def __init__(directory, show_imgs=False, similarity="normal", px_size=50, delete=False):
+    def compare_images(directory, show_imgs=False, similarity="normal", px_size=50, delete=False):
         """
         directory (str)......folder path to search for duplicate/similar images
         show_imgs (bool).....False = omits the output and doesn't show found images
