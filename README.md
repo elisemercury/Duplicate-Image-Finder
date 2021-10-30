@@ -17,7 +17,7 @@ Use the following function to make DIF search for duplicates in the specified fo
 
 
 
-``hello``
+``from difPy import compare_images``
 
 # 1
 
