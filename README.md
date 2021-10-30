@@ -1,7 +1,7 @@
-# Duplicate Image Finder (DIF)
+# Duplicate Image Finder (difPy)
 **Tired of going through all images in a folder and comparing them manually to check if they are duplicates?**
 
-:white_check_mark: The Duplicate Image Finder (DIF) Python script **automates** this task for you!
+:white_check_mark: The Duplicate Image Finder (difPy) Python package **automates** this task for you!
 
 ```python
 pip install difPy
