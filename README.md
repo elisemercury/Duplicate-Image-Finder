@@ -26,7 +26,8 @@ from difPy import dif
 compare_images("C:/Path/to/Folder/")
 ``` 
 Folder path must be specified as a Python string.
-## Additionnal Parameters
+
+## Additional Parameters
 The ``compare_images`` function has the following optional parameters:
 
 ```python
@@ -62,7 +63,7 @@ The higher the px_size, the more computational ressources and time required.
                            
 ### delete (bool)
 
-! Please use with care, as this cannot be undone !
+! Please use with care, as this cannot be undone
 
 When set to ``True``, the lower resolution duplicate images that were found by the DIF are automatically deleted from the folder.   
                            
