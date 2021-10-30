@@ -3,14 +3,14 @@
 
 :white_check_mark: The Duplicate Image Finder (DIF) Python script **automates** this task for you!
 
-```python
-pip install difPy
-```
+``pip install difPy``
+
+Read more on how the algorithm of the DIF works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051)
+
+Check out the [difPy package on PyPI.org](https://pypi.org/project/difPy/)
 
 ## Description
 The DIF searches for images in a specified target folder, compares the images it found and checks whether these are duplicates. It then outputs the **image files classified as duplicates** and the **filenames of the duplicate images having the lower resolution**, so you know which of the duplicate images are safe to be deleted. You can then either delete them manually, or let the DIF delete them for you.
-
-You can read more on how the algorithm of the DIF works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051).
 
 <p align="center">
   <img src="example_output.png" width="600" title="Example Output: Duplicate Image Finder">
