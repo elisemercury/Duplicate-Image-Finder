@@ -10,7 +10,7 @@ with open(os.path.join(base_dir, "README.md")) as f:
 setup(
   name = 'difPy',         
   packages = ['difPy'],   
-  version = '0.93333',      
+  version = '1.0.0',      
   license='MIT',        
   description = 'Python Duplicate Image Finder - searches for duplicate image files within a specified folder path.', 
   long_description=long_description,
@@ -27,7 +27,7 @@ setup(
           'opencv-python',
       ],
   classifiers=[
-    'Development Status :: 4 - Beta',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
+    'Development Status :: 5 - Production/Stable',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
     'Intended Audience :: Developers',      
     'Topic :: Software Development :: Build Tools',
     'License :: OSI Approved :: MIT License',   
