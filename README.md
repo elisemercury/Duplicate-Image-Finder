@@ -3,7 +3,9 @@
 
 :white_check_mark: The Duplicate Image Finder (DIF) Python script **automates** this task for you!
 
-``pip install difPy``
+```python
+pip install difPy
+```
 
 Read more on how the algorithm of the DIF works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051)
 
