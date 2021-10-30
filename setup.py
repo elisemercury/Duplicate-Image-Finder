@@ -1,21 +1,30 @@
 from distutils.core import setup
+import os
+import setuptools
+
+base_dir = os.path.dirname(__file__)
+
+with open(os.path.join(base_dir, "README.md")) as f:
+    long_description = f.read()
+
 setup(
-  name = 'PyDif',         
-  packages = ['PyDif'],   
-  version = '2.0',      
+  name = 'difPy',         
+  packages = ['difPy'],   
+  version = '0.93',      
   license='MIT',        
-  description = 'PyDif Duplicate Image Finder - searches for duplicate image files within a specified folder path.', 
+  description = 'Python Duplicate Image Finder - searches for duplicate image files within a specified folder path.', 
+  long_description=long_description,
+  long_description_content_type='text/markdown',
   author = 'Elise Landman',                  
   author_email = 'elisejlandman@hotmail.com', 
   url = 'https://github.com/elisemercury/Duplicate-Image-Finder', 
-  download_url = 'https://github.com/elisemercury/Duplicate-Image-Finder/archive/refs/tags/v2.0.tar.gz',    # change everytime for each new release
+  download_url = 'https://github.com/elisemercury/Duplicate-Image-Finder/archive/refs/tags/v1.0.tar.gz',    # change everytime for each new release
   keywords = ['duplicate', 'image', 'finder', "similarity", "pictures"],  
   install_requires=[          
           'scikit-image',
           'matplotlib',
           'numpy',
           'opencv-python',
-          'imghdr',
       ],
   classifiers=[
     'Development Status :: 4 - Beta',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
