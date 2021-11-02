@@ -23,7 +23,7 @@ Use the following function to make DIF search for duplicates in the specified fo
 
 ```python
 from difPy import dif
-compare_images("C:/Path/to/Folder/")
+dif.compare_images("C:/Path/to/Folder/")
 ``` 
 Folder path must be specified as a Python string.
 
