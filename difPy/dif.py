@@ -115,6 +115,8 @@ class dif:
                 if type(img) == np.ndarray:
                     img = img[..., 0:3]
                     img = cv2.resize(img, dsize=(px_size, px_size), interpolation=cv2.INTER_CUBIC)
+                    if len(img.shape) == 2:
+                        img = skimage.color.gray2rgb(img)
                     if counter == 0:
                         imgs_matrix = img
                         image_files.append(filename)
