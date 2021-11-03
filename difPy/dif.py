@@ -100,13 +100,17 @@ class dif:
         else:
             return set(lower_res)
 
-    # Function that searches the folder for image files, converts them to a matrix
-    def create_imgs_matrix(directory, px_size):
-        global image_files
-        image_files = []
+    def _process_directory(directory):
         directory += os.sep
         if not os.path.isdir(directory):
             raise FileNotFoundError(f"Directory: " + directory + " does not exist")
+        return directory
+
+    # Function that searches the folder for image files, converts them to a matrix
+    def create_imgs_matrix(directory, px_size):
+        directory = dif._process_directory(directory)
+        global image_files
+        image_files = []
         # create list of all files in directory     
         folder_files = [filename for filename in os.listdir(directory)]
 
@@ -165,6 +169,7 @@ class dif:
 
     # Function for checking the quality of compared images, appends the lower quality image to the list
     def check_img_quality(directory, imageA, imageB, list):
+        directory = dif._process_directory(directory)
         size_imgA = os.stat(directory + imageA).st_size
         size_imgB = os.stat(directory + imageB).st_size
         if size_imgA > size_imgB:
@@ -173,6 +178,7 @@ class dif:
             dif.add_to_list(imageA, list)
 
     def delete_imgs(directory, filenames_set):
+        directory = dif._process_directory(directory)
         print("\nDeletion in progress...")
         deleted = 0
         for filename in filenames_set:
