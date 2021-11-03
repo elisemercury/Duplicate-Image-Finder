@@ -104,6 +104,9 @@ class dif:
     def create_imgs_matrix(directory, px_size):
         global image_files
         image_files = []
+        directory += os.sep
+        if not os.path.isdir(directory):
+            raise FileNotFoundError(f"Directory: " + directory + " does not exist")
         # create list of all files in directory     
         folder_files = [filename for filename in os.listdir(directory)]
 
