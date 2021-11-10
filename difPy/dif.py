@@ -1,4 +1,4 @@
-import skimage.measure
+import skimage.color
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
@@ -10,6 +10,7 @@ import time
 Duplicate Image Finder (DIF): function that searches a given directory for images and finds duplicate/similar images among them.
 Outputs the number of found duplicate/similar image pairs with a list of the filenames having lower resolution.
 """
+
 
 class dif:
     def compare_images(directory, show_imgs=False, similarity="normal", px_size=50, delete=False):
@@ -50,15 +51,15 @@ class dif:
         srow_A = 0
         erow_A = nrows
         srow_B = erow_A
-        erow_B = srow_B + nrows       
+        erow_B = srow_B + nrows
 
         while erow_B <= imgs_matrix.shape[0]:
             while compared_img < (len(image_files)):
                 # select two images from imgs_matrix
-                imgA = imgs_matrix[srow_A : erow_A, # rows
-                                   0      : ncols]  # columns
-                imgB = imgs_matrix[srow_B : erow_B, # rows
-                                   0      : ncols]  # columns
+                imgA = imgs_matrix[srow_A: erow_A,  # rows
+                       0: ncols]  # columns
+                imgB = imgs_matrix[srow_B: erow_B,  # rows
+                       0: ncols]  # columns
                 # compare the images
                 rotations = 0
                 while image_files[main_img] not in duplicates and rotations <= 3:
@@ -66,7 +67,7 @@ class dif:
                         imgB = dif.rotate_img(imgB)
                     err = dif.mse(imgA, imgB)
                     if err < ref:
-                        if show_imgs == True:
+                        if show_imgs:
                             dif.show_img_figs(imgA, imgB, err)
                             dif.show_file_info(compared_img, main_img)
                         dif.add_to_list(image_files[main_img], duplicates)
@@ -83,12 +84,13 @@ class dif:
             main_img += 1
             compared_img = main_img + 1
 
-        msg = "\n***\nFound " + str(len(duplicates))  + " duplicate image pairs in " + str(len(image_files)) + " total images.\n\nThe following files have lower resolution:"
+        msg = "\n***\nFound " + str(len(duplicates)) + " duplicate image pairs in " + str(
+            len(image_files)) + " total images.\n\nThe following files have lower resolution:"
         print(msg)
         print(lower_res, "\n")
         time.sleep(0.5)
-        
-        if delete==True:
+
+        if delete:
             usr = input("Are you sure you want to delete all lower resolution duplicate images? (y/n)")
             if str(usr) == "y":
                 dif.delete_imgs(directory, set(lower_res))
@@ -98,21 +100,30 @@ class dif:
         else:
             return set(lower_res)
 
+    def _process_directory(directory):
+        directory += os.sep
+        if not os.path.isdir(directory):
+            raise FileNotFoundError(f"Directory: " + directory + " does not exist")
+        return directory
+
     # Function that searches the folder for image files, converts them to a matrix
     def create_imgs_matrix(directory, px_size):
-        global image_files   
+        directory = dif._process_directory(directory)
+        global image_files
         image_files = []
         # create list of all files in directory     
-        folder_files = [filename for filename in os.listdir(directory)]  
+        folder_files = [filename for filename in os.listdir(directory)]
 
         # create images matrix   
         counter = 0
-        for filename in folder_files: 
+        for filename in folder_files:
             if not os.path.isdir(directory + filename) and imghdr.what(directory + filename):
                 img = cv2.imdecode(np.fromfile(directory + filename, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
                 if type(img) == np.ndarray:
-                    img = img[...,0:3]
+                    img = img[..., 0:3]
                     img = cv2.resize(img, dsize=(px_size, px_size), interpolation=cv2.INTER_CUBIC)
+                    if len(img.shape) == 2:
+                        img = skimage.color.gray2rgb(img)
                     if counter == 0:
                         imgs_matrix = img
                         image_files.append(filename)
@@ -134,16 +145,16 @@ class dif:
         plt.suptitle("MSE: %.2f" % (err))
         # plot first image
         ax = fig.add_subplot(1, 2, 1)
-        plt.imshow(imageA, cmap = plt.cm.gray)
+        plt.imshow(imageA, cmap=plt.cm.gray)
         plt.axis("off")
         # plot second image
         ax = fig.add_subplot(1, 2, 2)
-        plt.imshow(imageB, cmap = plt.cm.gray)
+        plt.imshow(imageB, cmap=plt.cm.gray)
         plt.axis("off")
         # show the images
         plt.show()
 
-    #Function for rotating an image matrix by a 90 degree angle
+    # Function for rotating an image matrix by a 90 degree angle
     def rotate_img(image):
         image = np.rot90(image, k=1, axes=(0, 1))
         return image
@@ -158,22 +169,23 @@ class dif:
 
     # Function for checking the quality of compared images, appends the lower quality image to the list
     def check_img_quality(directory, imageA, imageB, list):
+        directory = dif._process_directory(directory)
         size_imgA = os.stat(directory + imageA).st_size
         size_imgB = os.stat(directory + imageB).st_size
         if size_imgA > size_imgB:
             dif.add_to_list(imageB, list)
         else:
             dif.add_to_list(imageA, list)
-    
+
     def delete_imgs(directory, filenames_set):
+        directory = dif._process_directory(directory)
         print("\nDeletion in progress...")
         deleted = 0
         for filename in filenames_set:
             try:
-                os.remove(directory + filename) 
-                print("Deleted file:" , filename)
+                os.remove(directory + filename)
+                print("Deleted file:", filename)
                 deleted += 1
             except:
-                print("Could not delete file:" , filename)
-        print("\n***\nDeleted" , deleted , "duplicates.")
-            
+                print("Could not delete file:", filename)
+        print("\n***\nDeleted", deleted, "duplicates.")
