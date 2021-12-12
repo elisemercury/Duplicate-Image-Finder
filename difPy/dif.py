@@ -172,7 +172,7 @@ class dif:
         directory = dif._process_directory(directory)
         size_imgA = os.stat(directory + imageA).st_size
         size_imgB = os.stat(directory + imageB).st_size
-        if size_imgA > size_imgB:
+        if size_imgA >= size_imgB:
             dif.add_to_list(imageB, list)
         else:
             dif.add_to_list(imageA, list)
