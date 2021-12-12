@@ -96,9 +96,9 @@ class dif:
                 dif.delete_imgs(directory, set(lower_res))
             else:
                 print("Image deletion canceled.")
-                return set(lower_res)
+                return (lower_res, duplicates)
         else:
-            return set(lower_res)
+            return (lower_res, duplicates)
 
     def _process_directory(directory):
         directory += os.sep
