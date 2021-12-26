@@ -9,9 +9,9 @@ with open(os.path.join(base_dir, "README.md")) as f:
 setup(
   name = 'difPy',         
   packages = ['difPy'],   
-  version = '1.2',      
+  version = '2.0',      
   license='MIT',        
-  description = 'Python Duplicate Image Finder - searches for duplicate image files within a specified folder path.', 
+  description = 'DifPy Python Duplicate Image Finder - searches for duplicate image files within folders.', 
   long_description=long_description,
   long_description_content_type='text/markdown',
   author = 'Elise Landman',                  
