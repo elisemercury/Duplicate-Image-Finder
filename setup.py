@@ -17,7 +17,7 @@ setup(
   author = 'Elise Landman',                  
   author_email = 'elisejlandman@hotmail.com', 
   url = 'https://github.com/elisemercury/Duplicate-Image-Finder', 
-  download_url = 'https://github.com/elisemercury/Duplicate-Image-Finder/archive/refs/tags/v1.2.tar.gz',    # change everytime for each new release
+  download_url = 'https://github.com/elisemercury/Duplicate-Image-Finder/archive/refs/tags/v2.0.tar.gz',    # change everytime for each new release
   keywords = ['duplicate', 'image', 'finder', "similarity", "pictures"],  
   install_requires=[          
           'scikit-image',
