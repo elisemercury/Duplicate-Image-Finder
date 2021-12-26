@@ -34,9 +34,9 @@ search = dif("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/")
 Folder paths must be specified as a Python string.
 
 ## Output
-The DIF gives multiple two types of output: 
+The DIF gives two types of output that you may use depending on your use case: 
 
-**A dictionary of duplicates/similar images that were found:** 
+A **dictionary** of duplicates/similar images that were found: 
 
 ```python
 search.result
@@ -49,7 +49,7 @@ search.result
 }
 ``` 
 
-**A list of duplicates/similar images that have the lowest quality:** 
+A **list** of duplicates/similar images that have the **lowest quality:** 
 
 ```python
 search.lower_quality
