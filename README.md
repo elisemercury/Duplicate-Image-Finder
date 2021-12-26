@@ -7,19 +7,19 @@
 pip install difPy
 ```
 
-Read more on how the algorithm of DifPy works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051)
+Read more on how the algorithm of difPy works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051)
 
 Check out the [difPy package on PyPI.org](https://pypi.org/project/difPy/)
 
 ## Description
-DifPy searches for images in **one or two different folders**, compares the images it found and checks whether these are duplicates. It then outputs the **image files classified as duplicates** and the **filenames of the duplicate images having the lower resolution**, so you know which of the duplicate images are safe to be deleted. You can then either delete them manually, or let DifPy delete them for you.
+DifPy searches for images in **one or two different folders**, compares the images it found and checks whether these are duplicates. It then outputs the **image files classified as duplicates** and the **filenames of the duplicate images having the lower resolution**, so you know which of the duplicate images are safe to be deleted. You can then either delete them manually, or let difPy delete them for you.
 
 <p align="center">
   <img src="example_output.png" width="400" title="Example Output: Duplicate Image Finder">
 </p>
 
 ## Basic Usage
-Use the following function to make DIF search for duplicates in one specified folder:
+Use the following function to make difPy search for duplicates in one specified folder:
 
 ```python
 from difPy import dif
@@ -34,7 +34,7 @@ search = dif("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/")
 Folder paths must be specified as a Python string.
 
 ## Output
-DifPy gives two types of output that you may use depending on your use case: 
+difPy gives two types of output that you may use depending on your use case: 
 
 A **dictionary** of duplicates/similar images that were found: 
 
@@ -68,7 +68,7 @@ dif(directory_A, directory_B, similarity="normal", px_size=50,
 ```
 ### similarity (str)
 
-Depending on which use-case you want to apply DifPy for, the granularity for the classification of the images can be adjusted.
+Depending on which use-case you want to apply difPy for, the granularity for the classification of the images can be adjusted.
 
 DifPy can f. e. search for exact matching duplicate images, or images that look similar, but are not necessarily duplicates.
 
@@ -87,7 +87,7 @@ The higher the px_size, the more computational ressources and time required.
    
 ### sort_output (bool)
 
-Per default, DifPy will output the filenames of the duplicate images within a dictionary by the order in which they were found. If you want the duplicate images to be ordered alphabetically then set sort_output to `true`.
+Per default, difPy will output the filenames of the duplicate images within a dictionary by the order in which they were found. If you want the duplicate images to be ordered alphabetically then set sort_output to `true`.
 
 ```False```= (default) output filenames of the duplicate/similar images by order they were found 
 
@@ -95,7 +95,7 @@ Per default, DifPy will output the filenames of the duplicate images within a di
 
 ### show_output (bool)
 
-Per default, DifPy will output only the filename of the duplicate images it found. If you want the duplicate images to be shown in the console output, change this value to ``True``.
+Per default, difPy will output only the filename of the duplicate images it found. If you want the duplicate images to be shown in the console output, change this value to ``True``.
 
 ```False```= (default) outputs filename of the duplicate/similar images found
 
@@ -105,5 +105,5 @@ Per default, DifPy will output only the filename of the duplicate images it foun
 
 ! Please use with care, as this cannot be undone
 
-When set to ``True``, the lower resolution duplicate images that were found by DifPy are automatically deleted from the folder.   
+When set to ``True``, the lower resolution duplicate images that were found by difPy are automatically deleted from the folder.   
                            
