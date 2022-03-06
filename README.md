@@ -66,7 +66,7 @@ DifPy has the following optional parameters:
 
 ```python
 dif(directory_A, directory_B, similarity="normal", px_size=50, 
-    sort_output=False, show_output=False, delete=False)
+    sort_output=False, show_output=False, delete=False, silent_del=False)
 ```
 ### similarity (str)
 
@@ -107,5 +107,10 @@ Per default, difPy will output only the filename of the duplicate images it foun
 
 ! Please use with care, as this cannot be undone
 
-When set to ``True``, the lower resolution duplicate images that were found by difPy are automatically deleted from the folder.   
+When set to ``True``, the lower resolution duplicate images that were found by difPy are deleted from the folder. Asks for user confirmation before deleting the images. To skip the user confimation, set silent_del to ```True```.  
                            
+### silent_del (bool)
+
+! Please use with care, as this cannot be undone
+
+When set to ``True``, the user confirmation is skipped and the lower resolution duplicate images that were found by difPy are automatically deleted from the folder.  
