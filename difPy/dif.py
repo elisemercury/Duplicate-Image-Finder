@@ -9,7 +9,7 @@ import collections
 
 class dif:
     
-    def __init__(self, directory_A, directory_B = None, similarity="normal", px_size=50, sort_output=False, show_output=False, delete=False):
+    def __init__(self, directory_A, directory_B = None, similarity="normal", px_size=50, sort_output=False, show_output=False, delete=False, silent_del=False):
         """
         directory_A (str)......folder path to search for duplicate/similar images
         directory_B (str)....second folder path to search for duplicate/similar images
@@ -25,6 +25,9 @@ class dif:
                              True = shows duplicate/similar images found in output            
         delete (bool)........! please use with care, as this cannot be undone
                              lower resolution duplicate images that were found are automatically deleted
+        silent_del (bool)....! please use with care, as this cannot be undone
+                             True = skips the asking for user confirmation when deleting lower resolution duplicate images
+                             will only work if "delete" AND "silent_del" are both == True
         
         OUTPUT (set).........a dictionary with the filename of the duplicate images 
                              and a set of lower resultion images of all duplicates
@@ -41,7 +44,7 @@ class dif:
             directory_B = directory_A
         
     
-        dif._validate_parameters(sort_output, show_output, similarity, px_size, delete)
+        dif._validate_parameters(sort_output, show_output, similarity, px_size, delete, silent_del)
             
         if directory_B == directory_A:
             result, lower_quality = dif._search_one_dir(directory_A, 
@@ -69,11 +72,14 @@ class dif:
         
         if len(result) != 0:
             if delete:
-                usr = input("Are you sure you want to delete all lower resolution duplicate images? \nThis cannot be undone. (y/n)")
-                if str(usr) == "y":
-                    dif._delete_imgs(set(lower_quality))
+                if not silent_del:
+                    usr = input("Are you sure you want to delete all lower resolution duplicate images? \nThis cannot be undone. (y/n)")
+                    if str(usr) == "y":
+                        dif._delete_imgs(set(lower_quality))
+                    else:
+                        print("Image deletion canceled.")
                 else:
-                    print("Image deletion canceled.")
+                    dif._delete_imgs(set(lower_quality))                 
             
     def _search_one_dir(directory_A, similarity="normal", px_size=50, sort_output=False, show_output=False, delete=False):
         
@@ -164,7 +170,7 @@ class dif:
             raise FileNotFoundError(f"Directory: " + directory + " does not exist")
         return directory
     
-    def _validate_parameters(sort_output, show_output, similarity, px_size, delete):
+    def _validate_parameters(sort_output, show_output, similarity, px_size, delete, silent_del):
         # validate the parameters of the function
         if sort_output != True and sort_output != False:
             raise ValueError('Invalid value for "sort_output" parameter.')
@@ -176,6 +182,8 @@ class dif:
             raise ValueError('Invalid value for "px_size" parameter.')
         if delete != True and delete != False:
             raise ValueError('Invalid value for "delete" parameter.')   
+        if silent_del != True and silent_del != False:
+            raise ValueError('Invalid value for "silent_del" parameter.')   
     
     def _create_imgs_matrix(directory, px_size):
         directory = dif._process_directory(directory)
@@ -186,11 +194,11 @@ class dif:
         # create images matrix   
         imgs_matrix = []
         for filename in folder_files:
+            path = os.path.join(directory, filename)
             # check if the file is not a folder
-            if not os.path.isdir(directory + filename):
-                # check if the file is an image
-                if imghdr.what(directory + filename):
-                    img = cv2.imdecode(np.fromfile(directory + filename, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+            if not os.path.isdir(path):
+                try:
+                    img = cv2.imdecode(np.fromfile(path, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
                     if type(img) == np.ndarray:
                         img = img[..., 0:3]
                         img = cv2.resize(img, dsize=(px_size, px_size), interpolation=cv2.INTER_CUBIC)
@@ -199,6 +207,8 @@ class dif:
                             img = skimage.color.gray2rgb(img)
                         imgs_matrix.append(img)
                         img_filenames.append(filename)
+                except:
+                    pass
         return imgs_matrix, img_filenames
     
     def _map_similarity(similarity):
@@ -257,13 +267,13 @@ class dif:
         
     # Function for deleting the lower quality images that were found after the search    
     def _delete_imgs(lower_quality_set):
+        deleted = 0
         for file in lower_quality_set:
-            print("\nDeletion in progress...")
-            deleted = 0
+            print("\nDeletion in progress...", end = "\r")
             try:
                 os.remove(file)
-                print("Deleted file:", file)
+                print("Deleted file:", file, end = "\r")
                 deleted += 1
             except:
-                print("Could not delete file:", file)
-            print("\n***\nDeleted", deleted, "duplicates/similar images.")
+                print("Could not delete file:", file, end = "\r")
+        print("\n***\nDeleted", deleted, "images.")
