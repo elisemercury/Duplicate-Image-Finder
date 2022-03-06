@@ -9,7 +9,7 @@ with open(os.path.join(base_dir, "README.md")) as f:
 setup(
   name = 'difPy',         
   packages = ['difPy'],   
-  version = '2.1',      
+  version = '2.2',      
   license='MIT',        
   description = 'DifPy Python Duplicate Image Finder - searches for duplicate image files within folders.', 
   long_description=long_description,
@@ -17,7 +17,7 @@ setup(
   author = 'Elise Landman',                  
   author_email = 'elisejlandman@hotmail.com', 
   url = 'https://github.com/elisemercury/Duplicate-Image-Finder', 
-  download_url = 'https://github.com/elisemercury/Duplicate-Image-Finder/archive/refs/tags/v2.1.tar.gz',    # change everytime for each new release
+  download_url = 'https://github.com/elisemercury/Duplicate-Image-Finder/archive/refs/tags/v2.2.tar.gz',    # change everytime for each new release
   keywords = ['duplicate', 'image', 'finder', "similarity", "pictures"],  
   install_requires=[          
           'scikit-image',
@@ -29,13 +29,9 @@ setup(
     'Development Status :: 5 - Production/Stable',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
     'Intended Audience :: Developers',      
     'Topic :: Software Development :: Build Tools',
-    'License :: OSI Approved :: MIT License',   
-    'Programming Language :: Python :: 3',      #Specify which pyhton versions to support
-    'Programming Language :: Python :: 3.4',
-    'Programming Language :: Python :: 3.5',
-    'Programming Language :: Python :: 3.6',
+    'License :: OSI Approved :: MIT License',    
     'Programming Language :: Python :: 3.7',
-    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.8', #Specify which pyhton versions to support
     'Programming Language :: Python :: 3.9',
   ],
 )
