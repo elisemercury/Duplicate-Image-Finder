@@ -66,7 +66,7 @@ DifPy has the following optional parameters:
 
 ```python
 dif(directory_A, directory_B, similarity="normal", px_size=50, 
-    sort_output=False, show_output=False, delete=False, silent_del=False)
+    sort_output=False, show_output=False, delete=False, silent_del=False, show_progress=False)
 ```
 ### similarity (str)
 
@@ -102,7 +102,15 @@ Per default, difPy will output only the filename of the duplicate images it foun
 ```False```= (default) outputs filename of the duplicate/similar images found
 
 ```True``` = outputs a sample and the filename
-                           
+
+### show_progress (bool)
+
+Per default, difPy will set this progress bar to ``False``. If you want to see where your lengthy processing is, change this value to ``True``.
+
+```False```= (default) no progress bar is shown
+
+```True``` = outputs a progress bar
+
 ### delete (bool)
 
 ! Please use with care, as this cannot be undone
