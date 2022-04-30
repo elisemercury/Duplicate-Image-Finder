@@ -97,7 +97,7 @@ class dif:
         # find duplicates/similar images within one folder
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
             if show_progress:
-                print("[{}/{}][{:.0%}]".format(count_A, len(img_matrices_A),
+                print("{}:[{}/{}][{:.0%}]".format(time.ctime(), count_A, len(img_matrices_A),
                       count_A/len(img_matrices_A)))
             for count_B, imageMatrix_B in enumerate(img_matrices_A):
                 if count_B != 0 and count_B > count_A and count_A != len(img_matrices_A):
@@ -145,7 +145,7 @@ class dif:
         # find duplicates/similar images between two folders
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
             if show_progress:
-                print("[{}/{}][{:.0%}]".format(count_A, len(img_matrices_A),
+                print("{}:[{}/{}][{:.0%}]".format(time.ctime(), count_A, len(img_matrices_A),
                       count_A/len(img_matrices_A)))
             for count_B, imageMatrix_B in enumerate(img_matrices_B):
                 rotations = 0
@@ -301,3 +301,4 @@ class dif:
             except:
                 print("Could not delete file:", file, end="\r")
         print("\n***\nDeleted", deleted, "images.")
+
