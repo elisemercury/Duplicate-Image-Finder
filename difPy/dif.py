@@ -10,28 +10,28 @@ import collections
 
 class dif:
 
-    def __init__(self, directory_A, directory_B=None, similarity="normal", px_size=50, sort_output=False, show_output=False, delete=False, silent_del=False, show_progress=False):
+    def __init__(self, directory_A, directory_B=None, similarity="normal", px_size=50, sort_output=False, show_output=False, show_progress=False, delete=False, silent_del=False):
         """
         directory_A (str)......folder path to search for duplicate/similar images
-        directory_B (str)....second folder path to search for duplicate/similar images
-        similarity (str)....."normal" = searches for duplicates, recommended setting, MSE < 200
-                             "high" = serached for exact duplicates, extremly sensitive to details, MSE < 0.1
-                             "low" = searches for similar images, MSE < 1000
-        px_size (int)........recommended not to change default value
-                             resize images to px_size height x width (in pixels) before being compared
-                             the higher the pixel size, the more computational ressources and time required 
-        sort_output (bool)...False = adds the duplicate images to output dictionary in the order they were found
-                             True = sorts the duplicate images in the output dictionars alphabetically 
-        show_output (bool)...False = omits the output and doesn't show found images
-                             True = shows duplicate/similar images found in output            
-        show_progress (bool).Flase = shows where your lengthy processing is
-        delete (bool)........! please use with care, as this cannot be undone
-                             lower resolution duplicate images that were found are automatically deleted
-        silent_del (bool)....! please use with care, as this cannot be undone
-                             True = skips the asking for user confirmation when deleting lower resolution duplicate images
-                             will only work if "delete" AND "silent_del" are both == True
+        directory_B (str)......second folder path to search for duplicate/similar images
+        similarity (str)......."normal" = searches for duplicates, recommended setting, MSE < 200
+                               "high" = serached for exact duplicates, extremly sensitive to details, MSE < 0.1
+                               "low" = searches for similar images, MSE < 1000
+        px_size (int)..........recommended not to change default value
+                               resize images to px_size height x width (in pixels) before being compared
+                               the higher the pixel size, the more computational ressources and time required 
+        sort_output (bool).....False = adds the duplicate images to output dictionary in the order they were found
+                               True = sorts the duplicate images in the output dictionars alphabetically 
+        show_output (bool).....False = omits the output and doesn't show found images
+                               True = shows duplicate/similar images found in output            
+        show_progress (bool)...False = shows where your lengthy processing currently is
+        delete (bool)..........! please use with care, as this cannot be undone
+                               lower resolution duplicate images that were found are automatically deleted
+        silent_del (bool)......! please use with care, as this cannot be undone
+                               True = skips the asking for user confirmation when deleting lower resolution duplicate images
+                               will only work if "delete" AND "silent_del" are both == True
 
-        OUTPUT (set).........a dictionary with the filename of the duplicate images 
+        OUTPUT (set)...........a dictionary with the filename of the duplicate images 
                              and a set of lower resultion images of all duplicates
         """
         start_time = time.time()
@@ -45,15 +45,14 @@ class dif:
             dif._process_directory(directory_A)
             directory_B = directory_A
 
-        dif._validate_parameters(
-            sort_output, show_output, similarity, px_size, delete, silent_del, show_progress)
+        dif._validate_parameters(sort_output, show_output, show_progress, similarity, px_size, delete, silent_del)
 
         if directory_B == directory_A:
             result, lower_quality = dif._search_one_dir(directory_A,
-                                                        similarity, px_size, sort_output, show_output, delete, show_progress)
+                                                        similarity, px_size, sort_output, show_output, show_progress, delete)
         else:
             result, lower_quality = dif._search_two_dirs(directory_A, directory_B,
-                                                         similarity, px_size, sort_output, show_output, delete, show_progress)
+                                                         similarity, px_size, sort_output, show_output, show_progress, delete)
             if len(lower_quality) != len(set(lower_quality)):
                 print("DifPy found that there are duplicates within directory A.")
 
@@ -70,14 +69,12 @@ class dif:
             images = "image"
         else:
             images = "images"
-        print("Found", len(result), images,
-              "with one or more duplicate/similar images in", time_elapsed, "seconds.")
+        print("Found", len(result), images, "with one or more duplicate/similar images in", time_elapsed, "seconds.")
 
         if len(result) != 0:
             if delete:
                 if not silent_del:
-                    usr = input(
-                        "Are you sure you want to delete all lower resolution duplicate images? \nThis cannot be undone. (y/n)")
+                    usr = input("Are you sure you want to delete all lower resolution duplicate images? \nThis cannot be undone. (y/n)")
                     if str(usr) == "y":
                         dif._delete_imgs(set(lower_quality))
                     else:
@@ -97,8 +94,7 @@ class dif:
         # find duplicates/similar images within one folder
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
             if show_progress:
-                print("{}:[{}/{}][{:.0%}]".format(time.ctime(), count_A, len(img_matrices_A),
-                      count_A/len(img_matrices_A)))
+                print("{}:[{}/{}][{:.0%}]".format(time.ctime(), count_A, len(img_matrices_A), count_A/len(img_matrices_A)))
             for count_B, imageMatrix_B in enumerate(img_matrices_A):
                 if count_B != 0 and count_B > count_A and count_A != len(img_matrices_A):
                     rotations = 0
@@ -114,14 +110,11 @@ class dif:
                                 dif._show_file_info(str("..." + directory_A[-35:]) + "/" + filenames_A[count_A],
                                                     str("..." + directory_A[-35:]) + "/" + filenames_A[count_B])
                             if filenames_A[count_A] in result.keys():
-                                result[filenames_A[count_A]]["duplicates"] = result[filenames_A[count_A]
-                                                                                    ]["duplicates"] + [directory_A + "/" + filenames_A[count_B]]
+                                result[filenames_A[count_A]]["duplicates"] = result[filenames_A[count_A]]["duplicates"] + [directory_A + "/" + filenames_A[count_B]]
                             else:
                                 result[filenames_A[count_A]] = {"location": directory_A + "/" + filenames_A[count_A],
-                                                                "duplicates": [directory_A + "/" + filenames_A[count_B]]
-                                                                }
-                            high, low = dif._check_img_quality(
-                                directory_A, directory_A, filenames_A[count_A], filenames_A[count_B])
+                                                                "duplicates": [directory_A + "/" + filenames_A[count_B]]}
+                            high, low = dif._check_img_quality(directory_A, directory_A, filenames_A[count_A], filenames_A[count_B])
                             lower_quality.append(low)
                             break
                         else:
@@ -165,12 +158,10 @@ class dif:
                                                 str("..." + directory_B[-35:]) + "/" + filenames_B[count_B])
 
                         if filenames_A[count_A] in result.keys():
-                            result[filenames_A[count_A]]["duplicates"] = result[filenames_A[count_A]
-                                                                                ]["duplicates"] + [directory_B + "/" + filenames_B[count_B]]
+                            result[filenames_A[count_A]]["duplicates"] = result[filenames_A[count_A]]["duplicates"] + [directory_B + "/" + filenames_B[count_B]]
                         else:
                             result[filenames_A[count_A]] = {"location": directory_A + "/" + filenames_A[count_A],
-                                                            "duplicates": [directory_B + "/" + filenames_B[count_B]]
-                                                            }
+                                                            "duplicates": [directory_B + "/" + filenames_B[count_B]]}
                         high, low = dif._check_img_quality(
                             directory_A, directory_B, filenames_A[count_A], filenames_B[count_B])
                         lower_quality.append(low)
@@ -269,9 +260,7 @@ class dif:
 
     # Function for printing filename info of plotted image files
     def _show_file_info(imageA, imageB):
-        print("""Duplicate files:\n{} and \n{}
-        
-        """.format(imageA, imageB))
+        print("""Duplicate files:\n{} and \n{}""".format(imageA, imageB))
 
     # Function for rotating an image matrix by a 90 degree angle
     def _rotate_img(image):
@@ -301,4 +290,3 @@ class dif:
             except:
                 print("Could not delete file:", file, end="\r")
         print("\n***\nDeleted", deleted, "images.")
-
