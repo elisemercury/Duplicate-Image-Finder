@@ -66,7 +66,7 @@ DifPy has the following optional parameters:
 
 ```python
 dif(directory_A, directory_B, similarity="normal", px_size=50, 
-    sort_output=False, show_output=False, delete=False, silent_del=False, show_progress=False)
+    sort_output=False, show_output=False, show_progress=False, delete=False, silent_del=False)
 ```
 ### similarity (str)
 
