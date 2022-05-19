@@ -35,6 +35,8 @@ class dif:
                              and a set of lower resultion images of all duplicates
         """
         start_time = time.time()
+        
+        print("DifPy process initializing...", end="\r")
 
         if directory_B != None:
             # process both directories
@@ -53,8 +55,6 @@ class dif:
         else:
             result, lower_quality = dif._search_two_dirs(directory_A, directory_B,
                                                          similarity, px_size, sort_output, show_output, show_progress, delete)
-            if len(lower_quality) != len(set(lower_quality)):
-                print("DifPy found that there are duplicates within directory A.")
 
         if sort_output == True:
             result = collections.OrderedDict(sorted(result.items()))
@@ -82,7 +82,7 @@ class dif:
                 else:
                     dif._delete_imgs(set(lower_quality))
 
-    def _search_one_dir(directory_A, similarity="normal", px_size=50, sort_output=False, show_output=False, delete=False, show_progress=False):
+    def _search_one_dir(directory_A, similarity="normal", px_size=50, sort_output=False, show_output=False, show_progress=False, delete=False):
 
         img_matrices_A, filenames_A = dif._create_imgs_matrix(
             directory_A, px_size)
@@ -94,7 +94,7 @@ class dif:
         # find duplicates/similar images within one folder
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
             if show_progress:
-                print("{}:[{}/{}][{:.0%}]".format(time.ctime(), count_A, len(img_matrices_A), count_A/len(img_matrices_A)))
+                dif._show_progress(count_A, img_matrices_A)
             for count_B, imageMatrix_B in enumerate(img_matrices_A):
                 if count_B != 0 and count_B > count_A and count_A != len(img_matrices_A):
                     rotations = 0
@@ -123,7 +123,7 @@ class dif:
             result = collections.OrderedDict(sorted(result.items()))
         return result, lower_quality
 
-    def _search_two_dirs(directory_A, directory_B=None, similarity="normal", px_size=50, sort_output=False, show_output=False, delete=False, show_progress=False):
+    def _search_two_dirs(directory_A, directory_B=None, similarity="normal", px_size=50, sort_output=False, show_output=False, show_progress=False, delete=False):
 
         img_matrices_A, filenames_A = dif._create_imgs_matrix(
             directory_A, px_size)
@@ -138,8 +138,7 @@ class dif:
         # find duplicates/similar images between two folders
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
             if show_progress:
-                print("{}:[{}/{}][{:.0%}]".format(time.ctime(), count_A, len(img_matrices_A),
-                      count_A/len(img_matrices_A)))
+                dif._show_progress(count_A, img_matrices_A)
             for count_B, imageMatrix_B in enumerate(img_matrices_B):
                 rotations = 0
                 #print(count_A, count_B)
@@ -181,7 +180,7 @@ class dif:
                 f"Directory: " + directory + " does not exist")
         return directory
 
-    def _validate_parameters(sort_output, show_output, similarity, px_size, delete, silent_del, show_progress):
+    def _validate_parameters(sort_output, show_output, show_progress, similarity, px_size, delete, silent_del):
         # validate the parameters of the function
         if sort_output != True and sort_output != False:
             raise ValueError('Invalid value for "sort_output" parameter.')
@@ -261,6 +260,14 @@ class dif:
     # Function for printing filename info of plotted image files
     def _show_file_info(imageA, imageB):
         print("""Duplicate files:\n{} and \n{}""".format(imageA, imageB))
+
+    # Function that displays a progress bar during the search
+    def _show_progress(count, img_matrix):
+        if count+1 == len(img_matrix):
+            print("{}:[{}/{}][{:.0%}]".format(time.ctime(), count, len(img_matrix), count/len(img_matrix)), end="\r")
+            print("{}:[{}/{}][{:.0%}]".format(time.ctime(), count+1, len(img_matrix), (count+1)/len(img_matrix)))
+        else:
+            print("{}:[{}/{}][{:.0%}]".format(time.ctime(), count, len(img_matrix), count/len(img_matrix)), end="\r")
 
     # Function for rotating an image matrix by a 90 degree angle
     def _rotate_img(image):

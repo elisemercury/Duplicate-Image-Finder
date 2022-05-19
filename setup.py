@@ -9,15 +9,15 @@ with open(os.path.join(base_dir, "README.md")) as f:
 setup(
   name = 'difPy',         
   packages = ['difPy'],   
-  version = '2.2',      
+  version = '2.3',      
   license='MIT',        
-  description = 'DifPy Python Duplicate Image Finder - searches for duplicate image files within folders.', 
+  description = 'DifPy Python Duplicate Image Finder - searches for duplicate images within folders.', 
   long_description=long_description,
   long_description_content_type='text/markdown',
   author = 'Elise Landman',                  
   author_email = 'elisejlandman@hotmail.com', 
   url = 'https://github.com/elisemercury/Duplicate-Image-Finder', 
-  download_url = 'https://github.com/elisemercury/Duplicate-Image-Finder/archive/refs/tags/v2.2.tar.gz',    # change everytime for each new release
+  download_url = 'https://github.com/elisemercury/Duplicate-Image-Finder/archive/refs/tags/v2.3.tar.gz',    # change everytime for each new release
   keywords = ['duplicate', 'image', 'finder', "similarity", "pictures"],  
   install_requires=[          
           'scikit-image',
