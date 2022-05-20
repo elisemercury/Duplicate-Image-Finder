@@ -9,6 +9,8 @@ pip install difPy
 ```
 > :point_right: difPy v2.x  has some **major updates** and **new features**. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for a detailed listing.
 
+> :open_hands: You find difPy is missing a feature? **Contributions are always welcome** - check our [contributor guidelines](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy) for more information.
+
 Read more on how the algorithm of difPy works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051).
 
 Check out the [difPy package on PyPI.org](https://pypi.org/project/difPy/)
@@ -121,4 +123,4 @@ When set to ``True``, the lower resolution duplicate images that were found by d
 
 ! Please use with care, as this cannot be undone
 
-When set to ``True``, the user confirmation is skipped and the lower resolution duplicate images that were found by difPy are automatically deleted from the folder.  
+When set to ``True``, the user confirmation is skipped and the lower resolution duplicate images that were found by difPy are automatically deleted from the folder. 
