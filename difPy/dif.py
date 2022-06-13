@@ -158,8 +158,11 @@ class dif:
                         else:
                             result[filenames_A[count_A]] = {"location": directory_A + "/" + filenames_A[count_A],
                                                             "duplicates": [directory_B + "/" + filenames_B[count_B]]}
-                        high, low = dif._check_img_quality(directory_A, directory_B, filenames_A[count_A], filenames_B[count_B])
-                        lower_quality.append(low)
+                        try:
+                            high, low = dif._check_img_quality(directory_A, directory_B, filenames_A[count_A], filenames_B[count_B])
+                            lower_quality.append(low)
+                        except: 
+                            pass
                         break
                     else:
                         rotations += 1
@@ -281,9 +284,9 @@ class dif:
         size_imgA = os.stat(os.path.join(dirA, imageA)).st_size
         size_imgB = os.stat(os.path.join(dirB, imageB)).st_size
         if size_imgA >= size_imgB:
-            return os.path.join(directoryA, imageA), os.path.join(directoryB, imageB)
+            return directoryA + "/" + imageA, directoryB + "/" + imageB
         else:
-            return os.path.join(directoryB, imageB), os.path.join(directoryA, imageA)
+            return directoryB + "/" + imageB, directoryA + "/" + imageA
     
     # Function that generates a dictionary for statistics around the completed DifPy process
     def _generate_stats(directoryA, directoryB, start_time, end_time, time_elapsed, similarity, total_searched, total_found):
