@@ -63,6 +63,25 @@ search.lower_quality
  "C:/Path/to/Image/duplicate_image2.jpg", ...]
 ``` 
 
+DifPy can also generate a **dictionary** with statistics on the completed process:
+
+```python
+search.stats
+
+> Output:
+{"directory_1" : "C:/Path/to/Folder_A/",
+ "directory_2" : "C:/Path/to/Folder_B/",
+ "duration" : {"start_date": "2022-06-13",
+    "start_time" : "14:44:19",
+    "end_date" : "2022-06-13",
+    "end_time" : "14:44:38",
+    "seconds_elapsed" : 18.6113},
+ "similarity_grade" : "normal",
+ "similarity_mse" : 200,
+ "total_images_searched" : 1032,
+ "total_images_found" : 1024}
+``` 
+
 ## Additional Parameters
 DifPy has the following optional parameters:
 
