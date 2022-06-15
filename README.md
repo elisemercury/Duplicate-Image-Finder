@@ -1,5 +1,10 @@
 # Duplicate Image Finder (difPy)
 
+![PyPIv](https://img.shields.io/pypi/v/difPy)
+![PyPI status](https://img.shields.io/pypi/status/difPy)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/difPy)
+![PyPI - License](https://img.shields.io/pypi/l/difPy)
+
 **Tired of going through all images in a folder and comparing them manually to check if they are duplicates?**
 
 :white_check_mark: The Duplicate Image Finder (difPy) Python package **automates** this task for you!
