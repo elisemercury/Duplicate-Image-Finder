@@ -116,8 +116,11 @@ class dif:
                             else:
                                 result[filenames_A[count_A]] = {"location": directory_A + "/" + filenames_A[count_A],
                                                                 "duplicates": [directory_A + "/" + filenames_A[count_B]]}
-                            high, low = dif._check_img_quality(directory_A, directory_A, filenames_A[count_A], filenames_A[count_B])
-                            lower_quality.append(low)
+                            try:                                    
+                                high, low = dif._check_img_quality(directory_A, directory_A, filenames_A[count_A], filenames_A[count_B])
+                                lower_quality.append(low)
+                            except:
+                                pass
                             break
                         else:
                             rotations += 1
