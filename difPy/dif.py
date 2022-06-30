@@ -1,3 +1,8 @@
+"""
+difPy - Python package for finding duplicate/similar images within folders 
+https://github.com/elisemercury/Duplicate-Image-Finder
+"""
+
 import skimage.color
 import matplotlib.pyplot as plt
 import numpy as np
@@ -6,6 +11,8 @@ import os
 import time
 import collections
 from pathlib import Path
+import argparse
+import json
 
 class dif:
 
@@ -31,22 +38,32 @@ class dif:
                                will only work if "delete" AND "silent_del" are both == True
 
         OUTPUT (set)...........a dictionary with the filename of the duplicate images 
-                             and a set of lower resultion images of all duplicates
+                               and a set of lower resultion images of all duplicates
+
+        *** CLI-Interface ***
+        dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-s [{low,normal,high}]] [-px [PX_SIZE]] [-so [{True,False}]]
+               [-o [{True,False}]] [-p [{True,False}]] [-d [{True,False}]] [-D [{True,False}]]
+        
+        OUTPUT.................output data is written to files and saved in the working directory
+                               difPy_results_xxx_.json
+                               difPy_lower_quality_xxx_.txt
+                               difPy_stats_xxx_.json
         """
         start_time = time.time()        
         print("DifPy process initializing...", end="\r")
 
-        if directory_B != None:
-            # process both directories
-            directory_A = dif._process_directory(directory_A)
-            directory_B = dif._process_directory(directory_B)
-        else:
+        if directory_B == None:
             # process one directory
             directory_A = dif._process_directory(directory_A)
             directory_B = directory_A
+        else:
+            # process two directories
+            directory_A = dif._process_directory(directory_A)
+            directory_B = dif._process_directory(directory_B)
 
         dif._validate_parameters(sort_output, show_output, show_progress, similarity, px_size, delete, silent_del)
 
+        # start the search
         if directory_B == directory_A:
             result, lower_quality, total = dif._search_one_dir(directory_A, 
                                                                similarity, px_size, 
@@ -74,7 +91,9 @@ class dif:
             images = "images"
         print("Found", len(result), images, "with one or more duplicate/similar images in", time_elapsed, "seconds.")
 
+        
         if len(result) != 0:
+            # optional delete images
             if delete:
                 if not silent_del:
                     usr = input("Are you sure you want to delete all lower resolution duplicate images? \nThis cannot be undone. (y/n)")
@@ -244,7 +263,6 @@ class dif:
         return imgs_matrix, folder_files
 
     # Function that creates a list of all subfolders it found in a folder
-    # C:/Users/elandman/Pictures/difPy/Folder 1
     def _find_subfolders(directory):
         subfolders = [Path(f.path) for f in os.scandir(directory) if f.is_dir()]
         for directory in list(subfolders):
@@ -315,9 +333,11 @@ class dif:
     # Function that generates a dictionary for statistics around the completed DifPy process
     def _generate_stats(directoryA, directoryB, start_time, end_time, time_elapsed, similarity, total_searched, total_found):
         stats = {}
-        stats["directory_1"] = directoryA
-        if directoryB != None:
-            stats["directory_2"] = directoryB
+        stats["directory_1"] = str(Path(directoryA))
+        if directoryB != directoryA:
+            stats["directory_2"] = str(Path(directoryB))
+        else:
+            stats["directory_2"] = None
         stats["duration"] = {"start_date": time.strftime("%Y-%m-%d", start_time),
                              "start_time": time.strftime("%H:%M:%S", start_time),
                              "end_date": time.strftime("%Y-%m-%d", end_time),
@@ -332,6 +352,7 @@ class dif:
     # Function for deleting the lower quality images that were found after the search
     def _delete_imgs(lower_quality_set):
         deleted = 0
+        # delete lower quality images
         for file in lower_quality_set:
             print("\nDeletion in progress...", end="\r")
             try:
@@ -341,3 +362,41 @@ class dif:
             except:
                 print("Could not delete file:", file, end="\r")
         print("\n***\nDeleted", deleted, "images.")
+
+# Parameters for when launching difPy via CLI
+if __name__ == "__main__":
+    # set CLI arguments
+    parser = argparse.ArgumentParser(description="Find duplicate images on your computer with difPy - https://github.com/elisemercury/Duplicate-Image-Finder")
+    parser.add_argument("-A", "--directory_A", type=str, help="Directory to search for images.", required=True)
+    parser.add_argument("-B", "--directory_B", type=str, help="(optional) Second directory to search for images.", required=False, nargs='?', default=None)
+    parser.add_argument("-s", "--similarity", type=str, help="(optional) Similarity grade.", required=False, nargs='?', choices=["low", "normal", "high"], default="normal")
+    parser.add_argument("-px", "--px_size", type=int, help="(optional) Compression size of images in pixels.", required=False, nargs='?', default=50)
+    parser.add_argument("-so", "--sort_output", type=bool, help="(optional) Sort the difPy output dict alphabetically.", required=False, nargs='?', choices=[True, False], default=False)
+    parser.add_argument("-o", "--show_output", type=bool, help="(optional) Shows the comapred images in real-time.", required=False, nargs='?', choices=[True, False], default=False)
+    parser.add_argument("-p", "--show_progress", type=bool, help="(optional) Shows the real-time progress of difPy.", required=False, nargs='?', choices=[True, False], default=False)
+    parser.add_argument("-d", "--delete", type=bool, help="(optional) Deletes all duplicate images with lower quality.", required=False, nargs='?', choices=[True, False], default=False)
+    parser.add_argument("-D", "--silent_del", type=bool, help="(optional) Supresses the user confirmation when deleting images.", required=False, nargs='?', choices=[True, False], default=False)
+    args = parser.parse_args()
+
+    # initialize difPy
+    search = dif(directory_A=args.directory_A, directory_B=args.directory_B, 
+                 similarity=args.similarity, px_size=args.px_size, 
+                 sort_output=args.sort_output, show_output=args.show_output, show_progress=args.show_progress, 
+                 delete=args.delete, silent_del=args.silent_del)
+
+    # create filenames for the output files
+    timestamp = time.time()
+    result_file = "difPy_results_" + str(timestamp) + ".json"
+    lq_file = "difPy_lower_quality_" + str(timestamp) + ".txt"
+    stats_file = "difPy_stats_" + str(timestamp) + ".json"
+
+    with open(result_file, "w") as file:
+        json.dump(search.result, file)
+
+    with open(lq_file, "w") as file:
+        file.writelines(search.lower_quality)
+
+    with open(stats_file, "w") as file:
+        json.dump(search.stats, file)
+
+    print(f"""\nSaved difPy results into files:\n{result_file} \n{lq_file} \n{stats_file}""")
