@@ -1,5 +1,5 @@
 """
-difPy - Python package for finding duplicate/similar images within folders 
+difPy - Python package for finding duplicate or similar images within folders 
 https://github.com/elisemercury/Duplicate-Image-Finder
 """
 
@@ -366,7 +366,7 @@ class dif:
 # Parameters for when launching difPy via CLI
 if __name__ == "__main__":
     # set CLI arguments
-    parser = argparse.ArgumentParser(description="Find duplicate images on your computer with difPy - https://github.com/elisemercury/Duplicate-Image-Finder")
+    parser = argparse.ArgumentParser(description="Find duplicate or similar images on your computer with difPy - https://github.com/elisemercury/Duplicate-Image-Finder")
     parser.add_argument("-A", "--directory_A", type=str, help="Directory to search for images.", required=True)
     parser.add_argument("-B", "--directory_B", type=str, help="(optional) Second directory to search for images.", required=False, nargs='?', default=None)
     parser.add_argument("-s", "--similarity", type=str, help="(optional) Similarity grade.", required=False, nargs='?', choices=["low", "normal", "high"], default="normal")
