@@ -87,6 +87,29 @@ search.stats
  "total_images_found" : 1024}
 ``` 
 
+## CLI Usage
+The output of difPy is then written to files that are saved in the working directory. "xxx" is a unique identifier for the difPy process:
+
+```python
+python dif.py -A "C:/Path/to/Folder_A/"
+
+python dif.py -A "C:/Path/to/Folder_A/" -B "C:/Path/to/Folder_B/"
+```
+It supports the following arguments:
+
+```python
+dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-s [{low,normal,high}]] [-px [PX_SIZE]] [-so [{True,False}]]
+       [-o [{True,False}]] [-p [{True,False}]] [-d [{True,False}]] [-D [{True,False}]]
+```
+
+The output of difPy is then written to files and saved in the working directory, where "xxx" is a unique timestamp:
+
+```python
+difPy_results_xxx.json
+difPy_lower_quality_xxx.txt
+difPy_stats_xxx.json
+```
+
 ## Additional Parameters
 DifPy has the following optional parameters:
 
@@ -150,13 +173,13 @@ When set to ``True``, the lower resolution duplicate images that were found by d
 When set to ``True``, the user confirmation is skipped and the lower resolution duplicate images that were found by difPy are automatically deleted from the folder.
 
 ## Similar Work 
+
+### DifPy as Webapp
+
 [A Streamlit based Webapp to find duplicate images from single/multiple directories based on difPy](https://github.com/prateekralhan/Streamlit-based-Duplicate-Images-Finder)
 
-##### Single Directory 📸✅
+**Single Directory** 📸✅
 ![demo1](https://user-images.githubusercontent.com/29462447/174408835-438234d9-5ff6-4159-a5e3-b908d885a8bc.gif)
 
-##### Two directories 📸✅
+**Two directories** 📸✅
 ![demo2](https://user-images.githubusercontent.com/29462447/174408842-5128838f-bf8f-43da-97d2-30a3264eb7af.gif)
-
-
-
