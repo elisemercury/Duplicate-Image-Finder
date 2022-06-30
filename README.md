@@ -105,9 +105,9 @@ dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-s [{low,normal,high}]] [-px [PX_
 The output of difPy is then written to files and saved in the working directory, where "xxx" is a unique timestamp:
 
 ```python
-difPy_results_xxx_.json
-difPy_lower_quality_xxx_.txt
-difPy_stats_xxx_.json
+difPy_results_xxx.json
+difPy_lower_quality_xxx.txt
+difPy_stats_xxx.json
 ```
 
 ## Additional Parameters
