@@ -5,6 +5,7 @@ import cv2
 import os
 import time
 import collections
+from pathlib import Path
 
 class dif:
 
@@ -37,11 +38,11 @@ class dif:
 
         if directory_B != None:
             # process both directories
-            dif._process_directory(directory_A)
-            dif._process_directory(directory_B)
+            directory_A = dif._process_directory(directory_A)
+            directory_B = dif._process_directory(directory_B)
         else:
             # process one directory
-            dif._process_directory(directory_A)
+            directory_A = dif._process_directory(directory_A)
             directory_B = directory_A
 
         dif._validate_parameters(sort_output, show_output, show_progress, similarity, px_size, delete, silent_del)
@@ -84,6 +85,14 @@ class dif:
                 else:
                     dif._delete_imgs(set(lower_quality))
 
+    # Function that processes the directories that were input as parameters
+    def _process_directory(directory):
+        directory = Path(directory)
+        # check if directories are valid
+        if not os.path.isdir(directory):
+            raise FileNotFoundError(f"Directory " + str(directory) + " does not exist")
+        return directory
+
     # Function that searches one directory for duplicate/similar images
     def _search_one_dir(directory_A, similarity="normal", px_size=50, sort_output=False, show_output=False, show_progress=False):
 
@@ -109,16 +118,16 @@ class dif:
                         if err < ref:
                             if show_output:
                                 dif._show_img_figs(imageMatrix_A, imageMatrix_B, err)
-                                dif._show_file_info(str("..." + folderfiles_A[count_A][0][-35:]) + "/" + folderfiles_A[count_A][1],
-                                                    str("..." + folderfiles_A[count_B][0][-35:]) + "/" + folderfiles_A[count_B][1])
+                                dif._show_file_info(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1],
+                                                    Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])
                             if folderfiles_A[count_A][1] in result.keys():
-                                result[folderfiles_A[count_A][1]]["duplicates"] = result[folderfiles_A[count_A][1]]["duplicates"] + [folderfiles_A[count_A][0] + "/" + folderfiles_A[count_B][1]]
+                                result[folderfiles_A[count_A][1]]["duplicates"] = result[folderfiles_A[count_A][1]]["duplicates"] + [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]
                             else:
-                                result[folderfiles_A[count_A][1]] = {"location": folderfiles_A[count_A][0] + "/" + folderfiles_A[count_A][1],
-                                                                     "duplicates": [folderfiles_A[count_A][0] + "/" + folderfiles_A[count_B][1]]}
+                                result[folderfiles_A[count_A][1]] = {"location": str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]),
+                                                                     "duplicates": [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]}
                             try:                                    
-                                high, low = dif._check_img_quality(folderfiles_A[count_A][0], folderfiles_A[count_A][0], folderfiles_A[count_A][1], folderfiles_A[count_B][1])
-                                lower_quality.append(low)
+                                high, low = dif._check_img_quality(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1], Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])
+                                lower_quality.append(str(low))
                             except:
                                 pass
                             break
@@ -127,6 +136,8 @@ class dif:
                             
         if sort_output == True:
             result = collections.OrderedDict(sorted(result.items()))
+
+        lower_quality = list(set(lower_quality))
         return result, lower_quality, total
 
     # Function that searches two directories for duplicate/similar images
@@ -154,16 +165,16 @@ class dif:
                     if err < ref:
                         if show_output:
                             dif._show_img_figs(imageMatrix_A, imageMatrix_B, err)
-                            dif._show_file_info(str("..." + folderfiles_A[count_A][0][-35:]) + "/" + folderfiles_A[count_A][1],
-                                                str("..." + folderfiles_B[count_B][0][-35:]) + "/" + folderfiles_B[count_B][1])
+                            dif._show_file_info(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1],
+                                                Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])
                         if folderfiles_A[count_A][1] in result.keys():
-                            result[folderfiles_A[count_A][1]]["duplicates"] = result[folderfiles_A[count_A][1]]["duplicates"] + [folderfiles_B[count_B][0] + "/" + folderfiles_B[count_B][1]]
+                            result[folderfiles_A[count_A][1]]["duplicates"] = result[folderfiles_A[count_A][1]]["duplicates"] + [str(Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])]
                         else:
-                            result[folderfiles_A[count_A][1]] = {"location": folderfiles_A[count_A][0] + "/" + folderfiles_A[count_A][1],
-                                                            "duplicates": [folderfiles_B[count_B][0] + "/" + folderfiles_B[count_B][1]]}
+                            result[folderfiles_A[count_A][1]] = {"location": str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]),
+                                                                 "duplicates": [str(Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])]}
                         try:
-                            high, low = dif._check_img_quality(folderfiles_A[count_A][0], folderfiles_B[count_B][0], folderfiles_A[count_A][1], folderfiles_B[count_B][1])
-                            lower_quality.append(low)
+                            high, low = dif._check_img_quality(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1], Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])
+                            lower_quality.append(str(low))
                         except:
                             pass
                         break
@@ -173,15 +184,8 @@ class dif:
         if sort_output == True:
             result = collections.OrderedDict(sorted(result.items()))
 
+        lower_quality = list(set(lower_quality))
         return result, lower_quality, total
-
-    # Function that processes the directories that were input as parameters
-    def _process_directory(directory):
-        # check if directories are valid
-        directory += os.sep
-        if not os.path.isdir(directory):
-            raise FileNotFoundError(f"Directory: " + directory + " does not exist")
-        return directory
 
     # Function that validates the input parameters of DifPy
     def _validate_parameters(sort_output, show_output, show_progress, similarity, px_size, delete, silent_del):
@@ -205,9 +209,6 @@ class dif:
     def _create_imgs_matrix(directory, px_size):
         subfolders = dif._find_subfolders(directory)
 
-        print(directory)
-        print(subfolders)
-
         # create list of tuples with files found in directory, format: (path, filename)
         folder_files = [(directory, filename) for filename in os.listdir(directory)]
         if len(subfolders) > 1:
@@ -216,12 +217,10 @@ class dif:
                 folder_files = folder_files + subfolder_files
 
         # create images matrix
-        imgs_matrix = []
-        print(folder_files[0:5])
+        imgs_matrix, delete_index = [], []
         for count, file in enumerate(folder_files):
-            path = os.path.join(file[0], file[1]) # file 1 is the filename
+            path = Path(file[0]) / file[1]
             # check if the file is not a folder
-            #print(path)
             if not os.path.isdir(path):
                 try:
                     img = cv2.imdecode(np.fromfile(
@@ -234,19 +233,20 @@ class dif:
                         if len(img.shape) == 2:
                             img = skimage.color.gray2rgb(img)
                         imgs_matrix.append(img)
-                except Exception as e:
-                    print(e)
-                    del folder_files[count]
+                except:
+                    delete_index.append(count)
             else:
-                del folder_files[count]
+                delete_index.append(count)
 
-        #print(len(folder_files), len(imgs_matrix))
+        for index in reversed(delete_index):
+            del folder_files[index]
+
         return imgs_matrix, folder_files
 
     # Function that creates a list of all subfolders it found in a folder
     # C:/Users/elandman/Pictures/difPy/Folder 1
     def _find_subfolders(directory):
-        subfolders = [f.path for f in os.scandir(directory) if f.is_dir()]
+        subfolders = [Path(f.path) for f in os.scandir(directory) if f.is_dir()]
         for directory in list(subfolders):
             subfolders.extend(dif._find_subfolders(directory))
         return subfolders
@@ -286,15 +286,17 @@ class dif:
 
     # Function for printing filename info of plotted image files
     def _show_file_info(imageA, imageB):
-        print("""Duplicate files:\n{} and \n{}""".format(imageA, imageB))
+        imageA = "..." + str(imageA)[-35:]
+        imageB = "..." + str(imageB)[-35:]
+        print(f"""Duplicate files:\n{imageA} and \n{imageB}\n""")
 
     # Function that displays a progress bar during the search
     def _show_progress(count, img_matrix):
         if count+1 == len(img_matrix):
-            print("DifPy processing images: [{}/{}] [{:.0%}]".format(count, len(img_matrix), count/len(img_matrix)), end="\r")
-            print("DifPy processing images: [{}/{}] [{:.0%}]".format(count+1, len(img_matrix), (count+1)/len(img_matrix)))            
+            print(f"DifPy processing images: [{count}/{len(img_matrix)}] [{count/len(img_matrix):.0%}]", end="\r")
+            print(f"DifPy processing images: [{count+1}/{len(img_matrix)}] [{(count+1)/len(img_matrix):.0%}]")          
         else:
-            print("DifPy processing images: [{}/{}] [{:.0%}]".format(count, len(img_matrix), count/len(img_matrix)), end="\r")
+            print(f"DifPy processing images: [{count}/{len(img_matrix)}] [{count/len(img_matrix):.0%}]", end="\r")
 
     # Function for rotating an image matrix by a 90 degree angle
     def _rotate_img(image):
@@ -302,15 +304,13 @@ class dif:
         return image
 
     # Function for checking the quality of compared images, appends the lower quality image to the list
-    def _check_img_quality(directoryA, directoryB, imageA, imageB):
-        dirA = dif._process_directory(directoryA)
-        dirB = dif._process_directory(directoryB)
-        size_imgA = os.stat(os.path.join(dirA, imageA)).st_size
-        size_imgB = os.stat(os.path.join(dirB, imageB)).st_size
+    def _check_img_quality(imageA, imageB):
+        size_imgA = os.stat(imageA).st_size
+        size_imgB = os.stat(imageB).st_size
         if size_imgA >= size_imgB:
-            return directoryA + "/" + imageA, directoryB + "/" + imageB
+            return imageA, imageB
         else:
-            return directoryB + "/" + imageB, directoryA + "/" + imageA
+            return imageB, imageA
     
     # Function that generates a dictionary for statistics around the completed DifPy process
     def _generate_stats(directoryA, directoryB, start_time, end_time, time_elapsed, similarity, total_searched, total_found):
