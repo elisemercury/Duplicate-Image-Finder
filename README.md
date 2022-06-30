@@ -88,7 +88,7 @@ search.stats
 ``` 
 
 ## CLI Usage
-The output of difPy is then written to files that are saved in the working directory. "xxx" is a unique identifier for the difPy process:
+You can make use of difPy through the CLI interface by using the following commands:
 
 ```python
 python dif.py -A "C:/Path/to/Folder_A/"
