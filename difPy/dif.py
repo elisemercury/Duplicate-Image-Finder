@@ -87,7 +87,7 @@ class dif:
     # Function that searches one directory for duplicate/similar images
     def _search_one_dir(directory_A, similarity="normal", px_size=50, sort_output=False, show_output=False, show_progress=False):
 
-        img_matrices_A, filenames_A = dif._create_imgs_matrix(directory_A, px_size)
+        img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size)
         total = len(img_matrices_A)
         result = {}
         lower_quality = []
@@ -109,15 +109,15 @@ class dif:
                         if err < ref:
                             if show_output:
                                 dif._show_img_figs(imageMatrix_A, imageMatrix_B, err)
-                                dif._show_file_info(str("..." + directory_A[-35:]) + "/" + filenames_A[count_A],
-                                                    str("..." + directory_A[-35:]) + "/" + filenames_A[count_B])
-                            if filenames_A[count_A] in result.keys():
-                                result[filenames_A[count_A]]["duplicates"] = result[filenames_A[count_A]]["duplicates"] + [directory_A + "/" + filenames_A[count_B]]
+                                dif._show_file_info(str("..." + folderfiles_A[count_A][0][-35:]) + "/" + folderfiles_A[count_A][1],
+                                                    str("..." + folderfiles_A[count_B][0][-35:]) + "/" + folderfiles_A[count_B][1])
+                            if folderfiles_A[count_A][1] in result.keys():
+                                result[folderfiles_A[count_A][1]]["duplicates"] = result[folderfiles_A[count_A][1]]["duplicates"] + [folderfiles_A[count_A][0] + "/" + folderfiles_A[count_B][1]]
                             else:
-                                result[filenames_A[count_A]] = {"location": directory_A + "/" + filenames_A[count_A],
-                                                                "duplicates": [directory_A + "/" + filenames_A[count_B]]}
+                                result[folderfiles_A[count_A][1]] = {"location": folderfiles_A[count_A][0] + "/" + folderfiles_A[count_A][1],
+                                                                     "duplicates": [folderfiles_A[count_A][0] + "/" + folderfiles_A[count_B][1]]}
                             try:                                    
-                                high, low = dif._check_img_quality(directory_A, directory_A, filenames_A[count_A], filenames_A[count_B])
+                                high, low = dif._check_img_quality(folderfiles_A[count_A][0], folderfiles_A[count_A][0], folderfiles_A[count_A][1], folderfiles_A[count_B][1])
                                 lower_quality.append(low)
                             except:
                                 pass
@@ -132,8 +132,8 @@ class dif:
     # Function that searches two directories for duplicate/similar images
     def _search_two_dirs(directory_A, directory_B=None, similarity="normal", px_size=50, sort_output=False, show_output=False, show_progress=False):
 
-        img_matrices_A, filenames_A = dif._create_imgs_matrix(directory_A, px_size)
-        img_matrices_B, filenames_B = dif._create_imgs_matrix(directory_B, px_size)
+        img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size)
+        img_matrices_B, folderfiles_B = dif._create_imgs_matrix(directory_B, px_size)
         total = len(img_matrices_A) + len(img_matrices_B)
         result = {}
         lower_quality = []
@@ -154,17 +154,17 @@ class dif:
                     if err < ref:
                         if show_output:
                             dif._show_img_figs(imageMatrix_A, imageMatrix_B, err)
-                            dif._show_file_info(str("..." + directory_A[-35:]) + "/" + filenames_A[count_A],
-                                                str("..." + directory_B[-35:]) + "/" + filenames_B[count_B])
-                        if filenames_A[count_A] in result.keys():
-                            result[filenames_A[count_A]]["duplicates"] = result[filenames_A[count_A]]["duplicates"] + [directory_B + "/" + filenames_B[count_B]]
+                            dif._show_file_info(str("..." + folderfiles_A[count_A][0][-35:]) + "/" + folderfiles_A[count_A][1],
+                                                str("..." + folderfiles_B[count_B][0][-35:]) + "/" + folderfiles_B[count_B][1])
+                        if folderfiles_A[count_A][1] in result.keys():
+                            result[folderfiles_A[count_A][1]]["duplicates"] = result[folderfiles_A[count_A][1]]["duplicates"] + [folderfiles_B[count_B][0] + "/" + folderfiles_B[count_B][1]]
                         else:
-                            result[filenames_A[count_A]] = {"location": directory_A + "/" + filenames_A[count_A],
-                                                            "duplicates": [directory_B + "/" + filenames_B[count_B]]}
+                            result[folderfiles_A[count_A][1]] = {"location": folderfiles_A[count_A][0] + "/" + folderfiles_A[count_A][1],
+                                                            "duplicates": [folderfiles_B[count_B][0] + "/" + folderfiles_B[count_B][1]]}
                         try:
-                            high, low = dif._check_img_quality(directory_A, directory_B, filenames_A[count_A], filenames_B[count_B])
+                            high, low = dif._check_img_quality(folderfiles_A[count_A][0], folderfiles_B[count_B][0], folderfiles_A[count_A][1], folderfiles_B[count_B][1])
                             lower_quality.append(low)
-                        except: 
+                        except:
                             pass
                         break
                     else:
@@ -203,16 +203,25 @@ class dif:
 
     # Function that creates a list of matrices for each image found in the folders
     def _create_imgs_matrix(directory, px_size):
-        directory = dif._process_directory(directory)
-        img_filenames = []
-        # create list of all files in directory
-        folder_files = [filename for filename in os.listdir(directory)]
+        subfolders = dif._find_subfolders(directory)
+
+        print(directory)
+        print(subfolders)
+
+        # create list of tuples with files found in directory, format: (path, filename)
+        folder_files = [(directory, filename) for filename in os.listdir(directory)]
+        if len(subfolders) > 1:
+            for folder in subfolders:
+                subfolder_files = [(folder, filename) for filename in os.listdir(folder)]
+                folder_files = folder_files + subfolder_files
 
         # create images matrix
         imgs_matrix = []
-        for filename in folder_files:
-            path = os.path.join(directory, filename)
+        print(folder_files[0:5])
+        for count, file in enumerate(folder_files):
+            path = os.path.join(file[0], file[1]) # file 1 is the filename
             # check if the file is not a folder
+            #print(path)
             if not os.path.isdir(path):
                 try:
                     img = cv2.imdecode(np.fromfile(
@@ -225,10 +234,22 @@ class dif:
                         if len(img.shape) == 2:
                             img = skimage.color.gray2rgb(img)
                         imgs_matrix.append(img)
-                        img_filenames.append(filename)
-                except:
-                    pass
-        return imgs_matrix, img_filenames
+                except Exception as e:
+                    print(e)
+                    del folder_files[count]
+            else:
+                del folder_files[count]
+
+        #print(len(folder_files), len(imgs_matrix))
+        return imgs_matrix, folder_files
+
+    # Function that creates a list of all subfolders it found in a folder
+    # C:/Users/elandman/Pictures/difPy/Folder 1
+    def _find_subfolders(directory):
+        subfolders = [f.path for f in os.scandir(directory) if f.is_dir()]
+        for directory in list(subfolders):
+            subfolders.extend(dif._find_subfolders(directory))
+        return subfolders
 
     # Function that maps the similarity grade to the respective MSE value
     def _map_similarity(similarity):
@@ -305,7 +326,7 @@ class dif:
         stats["similarity_grade"] = similarity
         stats["similarity_mse"] = dif._map_similarity(similarity)
         stats["total_images_searched"] = total_searched
-        stats["total_images_found"] = total_found
+        stats["total_dupl_sim_found"] = total_found
         return stats
 
     # Function for deleting the lower quality images that were found after the search
