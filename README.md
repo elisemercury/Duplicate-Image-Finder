@@ -173,10 +173,13 @@ When set to ``True``, the lower resolution duplicate images that were found by d
 When set to ``True``, the user confirmation is skipped and the lower resolution duplicate images that were found by difPy are automatically deleted from the folder.
 
 ## Similar Work 
+
+### DifPy as Webapp
+
 [A Streamlit based Webapp to find duplicate images from single/multiple directories based on difPy](https://github.com/prateekralhan/Streamlit-based-Duplicate-Images-Finder)
 
-##### Single Directory 📸✅
+**Single Directory** 📸✅
 ![demo1](https://user-images.githubusercontent.com/29462447/174408835-438234d9-5ff6-4159-a5e3-b908d885a8bc.gif)
 
-##### Two directories 📸✅
+**Two directories** 📸✅
 ![demo2](https://user-images.githubusercontent.com/29462447/174408842-5128838f-bf8f-43da-97d2-30a3264eb7af.gif)
