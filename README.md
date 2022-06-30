@@ -84,7 +84,7 @@ search.stats
  "similarity_grade" : "normal",
  "similarity_mse" : 200,
  "total_images_searched" : 1032,
- "total_images_found" : 1024}
+ "total_dupl_sim_found" : 1024}
 ``` 
 
 ## CLI Usage
