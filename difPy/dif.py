@@ -304,8 +304,8 @@ class dif:
 
     # Function for printing filename info of plotted image files
     def _show_file_info(imageA, imageB):
-        imageA = "..." + str(imageA)[-35:]
-        imageB = "..." + str(imageB)[-35:]
+        imageA = "..." + str(imageA)[-45:]
+        imageB = "..." + str(imageB)[-45:]
         print(f"""Duplicate files:\n{imageA} and \n{imageB}\n""")
 
     # Function that displays a progress bar during the search
