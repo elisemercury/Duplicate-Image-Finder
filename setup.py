@@ -11,7 +11,7 @@ setup(
   packages = ['difPy'],   
   version = '2.4',      
   license='MIT',        
-  description = 'DifPy Python Duplicate Image Finder - searches for duplicate or similar images within folders.', 
+  description = 'difPy Python Duplicate Image Finder - searches for duplicate or similar images within folders.', 
   long_description=long_description,
   long_description_content_type='text/markdown',
   author = 'Elise Landman',                  
