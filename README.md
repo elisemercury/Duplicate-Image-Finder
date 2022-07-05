@@ -183,3 +183,7 @@ When set to ``True``, the user confirmation is skipped and the lower resolution 
 
 **Two directories** 📸✅
 ![demo2](https://user-images.githubusercontent.com/29462447/174408842-5128838f-bf8f-43da-97d2-30a3264eb7af.gif)
+
+### Mac Photos Tool to find Duplicates (photosdup)
+
+[Tool to scan a Mac Photos library for duplicates, thumbnails etc. inspired by difPy](https://github.com/peter-sk/photosdup)
