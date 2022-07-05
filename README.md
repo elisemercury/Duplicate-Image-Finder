@@ -176,7 +176,7 @@ When set to `True`, the user confirmation is skipped and the lower resolution du
 
 ### DifPy as Webapp
 
-[A Streamlit based Webapp to find duplicate images from single/multiple directories based on difPy](https://github.com/prateekralhan/Streamlit-based-Duplicate-Images-Finder)
+[A Streamlit based Webapp to find duplicate images from single/multiple directories](https://github.com/prateekralhan/Streamlit-based-Duplicate-Images-Finder) - :dna: **based on difPy**
 
 **Single Directory** 📸✅
 ![demo1](https://user-images.githubusercontent.com/29462447/174408835-438234d9-5ff6-4159-a5e3-b908d885a8bc.gif)
@@ -186,4 +186,4 @@ When set to `True`, the user confirmation is skipped and the lower resolution du
 
 ### Mac Photos Tool to find Duplicates (photosdup)
 
-[Tool to scan a Mac Photos library for duplicates, thumbnails etc. inspired by difPy](https://github.com/peter-sk/photosdup)
+[Tool to scan a Mac Photos library for duplicates, thumbnails etc.](https://github.com/peter-sk/photosdup) - :sparkles: **inspired by difPy**
