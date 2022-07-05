@@ -28,13 +28,13 @@ DifPy searches for images in **one or two different folders**, compares the imag
 </p>
 
 ## Basic Usage
-Use the following function to make difPy search for duplicates in one specified folder:
+Use the following function to make difPy search for duplicates within one specific folder and its subfolders:
 
 ```python
 from difPy import dif
 search = dif("C:/Path/to/Folder/")
 ``` 
-To search for duplicates within two folders:
+To search for duplicates within two folders and their subfolders:
 
 ```python
 from difPy import dif
@@ -115,7 +115,7 @@ DifPy has the following optional parameters:
 
 ```python
 dif(directory_A, directory_B, similarity="normal", px_size=50, 
-    sort_output=False, show_output=False, show_progress=False, delete=False, silent_del=False)
+    show_progress=False, show_output=False, sort_output=False, delete=False, silent_del=False)
 ```
 ### similarity (str)
 
@@ -123,54 +123,54 @@ Depending on which use-case you want to apply difPy for, the granularity for the
 
 DifPy can f. e. search for exact matching duplicate images, or images that look similar, but are not necessarily duplicates.
 
-``"normal"`` = (recommended, default) searches for duplicates (with a certain tolerance)
+`"normal"` = (**recommended**, default) searches for duplicates with a certain tolerance
 
-``"high"`` = searches for duplicate images with extreme precision, f. e. for use with images that contain a lot of text     
+`"high"` = searches for duplicate images with extreme precision, f. e. for use when comparing images that contain a lot of details like f. e. text
 
-``"low"`` = searches for similar images
+`"low"` = searches for similar images
 
 ### px_size (int)
 
 ! Recommended not to change default value
 
-Absolute size in pixels (width x height) of the images before being compared.
+Absolute size in pixels (width x height) that the images will be compressed to before being compared.
 The higher the px_size, the more computational ressources and time required. 
    
 ### sort_output (bool)
 
-Per default, difPy will output the filenames of the duplicate images within a dictionary by the order in which they were found. If you want the duplicate images to be ordered alphabetically then set sort_output to `true`.
+Per default, difPy will output the filenames of the duplicate images within a dictionary by the order in which they were found. If you want the duplicate images to be ordered alphabetically then set sort_output to `True`.
 
-```False```= (default) output filenames of the duplicate/similar images by order they were found 
+`False`= (default) output filenames of the duplicate/similar images by order they were found 
 
-```True``` = outputs filesnames of duplicate/similar images in alphabetic order
+`True` = outputs filesnames of duplicate/similar images in alphabetic order
 
 ### show_output (bool)
 
-Per default, difPy will output only the filename of the duplicate images it found. If you want the duplicate images to be shown in the console output, change this value to ``True``.
+Per default, difPy will output only the filename of the duplicate images it found. If you want the duplicate images to be shown in the console output, change this value to `True`.
 
-```False```= (default) outputs filename of the duplicate/similar images found
+`False`= (default) outputs filename of the duplicate/similar images found
 
-```True``` = outputs a sample and the filename
+`True` = outputs a sample and the filename
 
 ### show_progress (bool)
 
-Per default, difPy will set this progress bar to ``False``. If you want to see where your lengthy processing is, change this value to ``True``.
+Per default, difPy will set this progress bar to `False`. If you want to see where your lengthy processing is, change this value to `True`.
 
-```False```= (default) no progress bar is shown
+`False`= (default) no progress bar is shown
 
-```True``` = outputs a progress bar
+`True` = outputs a progress bar
 
 ### delete (bool)
 
 ! Please use with care, as this cannot be undone
 
-When set to ``True``, the lower resolution duplicate images that were found by difPy are deleted from the folder. Asks for user confirmation before deleting the images. To skip the user confimation, set silent_del to ```True```.  
+When set to `True`, the lower resolution duplicate images that were found by difPy are deleted from the folder. Asks for user confirmation before deleting the images. To skip the user confimation, set silent_del to `True`.  
                            
 ### silent_del (bool)
 
 ! Please use with care, as this cannot be undone
 
-When set to ``True``, the user confirmation is skipped and the lower resolution duplicate images that were found by difPy are automatically deleted from the folder.
+When set to `True`, the user confirmation is skipped and the lower resolution duplicate images that were found by difPy are automatically deleted from the folder.
 
 ## Similar Work 
 
