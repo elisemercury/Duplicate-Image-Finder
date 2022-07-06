@@ -172,7 +172,7 @@ When set to ``True``, the lower resolution duplicate images that were found by d
 
 When set to ``True``, the user confirmation is skipped and the lower resolution duplicate images that were found by difPy are automatically deleted from the folder.
 
-## Similar Work 
+## Related Work 
 
 ### DifPy as Webapp
 
