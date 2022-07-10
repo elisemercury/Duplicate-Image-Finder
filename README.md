@@ -42,7 +42,7 @@ search = dif("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/")
 ``` 
 Folder paths must be specified as a Python string.
 
-> :open_book: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+> :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
 
 ## Output
 DifPy gives two types of output that you may use depending on your use case: 
