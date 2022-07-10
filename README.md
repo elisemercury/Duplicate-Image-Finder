@@ -115,6 +115,8 @@ difPy_lower_quality_xxx.txt
 difPy_stats_xxx.json
 ```
 
+> :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+
 ## Additional Parameters
 DifPy has the following optional parameters:
 
