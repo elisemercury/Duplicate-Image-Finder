@@ -187,3 +187,8 @@ When set to `True`, the user confirmation is skipped and the lower resolution du
 ### Mac Photos Tool to find Duplicates (photosdup)
 
 [Tool to scan a Mac Photos library for duplicates, thumbnails etc.](https://github.com/peter-sk/photosdup) - :sparkles: **inspired by difPy**
+
+***
+<p align="center"><b>
+:thought_balloon: Also want to be featured in the "Related Projects" section? Check our <a href="https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy#be-featured-as-difpy-related-project">contributor guidelines</a> to find out how!
+</b></p>
