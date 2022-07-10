@@ -18,7 +18,7 @@ warnings.filterwarnings('ignore')
 
 class dif:
 
-    def __init__(self, directory_A, directory_B=None, similarity="normal", px_size=50, show_progress=True, sort_output=False, show_output=False, delete=False, silent_del=False):
+    def __init__(self, directory_A, directory_B=None, similarity="normal", px_size=50, show_progress=True, show_output=False, sort_output=False, delete=False, silent_del=False):
         """
         directory_A (str)......folder path to search for duplicate/similar images
         directory_B (str)......second folder path to search for duplicate/similar images

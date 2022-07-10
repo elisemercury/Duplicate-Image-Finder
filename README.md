@@ -23,6 +23,8 @@ Check out the [difPy package on PyPI.org](https://pypi.org/project/difPy/)
 ## Description
 DifPy searches for images in **one or two different folders**, compares the images it found and checks whether these are duplicates. It then outputs the **image files classified as duplicates** and the **filenames of the duplicate images having the lower resolution**, so you know which of the duplicate images are safe to be deleted. You can then either delete them manually, or let difPy delete them for you.
 
+DifPy does not compare images based on their hashes. It compares them based on their tensors i. e. the image content - this allows difPy to not only search for duplicate images, but also for similar images.
+
 <p align="center">
   <img src="example_output.png" width="400" title="Example Output: Duplicate Image Finder">
 </p>
@@ -100,8 +102,9 @@ python dif.py -A "C:/Path/to/Folder_A/" -B "C:/Path/to/Folder_B/"
 It supports the following arguments:
 
 ```python
-dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]] [-s [{low,normal,high}]] [-px [PX_SIZE]]
-       [-p [{True,False}]] [-o [{True,False}]] [-so [{True,False}]] [-d [{True,False}]] [-D [{True,False}]]
+dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]] [-s [{low,normal,high}]] 
+       [-px [PX_SIZE]] [-p [{True,False}]] [-o [{True,False}]] [-so [{True,False}]] 
+       [-d [{True,False}]] [-D [{True,False}]]
 ```
 
 The output of difPy is then written to files and saved in the working directory, where "xxx" is a unique timestamp:
@@ -117,7 +120,7 @@ DifPy has the following optional parameters:
 
 ```python
 dif(directory_A, directory_B, similarity="normal", px_size=50, 
-    show_progress=False, show_output=False, sort_output=False, delete=False, silent_del=False)
+    show_progress=True, show_output=False, sort_output=False, delete=False, silent_del=False)
 ```
 ### similarity (str)
 
