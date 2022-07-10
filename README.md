@@ -42,6 +42,8 @@ search = dif("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/")
 ``` 
 Folder paths must be specified as a Python string.
 
+> :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+
 ## Output
 DifPy gives two types of output that you may use depending on your use case: 
 
@@ -98,8 +100,8 @@ python dif.py -A "C:/Path/to/Folder_A/" -B "C:/Path/to/Folder_B/"
 It supports the following arguments:
 
 ```python
-dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-s [{low,normal,high}]] [-px [PX_SIZE]] [-so [{True,False}]]
-       [-o [{True,False}]] [-p [{True,False}]] [-d [{True,False}]] [-D [{True,False}]]
+dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]] [-s [{low,normal,high}]] [-px [PX_SIZE]]
+       [-p [{True,False}]] [-o [{True,False}]] [-so [{True,False}]] [-d [{True,False}]] [-D [{True,False}]]
 ```
 
 The output of difPy is then written to files and saved in the working directory, where "xxx" is a unique timestamp:
@@ -135,14 +137,14 @@ DifPy can f. e. search for exact matching duplicate images, or images that look 
 
 Absolute size in pixels (width x height) that the images will be compressed to before being compared.
 The higher the px_size, the more computational ressources and time required. 
-   
-### sort_output (bool)
 
-Per default, difPy will output the filenames of the duplicate images within a dictionary by the order in which they were found. If you want the duplicate images to be ordered alphabetically then set sort_output to `True`.
+### show_progress (bool)
 
-`False`= (default) output filenames of the duplicate/similar images by order they were found 
+Per default, difPy will set this progress bar to `False`. If you want to see where your lengthy processing is, change this value to `True`.
 
-`True` = outputs filesnames of duplicate/similar images in alphabetic order
+`False`= (default) no progress bar is shown
+
+`True` = outputs a progress bar
 
 ### show_output (bool)
 
@@ -152,13 +154,13 @@ Per default, difPy will output only the filename of the duplicate images it foun
 
 `True` = outputs a sample and the filename
 
-### show_progress (bool)
+### sort_output (bool)
 
-Per default, difPy will set this progress bar to `False`. If you want to see where your lengthy processing is, change this value to `True`.
+Per default, difPy will output the filenames of the duplicate images within a dictionary by the order in which they were found. If you want the duplicate images to be ordered alphabetically then set sort_output to `True`.
 
-`False`= (default) no progress bar is shown
+`False`= (default) output filenames of the duplicate/similar images by order they were found 
 
-`True` = outputs a progress bar
+`True` = outputs filesnames of duplicate/similar images in alphabetic order
 
 ### delete (bool)
 
@@ -174,7 +176,7 @@ When set to `True`, the user confirmation is skipped and the lower resolution du
 
 ## Similar Work 
 
-### DifPy as Webapp
+### I. DifPy as Webapp
 
 [A Streamlit based Webapp to find duplicate images from single/multiple directories](https://github.com/prateekralhan/Streamlit-based-Duplicate-Images-Finder) - :dna: **based on difPy**
 
@@ -184,7 +186,7 @@ When set to `True`, the user confirmation is skipped and the lower resolution du
 **Two directories** 📸✅
 ![demo2](https://user-images.githubusercontent.com/29462447/174408842-5128838f-bf8f-43da-97d2-30a3264eb7af.gif)
 
-### Mac Photos Tool to find Duplicates (photosdup)
+### II. Mac Photos Tool to find Duplicates (photosdup)
 
 [Tool to scan a Mac Photos library for duplicates, thumbnails etc.](https://github.com/peter-sk/photosdup) - :sparkles: **inspired by difPy**
 

@@ -13,10 +13,12 @@ import collections
 from pathlib import Path
 import argparse
 import json
+import warnings
+warnings.filterwarnings('ignore')
 
 class dif:
 
-    def __init__(self, directory_A, directory_B=None, similarity="normal", px_size=50, sort_output=False, show_output=False, show_progress=False, delete=False, silent_del=False):
+    def __init__(self, directory_A, directory_B=None, similarity="normal", px_size=50, show_progress=True, sort_output=False, show_output=False, delete=False, silent_del=False):
         """
         directory_A (str)......folder path to search for duplicate/similar images
         directory_B (str)......second folder path to search for duplicate/similar images
@@ -26,11 +28,12 @@ class dif:
         px_size (int)..........recommended not to change default value
                                resize images to px_size height x width (in pixels) before being compared
                                the higher the pixel size, the more computational ressources and time required 
-        sort_output (bool).....False = adds the duplicate images to output dictionary in the order they were found
-                               True = sorts the duplicate images in the output dictionars alphabetically 
+        show_progress (bool)...True = shows progress stats of where your lengthy processing currently is
+                               False = doesn't show the progress stats
         show_output (bool).....False = omits the output and doesn't show found images
-                               True = shows duplicate/similar images found in output            
-        show_progress (bool)...False = shows where your lengthy processing currently is
+                               True = shows duplicate/similar images found in output   
+        sort_output (bool).....False = adds the duplicate images to output dictionary in the order they were found
+                               True = sorts the duplicate images in the output dictionars alphabetically          
         delete (bool)..........! please use with care, as this cannot be undone
                                lower resolution duplicate images that were found are automatically deleted
         silent_del (bool)......! please use with care, as this cannot be undone
@@ -41,8 +44,8 @@ class dif:
                                and a set of lower resultion images of all duplicates
 
         *** CLI-Interface ***
-        dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-s [{low,normal,high}]] [-px [PX_SIZE]] [-so [{True,False}]]
-               [-o [{True,False}]] [-p [{True,False}]] [-d [{True,False}]] [-D [{True,False}]]
+        dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]] [-s [{low,normal,high}]] [-px [PX_SIZE]]
+               [-p [{True,False}]] [-o [{True,False}]] [-so [{True,False}]] [-d [{True,False}]] [-D [{True,False}]]
         
         OUTPUT.................output data is written to files and saved in the working directory
                                difPy_results_xxx_.json
@@ -115,7 +118,7 @@ class dif:
     # Function that searches one directory for duplicate/similar images
     def _search_one_dir(directory_A, similarity="normal", px_size=50, sort_output=False, show_output=False, show_progress=False):
 
-        img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size)
+        img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size, show_progress)
         total = len(img_matrices_A)
         result = {}
         lower_quality = []
@@ -125,7 +128,7 @@ class dif:
         # find duplicates/similar images within one folder
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
             if show_progress:
-                dif._show_progress(count_A, img_matrices_A)
+                dif._show_progress(count_A, img_matrices_A, task='comparing images')
             for count_B, imageMatrix_B in enumerate(img_matrices_A):
                 if count_B > count_A and count_A != len(img_matrices_A):
                     rotations = 0
@@ -162,8 +165,8 @@ class dif:
     # Function that searches two directories for duplicate/similar images
     def _search_two_dirs(directory_A, directory_B=None, similarity="normal", px_size=50, sort_output=False, show_output=False, show_progress=False):
 
-        img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size)
-        img_matrices_B, folderfiles_B = dif._create_imgs_matrix(directory_B, px_size)
+        img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size, show_progress)
+        img_matrices_B, folderfiles_B = dif._create_imgs_matrix(directory_B, px_size, show_progress)
         total = len(img_matrices_A) + len(img_matrices_B)
         result = {}
         lower_quality = []
@@ -173,7 +176,7 @@ class dif:
         # find duplicates/similar images between two folders
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
             if show_progress:
-                dif._show_progress(count_A, img_matrices_A)
+                dif._show_progress(count_A, img_matrices_A, task='comparing images')
             for count_B, imageMatrix_B in enumerate(img_matrices_B):
                 rotations = 0
                 while rotations <= 3:
@@ -225,12 +228,12 @@ class dif:
             raise ValueError('Invalid value for "silent_del" parameter.')
 
     # Function that creates a list of matrices for each image found in the folders
-    def _create_imgs_matrix(directory, px_size):
+    def _create_imgs_matrix(directory, px_size, show_progress):
         subfolders = dif._find_subfolders(directory)
 
         # create list of tuples with files found in directory, format: (path, filename)
         folder_files = [(directory, filename) for filename in os.listdir(directory)]
-        if len(subfolders) > 1:
+        if len(subfolders) >= 1:
             for folder in subfolders:
                 subfolder_files = [(folder, filename) for filename in os.listdir(folder)]
                 folder_files = folder_files + subfolder_files
@@ -238,6 +241,8 @@ class dif:
         # create images matrix
         imgs_matrix, delete_index = [], []
         for count, file in enumerate(folder_files):
+            if show_progress:
+                dif._show_progress(count, folder_files, task='preparing files')
             path = Path(file[0]) / file[1]
             # check if the file is not a folder
             if not os.path.isdir(path):
@@ -311,12 +316,12 @@ class dif:
         print(f"""Duplicate files:\n{imageA} and \n{imageB}\n""")
 
     # Function that displays a progress bar during the search
-    def _show_progress(count, img_matrix):
-        if count+1 == len(img_matrix):
-            print(f"DifPy processing images: [{count}/{len(img_matrix)}] [{count/len(img_matrix):.0%}]", end="\r")
-            print(f"DifPy processing images: [{count+1}/{len(img_matrix)}] [{(count+1)/len(img_matrix):.0%}]")          
+    def _show_progress(count, list, task='processing images'):
+        if count+1 == len(list):
+            print(f"DifPy {task}: [{count}/{len(list)}] [{count/len(list):.0%}]", end="\r")
+            print(f"DifPy {task}: [{count+1}/{len(list)}] [{(count+1)/len(list):.0%}]")          
         else:
-            print(f"DifPy processing images: [{count}/{len(img_matrix)}] [{count/len(img_matrix):.0%}]", end="\r")
+            print(f"DifPy {task}: [{count}/{len(list)}] [{count/len(list):.0%}]", end="\r")
 
     # Function for rotating an image matrix by a 90 degree angle
     def _rotate_img(image):
@@ -368,20 +373,21 @@ class dif:
 # Parameters for when launching difPy via CLI
 if __name__ == "__main__":
     # set CLI arguments
-    parser = argparse.ArgumentParser(description="Find duplicate or similar images on your computer with difPy - https://github.com/elisemercury/Duplicate-Image-Finder")
-    parser.add_argument("-A", "--directory_A", type=str, help="Directory to search for images.", required=True)
-    parser.add_argument("-B", "--directory_B", type=str, help="(optional) Second directory to search for images.", required=False, nargs='?', default=None)
-    parser.add_argument("-s", "--similarity", type=str, help="(optional) Similarity grade.", required=False, nargs='?', choices=["low", "normal", "high"], default="normal")
-    parser.add_argument("-px", "--px_size", type=int, help="(optional) Compression size of images in pixels.", required=False, nargs='?', default=50)
-    parser.add_argument("-so", "--sort_output", type=bool, help="(optional) Sort the difPy output dict alphabetically.", required=False, nargs='?', choices=[True, False], default=False)
-    parser.add_argument("-o", "--show_output", type=bool, help="(optional) Shows the comapred images in real-time.", required=False, nargs='?', choices=[True, False], default=False)
-    parser.add_argument("-p", "--show_progress", type=bool, help="(optional) Shows the real-time progress of difPy.", required=False, nargs='?', choices=[True, False], default=False)
-    parser.add_argument("-d", "--delete", type=bool, help="(optional) Deletes all duplicate images with lower quality.", required=False, nargs='?', choices=[True, False], default=False)
-    parser.add_argument("-D", "--silent_del", type=bool, help="(optional) Supresses the user confirmation when deleting images.", required=False, nargs='?', choices=[True, False], default=False)
+    parser = argparse.ArgumentParser(description='Find duplicate or similar images on your computer with difPy - https://github.com/elisemercury/Duplicate-Image-Finder')
+    parser.add_argument("-A", "--directory_A", type=str, help='Directory to search for images.', required=True)
+    parser.add_argument("-B", "--directory_B", type=str, help='(optional) Second directory to search for images.', required=False, nargs='?', default=None)
+    parser.add_argument("-Z", "--output_directory", type=str, help='(optional) Output directory for the difPy result files. Default is working dir.', required=False, nargs='?', default=None)
+    parser.add_argument("-s", "--similarity", type=str, help='(optional) Similarity grade.', required=False, nargs='?', choices=['low', 'normal', 'high'], default='normal')
+    parser.add_argument("-px", "--px_size", type=int, help='(optional) Compression size of images in pixels.', required=False, nargs='?', default=50)
+    parser.add_argument("-p", "--show_progress", type=bool, help='(optional) Shows the real-time progress of difPy.', required=False, nargs='?', choices=[True, False], default=True)
+    parser.add_argument("-o", "--show_output", type=bool, help='(optional) Shows the comapred images in real-time.', required=False, nargs='?', choices=[True, False], default=False)
+    parser.add_argument("-so", "--sort_output", type=bool, help='(optional) Sort the difPy output dict alphabetically.', required=False, nargs='?', choices=[True, False], default=False)
+    parser.add_argument("-d", "--delete", type=bool, help='(optional) Deletes all duplicate images with lower quality.', required=False, nargs='?', choices=[True, False], default=False)
+    parser.add_argument("-D", "--silent_del", type=bool, help='(optional) Supresses the user confirmation when deleting images.', required=False, nargs='?', choices=[True, False], default=False)
     args = parser.parse_args()
 
     # initialize difPy
-    search = dif(directory_A=args.directory_A, directory_B=args.directory_B, 
+    search = dif(directory_A=args.directory_A, directory_B=args.directory_B,
                  similarity=args.similarity, px_size=args.px_size, 
                  sort_output=args.sort_output, show_output=args.show_output, show_progress=args.show_progress, 
                  delete=args.delete, silent_del=args.silent_del)
@@ -392,13 +398,21 @@ if __name__ == "__main__":
     lq_file = "difPy_lower_quality_" + str(timestamp) + ".txt"
     stats_file = "difPy_stats_" + str(timestamp) + ".json"
 
-    with open(result_file, "w") as file:
+    if args.output_directory != None:
+        dir = args.output_directory
+    else:
+        dir = os.getcwd()
+
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+
+    with open(os.path.join(dir, result_file), "w") as file:
         json.dump(search.result, file)
 
-    with open(lq_file, "w") as file:
+    with open(os.path.join(dir, lq_file), "w") as file:
         file.writelines(search.lower_quality)
 
-    with open(stats_file, "w") as file:
+    with open(os.path.join(dir, stats_file), "w") as file:
         json.dump(search.stats, file)
 
-    print(f"""\nSaved difPy results into files:\n{result_file} \n{lq_file} \n{stats_file}""")
+    print(f"""\nSaved difPy results into folder {dir} and filenames:\n{result_file} \n{lq_file} \n{stats_file}""")
