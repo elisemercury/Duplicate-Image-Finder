@@ -106,8 +106,7 @@ dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]] [-s [{low,
        [-px [PX_SIZE]] [-p [{True,False}]] [-o [{True,False}]] [-so [{True,False}]] 
        [-d [{True,False}]] [-D [{True,False}]]
 ```
-
-The output of difPy is then written to files and saved in the working directory, where "xxx" is a unique timestamp:
+The output of difPy is then written to files and saved in the working directory by default, or to the folder specified in the `-Z / -output_directory` parameter. The "xxx" in the filename is a unique timestamp:
 
 ```python
 difPy_results_xxx.json
