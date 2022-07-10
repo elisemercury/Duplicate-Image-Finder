@@ -145,11 +145,11 @@ The higher the px_size, the more computational ressources and time required.
 
 ### show_progress (bool)
 
-Per default, difPy will set this progress bar to `False`. If you want to see where your lengthy processing is, change this value to `True`.
+Per default, difPy will set this parameter to ``True``, so that you can see where your lengthy processing is. Change this value to ``False`` to disable the progress bar.
 
-`False`= (default) no progress bar is shown
+```False```= (default) no progress bar is shown
 
-`True` = outputs a progress bar
+```True``` = outputs a progress bar
 
 ### show_output (bool)
 
