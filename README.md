@@ -23,11 +23,11 @@ Check out the [difPy package on PyPI.org](https://pypi.org/project/difPy/)
 ## Description
 DifPy searches for images in **one or two different folders**, compares the images it found and checks whether these are duplicates. It then outputs the **image files classified as duplicates** and the **filenames of the duplicate images having the lower resolution**, so you know which of the duplicate images are safe to be deleted. You can then either delete them manually, or let difPy delete them for you.
 
-DifPy does not compare images based on their hashes. It compares them based on their tensors i. e. the image content - this allows difPy to not only search for duplicate images, but also for similar images.
-
 <p align="center">
   <img src="example_output.png" width="400" title="Example Output: Duplicate Image Finder">
 </p>
+
+DifPy does not compare images based on their hashes. It compares them based on their tensors i. e. the image content - this allows difPy to not only search for duplicate images, but also for similar images.
 
 ## Basic Usage
 Use the following function to make difPy search for duplicates within one specific folder and its subfolders:
