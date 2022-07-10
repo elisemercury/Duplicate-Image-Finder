@@ -27,8 +27,6 @@ DifPy searches for images in **one or two different folders**, compares the imag
   <img src="example_output.png" width="400" title="Example Output: Duplicate Image Finder">
 </p>
 
-For a detailed usage guide, please view the offcial [difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation).
-
 ## Basic Usage
 Use the following function to make difPy search for duplicates within one specific folder and its subfolders:
 
@@ -43,6 +41,8 @@ from difPy import dif
 search = dif("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/")
 ``` 
 Folder paths must be specified as a Python string.
+
+> For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
 
 ## Output
 DifPy gives two types of output that you may use depending on your use case: 
@@ -176,7 +176,7 @@ When set to `True`, the user confirmation is skipped and the lower resolution du
 
 ## Similar Work 
 
-### DifPy as Webapp
+### I. DifPy as Webapp
 
 [A Streamlit based Webapp to find duplicate images from single/multiple directories](https://github.com/prateekralhan/Streamlit-based-Duplicate-Images-Finder) - :dna: **based on difPy**
 
@@ -186,7 +186,7 @@ When set to `True`, the user confirmation is skipped and the lower resolution du
 **Two directories** 📸✅
 ![demo2](https://user-images.githubusercontent.com/29462447/174408842-5128838f-bf8f-43da-97d2-30a3264eb7af.gif)
 
-### Mac Photos Tool to find Duplicates (photosdup)
+### II. Mac Photos Tool to find Duplicates (photosdup)
 
 [Tool to scan a Mac Photos library for duplicates, thumbnails etc.](https://github.com/peter-sk/photosdup) - :sparkles: **inspired by difPy**
 
