@@ -252,6 +252,8 @@ class dif:
                         if len(img.shape) == 2:
                             img = skimage.color.gray2rgb(img)
                         imgs_matrix.append(img)
+                    else:
+                        delete_index.append(count)
                 except:
                     delete_index.append(count)
             else:
