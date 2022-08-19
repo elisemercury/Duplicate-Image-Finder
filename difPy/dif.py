@@ -350,7 +350,10 @@ class dif:
                              "end_date": time.strftime("%Y-%m-%d", end_time),
                              "end_time": time.strftime("%H:%M:%S", end_time),
                              "seconds_elapsed": time_elapsed}
-        stats["similarity_grade"] = similarity
+        if isinstance(similarity, int):
+            stats["similarity_grade"] = "manual"
+        else:
+            stats["similarity_grade"] = similarity
         stats["similarity_mse"] = dif._map_similarity(similarity)
         stats["total_images_searched"] = total_searched
         stats["total_dupl_sim_found"] = total_found
