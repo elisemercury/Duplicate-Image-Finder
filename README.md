@@ -134,7 +134,7 @@ Depending on which use-case you want to apply difPy for, the granularity for the
 
 `"low"` = searches for similar images
 
-To customize the classification threshhold and define the MSE value manually, you can set `similarity` to any integer.
+To customize the classification threshold and define the MSE value manually, you can set `similarity` to any integer.
 
 ### px_size (int)
 
