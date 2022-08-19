@@ -218,7 +218,7 @@ class dif:
             raise ValueError('Invalid value for "show_output" parameter.')
         if show_progress != True and show_progress != False:
             raise ValueError('Invalid value for "show_progress" parameter.')
-        if similarity not in ["low", "normal", "high"]:
+        if similarity not in ["low", "normal", "high"] and not isinstance(similarity, int):
             raise ValueError('Invalid value for "similarity" parameter.')
         if px_size < 10 or px_size > 5000:
             raise ValueError('Invalid value for "px_size" parameter.')
@@ -278,7 +278,9 @@ class dif:
 
     # Function that maps the similarity grade to the respective MSE value
     def _map_similarity(similarity):
-        if similarity == "low":
+        if isinstance(similarity, int):
+            ref = similarity
+        elif similarity == "low":
             ref = 1000
         # search for exact duplicate images, extremly sensitive, MSE < 0.1
         elif similarity == "high":
