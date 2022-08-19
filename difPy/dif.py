@@ -5,6 +5,7 @@ https://github.com/elisemercury/Duplicate-Image-Finder
 
 import skimage.color
 import matplotlib.pyplot as plt
+from datetime import datetime
 import numpy as np
 import cv2
 import os
@@ -18,34 +19,33 @@ warnings.filterwarnings('ignore')
 
 class dif:
 
-    def __init__(self, directory_A, directory_B=None, similarity="normal", px_size=50, show_progress=True, show_output=False, sort_output=False, delete=False, silent_del=False):
+    def __init__(self, directory_A, directory_B=None, similarity="normal", px_size=50, show_progress=True, show_output=False, delete=False, silent_del=False):
         """
-        directory_A (str)......folder path to search for duplicate/similar images
-        directory_B (str)......second folder path to search for duplicate/similar images
-        similarity (str)......."normal" = searches for duplicates, recommended setting, MSE < 200
-                               "high" = serached for exact duplicates, extremly sensitive to details, MSE < 0.1
-                               "low" = searches for similar images, MSE < 1000
-        px_size (int)..........recommended not to change default value
-                               resize images to px_size height x width (in pixels) before being compared
-                               the higher the pixel size, the more computational ressources and time required 
-        show_progress (bool)...True = shows progress stats of where your lengthy processing currently is
-                               False = doesn't show the progress stats
-        show_output (bool).....False = omits the output and doesn't show found images
-                               True = shows duplicate/similar images found in output   
-        sort_output (bool).....False = adds the duplicate images to output dictionary in the order they were found
-                               True = sorts the duplicate images in the output dictionars alphabetically          
-        delete (bool)..........! please use with care, as this cannot be undone
-                               lower resolution duplicate images that were found are automatically deleted
-        silent_del (bool)......! please use with care, as this cannot be undone
-                               True = skips the asking for user confirmation when deleting lower resolution duplicate images
-                               will only work if "delete" AND "silent_del" are both == True
+        directory_A (str)........folder path to search for duplicate/similar images
+        directory_B (str)........second folder path to search for duplicate/similar images
+        similarity (str, int)...."normal" = searches for duplicates, recommended setting, MSE < 200
+                                 "high" = serached for exact duplicates, extremly sensitive to details, MSE < 0.1
+                                 "low" = searches for similar images, MSE < 1000
+                                 or any int, which will be used as MSE threshold for comparison
+        px_size (int)............recommended not to change default value
+                                 resize images to px_size height x width (in pixels) before being compared
+                                 the higher the pixel size, the more computational ressources and time required 
+        show_progress (bool).....True = shows progress stats of where your lengthy processing currently is
+                                 False = doesn't show the progress stats
+        show_output (bool).......False = omits the output and doesn't show found images
+                                 True = shows duplicate/similar images found in output        
+        delete (bool)............! please use with care, as this cannot be undone
+                                 lower resolution duplicate images that were found are automatically deleted
+        silent_del (bool)........! please use with care, as this cannot be undone
+                                 True = skips the asking for user confirmation when deleting lower resolution duplicate images
+                                 will only work if "delete" AND "silent_del" are both == True
 
-        OUTPUT (set)...........a dictionary with the filename of the duplicate images 
+        OUTPUT (set).............a dictionary with the filename of the duplicate images 
                                and a set of lower resultion images of all duplicates
 
         *** CLI-Interface ***
         dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]] [-s [{low,normal,high}]] [-px [PX_SIZE]]
-               [-p [{True,False}]] [-o [{True,False}]] [-so [{True,False}]] [-d [{True,False}]] [-D [{True,False}]]
+               [-p [{True,False}]] [-o [{True,False}]] [-d [{True,False}]] [-D [{True,False}]]
         
         OUTPUT.................output data is written to files and saved in the working directory
                                difPy_results_xxx_.json
@@ -64,19 +64,17 @@ class dif:
             directory_A = dif._process_directory(directory_A)
             directory_B = dif._process_directory(directory_B)
 
-        dif._validate_parameters(sort_output, show_output, show_progress, similarity, px_size, delete, silent_del)
+        dif._validate_parameters(show_output, show_progress, similarity, px_size, delete, silent_del)
 
         # start the search
         if directory_B == directory_A:
             result, lower_quality, total = dif._search_one_dir(directory_A, 
                                                                similarity, px_size, 
-                                                               sort_output, show_output, show_progress)
+                                                               show_output, show_progress)
         else:
             result, lower_quality, total = dif._search_two_dirs(directory_A, directory_B,
                                                                 similarity, px_size, 
-                                                                sort_output, show_output, show_progress)
-        if sort_output == True:
-            result = collections.OrderedDict(sorted(result.items()))
+                                                                show_output, show_progress)
 
         end_time = time.time()
         time_elapsed = np.round(end_time - start_time, 4)
@@ -116,7 +114,7 @@ class dif:
         return directory
 
     # Function that searches one directory for duplicate/similar images
-    def _search_one_dir(directory_A, similarity="normal", px_size=50, sort_output=False, show_output=False, show_progress=False):
+    def _search_one_dir(directory_A, similarity="normal", px_size=50, show_output=False, show_progress=False):
 
         img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size, show_progress)
         total = len(img_matrices_A)
@@ -127,6 +125,7 @@ class dif:
 
         # find duplicates/similar images within one folder
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
+            img_id = datetime.now().strftime("%Y%m%d%H%M%S")
             if show_progress:
                 dif._show_progress(count_A, img_matrices_A, task='comparing images')
             for count_B, imageMatrix_B in enumerate(img_matrices_A):
@@ -140,13 +139,14 @@ class dif:
                         if err < ref:
                             if show_output:
                                 dif._show_img_figs(imageMatrix_A, imageMatrix_B, err)
-                                dif._show_file_info(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1],
+                                dif._show_file_info(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1], #0 is the path, 1 is the filename
                                                     Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])
-                            if folderfiles_A[count_A][1] in result.keys():
-                                result[folderfiles_A[count_A][1]]["duplicates"] = result[folderfiles_A[count_A][1]]["duplicates"] + [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]
+                            if img_id in result.keys():
+                                result[img_id]["duplicates"] = result[img_id]["duplicates"] + [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]
                             else:
-                                result[folderfiles_A[count_A][1]] = {"location": str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]),
-                                                                     "duplicates": [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]}
+                                result[img_id] = {'filename': str(folderfiles_A[count_A][1]),
+                                                  'location': str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]),
+                                                  'duplicates': [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]}
                             try:                                    
                                 high, low = dif._check_img_quality(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1], Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])
                                 lower_quality.append(str(low))
@@ -156,14 +156,13 @@ class dif:
                         else:
                             rotations += 1
                             
-        if sort_output == True:
-            result = collections.OrderedDict(sorted(result.items()))
-
+        result = collections.OrderedDict(sorted(result.items()))
         lower_quality = list(set(lower_quality))
+        
         return result, lower_quality, total
 
     # Function that searches two directories for duplicate/similar images
-    def _search_two_dirs(directory_A, directory_B=None, similarity="normal", px_size=50, sort_output=False, show_output=False, show_progress=False):
+    def _search_two_dirs(directory_A, directory_B=None, similarity="normal", px_size=50, show_output=False, show_progress=False):
 
         img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size, show_progress)
         img_matrices_B, folderfiles_B = dif._create_imgs_matrix(directory_B, px_size, show_progress)
@@ -175,6 +174,7 @@ class dif:
 
         # find duplicates/similar images between two folders
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
+            img_id = datetime.now().strftime("%Y%m%d%H%M%S")
             if show_progress:
                 dif._show_progress(count_A, img_matrices_A, task='comparing images')
             for count_B, imageMatrix_B in enumerate(img_matrices_B):
@@ -190,10 +190,11 @@ class dif:
                             dif._show_file_info(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1],
                                                 Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])
                         if folderfiles_A[count_A][1] in result.keys():
-                            result[folderfiles_A[count_A][1]]["duplicates"] = result[folderfiles_A[count_A][1]]["duplicates"] + [str(Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])]
+                            result[img_id]["duplicates"] = result[img_id]["duplicates"] + [str(Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])]
                         else:
-                            result[folderfiles_A[count_A][1]] = {"location": str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]),
-                                                                 "duplicates": [str(Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])]}
+                            result[img_id] = {'filename': str(folderfiles_A[count_A][1]),
+                                              'location': str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]),
+                                              'duplicates': [str(Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])]}
                         try:
                             high, low = dif._check_img_quality(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1], Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])
                             lower_quality.append(str(low))
@@ -203,22 +204,19 @@ class dif:
                     else:
                         rotations += 1
 
-        if sort_output == True:
-            result = collections.OrderedDict(sorted(result.items()))
-
+        result = collections.OrderedDict(sorted(result.items()))
         lower_quality = list(set(lower_quality))
+
         return result, lower_quality, total
 
     # Function that validates the input parameters of DifPy
-    def _validate_parameters(sort_output, show_output, show_progress, similarity, px_size, delete, silent_del):
+    def _validate_parameters(show_output, show_progress, similarity, px_size, delete, silent_del):
         # validate the parameters of the function
-        if sort_output != True and sort_output != False:
-            raise ValueError('Invalid value for "sort_output" parameter.')
         if show_output != True and show_output != False:
             raise ValueError('Invalid value for "show_output" parameter.')
         if show_progress != True and show_progress != False:
             raise ValueError('Invalid value for "show_progress" parameter.')
-        if similarity not in ["low", "normal", "high"]:
+        if similarity not in ["low", "normal", "high"] and not isinstance(similarity, int):
             raise ValueError('Invalid value for "similarity" parameter.')
         if px_size < 10 or px_size > 5000:
             raise ValueError('Invalid value for "px_size" parameter.')
@@ -278,7 +276,9 @@ class dif:
 
     # Function that maps the similarity grade to the respective MSE value
     def _map_similarity(similarity):
-        if similarity == "low":
+        if isinstance(similarity, int):
+            ref = similarity
+        elif similarity == "low":
             ref = 1000
         # search for exact duplicate images, extremly sensitive, MSE < 0.1
         elif similarity == "high":
@@ -350,7 +350,10 @@ class dif:
                              "end_date": time.strftime("%Y-%m-%d", end_time),
                              "end_time": time.strftime("%H:%M:%S", end_time),
                              "seconds_elapsed": time_elapsed}
-        stats["similarity_grade"] = similarity
+        if isinstance(similarity, int):
+            stats["similarity_grade"] = "manual"
+        else:
+            stats["similarity_grade"] = similarity
         stats["similarity_mse"] = dif._map_similarity(similarity)
         stats["total_images_searched"] = total_searched
         stats["total_dupl_sim_found"] = total_found
@@ -381,7 +384,6 @@ if __name__ == "__main__":
     parser.add_argument("-px", "--px_size", type=int, help='(optional) Compression size of images in pixels.', required=False, nargs='?', default=50)
     parser.add_argument("-p", "--show_progress", type=bool, help='(optional) Shows the real-time progress of difPy.', required=False, nargs='?', choices=[True, False], default=True)
     parser.add_argument("-o", "--show_output", type=bool, help='(optional) Shows the comapred images in real-time.', required=False, nargs='?', choices=[True, False], default=False)
-    parser.add_argument("-so", "--sort_output", type=bool, help='(optional) Sort the difPy output dict alphabetically.', required=False, nargs='?', choices=[True, False], default=False)
     parser.add_argument("-d", "--delete", type=bool, help='(optional) Deletes all duplicate images with lower quality.', required=False, nargs='?', choices=[True, False], default=False)
     parser.add_argument("-D", "--silent_del", type=bool, help='(optional) Supresses the user confirmation when deleting images.', required=False, nargs='?', choices=[True, False], default=False)
     args = parser.parse_args()
@@ -389,7 +391,7 @@ if __name__ == "__main__":
     # initialize difPy
     search = dif(directory_A=args.directory_A, directory_B=args.directory_B,
                  similarity=args.similarity, px_size=args.px_size, 
-                 sort_output=args.sort_output, show_output=args.show_output, show_progress=args.show_progress, 
+                 show_output=args.show_output, show_progress=args.show_progress, 
                  delete=args.delete, silent_del=args.silent_del)
 
     # create filenames for the output files
