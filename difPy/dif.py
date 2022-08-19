@@ -21,30 +21,31 @@ class dif:
 
     def __init__(self, directory_A, directory_B=None, similarity="normal", px_size=50, show_progress=True, show_output=False, delete=False, silent_del=False):
         """
-        directory_A (str)......folder path to search for duplicate/similar images
-        directory_B (str)......second folder path to search for duplicate/similar images
-        similarity (str)......."normal" = searches for duplicates, recommended setting, MSE < 200
-                               "high" = serached for exact duplicates, extremly sensitive to details, MSE < 0.1
-                               "low" = searches for similar images, MSE < 1000
-        px_size (int)..........recommended not to change default value
-                               resize images to px_size height x width (in pixels) before being compared
-                               the higher the pixel size, the more computational ressources and time required 
-        show_progress (bool)...True = shows progress stats of where your lengthy processing currently is
-                               False = doesn't show the progress stats
-        show_output (bool).....False = omits the output and doesn't show found images
-                               True = shows duplicate/similar images found in output        
-        delete (bool)..........! please use with care, as this cannot be undone
-                               lower resolution duplicate images that were found are automatically deleted
-        silent_del (bool)......! please use with care, as this cannot be undone
-                               True = skips the asking for user confirmation when deleting lower resolution duplicate images
-                               will only work if "delete" AND "silent_del" are both == True
+        directory_A (str)........folder path to search for duplicate/similar images
+        directory_B (str)........second folder path to search for duplicate/similar images
+        similarity (str, int)...."normal" = searches for duplicates, recommended setting, MSE < 200
+                                 "high" = serached for exact duplicates, extremly sensitive to details, MSE < 0.1
+                                 "low" = searches for similar images, MSE < 1000
+                                 or any int, which will be used as MSE threshold for comparison
+        px_size (int)............recommended not to change default value
+                                 resize images to px_size height x width (in pixels) before being compared
+                                 the higher the pixel size, the more computational ressources and time required 
+        show_progress (bool).....True = shows progress stats of where your lengthy processing currently is
+                                 False = doesn't show the progress stats
+        show_output (bool).......False = omits the output and doesn't show found images
+                                 True = shows duplicate/similar images found in output        
+        delete (bool)............! please use with care, as this cannot be undone
+                                 lower resolution duplicate images that were found are automatically deleted
+        silent_del (bool)........! please use with care, as this cannot be undone
+                                 True = skips the asking for user confirmation when deleting lower resolution duplicate images
+                                 will only work if "delete" AND "silent_del" are both == True
 
-        OUTPUT (set)...........a dictionary with the filename of the duplicate images 
+        OUTPUT (set).............a dictionary with the filename of the duplicate images 
                                and a set of lower resultion images of all duplicates
 
         *** CLI-Interface ***
         dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]] [-s [{low,normal,high}]] [-px [PX_SIZE]]
-               [-p [{True,False}]] [-o [{True,False}]] [-so [{True,False}]] [-d [{True,False}]] [-D [{True,False}]]
+               [-p [{True,False}]] [-o [{True,False}]] [-d [{True,False}]] [-D [{True,False}]]
         
         OUTPUT.................output data is written to files and saved in the working directory
                                difPy_results_xxx_.json

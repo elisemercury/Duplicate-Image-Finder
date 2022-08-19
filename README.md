@@ -49,15 +49,16 @@ Folder paths must be specified as a Python string.
 ## Output
 DifPy gives two types of output that you may use depending on your use case: 
 
-A **dictionary** of duplicates/similar images that were found: 
+A **dictionary** of duplicates/similar images that were found, where the keys are a **unique id** for each image file:
 
 ```python
 search.result
 
 > Output:
-{"image1" : {"location" : "C:/Path/to/Image/image1.jpg"},
-             "duplicates" : ["C:/Path/to/Image/duplicate_image1.jpg",
-                             "C:/Path/to/Image/duplicate_image2.jpg"]},
+{20220819171549 : {"filename" : "image1.jpg",
+                   "location" : "C:/Path/to/Image/image1.jpg"},
+                   "duplicates" : ["C:/Path/to/Image/duplicate_image1.jpg",
+                                   "C:/Path/to/Image/duplicate_image2.jpg"]},
 ...
 }
 ``` 
@@ -102,8 +103,8 @@ python dif.py -A "C:/Path/to/Folder_A/" -B "C:/Path/to/Folder_B/"
 It supports the following arguments:
 
 ```python
-dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]] [-s [{low,normal,high}]] 
-       [-px [PX_SIZE]] [-p [{True,False}]] [-o [{True,False}]] [-so [{True,False}]] 
+dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]] 
+       [-s [{low,normal,high}]] [-px [PX_SIZE]] [-p [{True,False}]] [-o [{True,False}]]
        [-d [{True,False}]] [-D [{True,False}]]
 ```
 The output of difPy is then written to files and saved in the working directory by default, or to the folder specified in the `-Z / -output_directory` parameter. The "xxx" in the filename is a unique timestamp:
@@ -121,19 +122,19 @@ DifPy has the following optional parameters:
 
 ```python
 dif(directory_A, directory_B, similarity="normal", px_size=50, 
-    show_progress=True, show_output=False, sort_output=False, delete=False, silent_del=False)
+    show_progress=True, show_output=False, delete=False, silent_del=False)
 ```
-### similarity (str)
+### similarity (str, int)
 
-Depending on which use-case you want to apply difPy for, the granularity for the classification of the images can be adjusted.
-
-DifPy can f. e. search for exact matching duplicate images, or images that look similar, but are not necessarily duplicates.
+Depending on which use-case you want to apply difPy for, the granularity for the classification of the images can be adjusted. DifPy can f. e. search for exact matching duplicate images, or images that look similar, but are not necessarily duplicates.
 
 `"normal"` = (**recommended**, default) searches for duplicates with a certain tolerance
 
 `"high"` = searches for duplicate images with extreme precision, f. e. for use when comparing images that contain a lot of details like f. e. text
 
 `"low"` = searches for similar images
+
+To customize the classification threshhold and define the MSE value manually, you can set `similarity` to any integer.
 
 ### px_size (int)
 
@@ -157,14 +158,6 @@ Per default, difPy will output only the filename of the duplicate images it foun
 `False`= (default) outputs filename of the duplicate/similar images found
 
 `True` = outputs a sample and the filename
-
-### sort_output (bool)
-
-Per default, difPy will output the filenames of the duplicate images within a dictionary by the order in which they were found. If you want the duplicate images to be ordered alphabetically then set sort_output to `True`.
-
-`False`= (default) output filenames of the duplicate/similar images by order they were found 
-
-`True` = outputs filesnames of duplicate/similar images in alphabetic order
 
 ### delete (bool)
 
