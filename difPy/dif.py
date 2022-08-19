@@ -52,61 +52,58 @@ class dif:
                                difPy_lower_quality_xxx_.txt
                                difPy_stats_xxx_.json
         """
-        try:
-            start_time = time.time()        
-            print("DifPy process initializing...", end="\r")
+        start_time = time.time()        
+        print("DifPy process initializing...", end="\r")
 
-            if directory_B == None:
-                # process one directory
-                directory_A = dif._process_directory(directory_A)
-                directory_B = directory_A
-            else:
-                # process two directories
-                directory_A = dif._process_directory(directory_A)
-                directory_B = dif._process_directory(directory_B)
+        if directory_B == None:
+            # process one directory
+            directory_A = dif._process_directory(directory_A)
+            directory_B = directory_A
+        else:
+            # process two directories
+            directory_A = dif._process_directory(directory_A)
+            directory_B = dif._process_directory(directory_B)
 
-            dif._validate_parameters(show_output, show_progress, similarity, px_size, delete, silent_del)
+        dif._validate_parameters(show_output, show_progress, similarity, px_size, delete, silent_del)
 
-            # start the search
-            if directory_B == directory_A:
-                result, lower_quality, total = dif._search_one_dir(directory_A, 
+        # start the search
+        if directory_B == directory_A:
+            result, lower_quality, total = dif._search_one_dir(directory_A, 
+                                                            similarity, px_size, 
+                                                            show_output, show_progress)
+        else:
+            result, lower_quality, total = dif._search_two_dirs(directory_A, directory_B,
                                                                 similarity, px_size, 
                                                                 show_output, show_progress)
-            else:
-                result, lower_quality, total = dif._search_two_dirs(directory_A, directory_B,
-                                                                    similarity, px_size, 
-                                                                    show_output, show_progress)
 
-            end_time = time.time()
-            time_elapsed = np.round(end_time - start_time, 4)
-            stats = dif._generate_stats(directory_A, directory_B, 
-                                        time.localtime(start_time), time.localtime(end_time), time_elapsed, 
-                                        similarity, total, len(result))
+        end_time = time.time()
+        time_elapsed = np.round(end_time - start_time, 4)
+        stats = dif._generate_stats(directory_A, directory_B, 
+                                    time.localtime(start_time), time.localtime(end_time), time_elapsed, 
+                                    similarity, total, len(result))
 
-            self.result = result
-            self.lower_quality = lower_quality
-            self.stats = stats
+        self.result = result
+        self.lower_quality = lower_quality
+        self.stats = stats
 
-            if len(result) == 1:
-                images = "image"
-            else:
-                images = "images"
-            print("Found", len(result), images, "with one or more duplicate/similar images in", time_elapsed, "seconds.")
+        if len(result) == 1:
+            images = "image"
+        else:
+            images = "images"
+        print("Found", len(result), images, "with one or more duplicate/similar images in", time_elapsed, "seconds.")
 
-            
-            if len(result) != 0:
-                # optional delete images
-                if delete:
-                    if not silent_del:
-                        usr = input("Are you sure you want to delete all lower resolution duplicate images? \nThis cannot be undone. (y/n)")
-                        if str(usr) == "y":
-                            dif._delete_imgs(set(lower_quality))
-                        else:
-                            print("Image deletion canceled.")
-                    else:
+        
+        if len(result) != 0:
+            # optional delete images
+            if delete:
+                if not silent_del:
+                    usr = input("Are you sure you want to delete all lower resolution duplicate images? \nThis cannot be undone. (y/n)")
+                    if str(usr) == "y":
                         dif._delete_imgs(set(lower_quality))
-        except KeyboardInterrupt:
-            raise KeyboardInterrupt
+                    else:
+                        print("Image deletion canceled.")
+                else:
+                    dif._delete_imgs(set(lower_quality))
 
     # Function that processes the directories that were input as parameters
     def _process_directory(directory):
@@ -240,30 +237,34 @@ class dif:
                 folder_files = folder_files + subfolder_files
 
         # create images matrix
-        imgs_matrix, delete_index = [], []
-        for count, file in enumerate(folder_files):
-            if show_progress:
-                dif._show_progress(count, folder_files, task='preparing files')
-            path = Path(file[0]) / file[1]
-            # check if the file is not a folder
-            if not os.path.isdir(path):
-                try:
-                    img = cv2.imdecode(np.fromfile(
-                        path, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
-                    if type(img) == np.ndarray:
-                        img = img[..., 0:3]
-                        img = cv2.resize(img, dsize=(
-                            px_size, px_size), interpolation=cv2.INTER_CUBIC)
-                        
-                        if len(img.shape) == 2:
-                            img = skimage.color.gray2rgb(img)
-                        imgs_matrix.append(img)
-                    else:
+
+        try:
+            imgs_matrix, delete_index = [], []
+            for count, file in enumerate(folder_files):
+                if show_progress:
+                    dif._show_progress(count, folder_files, task='preparing files')
+                path = Path(file[0]) / file[1]
+                # check if the file is not a folder
+                if not os.path.isdir(path):
+                    try:
+                        img = cv2.imdecode(np.fromfile(
+                            path, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+                        if type(img) == np.ndarray:
+                            img = img[..., 0:3]
+                            img = cv2.resize(img, dsize=(
+                                px_size, px_size), interpolation=cv2.INTER_CUBIC)
+                            
+                            if len(img.shape) == 2:
+                                img = skimage.color.gray2rgb(img)
+                            imgs_matrix.append(img)
+                        else:
+                            delete_index.append(count)
+                    except:
                         delete_index.append(count)
-                except:
+                else:
                     delete_index.append(count)
-            else:
-                delete_index.append(count)
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt
 
         for index in reversed(delete_index):
             del folder_files[index]
