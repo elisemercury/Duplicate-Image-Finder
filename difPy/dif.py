@@ -343,7 +343,7 @@ class dif:
         else:
             stats["similarity_grade"] = similarity
         stats["similarity_mse"] = dif._map_similarity(similarity)
-        stats["total_images_searched"] = total_searched
+        stats["total_files_searched"] = total_searched
         stats["total_dupl_sim_found"] = total_found
         return stats
 
