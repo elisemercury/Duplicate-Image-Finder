@@ -52,6 +52,7 @@ class dif:
                                difPy_lower_quality_xxx_.txt
                                difPy_stats_xxx_.json
         """
+        print("testv2")
         start_time = time.time()        
         print("DifPy process initializing...", end="\r")
 
@@ -353,7 +354,7 @@ class dif:
             print(f"DifPy {task}: [{count+1}/{len(list)}] [{(count+1)/len(list):.0%}]")          
         else:
             print(f"DifPy {task}: [{count}/{len(list)}] [{count/len(list):.0%}]", end="\r")
-            
+
     # Function for deleting the lower quality images that were found after the search
     def _delete_imgs(lower_quality_set):
         deleted = 0
