@@ -52,7 +52,7 @@ class dif:
                                difPy_lower_quality_xxx_.txt
                                difPy_stats_xxx_.json
         """
-        print("testv2")
+        print("testv3")
         start_time = time.time()        
         print("DifPy process initializing...", end="\r")
 
@@ -329,7 +329,7 @@ class dif:
     def _generate_stats(directoryA, directoryB, start_time, end_time, time_elapsed, similarity, total_searched, total_found):
         stats = {}
         stats["directory_1"] = str(Path(directoryA))
-        if directoryB != directoryA:
+        if directoryB != None:
             stats["directory_2"] = str(Path(directoryB))
         else:
             stats["directory_2"] = None
