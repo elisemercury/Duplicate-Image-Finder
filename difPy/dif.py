@@ -391,10 +391,10 @@ if __name__ == "__main__":
                  delete=args.delete, silent_del=args.silent_del)
 
     # create filenames for the output files
-    timestamp = time.time()
-    result_file = "difPy_results_" + str(timestamp) + ".json"
-    lq_file = "difPy_lower_quality_" + str(timestamp) + ".txt"
-    stats_file = "difPy_stats_" + str(timestamp) + ".json"
+    timestamp =str(time.time()).replace(".", "_")
+    result_file = "difPy_results_" + timestamp + ".json"
+    lq_file = "difPy_lower_quality_" + timestamp + ".txt"
+    stats_file = "difPy_stats_" + timestamp + ".json"
 
     if args.output_directory != None:
         dir = args.output_directory
