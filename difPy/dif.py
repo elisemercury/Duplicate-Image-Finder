@@ -15,9 +15,6 @@ from pathlib import Path
 import argparse
 import json
 import warnings
-import io
-from PIL import Image
-
 warnings.filterwarnings('ignore')
 
 class dif:
@@ -55,6 +52,7 @@ class dif:
                                difPy_lower_quality_xxx_.txt
                                difPy_stats_xxx_.json
         """
+        print("Test v1")
         start_time = time.time()        
         print("DifPy process initializing...", end="\r")
 
@@ -249,18 +247,17 @@ class dif:
                 # check if the file is not a folder
                 if not os.path.isdir(path):
                     try:
-                        with open(path, "rb") as fp:
-                            data= fp.read()
-                        # alt
-                        img = np.asarray(Image.open(io.BytesIO(data), ), np.uint8)
-                        # img = cv2.imdecode(np.fromfile(path, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+                        img = cv2.imdecode(np.fromfile(path, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
                         if type(img) == np.ndarray:
-                            img = img[..., 0:3]
-                            img = cv2.resize(img, dsize=(px_size, px_size), interpolation=cv2.INTER_CUBIC)
-                            
-                            if len(img.shape) == 2:
-                                img = skimage.color.gray2rgb(img)
-                            imgs_matrix.append(img)
+                            try:
+                                img = img[..., 0:3]
+                                img = cv2.resize(img, dsize=(px_size, px_size), interpolation=cv2.INTER_CUBIC)
+                                
+                                if len(img.shape) == 2:
+                                    img = skimage.color.gray2rgb(img)
+                                imgs_matrix.append(img)
+                            except KeyboardInterrupt:
+                                KeyboardInterrupt
                         else:
                             delete_index.append(count)
                     except:
