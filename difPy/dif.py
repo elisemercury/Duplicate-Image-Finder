@@ -237,10 +237,9 @@ class dif:
                 folder_files = folder_files + subfolder_files
 
         # create images matrix
-
-        try:
-            imgs_matrix, delete_index = [], []
-            for count, file in enumerate(folder_files):
+        imgs_matrix, delete_index = [], []
+        for count, file in enumerate(folder_files):
+            try:
                 if show_progress:
                     dif._show_progress(count, folder_files, task='preparing files')
                 path = Path(file[0]) / file[1]
@@ -263,8 +262,8 @@ class dif:
                         delete_index.append(count)
                 else:
                     delete_index.append(count)
-        except KeyboardInterrupt:
-            raise KeyboardInterrupt
+            except KeyboardInterrupt:
+                raise KeyboardInterrupt
 
         for index in reversed(delete_index):
             del folder_files[index]
