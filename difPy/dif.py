@@ -52,29 +52,29 @@ class dif:
                                difPy_lower_quality_xxx_.txt
                                difPy_stats_xxx_.json
         """
+        print("testv3")
         start_time = time.time()        
         print("DifPy process initializing...", end="\r")
+
+        dif._validate_parameters(show_output, show_progress, similarity, px_size, delete, silent_del)
 
         if directory_B == None:
             # process one directory
             directory_A = dif._process_directory(directory_A)
-            directory_B = directory_A
+            img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size, show_progress)
+            ref = dif._map_similarity(similarity)
+            result, lower_quality, total = dif._search_one_dir(img_matrices_A, folderfiles_A, 
+                                                               ref, show_output, show_progress)
         else:
             # process two directories
             directory_A = dif._process_directory(directory_A)
             directory_B = dif._process_directory(directory_B)
-
-        dif._validate_parameters(show_output, show_progress, similarity, px_size, delete, silent_del)
-
-        # start the search
-        if directory_B == directory_A:
-            result, lower_quality, total = dif._search_one_dir(directory_A, 
-                                                               similarity, px_size, 
-                                                               show_output, show_progress)
-        else:
-            result, lower_quality, total = dif._search_two_dirs(directory_A, directory_B,
-                                                                similarity, px_size, 
-                                                                show_output, show_progress)
+            img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size, show_progress)
+            img_matrices_B, folderfiles_B = dif._create_imgs_matrix(directory_B, px_size, show_progress)
+            ref = dif._map_similarity(similarity)
+            result, lower_quality, total = dif._search_two_dirs(img_matrices_A, folderfiles_A,
+                                                                img_matrices_B, folderfiles_B,
+                                                                ref, show_output, show_progress)
 
         end_time = time.time()
         time_elapsed = np.round(end_time - start_time, 4)
@@ -105,6 +105,22 @@ class dif:
                 else:
                     dif._delete_imgs(set(lower_quality))
 
+    # Function that validates the input parameters of DifPy
+    def _validate_parameters(show_output, show_progress, similarity, px_size, delete, silent_del):
+        # validate the parameters of the function
+        if show_output != True and show_output != False:
+            raise ValueError('Invalid value for "show_output" parameter.')
+        if show_progress != True and show_progress != False:
+            raise ValueError('Invalid value for "show_progress" parameter.')
+        if similarity not in ["low", "normal", "high"] and not isinstance(similarity, int):
+            raise ValueError('Invalid value for "similarity" parameter.')
+        if px_size < 10 or px_size > 5000:
+            raise ValueError('Invalid value for "px_size" parameter.')
+        if delete != True and delete != False:
+            raise ValueError('Invalid value for "delete" parameter.')
+        if silent_del != True and silent_del != False:
+            raise ValueError('Invalid value for "silent_del" parameter.')
+
     # Function that processes the directories that were input as parameters
     def _process_directory(directory):
         directory = Path(directory)
@@ -113,15 +129,56 @@ class dif:
             raise FileNotFoundError(f"Directory " + str(directory) + " does not exist")
         return directory
 
-    # Function that searches one directory for duplicate/similar images
-    def _search_one_dir(directory_A, similarity="normal", px_size=50, show_output=False, show_progress=False):
+    # Function that creates a list of matrices for each image found in the folders
+    def _create_imgs_matrix(directory, px_size, show_progress):
+        subfolders = dif._find_subfolders(directory)
 
-        img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size, show_progress)
+        # create list of tuples with files found in directory, format: (path, filename)
+        folder_files = [(directory, filename) for filename in os.listdir(directory)]
+        if len(subfolders) >= 1:
+            for folder in subfolders:
+                subfolder_files = [(folder, filename) for filename in os.listdir(folder)]
+                folder_files = folder_files + subfolder_files
+
+        # create images matrix
+        imgs_matrix, delete_index = [], []
+        for count, file in enumerate(folder_files):
+            try:
+                if show_progress:
+                    dif._show_progress(count, folder_files, task='preparing files')
+                path = Path(file[0]) / file[1]
+                # check if the file is not a folder
+                if not os.path.isdir(path):
+                    try:
+                        img = cv2.imdecode(np.fromfile(path, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+                        if type(img) == np.ndarray:
+                                img = img[..., 0:3]
+                                img = cv2.resize(img, dsize=(px_size, px_size), interpolation=cv2.INTER_CUBIC)
+                                
+                                if len(img.shape) == 2:
+                                    img = skimage.color.gray2rgb(img)
+                                imgs_matrix.append(img)
+                        else:
+                            delete_index.append(count)
+                    except:
+                        delete_index.append(count)
+                else:
+                    delete_index.append(count)
+            except KeyboardInterrupt:
+                raise KeyboardInterrupt
+
+        for index in reversed(delete_index):
+            del folder_files[index]
+
+        return imgs_matrix, folder_files
+
+    # Function that searches one directory for duplicate/similar images
+    def _search_one_dir(img_matrices_A, folderfiles_A, similarity, show_output=False, show_progress=False):
+
         total = len(img_matrices_A)
         result = {}
         lower_quality = []
-
-        ref = dif._map_similarity(similarity)
+        ref = similarity
 
         # find duplicates/similar images within one folder
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
@@ -162,15 +219,12 @@ class dif:
         return result, lower_quality, total
 
     # Function that searches two directories for duplicate/similar images
-    def _search_two_dirs(directory_A, directory_B=None, similarity="normal", px_size=50, show_output=False, show_progress=False):
+    def _search_two_dirs(img_matrices_A, folderfiles_A, img_matrices_B, folderfiles_B, similarity, show_output=False, show_progress=False):
 
-        img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size, show_progress)
-        img_matrices_B, folderfiles_B = dif._create_imgs_matrix(directory_B, px_size, show_progress)
         total = len(img_matrices_A) + len(img_matrices_B)
         result = {}
         lower_quality = []
-
-        ref = dif._map_similarity(similarity)
+        ref = similarity
 
         # find duplicates/similar images between two folders
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
@@ -209,71 +263,6 @@ class dif:
 
         return result, lower_quality, total
 
-    # Function that validates the input parameters of DifPy
-    def _validate_parameters(show_output, show_progress, similarity, px_size, delete, silent_del):
-        # validate the parameters of the function
-        if show_output != True and show_output != False:
-            raise ValueError('Invalid value for "show_output" parameter.')
-        if show_progress != True and show_progress != False:
-            raise ValueError('Invalid value for "show_progress" parameter.')
-        if similarity not in ["low", "normal", "high"] and not isinstance(similarity, int):
-            raise ValueError('Invalid value for "similarity" parameter.')
-        if px_size < 10 or px_size > 5000:
-            raise ValueError('Invalid value for "px_size" parameter.')
-        if delete != True and delete != False:
-            raise ValueError('Invalid value for "delete" parameter.')
-        if silent_del != True and silent_del != False:
-            raise ValueError('Invalid value for "silent_del" parameter.')
-
-    # Function that creates a list of matrices for each image found in the folders
-    def _create_imgs_matrix(directory, px_size, show_progress):
-        subfolders = dif._find_subfolders(directory)
-
-        # create list of tuples with files found in directory, format: (path, filename)
-        folder_files = [(directory, filename) for filename in os.listdir(directory)]
-        if len(subfolders) >= 1:
-            for folder in subfolders:
-                subfolder_files = [(folder, filename) for filename in os.listdir(folder)]
-                folder_files = folder_files + subfolder_files
-
-        # create images matrix
-        imgs_matrix, delete_index = [], []
-        for count, file in enumerate(folder_files):
-            if show_progress:
-                dif._show_progress(count, folder_files, task='preparing files')
-            path = Path(file[0]) / file[1]
-            # check if the file is not a folder
-            if not os.path.isdir(path):
-                try:
-                    img = cv2.imdecode(np.fromfile(
-                        path, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
-                    if type(img) == np.ndarray:
-                        img = img[..., 0:3]
-                        img = cv2.resize(img, dsize=(
-                            px_size, px_size), interpolation=cv2.INTER_CUBIC)
-                        
-                        if len(img.shape) == 2:
-                            img = skimage.color.gray2rgb(img)
-                        imgs_matrix.append(img)
-                    else:
-                        delete_index.append(count)
-                except:
-                    delete_index.append(count)
-            else:
-                delete_index.append(count)
-
-        for index in reversed(delete_index):
-            del folder_files[index]
-
-        return imgs_matrix, folder_files
-
-    # Function that creates a list of all subfolders it found in a folder
-    def _find_subfolders(directory):
-        subfolders = [Path(f.path) for f in os.scandir(directory) if f.is_dir()]
-        for directory in list(subfolders):
-            subfolders.extend(dif._find_subfolders(directory))
-        return subfolders
-
     # Function that maps the similarity grade to the respective MSE value
     def _map_similarity(similarity):
         if isinstance(similarity, int):
@@ -287,6 +276,13 @@ class dif:
         else:
             ref = 200
         return ref
+
+    # Function that creates a list of all subfolders it found in a folder
+    def _find_subfolders(directory):
+        subfolders = [Path(f.path) for f in os.scandir(directory) if f.is_dir()]
+        for directory in list(subfolders):
+            subfolders.extend(dif._find_subfolders(directory))
+        return subfolders
 
     # Function that calulates the mean squared error (mse) between two image matrices
     def _mse(imageA, imageB):
@@ -315,14 +311,6 @@ class dif:
         imageB = "..." + str(imageB)[-45:]
         print(f"""Duplicate files:\n{imageA} and \n{imageB}\n""")
 
-    # Function that displays a progress bar during the search
-    def _show_progress(count, list, task='processing images'):
-        if count+1 == len(list):
-            print(f"DifPy {task}: [{count}/{len(list)}] [{count/len(list):.0%}]", end="\r")
-            print(f"DifPy {task}: [{count+1}/{len(list)}] [{(count+1)/len(list):.0%}]")          
-        else:
-            print(f"DifPy {task}: [{count}/{len(list)}] [{count/len(list):.0%}]", end="\r")
-
     # Function for rotating an image matrix by a 90 degree angle
     def _rotate_img(image):
         image = np.rot90(image, k=1, axes=(0, 1))
@@ -341,7 +329,7 @@ class dif:
     def _generate_stats(directoryA, directoryB, start_time, end_time, time_elapsed, similarity, total_searched, total_found):
         stats = {}
         stats["directory_1"] = str(Path(directoryA))
-        if directoryB != directoryA:
+        if directoryB != None:
             stats["directory_2"] = str(Path(directoryB))
         else:
             stats["directory_2"] = None
@@ -355,9 +343,17 @@ class dif:
         else:
             stats["similarity_grade"] = similarity
         stats["similarity_mse"] = dif._map_similarity(similarity)
-        stats["total_images_searched"] = total_searched
+        stats["total_files_searched"] = total_searched
         stats["total_dupl_sim_found"] = total_found
         return stats
+
+    # Function that displays a progress bar during the search
+    def _show_progress(count, list, task='processing images'):
+        if count+1 == len(list):
+            print(f"DifPy {task}: [{count}/{len(list)}] [{count/len(list):.0%}]", end="\r")
+            print(f"DifPy {task}: [{count+1}/{len(list)}] [{(count+1)/len(list):.0%}]")          
+        else:
+            print(f"DifPy {task}: [{count}/{len(list)}] [{count/len(list):.0%}]", end="\r")
 
     # Function for deleting the lower quality images that were found after the search
     def _delete_imgs(lower_quality_set):
@@ -395,10 +391,10 @@ if __name__ == "__main__":
                  delete=args.delete, silent_del=args.silent_del)
 
     # create filenames for the output files
-    timestamp = time.time()
-    result_file = "difPy_results_" + str(timestamp) + ".json"
-    lq_file = "difPy_lower_quality_" + str(timestamp) + ".txt"
-    stats_file = "difPy_stats_" + str(timestamp) + ".json"
+    timestamp =str(time.time()).replace(".", "_")
+    result_file = "difPy_results_" + timestamp + ".json"
+    lq_file = "difPy_lower_quality_" + timestamp + ".txt"
+    stats_file = "difPy_stats_" + timestamp + ".json"
 
     if args.output_directory != None:
         dir = args.output_directory

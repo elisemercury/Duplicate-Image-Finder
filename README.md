@@ -4,6 +4,7 @@
 ![PyPI status](https://img.shields.io/pypi/status/difPy)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/difPy)
 ![PyPI - License](https://img.shields.io/pypi/l/difPy)
+<img src="https://img.shields.io/badge/dif-Py-blue?style=flat&logo=python&labelColor=white&logoWidth=20.svg/"></a>
 
 **Tired of going through all images in a folder and comparing them manually to check if they are duplicates?**
 
