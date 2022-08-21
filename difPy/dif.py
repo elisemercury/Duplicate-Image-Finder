@@ -15,6 +15,9 @@ from pathlib import Path
 import argparse
 import json
 import warnings
+import io
+from PIL import Image
+
 warnings.filterwarnings('ignore')
 
 class dif:
@@ -246,12 +249,14 @@ class dif:
                 # check if the file is not a folder
                 if not os.path.isdir(path):
                     try:
-                        img = cv2.imdecode(np.fromfile(
-                            path, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+                        with open(path, "rb") as fp:
+                            data= fp.read()
+                        # alt
+                        img = np.asarray(Image.open(io.BytesIO(data), ), np.uint8)
+                        # img = cv2.imdecode(np.fromfile(path, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
                         if type(img) == np.ndarray:
                             img = img[..., 0:3]
-                            img = cv2.resize(img, dsize=(
-                                px_size, px_size), interpolation=cv2.INTER_CUBIC)
+                            img = cv2.resize(img, dsize=(px_size, px_size), interpolation=cv2.INTER_CUBIC)
                             
                             if len(img.shape) == 2:
                                 img = skimage.color.gray2rgb(img)
