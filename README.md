@@ -56,7 +56,7 @@ A **dictionary** of duplicates/similar images that were found, where the keys ar
 search.result
 
 > Output:
-{20220819171549 : {"filename" : "image1.jpg",
+{20220824212437767808 : {"filename" : "image1.jpg",
                    "location" : "C:/Path/to/Image/image1.jpg"},
                    "duplicates" : ["C:/Path/to/Image/duplicate_image1.jpg",
                                    "C:/Path/to/Image/duplicate_image2.jpg"]},
@@ -105,7 +105,7 @@ It supports the following arguments:
 
 ```python
 dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]] 
-       [-s [{low,normal,high}]] [-px [PX_SIZE]] [-p [{True,False}]] [-o [{True,False}]]
+       [-s [{low,normal,high,int}]] [-px [PX_SIZE]] [-p [{True,False}]] [-o [{True,False}]]
        [-d [{True,False}]] [-D [{True,False}]]
 ```
 The output of difPy is then written to files and saved in the working directory by default, or to the folder specified in the `-Z / -output_directory` parameter. The "xxx" in the filename is a unique timestamp:
