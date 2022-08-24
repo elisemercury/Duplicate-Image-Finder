@@ -52,7 +52,6 @@ class dif:
                                difPy_lower_quality_xxx_.txt
                                difPy_stats_xxx_.json
         """
-        print("testv3")
         start_time = time.time()        
         print("DifPy process initializing...", end="\r")
 
@@ -182,7 +181,9 @@ class dif:
 
         # find duplicates/similar images within one folder
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
-            img_id = datetime.now().strftime("%Y%m%d%H%M%S")
+            img_id = datetime.now().strftime("%Y%m%d%H%M%S%f")
+            if img_id in result.keys():
+                img_id = str(int(img_id) + 1)
             if show_progress:
                 dif._show_progress(count_A, img_matrices_A, task='comparing images')
             for count_B, imageMatrix_B in enumerate(img_matrices_A):
@@ -228,7 +229,9 @@ class dif:
 
         # find duplicates/similar images between two folders
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
-            img_id = datetime.now().strftime("%Y%m%d%H%M%S")
+            img_id = datetime.now().strftime("%Y%m%d%H%M%S%f")
+            if img_id in result.keys():
+                img_id = str(int(img_id) + 1)
             if show_progress:
                 dif._show_progress(count_A, img_matrices_A, task='comparing images')
             for count_B, imageMatrix_B in enumerate(img_matrices_B):
@@ -243,7 +246,7 @@ class dif:
                             dif._show_img_figs(imageMatrix_A, imageMatrix_B, err)
                             dif._show_file_info(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1],
                                                 Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])
-                        if folderfiles_A[count_A][1] in result.keys():
+                        if img_id in result.keys():
                             result[img_id]["duplicates"] = result[img_id]["duplicates"] + [str(Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])]
                         else:
                             result[img_id] = {'filename': str(folderfiles_A[count_A][1]),
