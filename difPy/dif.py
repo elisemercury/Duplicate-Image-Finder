@@ -111,8 +111,13 @@ class dif:
             raise ValueError('Invalid value for "show_output" parameter.')
         if show_progress != True and show_progress != False:
             raise ValueError('Invalid value for "show_progress" parameter.')
-        if similarity not in ["low", "normal", "high"] and not isinstance(similarity, int):
-            raise ValueError('Invalid value for "similarity" parameter.')
+        if similarity not in ["low", "normal", "high"]: 
+            try:
+                similarity = float(similarity)
+                if similarity < 0:
+                  raise ValueError('Invalid value for "similarity" parameter.')  
+            except:
+                raise ValueError('Invalid value for "similarity" parameter.')
         if px_size < 10 or px_size > 5000:
             raise ValueError('Invalid value for "px_size" parameter.')
         if delete != True and delete != False:
@@ -268,16 +273,18 @@ class dif:
 
     # Function that maps the similarity grade to the respective MSE value
     def _map_similarity(similarity):
-        if isinstance(similarity, int):
+        try:
+            similarity = float(similarity)
             ref = similarity
-        elif similarity == "low":
-            ref = 1000
-        # search for exact duplicate images, extremly sensitive, MSE < 0.1
-        elif similarity == "high":
-            ref = 0.1
-        # normal, search for duplicates, recommended, MSE < 200
-        else:
-            ref = 200
+        except:      
+            if similarity == "low":
+                ref = 1000
+            # search for exact duplicate images, extremly sensitive, MSE < 0.1
+            elif similarity == "high":
+                ref = 0.1
+            # normal, search for duplicates, recommended, MSE < 200
+            else:
+                ref = 200
         return ref
 
     # Function that creates a list of all subfolders it found in a folder
@@ -372,14 +379,20 @@ class dif:
                 print("Could not delete file:", file, end="\r")
         print("\n***\nDeleted", deleted, "images.")
 
+def type_str_int(x):
+    try:
+        return int(x)
+    except:
+        return x
+
 # Parameters for when launching difPy via CLI
-if __name__ == "__main__":
+if __name__ == "__main__":    
     # set CLI arguments
     parser = argparse.ArgumentParser(description='Find duplicate or similar images on your computer with difPy - https://github.com/elisemercury/Duplicate-Image-Finder')
     parser.add_argument("-A", "--directory_A", type=str, help='Directory to search for images.', required=True)
     parser.add_argument("-B", "--directory_B", type=str, help='(optional) Second directory to search for images.', required=False, nargs='?', default=None)
     parser.add_argument("-Z", "--output_directory", type=str, help='(optional) Output directory for the difPy result files. Default is working dir.', required=False, nargs='?', default=None)
-    parser.add_argument("-s", "--similarity", type=str, help='(optional) Similarity grade.', required=False, nargs='?', choices=['low', 'normal', 'high'], default='normal')
+    parser.add_argument("-s", "--similarity", type=type_str_int, help='(optional) Similarity grade.', required=False, nargs='?', default='normal')
     parser.add_argument("-px", "--px_size", type=int, help='(optional) Compression size of images in pixels.', required=False, nargs='?', default=50)
     parser.add_argument("-p", "--show_progress", type=bool, help='(optional) Shows the real-time progress of difPy.', required=False, nargs='?', choices=[True, False], default=True)
     parser.add_argument("-o", "--show_output", type=bool, help='(optional) Shows the comapred images in real-time.', required=False, nargs='?', choices=[True, False], default=False)
