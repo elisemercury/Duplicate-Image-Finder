@@ -154,7 +154,7 @@ class dif:
                 # check if the file is not a folder
                 if not os.path.isdir(path):
                     try:
-                        img = cv2.imdecode(np.fromfile(path, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+                        img = cv2.imdecode(np.fromfile(path, dtype=np.uint8), cv2.IMREAD_COLOR)
                         if type(img) == np.ndarray:
                                 img = img[..., 0:3]
                                 img = cv2.resize(img, dsize=(px_size, px_size), interpolation=cv2.INTER_CUBIC)
@@ -187,7 +187,7 @@ class dif:
         # find duplicates/similar images within one folder
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
             img_id = datetime.now().strftime("%Y%m%d%H%M%S%f")
-            if img_id in result.keys():
+            while img_id in result.keys():
                 img_id = str(int(img_id) + 1)
             if show_progress:
                 dif._show_progress(count_A, img_matrices_A, task='comparing images')
@@ -235,7 +235,7 @@ class dif:
         # find duplicates/similar images between two folders
         for count_A, imageMatrix_A in enumerate(img_matrices_A):
             img_id = datetime.now().strftime("%Y%m%d%H%M%S%f")
-            if img_id in result.keys():
+            while img_id in result.keys():
                 img_id = str(int(img_id) + 1)
             if show_progress:
                 dif._show_progress(count_A, img_matrices_A, task='comparing images')
