@@ -252,8 +252,10 @@ class dif:
                             dif._show_file_info(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1],
                                                 Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])
                         if img_id in result.keys():
+                            print(1)
                             result[img_id]["duplicates"] = result[img_id]["duplicates"] + [str(Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])]
                         else:
+                            print(2)
                             result[img_id] = {'filename': str(folderfiles_A[count_A][1]),
                                               'location': str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]),
                                               'duplicates': [str(Path(folderfiles_B[count_B][0]) / folderfiles_B[count_B][1])]}
