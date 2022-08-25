@@ -57,9 +57,9 @@ search.result
 
 > Output:
 {20220824212437767808 : {"filename" : "image1.jpg",
-                   "location" : "C:/Path/to/Image/image1.jpg"},
-                   "duplicates" : ["C:/Path/to/Image/duplicate_image1.jpg",
-                                   "C:/Path/to/Image/duplicate_image2.jpg"]},
+                         "location" : "C:/Path/to/Image/image1.jpg"},
+                         "duplicates" : ["C:/Path/to/Image/duplicate_image1.jpg",
+                                         "C:/Path/to/Image/duplicate_image2.jpg"]},
 ...
 }
 ``` 
