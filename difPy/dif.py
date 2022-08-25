@@ -154,7 +154,7 @@ class dif:
                 # check if the file is not a folder
                 if not os.path.isdir(path):
                     try:
-                        img = cv2.imdecode(np.fromfile(path, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+                        img = cv2.imdecode(np.fromfile(path, dtype=np.uint8), cv2.IMREAD_COLOR)
                         if type(img) == np.ndarray:
                                 img = img[..., 0:3]
                                 img = cv2.resize(img, dsize=(px_size, px_size), interpolation=cv2.INTER_CUBIC)
