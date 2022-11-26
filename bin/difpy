@@ -1,0 +1,187 @@
+#!/usr/bin/env python3
+
+import os
+import json
+import difPy
+import pathlib
+import argparse
+import multiprocessing
+
+from datetime import datetime
+
+
+def todo(a,b):
+    print(f"{a}/{b}")
+
+difPy.ProgressHandler.handle = todo
+
+
+def pixel_type(px: int) -> int:
+    '''
+    Validate that pixel values are within a suitable range.
+
+    Parameters:
+        px          user specified pixel value
+
+    Returns:
+        validated pixel value
+    '''
+    if px < 10 or px > 5000:
+        raise argparse.ArgumentTypeError('Pixel size should be within the range 50-5000')
+
+    return px
+
+
+def similarity_type(sim: str) -> float:
+    '''
+    Validate and convert the user supplied similarity value.
+
+    Parameters:
+        sim         user supplied similarity value
+
+    Returns:
+        validated similarity value
+    '''
+    if sim == 'low':
+        return 1000
+
+    if sim == 'normal':
+        return 200
+
+    if sim == 'high':
+        return 0.1
+
+    if sim.is_numeric():
+        return int(sim)
+
+    else:
+        raise argparse.ArgumentTypeError("similarity needs to be 'low', 'normal', 'high' or a numeric value")
+
+
+def readdir_type(path: str) -> str:
+    '''
+    Validate that the specified directory is readable.
+
+    Parameters:
+        path        path to a directory
+
+    Returns:
+        validated directory
+    '''
+    path = pathlib.Path(path)
+
+    if not path.is_dir():
+        raise argparse.ArgumentTypeError(f'The specified path {path.absolute()} is not a directory')
+
+    if not os.access(path, os.R_OK):
+        raise argparse.ArgumentTypeError(f'The specified path {path.absolute()} is not readable')
+
+    return path
+
+
+def writedir_type(path: str) -> str:
+    '''
+    Validate that the specified directory is writable.
+
+    Parameters:
+        path        path to a directory
+
+    Returns:
+        validated directory
+    '''
+    path = pathlib.Path(path)
+
+    if not path.is_dir():
+        raise argparse.ArgumentTypeError(f'The specified path {path.absolute()} is not a directory')
+
+    if not os.access(path, os.W_OK):
+        raise argparse.ArgumentTypeError(f'The specified path {path.absolute()} is not writable')
+
+    return path
+
+
+def writefile_type(path: str) -> str:
+    '''
+    Validate that the specified file is writable. In case of an directory
+    was specified, makes a file out of it by appending {timestamp}.json.
+
+    Parameters:
+        path        path to a file
+
+    Returns:
+        validated file
+    '''
+    path = pathlib.Path(path)
+
+    if path.exists():
+
+        if not os.access(path, os.W_OK):
+            raise argparse.ArgumentTypeError(f'The specified path {path.absolute()} is not writable')
+
+        if path.is_dir():
+            path = path / f'{datetime.now()}.json'
+
+    else:
+        if not os.access(path.parent, os.W_OK):
+            raise argparse.ArgumentTypeError(f'The specified path {path.absolute()} is not writable')
+
+    return path
+
+
+start_time = datetime.now()
+parser = argparse.ArgumentParser(description=f'{difPy.name} v{difPy.version} - Find duplicate or similar images on your computer')
+parser.add_argument('path', type=readdir_type, nargs='+', help='path to search for duplicate images')
+parser.add_argument('--output-file', metavar='path', default=f'{start_time}.json', type=writefile_type, help='output file (default: {timestamp}.json)')
+parser.add_argument('--similarity', metavar='value', default='normal', type=similarity_type,  help='similarity grade - low, normal, high or int (default: normal)')
+parser.add_argument('--pixel-size', metavar='int', type=pixel_type, default=50, help='ompression size of images in pixels (default: 50)')
+parser.add_argument('--delete', action='store_true', help='delete duplicate images with lower quality')
+parser.add_argument('--force', action='store_true', help='supresses all confirmation prompts')
+parser.add_argument('--copy', metavar='path', type=writedir_type, help='directory to copy unique images to')
+parser.add_argument('--copy-duplicates', metavar='path', type=writedir_type, help='directory to copy duplicate images to')
+parser.add_argument('--move', metavar='path', type=writedir_type, help='directory to move unique images to')
+parser.add_argument('--move-duplicates', metavar='path', type=writedir_type, help='directory to move duplicate images to')
+parser.add_argument('-t', '--threads', default=1, metavar='int', type=int, help='directory to copy unique images to')
+parser.add_argument('--no-rotate', action='store_true', help='do not rotate image during comparison')
+parser.add_argument('--fast', action='store_true', help='enable fast comparison')
+
+args = parser.parse_args()
+
+if args.threads <= 1:
+
+    try:
+        matrices = []
+
+        for path in args.path:
+            print(f'[+] Preparing images in {path.absolute()}')
+            matrices.append(difPy.ImageMatrixCollection.from_folder(path))
+
+        print('[+] Comparing images.')
+
+        if len(matrices) == 1:
+            matrices[0].compare(matrices[0], args.similarity, not args.no_rotate, args.fast)
+
+        elif len(matrices) > 1:
+            matrices[0].compare(matrices[1:], args.similarity, not args.no_rotate, args.fast)
+
+        runtime = datetime.now() - start_time
+        duplicate_count = 0
+
+        for image_matrix in matrices[0]:
+            duplicate_count += len(image_matrix.duplicates)
+
+        if not args.fast:
+            duplicate_count //= 2
+
+        print(f'[+] difpy found {duplicate_count} duplicates in {runtime}.')
+
+        with open(args.output_file, 'w') as output:
+            output.write(json.dumps(matrices[0].to_dict()))
+
+        print(f'[+] Results written to {args.output_file}')
+
+    except KeyboardInterrupt:
+        print('[!] Interrupted.')
+
+
+else:
+    raise NotImplementedError('Not implemented yet.')
