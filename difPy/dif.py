@@ -6,6 +6,7 @@ https://github.com/elisemercury/Duplicate-Image-Finder
 import skimage.color
 import matplotlib.pyplot as plt
 from datetime import datetime
+from typing import List
 import numpy as np
 import cv2
 import os
@@ -68,6 +69,7 @@ class dif:
             # process two directories
             directory_A = dif._process_directory(directory_A)
             directory_B = dif._process_directory(directory_B)
+            dif._path_validation([directory_A, directory_B])
             img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size, show_progress)
             img_matrices_B, folderfiles_B = dif._create_imgs_matrix(directory_B, px_size, show_progress)
             ref = dif._map_similarity(similarity)
@@ -133,6 +135,14 @@ class dif:
             raise FileNotFoundError(f"Directory " + str(directory) + " does not exist")
         return directory
 
+    # Function that validates paths to exclude erroneous duplicates finding
+    def _path_validation(paths: List[Path]) -> None:
+        if len(set(paths)) == 1:
+            raise ValueError('An attempt to compare the directory with itself')
+        path1, path2 = paths
+        if path1.is_relative_to(path2) or path2.is_relative_to(path1):
+            raise ValueError('One belongs to another')
+    
     # Function that creates a list of matrices for each image found in the folders
     def _create_imgs_matrix(directory, px_size, show_progress):
         subfolders = dif._find_subfolders(directory)
