@@ -192,3 +192,19 @@ When set to `True`, the user confirmation is skipped and the lower resolution du
 <p align="center"><b>
 :thought_balloon: Also want to be featured in the "Related Projects" section? Check our <a href="https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy#be-featured-as-difpy-related-project">contributor guidelines</a> to find out how!
 </b></p>
+
+### Docker Image
+
+Building the docker image by execut the following command.
+
+```bash
+docker build -t difpy:2.4.4 .
+```
+
+To test the docker image, you please prepare some photos in your host (let's say /home/theuser/difPy/tests/images/) and execute the following command
+
+```bash
+docker run --rm -v /home/theuser/difPy/tests/images:/images:ro -e TARGET='/images' bash
+pip install pytest
+python -m pytest -svv
+```
