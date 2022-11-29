@@ -138,10 +138,10 @@ class dif:
     # Function that validates paths to exclude erroneous duplicates finding
     def _path_validation(paths: List[Path]) -> None:
         if len(set(paths)) == 1:
-            raise ValueError('An attempt to compare the directory with itself')
+            raise ValueError('An attempt to compare the directory with itself.')
         path1, path2 = paths
         if path1.is_relative_to(path2) or path2.is_relative_to(path1):
-            raise ValueError('One belongs to another')
+            raise ValueError('One directory belongs to another.')
     
     # Function that creates a list of matrices for each image found in the folders
     def _create_imgs_matrix(directory, px_size, show_progress):
