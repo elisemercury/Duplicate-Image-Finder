@@ -24,9 +24,6 @@ setup(
   scripts=[
             'bin/difpy'
           ],
-  packages=[
-             'difPy',
-           ],
   classifiers=[
     'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',
