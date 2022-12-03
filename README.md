@@ -1,4 +1,6 @@
-# Duplicate Image Finder (difPy)
+### Duplicate Image Finder (difPy)
+
+----
 
 ![PyPIv](https://img.shields.io/pypi/v/difPy)
 ![PyPI status](https://img.shields.io/pypi/status/difPy)
@@ -6,189 +8,113 @@
 ![PyPI - License](https://img.shields.io/pypi/l/difPy)
 <img src="https://img.shields.io/badge/dif-Py-blue?style=flat&logo=python&labelColor=white&logoWidth=20.svg/"></a>
 
-**Tired of going through all images in a folder and comparing them manually to check if they are duplicates?**
+*difPy* is a python library that can be used to identify duplicates within a given set of images. In contrast to other
+libraries, *difPy* does not use machine learning or other complex techniques to identify duplicates, but simply relies on
+the *mean squared error* (*MSE*) when comparing the color codes on each pixel. This method provides a fast but still quite
+reliable way to identify duplicate images.
 
-:white_check_mark: The Duplicate Image Finder (difPy) Python package **automates** this task for you!
+*difPy* also ships the command line tool *difpy* that uses the *difPy library* to implement some common operations like:
 
-```python
-pip install difPy
-```
-> :point_right: difPy v2.4.x  has some **major updates** and **new features**. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for a detailed listing.
+* Identifying duplicates within a user specified set of image files
+* Deleting duplicate images
+* Moving duplicate or unique images to another location
 
-> :open_hands: Our motto? The more users use difPy, the more issues and missing features can be detected, and the better the algorithm gets over time. **Contributions are always welcome** - check our [contributor guidelines](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy) for more information.
 
-Read more on how the algorithm of difPy works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051).
+### Installation
 
-Check out the [difPy package on PyPI.org](https://pypi.org/project/difPy/)
+----
 
-## Description
-DifPy searches for images in **one or two different folders**, compares the images it found and checks whether these are duplicates. It then outputs the **image files classified as duplicates** and the **filenames of the duplicate images having the lower resolution**, so you know which of the duplicate images are safe to be deleted. You can then either delete them manually, or let difPy delete them for you.
+*difPy* can be installed via [pip](https://pypi.org/project/difPy/):
 
-<p align="center">
-  <img src="example_output.png" width="400" title="Example Output: Duplicate Image Finder">
-</p>
-
-DifPy does not compare images based on their hashes. It compares them based on their tensors i. e. the image content - this allows difPy to not only search for duplicate images, but also for similar images.
-
-## Basic Usage
-Use the following function to make difPy search for duplicates within one specific folder and its subfolders:
-
-```python
-from difPy import dif
-search = dif("C:/Path/to/Folder/")
-``` 
-To search for duplicates within two folders and their subfolders:
-
-```python
-from difPy import dif
-search = dif("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/")
-``` 
-Folder paths must be specified as a Python string.
-
-> :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
-
-## Output
-DifPy gives two types of output that you may use depending on your use case: 
-
-A **dictionary** of duplicates/similar images that were found, where the keys are a **unique id** for each image file:
-
-```python
-search.result
-
-> Output:
-{20220824212437767808 : {"filename" : "image1.jpg",
-                         "location" : "C:/Path/to/Image/image1.jpg"},
-                         "duplicates" : ["C:/Path/to/Image/duplicate_image1.jpg",
-                                         "C:/Path/to/Image/duplicate_image2.jpg"]},
-...
-}
-``` 
-
-A **list** of duplicates/similar images that have the **lowest quality:** 
-
-```python
-search.lower_quality
-
-> Output:
-["C:/Path/to/Image/duplicate_image1.jpg", 
- "C:/Path/to/Image/duplicate_image2.jpg", ...]
-``` 
-
-DifPy can also generate a **dictionary** with statistics on the completed process:
-
-```python
-search.stats
-
-> Output:
-{"directory_1" : "C:/Path/to/Folder_A/",
- "directory_2" : "C:/Path/to/Folder_B/",
- "duration" : {"start_date": "2022-06-13",
-               "start_time" : "14:44:19",
-               "end_date" : "2022-06-13",
-               "end_time" : "14:44:38",
-               "seconds_elapsed" : 18.6113},
- "similarity_grade" : "normal",
- "similarity_mse" : 200,
- "total_images_searched" : 1032,
- "total_dupl_sim_found" : 1024}
-``` 
-
-## CLI Usage
-You can make use of difPy through the CLI interface by using the following commands:
-
-```python
-python dif.py -A "C:/Path/to/Folder_A/"
-
-python dif.py -A "C:/Path/to/Folder_A/" -B "C:/Path/to/Folder_B/"
-```
-It supports the following arguments:
-
-```python
-dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]] 
-       [-s [{low,normal,high,int}]] [-px [PX_SIZE]] [-p [{True,False}]] [-o [{True,False}]]
-       [-d [{True,False}]] [-D [{True,False}]]
-```
-The output of difPy is then written to files and saved in the working directory by default, or to the folder specified in the `-Z / -output_directory` parameter. The "xxx" in the filename is a unique timestamp:
-
-```python
-difPy_results_xxx.json
-difPy_lower_quality_xxx.txt
-difPy_stats_xxx.json
+```console
+[user@host ~]$ pip3 install --user difPy
 ```
 
-> :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+Make sure that `~/.local/bin` is part of your `$PATH` environment variable, as the `difpy` executable
+script will be placed within this location.
 
-## Additional Parameters
-DifPy has the following optional parameters:
 
-```python
-dif(directory_A, directory_B, similarity="normal", px_size=50, 
-    show_progress=True, show_output=False, delete=False, silent_del=False)
+### Description
+
+----
+
+*difPy* searches for images in one or more folders, compares the images it finds and checks whether these are duplicates.
+By default, *difPy* outputs it's results as a *JSON* formatted report file that contains information on the identified
+duplicates. Other operations may be selected by specifying the corresponding command line switches.
+
+Notice that *difpy's* operation mode slightly differs when specifying one, or multiple paths as arguments. When only one
+path was specified, *difpy* searches this path for image files and compares them to each other. Recursive search can be
+used to find image files in subfolders too. When specifying multiple paths however, *difpy* only compares images across
+these paths. This means that specifying `path1 path2 path3` as arguments compares `path1` to `path2` and `path1` to `path3`.
+If you want instead to compare all images to each other, use a shared directory and recursive search instead.
+
+*difPy* does not compare images based on their hashes. It compares them based on their tensors i. e. the image content -
+this allows *difPy* to not only search for duplicate images, but also for similar images. The threshold from which on
+images should be considered duplicates can be adjusted by the user.
+
+
+### Usage Examples
+
+----
+
+Comparing `102` images in a single folder:
+
+```console
+[user@host ~]$ difpy Sample/
+[+] Preparing images in /home/user/Sample
+100%|######################################################| 102/102 [00:05<00:00, 18.06it/s]
+[+] Comparing 10404 images.
+100%|###############################################| 10404/10404 [00:00<00:00, 11430.98it/s]
+[+] difpy found 100 duplicates in 0:00:06.565350.
+[+] Results written to 2022-12-03 21:41:53.632870.json
 ```
-### similarity (str, int)
 
-Depending on which use-case you want to apply difPy for, the granularity for the classification of the images can be adjusted. DifPy can f. e. search for exact matching duplicate images, or images that look similar, but are not necessarily duplicates.
+*difpy* identified `100` duplicates, but performed many compares for it. You can speed up the
+procedure by using the `--fast` option. With `--fast` specified, when an image is identified
+as duplicate, it is no longer compared to other images. This can lead to missing detection
+for some edge cases (image `A` similar to image `B`, `B` similar to `C` but `A` not similar to `C`),
+but this should be neglectable for most situations (*difpy* still says it performs `10404` comparisons,
+but most of them are skipped):
 
-`"normal"` = (**recommended**, default) searches for duplicates with a certain tolerance
+```console
+[user@host ~]$ difpy --fast Sample/
+[+] Preparing images in /home/user/Sample
+100%|######################################################| 102/102 [00:05<00:00, 17.97it/s]
+[+] Comparing 10404 images.
+100%|##############################################| 10404/10404 [00:00<00:00, 352920.32it/s]
+[+] difpy found 100 duplicates in 0:00:05.711823.
+[+] Results written to 2022-12-03 21:46:42.968639.json
+```
 
-`"high"` = searches for duplicate images with extreme precision, f. e. for use when comparing images that contain a lot of details like f. e. text
+You may also enable multi-threading to achieve a speedup:
 
-`"low"` = searches for similar images
+```console
+[user@host ~]$ difpy --threads 4 Sample/
+[+] Preparing images in /home/user/Sample
+100%|######################################################| 102/102 [00:03<00:00, 26.95it/s]
+[+] Comparing 10404 images.
+100%|################################################| 10404/10404 [00:08<00:00, 1240.73it/s]
+[+] difpy found 0 duplicates in 0:00:12.292961.
+[+] Results written to 2022-12-03 21:49:31.248227.json
+```
 
-To customize the classification threshold and define the MSE value manually, you can set `similarity` to any integer.
+Finally, you may want to move duplicate and unique images to different folders:
 
-### px_size (int)
+```console
+[user@host ~]$ difpy --fast --move-duplicates Dups/ --move-uniq Uniq Sample/
+[+] Preparing images in /home/user/Sample
+100%|######################################################| 102/102 [00:05<00:00, 17.78it/s]
+[+] Comparing 10404 images.
+100%|##############################################| 10404/10404 [00:00<00:00, 291348.12it/s]
+[+] difpy found 100 duplicates in 0:00:05.822249.
+[+] Results written to 2022-12-03 22:46:03.656267.json
+[+] 2 images moved to /home/user/Uniq
+[+] 100 images moved to /home/user/Dups
+```
 
-! Recommended not to change default value
+## Other Projects
 
-Absolute size in pixels (width x height) that the images will be compressed to before being compared.
-The higher the px_size, the more computational ressources and time required. 
+----
 
-### show_progress (bool)
-
-Per default, difPy will set this parameter to ``True``, so that you can see where your lengthy processing is. Change this value to ``False`` to disable the progress bar.
-
-```False```= (default) no progress bar is shown
-
-```True``` = outputs a progress bar
-
-### show_output (bool)
-
-Per default, difPy will output only the filename of the duplicate images it found. If you want the duplicate images to be shown in the console output, change this value to `True`.
-
-`False`= (default) outputs filename of the duplicate/similar images found
-
-`True` = outputs a sample and the filename
-
-### delete (bool)
-
-! Please use with care, as this cannot be undone
-
-When set to `True`, the lower resolution duplicate images that were found by difPy are deleted from the folder. Asks for user confirmation before deleting the images. To skip the user confimation, set silent_del to `True`.  
-                           
-### silent_del (bool)
-
-! Please use with care, as this cannot be undone
-
-When set to `True`, the user confirmation is skipped and the lower resolution duplicate images that were found by difPy are automatically deleted from the folder.
-
-## Similar Work 
-
-### I. DifPy as Webapp
-
-[A Streamlit based Webapp to find duplicate images from single/multiple directories](https://github.com/prateekralhan/Streamlit-based-Duplicate-Images-Finder) - :dna: **based on difPy**
-
-**Single Directory** 📸✅
-![demo1](https://user-images.githubusercontent.com/29462447/174408835-438234d9-5ff6-4159-a5e3-b908d885a8bc.gif)
-
-**Two directories** 📸✅
-![demo2](https://user-images.githubusercontent.com/29462447/174408842-5128838f-bf8f-43da-97d2-30a3264eb7af.gif)
-
-### II. Mac Photos Tool to find Duplicates (photosdup)
-
-[Tool to scan a Mac Photos library for duplicates, thumbnails etc.](https://github.com/peter-sk/photosdup) - :sparkles: **inspired by difPy**
-
-***
-<p align="center"><b>
-:thought_balloon: Also want to be featured in the "Related Projects" section? Check our <a href="https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy#be-featured-as-difpy-related-project">contributor guidelines</a> to find out how!
-</b></p>
+* [Web application for filtering duplicates using difPy](https://github.com/prateekralhan/Streamlit-based-Duplicate-Images-Finder)
+* [Photosdup - MacOS duplicate image finder](https://github.com/peter-sk/photosdup)

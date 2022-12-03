@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import json
 import difPy
+import shutil
 import pathlib
 import argparse
 import multiprocessing
 
+from tqdm import tqdm
 from datetime import datetime
-
-
-def todo(a,b):
-    print(f"{a}/{b}")
-
-difPy.ProgressHandler.handle = todo
 
 
 def pixel_type(px: int) -> int:
@@ -136,52 +133,294 @@ parser.add_argument('--similarity', metavar='value', default='normal', type=simi
 parser.add_argument('--pixel-size', metavar='int', type=pixel_type, default=50, help='ompression size of images in pixels (default: 50)')
 parser.add_argument('--delete', action='store_true', help='delete duplicate images with lower quality')
 parser.add_argument('--force', action='store_true', help='supresses all confirmation prompts')
-parser.add_argument('--copy', metavar='path', type=writedir_type, help='directory to copy unique images to')
+parser.add_argument('--copy-uniq', dest='copy', metavar='path', type=writedir_type, help='directory to copy unique images to')
 parser.add_argument('--copy-duplicates', metavar='path', type=writedir_type, help='directory to copy duplicate images to')
-parser.add_argument('--move', metavar='path', type=writedir_type, help='directory to move unique images to')
+parser.add_argument('--move-uniq', dest='move', metavar='path', type=writedir_type, help='directory to move unique images to')
 parser.add_argument('--move-duplicates', metavar='path', type=writedir_type, help='directory to move duplicate images to')
-parser.add_argument('-t', '--threads', default=1, metavar='int', type=int, help='directory to copy unique images to')
+parser.add_argument('--threads', default=1, metavar='int', type=int, help='directory to copy unique images to')
 parser.add_argument('--no-rotate', action='store_true', help='do not rotate image during comparison')
+parser.add_argument('--no-out', action='store_true', help='do not create an output file')
 parser.add_argument('--fast', action='store_true', help='enable fast comparison')
+parser.add_argument('--recursive', action='store_true', help='search directories recursively')
 
 args = parser.parse_args()
 
-if args.threads <= 1:
+try:
 
-    try:
+    # Single threaded version. Way easier to implement and probably faster for
+    # small sets of images. Theoretically, one could delete this section and always
+    # use the multi threaded variant, even when args.threads = 1. However, we keep
+    # this as an example on how to use the high level API from difPy.
+    if args.threads <= 1:
+
+        count = 0
         matrices = []
 
         for path in args.path:
-            print(f'[+] Preparing images in {path.absolute()}')
-            matrices.append(difPy.ImageMatrixCollection.from_folder(path))
 
-        print('[+] Comparing images.')
+            print(f'[+] Preparing images in {path.absolute()}')
+            files = difPy.ImageMatrix._glob(path, args.recursive)
+
+            with tqdm(total=len(files), ascii=True) as progress_bar:
+
+                handler = difPy.ProgressHandler(lambda x, y: progress_bar.update(1))
+                matrix_collection = difPy.ImageMatrixCollection.from_list(files, args.pixel_size, handler)
+
+            count += matrix_collection.size()
+            matrices.append(matrix_collection)
 
         if len(matrices) == 1:
-            matrices[0].compare(matrices[0], args.similarity, not args.no_rotate, args.fast)
+
+            comp_total = matrices[0].size() ** 2
+            print(f'[+] Comparing {comp_total} images.')
+
+            with tqdm(total=comp_total, ascii=True) as progress_bar:
+
+                handler = difPy.ProgressHandler(lambda x, y: progress_bar.update(1))
+                matrices[0].compare(matrices[0], args.similarity, not args.no_rotate, args.fast, handler)
 
         elif len(matrices) > 1:
-            matrices[0].compare(matrices[1:], args.similarity, not args.no_rotate, args.fast)
 
-        runtime = datetime.now() - start_time
-        duplicate_count = 0
+            comp_total = 0
 
-        for image_matrix in matrices[0]:
-            duplicate_count += len(image_matrix.duplicates)
+            for matrix in matrices[1:]:
+                comp_total += matrices[0].size() * matrix.size()
 
-        if not args.fast:
-            duplicate_count //= 2
+            print(f'[+] Comparing {comp_total} images.')
 
-        print(f'[+] difpy found {duplicate_count} duplicates in {runtime}.')
+            with tqdm(total=comp_total, ascii=True) as progress_bar:
+                handler = difPy.ProgressHandler(lambda x, y: progress_bar.update(1))
+                matrices[0].multi_compare(matrices[1:], args.similarity, not args.no_rotate, args.fast, handler)
+
+    # The multi threaded variant uses multiprocessing to distribute the work between different
+    # cores. When building the difPy library it was intended to pass a separate progress bar to
+    # each thread. However, this did not work as tqdm bars cannot be pickeled easily. Therefore,
+    # we need to use some more low level operations and cannot fully rely on the difPy library.
+    else:
+
+        count = 0
+        matrices = []
+
+        for path in args.path:
+
+            print(f'[+] Preparing images in {path.absolute()}')
+            files = difPy.ImageMatrix._glob(path, args.recursive)
+
+            with multiprocessing.Pool(args.threads) as pool:
+
+                with tqdm(total=len(files), ascii=True) as pbar:
+
+                    workers = []
+
+                    for file in files:
+
+                        worker = pool.apply_async(difPy.ImageMatrix.from_file, [file, args.pixel_size])
+                        workers.append(worker)
+
+                    image_matrices = []
+
+                    for worker in workers:
+                        image_matrices.append(worker.get())
+                        pbar.update(1)
+
+            collection = difPy.ImageMatrixCollection(image_matrices)
+            matrices.append(collection)
+
+            count += collection.size()
+
+        if len(matrices) == 1:
+            combinations = matrices[0].combinations([matrices[0]])
+
+        elif len(matrices) > 1:
+            combinations = []
+
+            for matrix in matrices[1:]:
+                combinations += matrices[0].combinations(matrix)
+
+        print(f'[+] Comparing {len(combinations)} images.')
+
+        with multiprocessing.Pool(args.threads) as pool:
+
+            with tqdm(total=len(combinations), ascii=True) as pbar:
+
+                workers = []
+
+                for comb in combinations:
+                    worker = pool.apply_async(comb[0].compare, [comb[1], not args.no_rotate, args.similarity, args.fast])
+                    workers.append(worker)
+
+                for worker in workers:
+                    worker.get()
+                    pbar.update(1)
+
+    # Shared part. From here on, the single and multi threaded variant share the same
+    # code. All memory intensive stuff is done from here and there is no advantage from
+    # using mutliprocessing.
+
+    runtime = datetime.now() - start_time
+    duplicate_count = 0
+
+    for collection in matrices:
+        duplicate_count += len(collection.get_duplicates(args.fast))
+
+    print(f'[+] difpy found {duplicate_count} duplicates in {runtime}.')
+
+    if not args.no_out:
 
         with open(args.output_file, 'w') as output:
             output.write(json.dumps(matrices[0].to_dict()))
 
         print(f'[+] Results written to {args.output_file}')
 
-    except KeyboardInterrupt:
-        print('[!] Interrupted.')
+    # Copy or move uniq files. The actual implementation differes depending on whether
+    # there was a single folder specified or multiple.
+    if args.copy or args.move:
 
+        copy_count = 0
+        move_count = 0
 
-else:
-    raise NotImplementedError('Not implemented yet.')
+        # If a single folder was specified, we take the highes quality unique images
+        # within the collection and copy them to the desired destination folder.
+        if len(matrices) == 1:
+
+            unique = matrices[0].get_higher_quality(args.fast)
+            for image in unique:
+
+                if args.copy:
+                    copy_count += 1
+                    shutil.copy(image.path, args.copy)
+
+                if args.move:
+                    move_count += 1
+                    shutil.move(image.path, args.move)
+                    matrices[0].remove_matrix(image)
+
+        # When we have multiple folders specified, we simply copy or move all uniq images
+        # identified within the latter specified folders.
+        else:
+
+            for collection in matrices[1:]:
+
+                for image in collection:
+
+                    if len(image.duplicates) != 0:
+                        continue
+
+                    if args.copy:
+                        copy_count += 1
+                        shutil.copy(image.path, args.copy)
+
+                    if args.move:
+                        move_count += 1
+                        shutil.move(image.path, args.move)
+                        collection.matrices.remove_matrix(image)
+
+        if copy_count != 0:
+            print(f'[+] {copy_count} images copied to {args.copy.absolute()}')
+
+        if move_count != 0:
+            print(f'[+] {move_count} images moved to {args.move.absolute()}')
+
+        # If --copy-duplicates or --move-duplicates was specified, we have an easy task from
+        # here as the unique images are gone already. So just copy the rest:
+        if args.copy_duplicates or args.move_duplicates:
+
+            copy_count = 0
+            move_count = 0
+
+            for collection in matrices:
+                for image in collection:
+
+                    if args.copy_duplicates:
+                        copy_count += 1
+                        shutil.copy(image.path, args.copy_duplicates)
+
+                    if args.move_duplicates:
+                        move_count += 1
+                        shutil.move(image.path, args.move_duplicates)
+
+            if copy_count != 0:
+                print(f'[+] {copy_count} images copied to {args.copy_duplicates.absolute()}')
+
+            if move_count != 0:
+                print(f'[+] {move_count} images moved to {args.move_duplicates.absolute()}')
+
+    # Copy or move duplicate files. The actual implementation differes depending on whether
+    # there was a single folder specified or multiple.
+    elif args.copy_duplicates or args.move_duplicates:
+
+        copy_count = 0
+        move_count = 0
+
+        # If a single folder was specified, we take all images that appeard multiple times
+        # but exlcude the one with the highes quality, as this is not considered to be a duplicate.
+        if len(matrices) == 1:
+
+            duplicates = matrices[0].get_duplicates(args.fast)
+            for image in duplicates:
+
+                if args.copy_duplicates:
+                    copy_count += 1
+                    shutil.copy(image.path, args.copy_duplicates)
+
+                if args.move_duplicates:
+                    move_count += 1
+                    shutil.move(image.path, args.move_duplicates)
+
+        # When we have multiple folders specified, we simply copy or move all images
+        # identified as duplicates within the latter specified folders.
+        else:
+
+            for collection in matrices[1:]:
+
+                for image in collection:
+
+                    if len(image.duplicates) == 0:
+                        continue
+
+                    if args.copy_duplicates:
+                        copy_count += 1
+                        shutil.copy(image.path, args.copy_duplicates)
+
+                    if args.move_duplicates:
+                        move_count += 1
+                        shutil.move(image.path, args.move_duplicates)
+
+        if copy_count != 0:
+            print(f'[+] {copy_count} images copied to {args.copy.absolute()}')
+
+        if move_count != 0:
+            print(f'[+] {move_count} images moved to {args.move.absolute()}')
+
+    if args.delete:
+
+        duplicates = matrices[0].get_duplicates(args.fast)
+        print(f'[+] Going to delete {len(duplicates)} images.')
+
+        while True and not args.force:
+
+            selection = input('[+] Are you sure? (yes/no/details) ')
+
+            if selection in ['y', 'Y', 'yes', 'Yes']:
+                break
+
+            elif selection in ['n', 'N', 'no', 'No']:
+                print('[+] Aborting.')
+                sys.exit(0)
+
+            elif selection in ['d', 'D', 'details', 'Details']:
+                print('[+] The following images are going to be deleted:')
+
+                for image in duplicates:
+                    print(f'[+]\t{image.path}')
+
+            else:
+                print('[+] Invalid choice: {selection}')
+
+        for image in duplicates:
+            image.path.unlink()
+
+        print('[+] Deletion finished.')
+
+except KeyboardInterrupt:
+    print('[!] Interrupted.')
