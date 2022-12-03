@@ -321,12 +321,16 @@ try:
         if move_count != 0:
             print(f'[+] {move_count} images moved to {args.move.absolute()}')
 
-        # If --copy-duplicates or --move-duplicates was specified, we have an easy task from
-        # here as the unique images are gone already. So just copy the rest:
-        if args.copy_duplicates or args.move_duplicates:
+    # Copy or move duplicate files. The actual implementation differes depending on whether
+    # there was a single folder specified or multiple.
+    if args.copy_duplicates or args.move_duplicates:
 
-            copy_count = 0
-            move_count = 0
+        copy_count = 0
+        move_count = 0
+
+        # If --move-uniq was specified, we have an easy task from here as the unique images
+        # are gone already. So just copy the rest:
+        if args.move:
 
             for collection in matrices:
                 for image in collection:
@@ -339,44 +343,14 @@ try:
                         move_count += 1
                         shutil.move(image.path, args.move_duplicates)
 
-            if copy_count != 0:
-                print(f'[+] {copy_count} images copied to {args.copy_duplicates.absolute()}')
-
-            if move_count != 0:
-                print(f'[+] {move_count} images moved to {args.move_duplicates.absolute()}')
-
-    # Copy or move duplicate files. The actual implementation differes depending on whether
-    # there was a single folder specified or multiple.
-    elif args.copy_duplicates or args.move_duplicates:
-
-        copy_count = 0
-        move_count = 0
-
-        # If a single folder was specified, we take all images that appeard multiple times
-        # but exlcude the one with the highes quality, as this is not considered to be a duplicate.
-        if len(matrices) == 1:
-
-            duplicates = matrices[0].get_duplicates(args.fast)
-            for image in duplicates:
-
-                if args.copy_duplicates:
-                    copy_count += 1
-                    shutil.copy(image.path, args.copy_duplicates)
-
-                if args.move_duplicates:
-                    move_count += 1
-                    shutil.move(image.path, args.move_duplicates)
-
-        # When we have multiple folders specified, we simply copy or move all images
-        # identified as duplicates within the latter specified folders.
         else:
 
-            for collection in matrices[1:]:
+            # If a single folder was specified, we take all images that appeard multiple times
+            # but exlcude the one with the highes quality, as this is not considered to be a duplicate.
+            if len(matrices) == 1:
 
-                for image in collection:
-
-                    if len(image.duplicates) == 0:
-                        continue
+                duplicates = matrices[0].get_duplicates(args.fast)
+                for image in duplicates:
 
                     if args.copy_duplicates:
                         copy_count += 1
@@ -386,11 +360,30 @@ try:
                         move_count += 1
                         shutil.move(image.path, args.move_duplicates)
 
+            # When we have multiple folders specified, we simply copy or move all images
+            # identified as duplicates within the latter specified folders.
+            else:
+
+                for collection in matrices[1:]:
+
+                    for image in collection:
+
+                        if len(image.duplicates) == 0:
+                            continue
+
+                        if args.copy_duplicates:
+                            copy_count += 1
+                            shutil.copy(image.path, args.copy_duplicates)
+
+                        if args.move_duplicates:
+                            move_count += 1
+                            shutil.move(image.path, args.move_duplicates)
+
         if copy_count != 0:
-            print(f'[+] {copy_count} images copied to {args.copy.absolute()}')
+            print(f'[+] {copy_count} images copied to {args.copy_duplicates.absolute()}')
 
         if move_count != 0:
-            print(f'[+] {move_count} images moved to {args.move.absolute()}')
+            print(f'[+] {move_count} images moved to {args.move_duplicates.absolute()}')
 
     if args.delete:
 
