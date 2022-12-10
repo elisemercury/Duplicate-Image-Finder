@@ -17,4 +17,4 @@ RUN export PATH="/home/difpy/.local/bin:$PATH" \
  && python3 setup.py sdist                     \
  && pip3 install --user dist/*
 
-CMD ["/home/difpy/.local/bin/difpy"]
+ENTRYPOINT ["/home/difpy/.local/bin/difpy"]
