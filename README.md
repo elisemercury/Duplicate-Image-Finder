@@ -122,9 +122,17 @@ difPy_stats_xxx.json
 DifPy has the following optional parameters:
 
 ```python
-dif(directory_A, directory_B, similarity="normal", px_size=50, 
+dif(directory_A, directory_B, recursive=True, similarity="normal", px_size=50, 
     show_progress=True, show_output=False, delete=False, silent_del=False)
 ```
+### recursive (bool)
+
+Per default, difPy will search for duplicate images also in subfolders. If set to ``False``, subfolders will not be scanned. 
+
+```True```= (default) use subfolders
+
+```False``` = don't use subfolders
+
 ### similarity (str, int)
 
 Depending on which use-case you want to apply difPy for, the granularity for the classification of the images can be adjusted. DifPy can f. e. search for exact matching duplicate images, or images that look similar, but are not necessarily duplicates.
