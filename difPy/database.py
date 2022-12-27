@@ -23,9 +23,9 @@ class Database:
         Create the config table and insert a config dictionary.
         :param config: config dict
         :param type_name: name under which config is stored
-        :return: bool -> insert successfull or not (key already exists)
+        :return: bool -> insert successful or not (key already exists)
         """
-        if not self.test_config_table_existence():
+        if not self.config_table_exists():
             self.debug_execute("CREATE TABLE config (key INTEGER PRIMARY KEY AUTOINCREMENT, "
                                "name TEXT UNIQUE , value TEXT)")
 
@@ -119,7 +119,7 @@ class Database:
         json_string = bytes_string.decode("utf-8")
         return json.loads(json_string)
 
-    def test_config_table_existence(self):
+    def config_table_exists(self):
         """
         Check the master table if the config table exists. DOES NOT VERIFY THE TABLE DEFINITION!
         :return:
