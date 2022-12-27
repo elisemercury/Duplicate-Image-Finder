@@ -125,4 +125,79 @@ class Database:
         :return:
         """
         self.cur.execute("SELECT * FROM sqlite_master WHERE tbl_name IS 'config'")
-        return self.cur.fetchone() is None
+        return self.cur.fetchone()  is not None
+
+    def create_directory_tables(self, secondary_folder: bool = False, purge: bool = True):
+        """
+        Create the directory tables. Default for purge is true, to recompute it in case the program is stopped during 
+        indexing. ASSUMPTION: Indexing is a very fast operation. TODO Handle Stop mit Indexing.
+
+        :param secondary_folder: if True, create a table for the secondary folder as well.
+        :param purge: if True, purge the tables before creating them.
+        :return:
+        """
+
+        # Drop the tables if purge is set
+        if purge:
+            print("Purging preexisting indexes of directories.")
+            
+            if self.test_dir_table_existence(True):
+                print("Dropping directory A table.")
+                self.drop_dir(True)
+                
+            if self.test_dir_table_existence(False):
+                print("Dropping directory B table.")
+                self.drop_dir(False)
+
+        self.debug_execute("CREATE TABLE directory_a (key INTEGER PRIMARY KEY AUTOINCREMENT, "
+                           "path TEXT , "
+                           "filename TEXT )")
+
+        if secondary_folder:
+            self.debug_execute("CREATE TABLE directory_b (key INTEGER PRIMARY KEY AUTOINCREMENT, "
+                               "path TEXT , "
+                               "filename TEXT )")
+
+    def test_dir_table_existence(self, dir_a: bool = True):
+        """
+        Check the table for directory X, exists. DOES NOT VERIFY THE TABLE DEFINITION!
+        :param dir_a: True if dir_a, False if dir_b
+        :return:
+        """
+        tbl_name = "directory_a" if dir_a else "directory_b"
+        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS '{tbl_name}'")
+        return self.cur.fetchone() is not None
+
+    def drop_dir(self, dir_a: bool = True):
+        """
+        Drop a table related to the directories.
+        :param dir_a: if True, drop dir A table, else drop dir b table.
+        :return:
+        """
+        tbl_name = "directory_a" if dir_a else "directory_b"
+        self.debug_execute(f"DROP TABLE {tbl_name}")
+        self.con.commit()
+
+    def add_file(self, path: str, filename: str, dir_a: bool = True):
+        """
+        Add a file to the database.
+        :param path: path to file, including filename (e.g. /home/user/file.txt)
+        :param filename: filename (e.g. file.txt) // For faster searching
+        :param dir_a: if True, add to dir_a, else add to dir_b
+        :return:
+        """
+
+        tbl_name = "directory_a" if dir_a else "directory_b"
+        self.debug_execute(f"INSERT INTO {tbl_name} (path, filename) VALUES ('{path}', '{filename}')")
+        self.con.commit()
+
+    def get_dir_count(self, dir_a: bool = True):
+        """
+        Get the number of files in the directory.
+        :param dir_a: if True, get count of dir_a, else get count of dir_b
+        :return:
+        """
+        tbl_name = "directory_a" if dir_a else "directory_b"
+        self.debug_execute(f"SELECT COUNT(key) FROM {tbl_name}")
+        return self.cur.fetchone()[0]
+
