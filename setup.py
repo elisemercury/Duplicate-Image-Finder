@@ -31,7 +31,7 @@ setup(
     'Topic :: Software Development :: Build Tools',
     'License :: OSI Approved :: MIT License',    
     'Programming Language :: Python :: 3.7',
-    'Programming Language :: Python :: 3.8', #Specify which pyhton versions to support
+    'Programming Language :: Python :: 3.8',  # Specify which python versions to support
     'Programming Language :: Python :: 3.9',
   ],
 )
