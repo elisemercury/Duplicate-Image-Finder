@@ -227,9 +227,18 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
         assert 8 > args.amount > -8, "amount exceeding range"
 
         p, e = os.path.splitext(args.out_path)
+        path_0 = f"{p}_0{e}"
         path_90 = f"{p}_90{e}"
         path_180 = f"{p}_180{e}"
         path_270 = f"{p}_270{e}"
+
+        # shift only if the amount is non-zero
+        if args.amount > 0:
+            xp.right_shift(img, args.amount)
+        elif args.amount < 0:
+            xp.left_shift(img, abs(args.amount))
+
+        cv2.imwrite(path_0, img)
 
         # rot 90
         np.rot90(img, k=1, axes=(0, 1))
@@ -250,6 +259,7 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
         hash_270 = hash_file(path_270)
 
         # shouldn't be allowed to fail
+        os.remove(path_0)
         os.remove(path_90)
         os.remove(path_180)
         os.remove(path_270)
