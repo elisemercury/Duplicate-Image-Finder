@@ -456,7 +456,12 @@ class FastDifPy:
         byte_count_a = dir_a_count * self.__thumbnail_size_x * self.__thumbnail_size_y * 3
         byte_count_b = dir_b_count * self.__thumbnail_size_x * self.__thumbnail_size_y * 3
 
-        target = max(len(self.p_root_dir_a), len(self.p_root_dir_b))
+        target = max(len(self.p_root_dir_a), len(self.p_root_dir_b), len(self.p_root_dir_b) + len(self.p_root_dir_a))
+
+        print(f"Estimated disk usage by {fill(len(self.p_root_dir_a), target)}: " + h(byte_count_a, "B") + " bytes")
+        print(f"Estimated disk usage by {fill(len(self.p_root_dir_b), target)}: " + h(byte_count_b, "B") + " bytes")
+        print(f"Estimated disk usage by {fill('the two dirs ', target)}: " + h(byte_count_b + byte_count_a,
+                                                                               "B") + "bytes")
 
         print(f"Estimated disk usage by {fill(self.p_root_dir_a, target)}: " + h(byte_count_a, "B") + " bytes")
         print(f"Estimated disk usage by {fill(self.p_root_dir_b, target)}: " + h(byte_count_b, "B") + " bytes")
