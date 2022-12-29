@@ -1,5 +1,6 @@
 import math
 import hashlib
+import numpy as np
 
 """
 File contains a small list of utilities for the main classes. The utilities are not specific to this project but are a 
@@ -7,7 +8,18 @@ nice to have.
 """
 
 
-def hash_file(path):
+def hash_np(mat: np.ndarray) -> str:
+    """
+    Hashes a np array by performing a hash of its underlying buffer.
+    :param mat: multidimensional numpy array.
+    :return: hash
+    """
+    sha256_hash = hashlib.sha256()
+    sha256_hash.update(mat.data)
+    return sha256_hash.hexdigest()
+
+
+def hash_file(path) -> str:
     """
     Hashes a file with sha256
     :param path: file_path to hash
