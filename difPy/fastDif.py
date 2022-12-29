@@ -89,6 +89,8 @@ class PreprocessResults:
     hash_180: str
     hash_270: str
 
+    error: str
+
     @staticmethod
     def from_json(json_string: str):
         """
@@ -99,13 +101,186 @@ class PreprocessResults:
         obj_dict = json.loads(json_string)
         keys = obj_dict.keys()
 
-        target_keys = ["in_path", "out_path", "original_x", "original_y", "hash_0", "hash_90", "hash_180", "hash_270", "success"]
+        target_keys = ["in_path", "out_path", "original_x", "original_y", "hash_0", "hash_90", "hash_180", "hash_270",
+                       "success", "error"]
         if not all(x in keys for x in target_keys):
             raise ValueError("Provided Json String doesn't contain the necessary keys.")
 
+        return PreprocessResults(in_path=obj_dict["in_path"],
+                                 out_path=obj_dict["out_path"],
+                                 original_x=obj_dict["original_x"],
+                                 original_y=obj_dict["original_y"],
+                                 success=obj_dict["success"],
+                                 hash_0=obj_dict["hash_0"],
+                                 hash_90=obj_dict["hash_90"],
+                                 hash_180=obj_dict["hash_180"],
+                                 hash_270=obj_dict["hash_270"],
+                                 error=obj_dict["error"])
+
+    @staticmethod
+    def error_obj(in_path: str, out_path: str, error: str):
+        return PreprocessResults(
+            in_path=in_path,
+            out_path=out_path,
+            success=False,
+            error=error,
+            original_x=-1,
+            original_y=-1,
+            hash_0="<ERROR>",
+            hash_90="<ERROR>",
+            hash_180="<ERROR>",
+            hash_270="<ERROR>",
+        )
+
+    @staticmethod
+    def no_hash_init(in_path: str, out_path: str, original_x: int, original_y: int):
+        return PreprocessResults(
+            in_path=in_path,
+            out_path=out_path,
+            success=True,
+            error="<EMPTY>",
+            original_x=original_x,
+            original_y=original_y,
+            hash_0="<EMPTY>",
+            hash_90="<EMPTY>",
+            hash_180="<EMPTY>",
+            hash_270="<EMPTY>",
+        )
+
+    def to_dict(self):
+        """
+        Convert object to dict representation
+        :return:
+        """
+        return {
+            "in_path": self.in_path,
+            "out_path": self.out_path,
+            "original_x": self.original_x,
+            "original_y": self.original_y,
+            "hash_0": self.hash_0,
+            "hash_90": self.hash_90,
+            "hash_180": self.hash_180,
+            "hash_270": self.hash_270,
+            "success": self.success,
+            "error": self.error,
+        }
+
+    def to_json(self):
+        """
+        Converts an object into json string.
+        :return:
+        """
+        return json.dumps(self.to_dict())
+
+
+def process_image(args: PreprocessArguments) -> PreprocessResults:
+    """
+    Perform the preprocessing on the image.
+    :param args: arguments to parse
+    :return:
+    """
+    try:
+        img = cv2.imdecode(np.fromfile(args.in_path, dtype=np.uint8), cv2.IMREAD_COLOR)
+
+        org_size_x, org_size_y, _ = np.shape(img)
+
+        if type(img) != np.ndarray:
+            return PreprocessResults.error_obj(in_path=args.in_path, out_path=args.out_path,
+                                               error="Type Error, result of image decode was not np.ndarray")
+
+        img = img[..., 0:3]
+        img = cv2.resize(img, dsize=(args.size_x, args.size_y), interpolation=cv2.INTER_CUBIC)
+
+        if len(img.shape) == 2:
+            img = skimage.color.gray2rgb(img)
+
+        # write 0 deg
+        cv2.imwrite(args.out_path, img)
+
+        if not args.compute_hash:
+            return PreprocessResults.no_hash_init(in_path=args.in_path,
+                                                  out_path=args.out_path,
+                                                  original_x=org_size_x,
+                                                  original_y=org_size_y)
+
+        p, e = os.path.splitext(args.out_path)
+        path_90 = f"{p}_90{e}"
+        path_180 = f"{p}_180{e}"
+        path_270 = f"{p}_270{e}"
+
+        # rot 90
+        np.rot90(img, k=1, axes=(0, 1))
+        cv2.imwrite(path_90, img)
+
+        # rot 180
+        np.rot90(img, k=1, axes=(0, 1))
+        cv2.imwrite(path_180, img)
+
+        # rot 270
+        np.rot90(img, k=1, axes=(0, 1))
+        cv2.imwrite(path_270, img)
+
+        # need to compute file hash since writing the
+        hash_0 = hash_file(args.out_path)
+        hash_90 = hash_file(path_90)
+        hash_180 = hash_file(path_180)
+        hash_270 = hash_file(path_270)
+
+        # shouldn't be allowed to fail
+        os.remove(path_90)
+        os.remove(path_180)
+        os.remove(path_270)
+
+        return PreprocessResults(
+            in_path=args.in_path,
+            out_path=args.out_path,
+            success=True,
+            error="<EMPTY>",
+            original_x=org_size_x,
+            original_y=org_size_y,
+            hash_0=hash_0,
+            hash_90=hash_90,
+            hash_180=hash_180,
+            hash_270=hash_270,
+        )
+
+    except Exception as e:
+        return PreprocessResults.error_obj(in_path=args.in_path, out_path=args.out_path,
+                                           error=f"Error: {e}")
+
+
+def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int):
+    """
+    Parallel implementation of first loop iteration.
+    :param iq: input queue containing arguments dict or
+    :param output: output queue containing only json strings of obj
+    :param identifier: id of running thread
+    :return:
+    """
+    timeout = 0
+
+    while timeout < 60:
+        try:
+            args_str = iq.get(timeout=1)
+        except queue.Empty:
+            timeout += 1
+            continue
+
+        if args_str is None:
+            print(f"{identifier:02} Terminating")
+            break
+
+        args = PreprocessArguments.from_json(args_str)
+        timeout = 0
+
+        result = process_image(args)
+        print(os.path.basename(args.in_path))
+
+        # Sending the result to the handler
+        output.put(result.to_json())
+
 
 class FastDifPy:
-
     p_db: str
     p_root_dir_a: str
     p_root_dir_b: Union[str, None]
