@@ -13,9 +13,89 @@ Features:
 - Use Parallelization to use multicore CPUs
 - Use of aspect rotation to ignore images with non-matching aspect ratio
 - Use hash based deduplication to find duplicates with color grading
-- Use of binary differentiation to detect hard file duplicates
-- Use of file names / zero difference to detect images which differ only in the metadata.
+- Use of binary differentiation to detect hard file duplicates  # TODO for later
+- Use of file names / zero difference to detect images which differ only in the metadata.  # TODO for later
 """
+
+# TODO Implement process stop recovery.
+
+
+@dataclass
+class PreprocessArguments:
+    in_path: str
+    out_path: str
+
+    size_x: int
+    size_y: int
+
+    compute_hash: bool
+
+    @staticmethod
+    def from_json(json_string: str):
+        """
+        Create a PreprocessArguments object from a json dict. (jsonified by the to_json method of the class)
+        :param json_string: string to convert to object.
+        :return:
+        """
+        obj_dict = json.loads(json_string)
+        keys = obj_dict.keys()
+
+        target_keys = ["in_path", "out_path", "size_x", "size_y", "compute_hash"]
+        if not all(x in keys for x in target_keys):
+            raise ValueError("Provided Json String doesn't contain the necessary keys.")
+
+        return PreprocessArguments(obj_dict["in_path"], obj_dict["out_path"], obj_dict["size_x"], obj_dict["size_y"],
+                                   obj_dict["compute_hash"])
+
+    def to_dict(self):
+        """
+        Convert object to dict
+        :return:
+        """
+        return {
+            "in_path": self.in_path,
+            "out_path": self.out_path,
+            "size_x": self.size_x,
+            "size_y": self.size_y,
+            "compute_hash": self.compute_hash
+        }
+
+    def to_json(self):
+        """
+        Convert an Object into json string.
+        :return:
+        """
+        return json.dumps(self.to_dict())
+
+
+@dataclass
+class PreprocessResults:
+    in_path: str
+    out_path: str
+
+    success: bool
+
+    original_x: int
+    original_y: int
+
+    hash_0: str
+    hash_90: str
+    hash_180: str
+    hash_270: str
+
+    @staticmethod
+    def from_json(json_string: str):
+        """
+        Create the PreprocessResults Object from a json dict (jsonified by the to_json method of the object)
+        :param json_string: string to convert to object.
+        :return:
+        """
+        obj_dict = json.loads(json_string)
+        keys = obj_dict.keys()
+
+        target_keys = ["in_path", "out_path", "original_x", "original_y", "hash_0", "hash_90", "hash_180", "hash_270", "success"]
+        if not all(x in keys for x in target_keys):
+            raise ValueError("Provided Json String doesn't contain the necessary keys.")
 
 
 class FastDifPy:
