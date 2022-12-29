@@ -183,10 +183,19 @@ class PreprocessResults:
         return json.dumps(self.to_dict())
 
 
-def process_image(args: PreprocessArguments) -> PreprocessResults:
+def process_image_cuda(args: PreprocessArguments) -> PreprocessResults:
+    # import cupy and use cupy instead of the
+    # TODO Test if the process works correctly with cupy
+    import cupy as cp
+
+    return process_image(cp)
+
+
+def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
     """
     Perform the preprocessing on the image.
     :param args: arguments to parse
+    :param xp: implementation of numpy. default is numpy but might also be cupy
     :return:
     """
     try:
