@@ -36,6 +36,7 @@ class PreprocessArguments:
     size_y: int
 
     compute_hash: bool
+    store_thumb: bool
 
     amount: int
 
@@ -49,12 +50,17 @@ class PreprocessArguments:
         obj_dict = json.loads(json_string)
         keys = obj_dict.keys()
 
-        target_keys = ["in_path", "out_path", "size_x", "size_y", "compute_hash", "amount"]
+        target_keys = ["in_path", "out_path", "size_x", "size_y", "compute_hash", "amount", "store_thumb"]
         if not all(x in keys for x in target_keys):
             raise ValueError("Provided Json String doesn't contain the necessary keys.")
 
-        return PreprocessArguments(obj_dict["in_path"], obj_dict["out_path"], obj_dict["size_x"], obj_dict["size_y"],
-                                   obj_dict["compute_hash"], amount=obj_dict["amount"])
+        return PreprocessArguments(in_path=obj_dict["in_path"],
+                                   out_path=obj_dict["out_path"],
+                                   size_x=obj_dict["size_x"],
+                                   size_y=obj_dict["size_y"],
+                                   compute_hash=obj_dict["compute_hash"],
+                                   amount=obj_dict["amount"],
+                                   store_thumb=obj_dict["store_thumb"])
 
     def to_dict(self):
         """
