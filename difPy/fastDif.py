@@ -74,6 +74,7 @@ class PreprocessArguments:
             "size_y": self.size_y,
             "compute_hash": self.compute_hash,
             "amount": self.amount,
+            "store_thumb": self.store_thumb,
         }
 
     def to_json(self):
