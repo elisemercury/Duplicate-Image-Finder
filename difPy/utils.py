@@ -1,10 +1,25 @@
 import math
-
+import hashlib
 
 """
 File contains a small list of utilities for the main classes. The utilities are not specific to this project but are a 
 nice to have.
 """
+
+
+def hash_file(path):
+    """
+    Hashes a file with sha256
+    :param path: file_path to hash
+    :return:
+    """
+    sha256_hash = hashlib.sha256()
+    with open(path, "rb") as f:
+        # Read and update hash string value in blocks of 4K
+        for byte_block in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(byte_block)
+        result = sha256_hash.hexdigest()
+    return result
 
 
 def fill(base: str, length: int, fill_char: str = " ", left: bool = True) -> str:
