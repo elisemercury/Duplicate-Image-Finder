@@ -204,8 +204,9 @@ def process_image(args: PreprocessArguments) -> PreprocessResults:
         if len(img.shape) == 2:
             img = skimage.color.gray2rgb(img)
 
-        # write 0 deg
-        cv2.imwrite(args.out_path, img)
+        # write thumbnail
+        if args.store_thumb:
+            cv2.imwrite(args.out_path, img)
 
         if not args.compute_hash:
             return PreprocessResults.no_hash_init(in_path=args.in_path,
