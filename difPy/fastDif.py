@@ -249,15 +249,23 @@ def process_image(args: PreprocessArguments) -> PreprocessResults:
                                            error=f"Error: {e}")
 
 
-def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int):
+def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: bool):
     """
     Parallel implementation of first loop iteration.
     :param iq: input queue containing arguments dict or
     :param output: output queue containing only json strings of obj
     :param identifier: id of running thread
+    :param try_cupy: check if cupy is available and use cupy instead.
     :return:
     """
     timeout = 0
+
+    if try_cupy:
+        try:
+            import cupy
+            cupy_avail = True
+        except ImportError:
+            cupy_avail = False
 
     while timeout < 60:
         try:
@@ -273,7 +281,10 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int):
         args = PreprocessArguments.from_json(args_str)
         timeout = 0
 
-        result = process_image(args)
+        if cupy_avail:
+            result = process_image_cuda(args)
+        else:
+            result = process_image(args)
         print(os.path.basename(args.in_path))
 
         # Sending the result to the handler
