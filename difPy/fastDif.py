@@ -28,6 +28,7 @@ Features:
 
 @dataclass
 class PreprocessArguments:
+    # TODO different amounts for different colors.
     in_path: str
     out_path: str
 
@@ -35,6 +36,8 @@ class PreprocessArguments:
     size_y: int
 
     compute_hash: bool
+
+    amount: int
 
     @staticmethod
     def from_json(json_string: str):
@@ -46,12 +49,12 @@ class PreprocessArguments:
         obj_dict = json.loads(json_string)
         keys = obj_dict.keys()
 
-        target_keys = ["in_path", "out_path", "size_x", "size_y", "compute_hash"]
+        target_keys = ["in_path", "out_path", "size_x", "size_y", "compute_hash", "amount"]
         if not all(x in keys for x in target_keys):
             raise ValueError("Provided Json String doesn't contain the necessary keys.")
 
         return PreprocessArguments(obj_dict["in_path"], obj_dict["out_path"], obj_dict["size_x"], obj_dict["size_y"],
-                                   obj_dict["compute_hash"])
+                                   obj_dict["compute_hash"], amount=obj_dict["amount"])
 
     def to_dict(self):
         """
@@ -63,7 +66,8 @@ class PreprocessArguments:
             "out_path": self.out_path,
             "size_x": self.size_x,
             "size_y": self.size_y,
-            "compute_hash": self.compute_hash
+            "compute_hash": self.compute_hash,
+            "amount": self.amount,
         }
 
     def to_json(self):
