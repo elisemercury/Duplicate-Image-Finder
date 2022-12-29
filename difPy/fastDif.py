@@ -200,11 +200,11 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
     :return:
     """
     try:
-        img = cv2.imdecode(np.fromfile(args.in_path, dtype=np.uint8), cv2.IMREAD_COLOR)
+        img = cv2.imdecode(xp.fromfile(args.in_path, dtype=xp.uint8), cv2.IMREAD_COLOR)
 
-        org_size_x, org_size_y, _ = np.shape(img)
+        org_size_x, org_size_y, _ = xp.shape(img)
 
-        if type(img) != np.ndarray:
+        if type(img) != xp.ndarray:
             return PreprocessResults.error_obj(in_path=args.in_path, out_path=args.out_path,
                                                error="Type Error, result of image decode was not np.ndarray")
 
@@ -241,15 +241,15 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
         cv2.imwrite(path_0, img)
 
         # rot 90
-        np.rot90(img, k=1, axes=(0, 1))
+        xp.rot90(img, k=1, axes=(0, 1))
         cv2.imwrite(path_90, img)
 
         # rot 180
-        np.rot90(img, k=1, axes=(0, 1))
+        xp.rot90(img, k=1, axes=(0, 1))
         cv2.imwrite(path_180, img)
 
         # rot 270
-        np.rot90(img, k=1, axes=(0, 1))
+        xp.rot90(img, k=1, axes=(0, 1))
         cv2.imwrite(path_270, img)
 
         # need to compute file hash since writing the
