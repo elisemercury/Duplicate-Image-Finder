@@ -224,6 +224,8 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
                                                   original_x=org_size_x,
                                                   original_y=org_size_y)
 
+        assert 8 > args.amount > -8, "amount exceeding range"
+
         p, e = os.path.splitext(args.out_path)
         path_90 = f"{p}_90{e}"
         path_180 = f"{p}_180{e}"
