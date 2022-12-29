@@ -29,6 +29,7 @@ Features:
 @dataclass
 class PreprocessArguments:
     # TODO different amounts for different colors.
+    key: int
     in_path: str
     out_path: str
 
@@ -50,7 +51,7 @@ class PreprocessArguments:
         obj_dict = json.loads(json_string)
         keys = obj_dict.keys()
 
-        target_keys = ["in_path", "out_path", "size_x", "size_y", "compute_hash", "amount", "store_thumb"]
+        target_keys = ["in_path", "out_path", "size_x", "size_y", "compute_hash", "amount", "store_thumb", "key"]
         if not all(x in keys for x in target_keys):
             raise ValueError("Provided Json String doesn't contain the necessary keys.")
 
@@ -60,7 +61,8 @@ class PreprocessArguments:
                                    size_y=obj_dict["size_y"],
                                    compute_hash=obj_dict["compute_hash"],
                                    amount=obj_dict["amount"],
-                                   store_thumb=obj_dict["store_thumb"])
+                                   store_thumb=obj_dict["store_thumb"],
+                                   key=int(obj_dict["key"]))
 
     def to_dict(self):
         """
@@ -75,6 +77,7 @@ class PreprocessArguments:
             "compute_hash": self.compute_hash,
             "amount": self.amount,
             "store_thumb": self.store_thumb,
+            "key": self.key
         }
 
     def to_json(self):
@@ -87,6 +90,7 @@ class PreprocessArguments:
 
 @dataclass
 class PreprocessResults:
+    key: int
     in_path: str
     out_path: str
 
@@ -113,7 +117,7 @@ class PreprocessResults:
         keys = obj_dict.keys()
 
         target_keys = ["in_path", "out_path", "original_x", "original_y", "hash_0", "hash_90", "hash_180", "hash_270",
-                       "success", "error"]
+                       "success", "error", "key"]
         if not all(x in keys for x in target_keys):
             raise ValueError("Provided Json String doesn't contain the necessary keys.")
 
@@ -126,10 +130,11 @@ class PreprocessResults:
                                  hash_90=obj_dict["hash_90"],
                                  hash_180=obj_dict["hash_180"],
                                  hash_270=obj_dict["hash_270"],
-                                 error=obj_dict["error"])
+                                 error=obj_dict["error"],
+                                 key=int(obj_dict["key"]))
 
     @staticmethod
-    def error_obj(in_path: str, out_path: str, error: str):
+    def error_obj(in_path: str, out_path: str, error: str, key: int):
         return PreprocessResults(
             in_path=in_path,
             out_path=out_path,
@@ -141,10 +146,11 @@ class PreprocessResults:
             hash_90="<ERROR>",
             hash_180="<ERROR>",
             hash_270="<ERROR>",
+            key=key,
         )
 
     @staticmethod
-    def no_hash_init(in_path: str, out_path: str, original_x: int, original_y: int):
+    def no_hash_init(in_path: str, out_path: str, original_x: int, original_y: int, key: int):
         return PreprocessResults(
             in_path=in_path,
             out_path=out_path,
@@ -156,6 +162,7 @@ class PreprocessResults:
             hash_90="<EMPTY>",
             hash_180="<EMPTY>",
             hash_270="<EMPTY>",
+            key=key,
         )
 
     def to_dict(self):
@@ -174,6 +181,7 @@ class PreprocessResults:
             "hash_270": self.hash_270,
             "success": self.success,
             "error": self.error,
+            "key": self.key,
         }
 
     def to_json(self):
@@ -492,8 +500,14 @@ class FastDifPy:
         print(f"Estimated disk usage by {fill('the two dirs ', target)}: " + h(byte_count_b + byte_count_a,
                                                                                "B") + "bytes")
 
-        print(f"Estimated disk usage by {fill(self.p_root_dir_a, target)}: " + h(byte_count_a, "B") + " bytes")
-        print(f"Estimated disk usage by {fill(self.p_root_dir_b, target)}: " + h(byte_count_b, "B") + " bytes")
+    def first_loop_iteration(self, compute_thumbnails: bool = True, compute_hash: bool = False, amount: int = 4):
+        # store thumbnails if possible.
+        if compute_hash:
+            if amount == 0:
+                print("WARNING: amount 0, only EXACT duplicates are detected like this.")
+
+            if amount > 7 or amount < -7:
+                raise ValueError("amount my only be in range [-7, 7]")
 
     def clean_up(self):
         # TODO remove the thumbnails
@@ -527,4 +541,3 @@ class FastDifPy:
             warnings.warn("Thumbnail size is very large. Higher Accuracy will slow down the process and "
                           "increase storage usage.")
         self.__thumbnail_size_y = value
-
