@@ -125,7 +125,7 @@ class Database:
         :return:
         """
         self.cur.execute("SELECT * FROM sqlite_master WHERE tbl_name IS 'config'")
-        return self.cur.fetchone()  is not None
+        return self.cur.fetchone() is not None
 
     def create_directory_tables(self, secondary_folder: bool = False, purge: bool = True):
         """
@@ -206,4 +206,26 @@ class Database:
         tbl_name = "directory_a" if dir_a else "directory_b"
         self.debug_execute(f"SELECT COUNT(key) FROM {tbl_name}")
         return self.cur.fetchone()[0]
+
+    def update_dir_success(self, key: int, dir_a: bool = True):
+        """
+        Set the flag for success of the file with the matching key. Set it in either table_a or table_b.
+        Error not updated.
+        :param key: file identifier which is to be updated
+        :param dir_a: TRUE <=> update directory_a, ELSE update directory_b
+        :return:
+        """
+        tbl_name = "directory_a" if dir_a else "directory_b"
+        self.debug_execute(f"UPDATE {tbl_name} SET proc_suc = 1 WHERE key = {key}")
+
+    def update_dir_error(self, key: int, msg: str, dir_a: bool = True):
+        """
+        Set the flag for error of the file with the matching key. Set it in either table_a or table_b
+        Error is stored in plane text atm (It might be necessary to store it in b64.
+        :param key: file identifier which is to be updated
+        :param dir_a: TRUE <=> update directory_a, ELSE update directory_b
+        :param msg: error message created when attempting to process the file.
+        """
+        tbl_name = "directory_a" if dir_a else "directory_b"
+        self.debug_execute(f"UPDATE {tbl_name} SET proc_suc = 0, error='{msg}' WHERE key = {key}")
 
