@@ -152,13 +152,17 @@ class Database:
         self.debug_execute("CREATE TABLE directory_a (key INTEGER PRIMARY KEY AUTOINCREMENT, "
                            "path TEXT , "
                            "filename TEXT, "
-                           "proc_suc INTEGER DEFAULT 1)")
+                           "error TEXT DEFAULT '<EMPTY>',"
+                           "proc_suc INTEGER DEFAULT -1 CHECK "
+                           "( directory_a.proc_suc >= -1 AND directory_a.proc_suc <= 1 ))")
 
         if secondary_folder:
             self.debug_execute("CREATE TABLE directory_b (key INTEGER PRIMARY KEY AUTOINCREMENT, "
                                "path TEXT , "
                                "filename TEXT ,"
-                               "proc_suc INTEGER DEFAULT 1)")
+                               "error TEXT DEFAULT '<EMPTY>',"
+                               "proc_suc INTEGER DEFAULT -1 CHECK "
+                               "( directory_b.proc_suc >= -1 AND directory_b.proc_suc <= 1 ))")
 
     def test_dir_table_existence(self, dir_a: bool = True):
         """
