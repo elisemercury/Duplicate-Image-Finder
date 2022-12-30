@@ -15,8 +15,15 @@ class Database:
     con: sqlite3.Connection = None
     cur: sqlite3.Cursor = None
 
+    a_done: bool
+    b_done: bool
+    has_b: Union[bool, None]
+
     def __init__(self, path):
         self.connect(path)
+        self.a_done = False
+        self.b_done = False
+        self.has_b = None
 
     def create_config(self, config: dict, type_name: str) -> bool:
         """
@@ -157,6 +164,7 @@ class Database:
                            "( directory_a.proc_suc >= -1 AND directory_a.proc_suc <= 1 ))")
 
         if secondary_folder:
+            self.has_b = True
             self.debug_execute("CREATE TABLE directory_b (key INTEGER PRIMARY KEY AUTOINCREMENT, "
                                "path TEXT , "
                                "filename TEXT ,"
