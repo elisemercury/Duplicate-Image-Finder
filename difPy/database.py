@@ -229,3 +229,41 @@ class Database:
         tbl_name = "directory_a" if dir_a else "directory_b"
         self.debug_execute(f"UPDATE {tbl_name} SET proc_suc = 0, error='{msg}' WHERE key = {key}")
 
+    def get_next_to_process(self):
+        """
+        Get an unprocessed entry from (one) of the directory table (s). Returns None per default to signify that
+        there's nothing to be computed.
+        :return: Next one to compute or None
+        """
+        if not self.a_done:
+            self.debug_execute("SELECT * FROM directory_a WHERE proc_suc = -1")
+            res = self.cur.fetchone()
+
+            if res is None:
+                self.a_done = True
+
+            return res
+
+        # if the has_b attribute is not computed, set it here.
+        if self.has_b is None:
+            self.has_b = self.test_dir_table_existence(dir_a=False)
+
+            # Only needs to be eval. here since if it doesn't exist, we don't need to query the db. if it exists,
+            # there's no need to recheck the has condition every time.
+            if not self.has_b:
+                self.b_done = True
+                return None
+
+        # query b table
+        if not self.b_done:
+            self.debug_execute("SELECT * FROM directory_b WHERE proc_suc = -1")
+            res = self.cur.fetchone()
+
+            if res is None:
+                self.b_done = True
+
+            return res
+
+        # return None is the fall through and the default
+        return None
+
