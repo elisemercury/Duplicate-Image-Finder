@@ -2,6 +2,7 @@ import sqlite3
 import base64
 import json
 from typing import Any, Union
+import datetime
 
 """
 Default implementation of the Database.
@@ -18,6 +19,8 @@ class Database:
     a_done: bool
     b_done: bool
     has_b: Union[bool, None]
+
+    last_update: datetime.datetime = None
 
     def __init__(self, path):
         self.connect(path)
