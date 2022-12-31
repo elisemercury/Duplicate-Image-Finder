@@ -210,11 +210,20 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
     try:
         img = cv2.imdecode(xp.fromfile(args.in_path, dtype=xp.uint8), cv2.IMREAD_COLOR)
 
-        org_size_x, org_size_y, _ = xp.shape(img)
-
         if type(img) != xp.ndarray:
             return PreprocessResults.error_obj(in_path=args.in_path, out_path=args.out_path,
-                                               error="Type Error, result of image decode was not np.ndarray")
+                                               error="Type Error, result of image decode was not np.ndarray",
+                                               key=args.key)
+
+        org_size_x, org_size_y, _ = xp.shape(img)
+
+        # only get the image size for the scheduler to accelerate non-matching images.
+        if not args.compute_hash and not args.store_thumb:
+            return PreprocessResults.no_hash_init(in_path=args.in_path,
+                                                  out_path=args.out_path,
+                                                  original_x=org_size_x,
+                                                  original_y=org_size_y,
+                                                  key=args.key)
 
         img = img[..., 0:3]
         img = cv2.resize(img, dsize=(args.size_x, args.size_y), interpolation=cv2.INTER_CUBIC)
@@ -226,12 +235,15 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
         if args.store_thumb:
             cv2.imwrite(args.out_path, img)
 
+        # return here if the hashes are not computed
         if not args.compute_hash:
             return PreprocessResults.no_hash_init(in_path=args.in_path,
                                                   out_path=args.out_path,
                                                   original_x=org_size_x,
-                                                  original_y=org_size_y)
+                                                  original_y=org_size_y,
+                                                  key=args.key)
 
+        # TODO move this part into a new function
         assert 8 > args.amount > -8, "amount exceeding range"
 
         p, e = os.path.splitext(args.out_path)
@@ -283,11 +295,12 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
             hash_90=hash_90,
             hash_180=hash_180,
             hash_270=hash_270,
+            key=args.key
         )
 
     except Exception as e:
         return PreprocessResults.error_obj(in_path=args.in_path, out_path=args.out_path,
-                                           error=f"Error: {e}")
+                                           error=f"Error: {e}", key=args.key)
 
 
 def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: bool):
