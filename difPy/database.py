@@ -47,7 +47,6 @@ class Database:
             return False
 
         self.debug_execute(f"INSERT INTO config (name, value) VALUES ('{type_name}', '{config_string}')")
-        self.con.commit()
         return True
 
     def get_config(self, type_name: str) -> Union[dict, None]:
@@ -71,7 +70,6 @@ class Database:
         :return:
         """
         self.debug_execute(f"DELETE FROM config WHERE name IS '{type_name}'")
-        self.con.commit()
 
     def update_config(self, config: dict, type_name: str):
         """
@@ -82,7 +80,6 @@ class Database:
         """
         config_string = self.to_b64(config)
         self.debug_execute(f"UPDATE config SET value = '{config_string}' WHERE name IS '{type_name}'")
-        self.con.commit()
 
     def debug_execute(self, statement: str, commit_now: bool = False):
         """
