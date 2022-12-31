@@ -20,10 +20,11 @@ warnings.filterwarnings('ignore')
 
 class dif:
 
-    def __init__(self, directory_A, directory_B=None, similarity="normal", px_size=50, show_progress=True, show_output=False, delete=False, silent_del=False):
+    def __init__(self, directory_A, directory_B=None, recursive=True, similarity="normal", px_size=50, show_progress=True, show_output=False, delete=False, silent_del=False):
         """
         directory_A (str)........folder path to search for duplicate/similar images
         directory_B (str)........second folder path to search for duplicate/similar images
+        recursive (bool).........scan subfolders for duplicate images
         similarity (str, int)...."normal" = searches for duplicates, recommended setting, MSE < 200
                                  "high" = serached for exact duplicates, extremly sensitive to details, MSE < 0.1
                                  "low" = searches for similar images, MSE < 1000
@@ -45,7 +46,7 @@ class dif:
                                and a set of lower resultion images of all duplicates
 
         *** CLI-Interface ***
-        dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]] [-s [{low,normal,high}]] [-px [PX_SIZE]]
+        dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]] [-r [{True,False}]] [-s [{low,normal,high}]] [-px [PX_SIZE]]
                [-p [{True,False}]] [-o [{True,False}]] [-d [{True,False}]] [-D [{True,False}]]
         
         OUTPUT.................output data is written to files and saved in the working directory
@@ -55,13 +56,13 @@ class dif:
         """
         start_time = time.time()        
         print("DifPy process initializing...", end="\r")
-
-        dif._validate_parameters(show_output, show_progress, similarity, px_size, delete, silent_del)
+        print(f"Recursive: {recursive}" )
+        dif._validate_parameters(show_output, show_progress, recursive, similarity, px_size, delete, silent_del)
 
         if directory_B == None:
             # process one directory
             directory_A = dif._process_directory(directory_A)
-            img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size, show_progress)
+            img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size, recursive, show_progress)
             ref = dif._map_similarity(similarity)
             result, lower_quality, total = dif._search_one_dir(img_matrices_A, folderfiles_A, 
                                                                ref, show_output, show_progress)
@@ -70,8 +71,8 @@ class dif:
             directory_A = dif._process_directory(directory_A)
             directory_B = dif._process_directory(directory_B)
             dif._path_validation([directory_A, directory_B])
-            img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size, show_progress)
-            img_matrices_B, folderfiles_B = dif._create_imgs_matrix(directory_B, px_size, show_progress)
+            img_matrices_A, folderfiles_A = dif._create_imgs_matrix(directory_A, px_size, recursive, show_progress)
+            img_matrices_B, folderfiles_B = dif._create_imgs_matrix(directory_B, px_size, recursive, show_progress)
             ref = dif._map_similarity(similarity)
             result, lower_quality, total = dif._search_two_dirs(img_matrices_A, folderfiles_A,
                                                                 img_matrices_B, folderfiles_B,
@@ -107,12 +108,14 @@ class dif:
                     dif._delete_imgs(set(lower_quality))
 
     # Function that validates the input parameters of DifPy
-    def _validate_parameters(show_output, show_progress, similarity, px_size, delete, silent_del):
+    def _validate_parameters(show_output, show_progress, recursive, similarity, px_size, delete, silent_del):
         # validate the parameters of the function
         if show_output != True and show_output != False:
             raise ValueError('Invalid value for "show_output" parameter.')
         if show_progress != True and show_progress != False:
             raise ValueError('Invalid value for "show_progress" parameter.')
+        if recursive != True and recursive != False:
+            raise ValueError('Invalid value for "recursive" parameter.')
         if similarity not in ["low", "normal", "high"]: 
             try:
                 similarity = float(similarity)
@@ -144,15 +147,16 @@ class dif:
             raise ValueError('One directory belongs to another.')
     
     # Function that creates a list of matrices for each image found in the folders
-    def _create_imgs_matrix(directory, px_size, show_progress):
-        subfolders = dif._find_subfolders(directory)
+    def _create_imgs_matrix(directory, px_size, recursive, show_progress):
 
         # create list of tuples with files found in directory, format: (path, filename)
         folder_files = [(directory, filename) for filename in os.listdir(directory)]
-        if len(subfolders) >= 1:
-            for folder in subfolders:
-                subfolder_files = [(folder, filename) for filename in os.listdir(folder)]
-                folder_files = folder_files + subfolder_files
+        if recursive == True:
+            subfolders = dif._find_subfolders(directory)
+            if len(subfolders) >= 1:
+                for folder in subfolders:
+                    subfolder_files = [(folder, filename) for filename in os.listdir(folder)]
+                    folder_files = folder_files + subfolder_files
 
         # create images matrix
         imgs_matrix, delete_index = [], []
@@ -401,6 +405,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Find duplicate or similar images on your computer with difPy - https://github.com/elisemercury/Duplicate-Image-Finder')
     parser.add_argument("-A", "--directory_A", type=str, help='Directory to search for images.', required=True)
     parser.add_argument("-B", "--directory_B", type=str, help='(optional) Second directory to search for images.', required=False, nargs='?', default=None)
+    parser.add_argument("-r", "--recursive", type=bool, help='(optional) Scan subfolders for duplicate images', required=False, nargs='?', choices=[True, False], default=False)
     parser.add_argument("-Z", "--output_directory", type=str, help='(optional) Output directory for the difPy result files. Default is working dir.', required=False, nargs='?', default=None)
     parser.add_argument("-s", "--similarity", type=type_str_int, help='(optional) Similarity grade.', required=False, nargs='?', default='normal')
     parser.add_argument("-px", "--px_size", type=int, help='(optional) Compression size of images in pixels.', required=False, nargs='?', default=50)
@@ -409,10 +414,10 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--delete", type=bool, help='(optional) Deletes all duplicate images with lower quality.', required=False, nargs='?', choices=[True, False], default=False)
     parser.add_argument("-D", "--silent_del", type=bool, help='(optional) Supresses the user confirmation when deleting images.', required=False, nargs='?', choices=[True, False], default=False)
     args = parser.parse_args()
-
+    print(f"args {args}")
     # initialize difPy
     search = dif(directory_A=args.directory_A, directory_B=args.directory_B,
-                 similarity=args.similarity, px_size=args.px_size, 
+                 recursive=args.recursive, similarity=args.similarity, px_size=args.px_size, 
                  show_output=args.show_output, show_progress=args.show_progress, 
                  delete=args.delete, silent_del=args.silent_del)
 
