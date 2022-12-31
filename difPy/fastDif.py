@@ -516,7 +516,19 @@ class FastDifPy:
         print(f"Estimated disk usage by {fill('the two dirs ', target)}: " + h(byte_count_b + byte_count_a,
                                                                                "B") + "bytes")
 
-    def first_loop_iteration(self, compute_thumbnails: bool = True, compute_hash: bool = False, amount: int = 4):
+    def check_create_thumbnail_dir(self):
+        """
+        Create the thumbnail directories if they don't exist already.
+        :return:
+        """
+        if not os.path.exists(self.thumb_dir_a):
+            os.makedirs(self.thumb_dir_a)
+
+        if self.thumb_dir_b is not None and not os.path.exists(self.__thumb_dir_b):
+            os.makedirs(self.thumb_dir_b)
+
+    def first_loop_iteration(self, compute_thumbnails: bool = True, compute_hash: bool = False, amount: int = 4,
+                             gpu_proc: int = 0, cpu_proc: int = 16):
         # store thumbnails if possible.
         if compute_hash:
             if amount == 0:
@@ -524,6 +536,44 @@ class FastDifPy:
 
             if amount > 7 or amount < -7:
                 raise ValueError("amount my only be in range [-7, 7]")
+
+        # thumbnail are required to exist for both.
+        if compute_thumbnails or compute_hash:
+            self.check_create_thumbnail_dir()
+
+        cpu_handles = []
+        gpu_handles = []
+
+        task_queue = mp.Queue()
+        res_queue = mp.Queue()
+
+        # prefill loop
+        for i in range(cpu_proc + gpu_proc):
+            task = self.db.get_next_to_process()
+
+            # stop if there's nothing left to do.
+            if task is None:
+                break
+
+            arg = PreprocessArguments(
+                amount=amount,
+                key=task[0],
+                out_path=self.generate_thumbnail_path()
+            )
+
+
+        # start processes
+        for i in range(cpu_proc):
+            p = mp.Process(target=parallel_resize, args=(task_queue, res_queue, i, False))
+            p.start()
+            cpu_handles.append(p)
+
+        for i in range(cpu_proc, gpu_proc + cpu_proc):
+            p = mp.Process(target=parallel_resize, args=(task_queue, res_queue, i, True))
+            p.start()
+            gpu_handles.append(i)
+
+
 
     def clean_up(self):
         # TODO remove the thumbnails
