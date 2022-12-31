@@ -81,7 +81,7 @@ class Database:
         self.debug_execute(f"UPDATE config SET value = '{config_string}' WHERE name IS '{type_name}'")
         self.con.commit()
 
-    def debug_execute(self, statement: str):
+    def debug_execute(self, statement: str, commit_now: bool = False):
         """
         Wrapper to print the infringing statement in case of an error.
         :param statement: statement to execute
@@ -92,6 +92,11 @@ class Database:
         except Exception as e:
             print(f"Exception {e} with statement:\n{statement}")
             raise e
+
+        # automatically commit.
+        if (datetime.datetime.now() - self.last_update).total_seconds() > 60 or commit_now or self.last_update is None:
+            self.con.commit()
+            self.last_update = datetime.datetime.now()
 
     def connect(self, path):
         """
