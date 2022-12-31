@@ -221,9 +221,16 @@ class dif:
                             if img_id in result.keys():
                                 result[img_id]["duplicates"] = result[img_id]["duplicates"] + [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]
                             else:
+                                check = False
+                                for id in result.keys():
+                                    if str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]) in id["duplicates"]:
+                                        result[id]["duplicates"] = result[id]["duplicates"] + [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]
+                                        check = True
+                                        break
+                            if check == False:
                                 result[img_id] = {'filename': str(folderfiles_A[count_A][1]),
-                                                  'location': str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]),
-                                                  'duplicates': [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]}
+                                                'location': str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]),
+                                                'duplicates': [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]}
                             try:                                    
                                 high, low = dif._check_img_quality(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1], Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])
                                 lower_quality.append(str(low))
