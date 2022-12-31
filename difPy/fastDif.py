@@ -347,8 +347,11 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
 
 class FastDifPy:
     p_db: str
-    p_root_dir_a: str
-    p_root_dir_b: Union[str, None]
+    __p_root_dir_a: str
+    __p_root_dir_b: Union[str, None]
+
+    __thumb_dir_a: str
+    __thumb_dir_b: Union[str, None]
 
     __thumbnail_size_x = 64
     __thumbnail_size_y = 64
@@ -554,3 +557,31 @@ class FastDifPy:
             warnings.warn("Thumbnail size is very large. Higher Accuracy will slow down the process and "
                           "increase storage usage.")
         self.__thumbnail_size_y = value
+
+    @property
+    def p_root_dir_a(self):
+        return self.__p_root_dir_a
+
+    @p_root_dir_a.setter
+    def p_root_dir_a(self, value):
+        if os.path.exists(value):
+            self.__p_root_dir_a = value
+            self.__thumb_dir_a = os.path.join(self.__p_root_dir_a, ".temp_thumbnails")
+
+    @property
+    def p_root_dir_b(self):
+        return self.__p_root_dir_b
+
+    @p_root_dir_b.setter
+    def p_root_dir_b(self, value):
+        if os.path.exists(value):
+            self.__p_root_dir_b = value
+            self.__thumb_dir_b = os.path.join(self.__p_root_dir_b, ".temp_thumbnails")
+
+    @property
+    def thumb_dir_a(self):
+        return self.__thumb_dir_a
+
+    @property
+    def thumb_dir_b(self):
+        return self.__thumb_dir_b
