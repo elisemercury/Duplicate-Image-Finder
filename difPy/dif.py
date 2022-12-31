@@ -222,6 +222,7 @@ class dif:
                                 result[img_id]["duplicates"] = result[img_id]["duplicates"] + [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]
                             else:
                                 check = False
+                                print("TEST")
                                 for id in result.keys():
                                     if str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]) in id["duplicates"]:
                                         result[id]["duplicates"] = result[id]["duplicates"] + [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]
