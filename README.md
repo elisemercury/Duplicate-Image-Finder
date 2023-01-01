@@ -129,9 +129,9 @@ dif(directory_A, directory_B, recursive=True, similarity="normal", px_size=50,
 
 Per default, difPy will search for duplicate images also in subfolders. If set to ``False``, subfolders will not be scanned. 
 
-```True```= (default) use subfolders
+```True```= (default) searches through subfolders in the directory paths
 
-```False``` = don't use subfolders
+```False``` = doesn't search through subfolders in the directory paths
 
 ### similarity (str, int)
 
