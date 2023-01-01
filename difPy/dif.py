@@ -56,7 +56,6 @@ class dif:
         """
         start_time = time.time()        
         print("DifPy process initializing...", end="\r")
-        print(f"Recursive: {recursive}" )
         dif._validate_parameters(show_output, show_progress, recursive, similarity, px_size, delete, silent_del)
 
         if directory_B == None:
@@ -82,7 +81,7 @@ class dif:
         time_elapsed = np.round(end_time - start_time, 4)
         stats = dif._generate_stats(directory_A, directory_B, 
                                     time.localtime(start_time), time.localtime(end_time), time_elapsed, 
-                                    similarity, total, len(result))
+                                    recursive, similarity, total, len(result))
 
         self.result = result
         self.lower_quality = lower_quality
@@ -209,7 +208,7 @@ class dif:
                 if count_B > count_A and count_A != len(img_matrices_A):
                     rotations = 0
                     while rotations <= 3:
-                        if rotations != 0:
+                        if rotations != 0: 
                             imageMatrix_B = dif._rotate_img(imageMatrix_B)
 
                         err = dif._mse(imageMatrix_A, imageMatrix_B)
@@ -221,9 +220,17 @@ class dif:
                             if img_id in result.keys():
                                 result[img_id]["duplicates"] = result[img_id]["duplicates"] + [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]
                             else:
+                                check = False
+                                for id in result.keys():
+                                    for dupl in result[id]["duplicates"]:
+                                        if os.path.samefile(dupl, str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])):
+                                            result[id]["duplicates"] = result[id]["duplicates"] + [str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1])]
+                                            check = True
+                                            break
+                            if not check:
                                 result[img_id] = {'filename': str(folderfiles_A[count_A][1]),
-                                                  'location': str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]),
-                                                  'duplicates': [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]}
+                                                'location': str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]),
+                                                'duplicates': [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]}
                             try:                                    
                                 high, low = dif._check_img_quality(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1], Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])
                                 lower_quality.append(str(low))
@@ -350,7 +357,7 @@ class dif:
             return imageB, imageA
     
     # Function that generates a dictionary for statistics around the completed DifPy process
-    def _generate_stats(directoryA, directoryB, start_time, end_time, time_elapsed, similarity, total_searched, total_found):
+    def _generate_stats(directoryA, directoryB, start_time, end_time, time_elapsed, recursive, similarity, total_searched, total_found):
         stats = {}
         stats["directory_1"] = str(Path(directoryA))
         if directoryB != None:
@@ -362,6 +369,7 @@ class dif:
                              "end_date": time.strftime("%Y-%m-%d", end_time),
                              "end_time": time.strftime("%H:%M:%S", end_time),
                              "seconds_elapsed": time_elapsed}
+        stats["recursive"] = recursive
         if isinstance(similarity, int):
             stats["similarity_grade"] = "manual"
         else:
