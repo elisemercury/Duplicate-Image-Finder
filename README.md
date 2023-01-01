@@ -131,6 +131,27 @@ difPy_lower_quality_xxx.txt
 difPy_stats_xxx.json
 ```
 
+:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+
+## Similar Work 
+
+### I. DifPy as Webapp
+
+[A Streamlit based Webapp to find duplicate images from single/multiple directories](https://github.com/prateekralhan/Streamlit-based-Duplicate-Images-Finder) - :dna: **based on difPy**
+
+**Single Directory** 📸✅
+![demo1](https://user-images.githubusercontent.com/29462447/174408835-438234d9-5ff6-4159-a5e3-b908d885a8bc.gif)
+
+**Two directories** 📸✅
+![demo2](https://user-images.githubusercontent.com/29462447/174408842-5128838f-bf8f-43da-97d2-30a3264eb7af.gif)
+
+### II. Mac Photos Tool to find Duplicates (photosdup)
+
+[Tool to scan a Mac Photos library for duplicates, thumbnails etc.](https://github.com/peter-sk/photosdup) - :sparkles: **inspired by difPy**
+
 -------
 
-:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+***
+<p align="center"><b>
+:thought_balloon: Also want to be featured in the "Related Projects" section? Check our <a href="https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy#be-featured-as-difpy-related-project">contributor guidelines</a> to find out how!
+</b></p>
