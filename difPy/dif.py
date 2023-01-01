@@ -224,11 +224,12 @@ class dif:
                                 check = False
                                 print("TEST")
                                 for id in result.keys():
-                                    if str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]) in result[id]["duplicates"]:
-                                        result[id]["duplicates"] = result[id]["duplicates"] + [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]
-                                        check = True
-                                        print(f"Found file {str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])}")
-                                        break
+                                    for dupl in id["duplicates"]:
+                                        if os.path.samefile(dupl, str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])):
+                                            result[id]["duplicates"] = result[id]["duplicates"] + [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]
+                                            check = True
+                                            print(f"Found file {str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])}")
+                                            break
                             if check == False:
                                 result[img_id] = {'filename': str(folderfiles_A[count_A][1]),
                                                 'location': str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]),
