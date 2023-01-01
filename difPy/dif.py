@@ -209,7 +209,7 @@ class dif:
                 if count_B > count_A and count_A != len(img_matrices_A):
                     rotations = 0
                     while rotations <= 3:
-                        if rotations != 0:
+                        if rotations != 0: 
                             imageMatrix_B = dif._rotate_img(imageMatrix_B)
 
                         err = dif._mse(imageMatrix_A, imageMatrix_B)
@@ -224,7 +224,7 @@ class dif:
                                 check = False
                                 print("TEST")
                                 for id in result.keys():
-                                    if str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]) in id["duplicates"]:
+                                    if str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1]) in result[id]["duplicates"]:
                                         result[id]["duplicates"] = result[id]["duplicates"] + [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]
                                         check = True
                                         break
