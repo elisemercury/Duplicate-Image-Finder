@@ -226,7 +226,7 @@ class dif:
                                 for id in result.keys():
                                     for dupl in result[id]["duplicates"]:
                                         if os.path.samefile(dupl, str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])):
-                                            result[id]["duplicates"] = result[id]["duplicates"] + [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]
+                                            result[id]["duplicates"] = result[id]["duplicates"] + [str(Path(folderfiles_A[count_A][0]) / folderfiles_A[count_A][1])]
                                             check = True
                                             print(f"Found file {str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])}")
                                             break
