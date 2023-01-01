@@ -56,7 +56,6 @@ class dif:
         """
         start_time = time.time()        
         print("DifPy process initializing...", end="\r")
-        print(f"Recursive: {recursive}" )
         dif._validate_parameters(show_output, show_progress, recursive, similarity, px_size, delete, silent_del)
 
         if directory_B == None:
@@ -82,7 +81,7 @@ class dif:
         time_elapsed = np.round(end_time - start_time, 4)
         stats = dif._generate_stats(directory_A, directory_B, 
                                     time.localtime(start_time), time.localtime(end_time), time_elapsed, 
-                                    similarity, total, len(result))
+                                    recursive, similarity, total, len(result))
 
         self.result = result
         self.lower_quality = lower_quality
@@ -358,7 +357,7 @@ class dif:
             return imageB, imageA
     
     # Function that generates a dictionary for statistics around the completed DifPy process
-    def _generate_stats(directoryA, directoryB, start_time, end_time, time_elapsed, similarity, total_searched, total_found):
+    def _generate_stats(directoryA, directoryB, start_time, end_time, time_elapsed, recursive, similarity, total_searched, total_found):
         stats = {}
         stats["directory_1"] = str(Path(directoryA))
         if directoryB != None:
@@ -370,6 +369,7 @@ class dif:
                              "end_date": time.strftime("%Y-%m-%d", end_time),
                              "end_time": time.strftime("%H:%M:%S", end_time),
                              "seconds_elapsed": time_elapsed}
+        stats["recursive"] = recursive
         if isinstance(similarity, int):
             stats["similarity_grade"] = "manual"
         else:
