@@ -2,7 +2,14 @@
 
 **Tired of going through all images in a folder and comparing them manually to check if they are duplicates?**
 
-The Duplicate Image Finder (difPy) Python package **automates** this task for you!
+:white_check_mark: The Duplicate Image Finder (difPy) Python package **automates** this task for you!
+
+```python
+pip install difPy
+```
+> :point_right: difPy v2.4.x  has some **major updates** and **new features**. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for a detailed listing. 
+
+> :open_hands: Our motto? The more users use difPy, the more issues and missing features can be detected, and the better the algorithm gets over time. **Contributions are always welcome** - check our [contributor guidelines](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy) for more information.
 
 Read more on how the algorithm of difPy works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051).
 
