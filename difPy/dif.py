@@ -413,7 +413,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Find duplicate or similar images on your computer with difPy - https://github.com/elisemercury/Duplicate-Image-Finder')
     parser.add_argument("-A", "--directory_A", type=str, help='Directory to search for images.', required=True)
     parser.add_argument("-B", "--directory_B", type=str, help='(optional) Second directory to search for images.', required=False, nargs='?', default=None)
-    parser.add_argument("-r", "--recursive", type=bool, help='(optional) Scan subfolders for duplicate images', required=False, nargs='?', choices=[True, False], default=False)
+    parser.add_argument("-r", "--recursive", type=bool, help='(optional) Scan subfolders for duplicate images', required=False, nargs='?', choices=[True, False], default=True)
     parser.add_argument("-Z", "--output_directory", type=str, help='(optional) Output directory for the difPy result files. Default is working dir.', required=False, nargs='?', default=None)
     parser.add_argument("-s", "--similarity", type=type_str_int, help='(optional) Similarity grade.', required=False, nargs='?', default='normal')
     parser.add_argument("-px", "--px_size", type=int, help='(optional) Compression size of images in pixels.', required=False, nargs='?', default=50)
