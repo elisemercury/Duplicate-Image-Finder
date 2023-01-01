@@ -49,10 +49,10 @@ class dif:
         dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]] [-r [{True,False}]] [-s [{low,normal,high}]] [-px [PX_SIZE]]
                [-p [{True,False}]] [-o [{True,False}]] [-d [{True,False}]] [-D [{True,False}]]
         
-        OUTPUT.................output data is written to files and saved in the working directory
-                               difPy_results_xxx_.json
-                               difPy_lower_quality_xxx_.txt
-                               difPy_stats_xxx_.json
+        OUTPUT.................output data is written to files and saved in the working directory.
+                               difPy_results_xxx.json
+                               difPy_lower_quality_xxx.txt
+                               difPy_stats_xxx.json
         """
         start_time = time.time()        
         print("DifPy process initializing...", end="\r")
