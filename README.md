@@ -1,5 +1,11 @@
 # Duplicate Image Finder (difPy)
 
+![PyPIv](https://img.shields.io/pypi/v/difPy)
+![PyPI status](https://img.shields.io/pypi/status/difPy)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/difPy)
+![PyPI - License](https://img.shields.io/pypi/l/difPy)
+<img src="https://img.shields.io/badge/dif-Py-blue?style=flat&logo=python&labelColor=white&logoWidth=20.svg/"></a>
+
 **Tired of going through all images in a folder and comparing them manually to check if they are duplicates?**
 
 :white_check_mark: The Duplicate Image Finder (difPy) Python package **automates** this task for you!
@@ -13,23 +19,27 @@ pip install difPy
 
 Read more on how the algorithm of difPy works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051).
 
-For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+Check out the [difPy package on PyPI.org](https://pypi.org/project/difPy/)
 
 -------
 
 ## Description
 DifPy searches for images in **one or two different folders**, compares the images it found and checks whether these are duplicates. It then outputs the **image files classified as duplicates** and the **filenames of the duplicate images having the lower resolution**, so you know which of the duplicate images are safe to be deleted. You can then either delete them manually, or let difPy delete them for you.
 
+<p align="center">
+  <img src="example_output.png" width="400" title="Example Output: Duplicate Image Finder">
+</p>
+
 DifPy does not compare images based on their hashes. It compares them based on their tensors i. e. the image content - this allows difPy to not only search for duplicate images, but also for similar images.
 
 ## Basic Usage
-Use the following function to make difPy search for duplicates in one specified folder:
+Use the following function to make difPy search for duplicates within one specific folder and its subfolders:
 
 ```python
 from difPy import dif
 search = dif("C:/Path/to/Folder/")
 ``` 
-To search for duplicates within two folders:
+To search for duplicates within two folders and their subfolders:
 
 ```python
 from difPy import dif
@@ -37,10 +47,12 @@ search = dif("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/")
 ``` 
 Folder paths must be specified as a Python string.
 
+:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+
 ## Output
 DifPy gives two types of output that you may use depending on your use case: 
 
-A **dictionary** of duplicates/similar images that were found: 
+A **dictionary** of duplicates/similar images that were found, where the keys are a **unique id** for each image file:
 
 ```python
 search.result
@@ -81,8 +93,7 @@ search.stats
  "similarity_grade" : "normal",
  "similarity_mse" : 200,
  "total_files_searched" : 1032,
- "total_dupl_sim_found" : 1024,
- "total_undecodable" : 5}
+ "total_dupl_sim_found" : 1024}
 ``` 
 
 ## Additional Parameters
@@ -92,6 +103,8 @@ DifPy has the following optional parameters:
 dif(directory_A, directory_B, recursive=True, similarity="normal", px_size=50, 
     show_progress=True, show_output=False, delete=False, silent_del=False)
 ```
+
+:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
 
 ## CLI Usage
 You can make use of difPy through the CLI interface by using the following commands:
@@ -110,7 +123,7 @@ dif.py [-h] -A DIRECTORY_A [-B [DIRECTORY_B]] [-Z [OUTPUT_DIRECTORY]]
        [-d [{True,False}]] [-D [{True,False}]]
 ```
 
-The output of difPy is then written to files and saved in the working directory, where "xxx" is a unique timestamp:
+The output of difPy is then written to files and saved in the working directory by default, or to the folder specified in the `-Z / -output_directory` parameter. The "xxx" in the filename is a unique timestamp:
 
 ```python
 difPy_results_xxx.json
@@ -120,4 +133,4 @@ difPy_stats_xxx.json
 
 -------
 
-For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
