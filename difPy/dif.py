@@ -224,7 +224,7 @@ class dif:
                                 check = False
                                 print("TEST")
                                 for id in result.keys():
-                                    for dupl in id["duplicates"]:
+                                    for dupl in result[id]["duplicates"]:
                                         if os.path.samefile(dupl, str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])):
                                             result[id]["duplicates"] = result[id]["duplicates"] + [str(Path(folderfiles_A[count_B][0]) / folderfiles_A[count_B][1])]
                                             check = True
