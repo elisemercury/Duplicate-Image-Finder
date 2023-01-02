@@ -215,7 +215,6 @@ class Database:
         """
         tbl_name = "directory_a" if dir_a else "directory_b"
         self.debug_execute(f"DROP TABLE {tbl_name}")
-        self.con.commit()
 
     def add_file(self, path: str, filename: str, dir_a: bool = True):
         """
@@ -228,7 +227,6 @@ class Database:
 
         tbl_name = "directory_a" if dir_a else "directory_b"
         self.debug_execute(f"INSERT INTO {tbl_name} (path, filename) VALUES ('{path}', '{filename}')")
-        self.con.commit()
 
     def get_dir_count(self, dir_a: bool = True):
         """
