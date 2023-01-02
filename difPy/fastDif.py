@@ -568,7 +568,7 @@ class FastDifPy:
         cpu_handles = []
         gpu_handles = []
 
-        task_queue = mp.Queue()
+        task_queue = mp.Queue(maxsize=(cpu_proc + gpu_proc) * 2)
         res_queue = mp.Queue()
 
         # prefill loop
@@ -579,24 +579,34 @@ class FastDifPy:
             if task is None:
                 break
 
+            # generate a new argument
             arg = PreprocessArguments(
                 amount=amount,
-                key=task[0],
-                out_path=self.generate_thumbnail_path()
+                key=task["key"],
+                in_path=task["path"],
+                out_path=self.generate_thumbnail_path(dir_a=task["dir_a"], filename=task["filename"], key=task["key"]),
+                compute_hash=compute_hash,
+                store_thumb=compute_thumbnails,
+                size_x=self.thumbnail_size_x,
+                size_y=self.__thumbnail_size_y,
             )
 
+            task_queue.put(arg.to_json())
 
-        # start processes
+
+        # start processes for cpu
         for i in range(cpu_proc):
             p = mp.Process(target=parallel_resize, args=(task_queue, res_queue, i, False))
             p.start()
             cpu_handles.append(p)
 
+        # start processes for gpu
         for i in range(cpu_proc, gpu_proc + cpu_proc):
             p = mp.Process(target=parallel_resize, args=(task_queue, res_queue, i, True))
             p.start()
             gpu_handles.append(i)
 
+        # turn main loop ito handler and perform monitoring of the threads.
 
 
     def clean_up(self):
