@@ -273,7 +273,7 @@ class Database:
             if res is None:
                 self.a_done = True
 
-            return res
+            return self.all_to_dict_dir(res, dir_a=True)
 
         # if the has_b attribute is not computed, set it here.
         if self.has_b is None:
@@ -293,7 +293,7 @@ class Database:
             if res is None:
                 self.b_done = True
 
-            return res
+            return self.all_to_dict_dir(res, dir_a=False)
 
         # return None is the fall through and the default
         return None
