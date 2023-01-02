@@ -303,17 +303,18 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
                                            error=f"Error: {e}", key=args.key)
 
 
-def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: bool):
+def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: bool) -> bool:
     """
     Parallel implementation of first loop iteration.
     :param iq: input queue containing arguments dict or
     :param output: output queue containing only json strings of obj
     :param identifier: id of running thread
     :param try_cupy: check if cupy is available and use cupy instead.
-    :return:
+    :return: True, running was successful and no error encountered, otherwise exit without return or return False
     """
     timeout = 0
 
+    # try to use cupy if it is indicated by arguments
     if try_cupy:
         try:
             import cupy
@@ -321,6 +322,7 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
         except ImportError:
             cupy_avail = False
 
+    # stay awake for 60s, otherwise kill
     while timeout < 60:
         try:
             args_str = iq.get(timeout=1)
@@ -329,7 +331,7 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
             continue
 
         if args_str is None:
-            print(f"{identifier:02} Terminating")
+            print(f"{identifier:03} Terminating")
             break
 
         args = PreprocessArguments.from_json(args_str)
@@ -339,11 +341,12 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
             result = process_image_cuda(args)
         else:
             result = process_image(args)
-        print(os.path.basename(args.in_path))
+        print(f"{identifier:03}: Done with {os.path.basename(args.in_path)}")
 
         # Sending the result to the handler
         output.put(result.to_json())
 
+    return True
 
 class FastDifPy:
     p_db: str
