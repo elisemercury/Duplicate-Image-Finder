@@ -530,6 +530,27 @@ class FastDifPy:
         if self.thumb_dir_b is not None and not os.path.exists(self.__thumb_dir_b):
             os.makedirs(self.thumb_dir_b)
 
+    def generate_thumbnail_path(self, key: int, filename: str, dir_a: bool):
+        """
+        Generate the thumbnail_path first tries to fetch the thumbnail name from the db if it exists already,
+        otherwise generate a new name.
+
+        :param key: key in the directory_x table
+        :param filename: the name of the file with extension
+        :param dir_a: if the file is located in directory a or b
+        :return: the thumbnail path.
+        """
+        name = self.db.get_thumb_name(key, dir_a=dir_a)
+        directory = self.thumb_dir_a if dir_a else self.__thumb_dir_b
+
+        # return the name if it existed already
+        if name is not None:
+            return os.path.join(directory, name)
+
+        name = self.db.generate_new_thumb_name(key, filename, dir_a=dir_a)
+        return os.path.join(directory, name
+
+
     def first_loop_iteration(self, compute_thumbnails: bool = True, compute_hash: bool = False, amount: int = 4,
                              gpu_proc: int = 0, cpu_proc: int = 16):
         # store thumbnails if possible.
