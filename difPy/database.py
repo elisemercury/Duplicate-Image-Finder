@@ -298,3 +298,101 @@ class Database:
         # return None is the fall through and the default
         return None
 
+    def create_thumb_table(self, secondary_folder: bool = False, purge: bool = False):
+        """
+        Create tables which contain the names of the thumbnails ( to make sure there's no collisions ahead of time)
+
+        :param secondary_folder: if True, create a table for the secondary folder as well.
+        :param purge: if True, purge the tables before creating them.
+        :return:
+        """
+
+        # Drop the tables if purge is set
+        if purge:
+            print("Purging preexisting indexes of directories.")
+
+            if self.test_thumb_table_existence(True):
+                print("Dropping directory A table.")
+                self.drop_thumb(True)
+
+            if self.test_thumb_table_existence(False):
+                print("Dropping directory B table.")
+                self.drop_thumb(False)
+
+        self.debug_execute("CREATE TABLE thumb_a ( key INTEGER PRIMARY KEY, filename TEXT UNIQUE )")
+
+        if secondary_folder:
+            self.debug_execute("CREATE TABLE thumb_b ( key INTEGER PRIMARY KEY, filename TEXT UNIQUE )")
+
+    def test_thumb_table_existence(self, dir_a: bool = True):
+        """
+        Check the table for thumbnails of directory X, exists. DOES NOT VERIFY THE TABLE DEFINITION!
+        :param dir_a: True if dir_a, False if dir_b
+        :return:
+        """
+        tbl_name = "thumb_a" if dir_a else "thumb_b"
+        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS '{tbl_name}'")
+        return self.cur.fetchone() is not None
+
+    def drop_thumb(self, dir_a: bool = True):
+        """
+        Drop a table related to the thumbnails of a directory.
+        :param dir_a: if True, drop thumb A table, else drop thumb b table.
+        :return:
+        """
+        tbl_name = "thumb_a" if dir_a else "thumb_b"
+        self.debug_execute(f"DROP TABLE {tbl_name}")
+
+    def get_thumb_name(self, key: int, dir_a: bool):
+        """
+        Get the thumbnail name associated with the key.
+        :param key: key to search the thumbnail path for
+        :param dir_a: if the key is to be searched in the directory_a or directory_b table.
+        :return:
+        """
+        tbl_name = "thumb_a" if dir_a else "thumb_b"
+        self.debug_execute(f"SELECT * FROM {tbl_name} WHERE key = {key}")
+        return self.cur.fetchone()
+
+    def generate_new_thumb_name(self, key: int, file_name: str, retry_limit: int = 1000, dir_a: bool = True):
+        """
+        Generate a new free name for a file. If a file name is taken, will retry a limited number of times again.
+
+        :param key: key in the directory_X tables
+        :param file_name: file name for which to generate the thumbnail name
+        :param retry_limit: how many file names are to be tested.
+        :param dir_a: if it is to be inserted into thumb_a or thumb_b table.
+        :return:
+        """
+        index = 0
+        tbl_name = "thumb_a" if dir_a else "thumb_b"
+        free = False
+
+        name, ext = os.path.splitext(file_name)
+        thumb_name = f"thumb_{index:03}_{name}"
+
+        while not free:
+            if self.thumb_name_exists(thumb_name, dir_a):
+                index += 1
+                name, ext = os.path.splitext(file_name)
+                thumb_name = f"thumb_{index:03}_{name}"
+            else:
+                free = True
+
+            if index > retry_limit:
+                raise ValueError(f"Filename '{file_name}' is too common, it has been used {retry_limit} times.")
+
+        self.debug_execute(f"INSERT INTO {tbl_name} (key, filename) VALUES ({key}, '{thumb_name}')")
+        return thumb_name
+
+    def thumb_name_exists(self, thumb_name: str, dir_a: bool = True):
+        """
+        Check if the name exists already, given the name and the directory the file is in.
+
+        :param thumb_name: name to check
+        :param dir_a: if it is to be searched in dir a or dir b
+        :return:
+        """
+        tbl_name = "thumb_a" if dir_a else "thumb_b"
+        self.debug_execute(f"SELECT * FROM {tbl_name} WHERE filename IS '{thumb_name}'")
+        return self.cur.fetchone() is not None
