@@ -178,6 +178,25 @@ class Database:
                                "proc_suc INTEGER DEFAULT -1 CHECK "
                                "( directory_b.proc_suc >= -1 AND directory_b.proc_suc <= 1 ))")
 
+    @staticmethod
+    def all_to_dict_dir(row: Union[tuple, None], dir_a: bool = True):
+        """
+        Takes the result of a 'SELECT *' from a directory table and turns the tuple into a dict
+        :param row: tuple to turn into dict
+        :param dir_a: if the file was in directory a or directory b
+        :return:
+        """
+        if row is None:
+            return None
+
+        return {"key": row[0],
+                "path": row[1],
+                "filename": row[2],
+                "error": row[3],
+                "proc_suc": row[4],
+                "dir_a": dir_a
+                }
+
     def test_dir_table_existence(self, dir_a: bool = True):
         """
         Check the table for directory X, exists. DOES NOT VERIFY THE TABLE DEFINITION!
