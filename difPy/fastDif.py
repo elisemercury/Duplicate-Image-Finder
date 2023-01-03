@@ -645,10 +645,118 @@ class FastDifPy:
         for i in range(cpu_proc, gpu_proc + cpu_proc):
             p = mp.Process(target=parallel_resize, args=(task_queue, res_queue, i, True))
             p.start()
-            gpu_handles.append(i)
+            gpu_handles.append(p)
 
-        # turn main loop ito handler and perform monitoring of the threads.
+        # turn main loop into handler and perform monitoring of the threads.
+        run = True
+        none_counter = 0
+        timeout = 0
 
+        # handle the running state of the loop
+        while run:
+            if self.handle_result_of_first_loop(res_queue, compute_hash):
+                task = self.db.get_next_to_process()
+
+                # if there's no task left, stop the loop.
+                if task is None:
+                    none_counter += 1
+                    task_queue.put(None)
+
+                else:
+                    # generate a new argument
+                    arg = PreprocessArguments(
+                        amount=amount,
+                        key=task["key"],
+                        in_path=task["path"],
+                        out_path=self.generate_thumbnail_path(dir_a=task["dir_a"], filename=task["filename"], key=task["key"]),
+                        compute_hash=compute_hash,
+                        store_thumb=compute_thumbnails,
+                        size_x=self.thumbnail_size_x,
+                        size_y=self.__thumbnail_size_y,
+                    )
+
+                    task_queue.put(arg.to_json())
+                    timeout = 0
+            else:
+                timeout += 1
+
+            # if this point is reached, all processes should be done and the queues empty.
+            if none_counter >= cpu_proc + gpu_proc:
+                run = False
+
+            # at this point we should have been idling for 60s
+            if timeout > 60:
+                print("Timeout reached, stopping.")
+                run = False
+
+        # all processes should be done now, iterating through and killing them if they're still alive.
+        for i in range(len(cpu_handles)):
+            p = cpu_handles[i]
+            try:
+                print(f"Trying to join process {i} Process State is {p.is_alive()}")
+                p.join(60)
+            except TimeoutError:
+                print(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
+                p.kill()
+
+        for i in range(len(gpu_handles)):
+            p = gpu_handles[i]
+            try:
+                print(f"Trying to join process {i + cpu_proc} Process State is {p.is_alive()}")
+                p.join(60)
+            except TimeoutError:
+                print(f"Process {i + cpu_proc} timed out. Alive state: {p.is_alive()}; killing it.")
+                p.kill()
+
+        # try to handle any remaining results that are in the queue.
+        for _ in range((cpu_proc + gpu_proc) * 2):
+            if not self.handle_result_of_first_loop(res_queue, compute_hash):
+                break
+
+        assert res_queue.empty(), "Result queue is not empty after all processes have been killed."
+        print("All Images have been preprocessed.")
+
+    def handle_result_of_first_loop(self, res_q: mp.Queue, compute_hash: bool) -> bool:
+        """
+        Dequeues a result of the results queue and updates the database accordingly.
+        :param res_q: results queue
+        :param compute_hash: if the hash was computed
+        :return: if a result was handled.
+        """
+        # retrieve the result from the queue
+        try:
+            res = res_q.get(timeout=1)
+        except queue.Empty:
+            return False
+
+        # sanatize result
+        assert type(res) is str, "Result is not a string"
+        result_obj = PreprocessResults.from_json(res)
+
+        # Handle the case when an error occurred.
+        if not result_obj.success:
+            self.db.update_dir_error(key=result_obj.key, dir_a=result_obj.dir_a, msg=result_obj.error)
+            return True
+
+        # store the hash if computed
+        if compute_hash:
+            # Drop hashes if they are only partly computed.
+            if not self.db.has_all_hashes(dir_a=result_obj.dir_a, dir_key=result_obj.key):
+                self.db.del_all_hashes(dir_a=result_obj.dir_a, dir_key=result_obj.key)
+
+            # Store all hashes
+            self.db.insert_hash(dir_a=result_obj.dir_a, dir_key=result_obj.key, fhash=result_obj.hash_0, rotation=0)
+            self.db.insert_hash(dir_a=result_obj.dir_a, dir_key=result_obj.key, fhash=result_obj.hash_90, rotation=90)
+            self.db.insert_hash(dir_a=result_obj.dir_a, dir_key=result_obj.key, fhash=result_obj.hash_180, rotation=180)
+            self.db.insert_hash(dir_a=result_obj.dir_a, dir_key=result_obj.key, fhash=result_obj.hash_270, rotation=270)
+
+        # mark file as processed only if the other data was inserted.
+        self.db.update_dir_success(key=result_obj.key, dir_a=result_obj.dir_a, px=result_obj.original_x,
+                                   py=result_obj.original_y)
+
+        # to be sure commit here.
+        self.db.con.commit()
+        return True
 
     def clean_up(self):
         # TODO remove the thumbnails
