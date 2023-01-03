@@ -390,6 +390,24 @@ class FastDifPy:
         :param test_db: Weather or not the code should test for the presence of the default sqlite database.
         """
 
+        if not os.path.isdir(directory_a):
+            raise NotADirectoryError(f"{directory_a} is not a directory")
+
+        if directory_b is not None and not os.path.isdir(directory_b):
+            raise NotADirectoryError(f"{directory_b} is not a directory")
+
+        directory_a = os.path.abspath(directory_a)
+        directory_b = os.path.abspath(directory_b) if directory_b is not None else None
+
+        # make sure the paths aren't subdirs of each other.
+        if directory_b is not None:
+            temp_a = directory_a + os.sep
+            temp_b = directory_b + os.sep
+            if temp_a.startswith(temp_b):
+                raise ValueError(f"{directory_a} is a subdirectory of {directory_b}")
+            elif temp_b.startswith(temp_a):
+                raise ValueError(f"{directory_b} is a subdirectory of {directory_a}")
+
         self.p_root_dir_b = directory_a
         self.p_root_dir_b = directory_b
 
