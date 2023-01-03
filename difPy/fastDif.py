@@ -223,7 +223,8 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
         if type(img) != xp.ndarray:
             return PreprocessResults.error_obj(in_path=args.in_path, out_path=args.out_path,
                                                error="Type Error, result of image decode was not np.ndarray",
-                                               key=args.key)
+                                               key=args.key,
+                                               dir_a=args.dir_a)
 
         org_size_x, org_size_y, _ = xp.shape(img)
 
@@ -233,7 +234,8 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
                                                   out_path=args.out_path,
                                                   original_x=org_size_x,
                                                   original_y=org_size_y,
-                                                  key=args.key)
+                                                  key=args.key,
+                                                  dir_a=args.dir_a)
 
         img = img[..., 0:3]
         img = cv2.resize(img, dsize=(args.size_x, args.size_y), interpolation=cv2.INTER_CUBIC)
@@ -251,7 +253,8 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
                                                   out_path=args.out_path,
                                                   original_x=org_size_x,
                                                   original_y=org_size_y,
-                                                  key=args.key)
+                                                  key=args.key,
+                                                  dir_a=args.dir_a)
 
         # TODO move this part into a new function
         assert 8 > args.amount > -8, "amount exceeding range"
@@ -309,8 +312,8 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
         )
 
     except Exception as e:
-        return PreprocessResults.error_obj(in_path=args.in_path, out_path=args.out_path,
-                                           error=f"Error: {e}", key=args.key)
+        return PreprocessResults.error_obj(in_path=args.in_path, out_path=args.out_path, error=f"Error: {e}",
+                                           key=args.key, dir_a=args.dir_a)
 
 
 def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: bool) -> bool:
