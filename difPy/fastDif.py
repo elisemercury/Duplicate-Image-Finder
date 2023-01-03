@@ -207,7 +207,7 @@ def process_image_cuda(args: PreprocessArguments) -> PreprocessResults:
     # TODO Test if the process works correctly with cupy
     import cupy as cp
 
-    return process_image(cp)
+    return process_image(args, xp=cp)
 
 
 def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
