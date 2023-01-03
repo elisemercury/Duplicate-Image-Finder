@@ -29,6 +29,10 @@ class Database:
         self.b_done = False
         self.has_b = None
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # CONFIG TABLE
+    # ------------------------------------------------------------------------------------------------------------------
+
     def create_config(self, config: dict, type_name: str) -> bool:
         """
         Create the config table and insert a config dictionary.
@@ -139,6 +143,10 @@ class Database:
         """
         self.cur.execute("SELECT * FROM sqlite_master WHERE tbl_name IS 'config'")
         return self.cur.fetchone() is not None
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # DIRECTORY TABLES
+    # ------------------------------------------------------------------------------------------------------------------
 
     def create_directory_tables(self, secondary_folder: bool = False, purge: bool = True):
         """
@@ -297,6 +305,10 @@ class Database:
 
         # return None is the fall through and the default
         return None
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # THUMBNAIL FILENAME TABLE
+    # ------------------------------------------------------------------------------------------------------------------
 
     def create_thumb_table(self, secondary_folder: bool = False, purge: bool = False):
         """
