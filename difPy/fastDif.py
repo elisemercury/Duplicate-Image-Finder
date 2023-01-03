@@ -630,7 +630,7 @@ class FastDifPy:
                 compute_hash=compute_hash,
                 store_thumb=compute_thumbnails,
                 size_x=self.thumbnail_size_x,
-                size_y=self.__thumbnail_size_y,
+                size_y=self.thumbnail_size_y,
             )
 
             task_queue.put(arg.to_json())
@@ -672,7 +672,7 @@ class FastDifPy:
                         compute_hash=compute_hash,
                         store_thumb=compute_thumbnails,
                         size_x=self.thumbnail_size_x,
-                        size_y=self.__thumbnail_size_y,
+                        size_y=self.thumbnail_size_y,
                     )
 
                     task_queue.put(arg.to_json())
