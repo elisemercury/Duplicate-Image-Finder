@@ -735,7 +735,7 @@ class FastDifPy:
         except queue.Empty:
             return False
 
-        # sanatize result
+        # sanitize result
         assert type(res) is str, "Result is not a string"
         result_obj = PreprocessResults.from_json(res)
 
