@@ -370,3 +370,152 @@ class Database:
         tbl_name = "thumb_a" if dir_a else "thumb_b"
         self.debug_execute(f"SELECT * FROM {tbl_name} WHERE filename IS '{thumb_name}'")
         return self.cur.fetchone() is not None
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # HASH TABLE
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def create_hash_table(self, purge: bool = False) :
+        """
+        Create the config table and insert a config dictionary.
+        :param purge: if True, purge the table before creating it.
+        :return:
+        """
+        if purge:
+            if self.test_hash_table_existence():
+                self.drop_hash_table()
+
+        self.debug_execute("CREATE TABLE hash_table ("
+                           "key INTEGER PRIMARY KEY AUTOINCREMENT , "
+                           "hash TEXT , "
+                           "dir_a INTEGER CHECK ( hash_table.dir_a >= 0 AND hash_table.dir_a <= 1 ), "
+                           "dir_key INTEGER ,"
+                           "rotation INTEGER) ")
+
+    def test_hash_table_existence(self):
+        """
+        Check if the hash table exists. DOES NOT VERIFY THE TABLE DEFINITION!
+        :return:
+        """
+        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'hash_table'")
+        return self.cur.fetchone() is not None
+
+    def drop_hash_table(self):
+        """
+        Drop the hash table.
+        :return:
+        """
+        self.debug_execute(f"DROP TABLE hash_table")
+
+    def insert_hash(self, fhash: str, dir_a: bool, dir_key: int, rotation: int):
+        """
+        Insert a hash into the hash table.
+        :param fhash: hash to insert
+        :param dir_a: if the file is in dir_a or dir_b
+        :param dir_key: key of the file in the directory table
+        :param rotation: rotation of the file
+        :return:
+        """
+        dir_a_num = 1 if dir_a else 0
+        self.debug_execute(f"INSERT INTO hash_table (hash, dir_a, dir_key, rotation) VALUES ('{fhash}', {dir_a_num},"
+                           f" {dir_key}, {rotation})")
+
+    def has_all_hashes(self, dir_a: bool, dir_key: int):
+        """
+        Check if a file has a hash.
+        :param dir_a: if the file is in dir_a or dir_b
+        :param dir_key: key of the file in the directory table
+        :return: if a file has all 4 entries.
+        """
+        dir_a_num = 1 if dir_a else 0
+        self.debug_execute(f"SELECT * FROM hash_table WHERE dir_a = {dir_a_num} AND dir_key = {dir_key}")
+        return len(self.cur.fetchall()) == 4
+
+    def has_any_hash(self, dir_a: bool, dir_key: int):
+        """
+        Check if a file has a hash.
+        :param dir_a: if the file is in dir_a or dir_b
+        :param dir_key: key of the file in the directory table
+        :return: if a file has any entry.
+        """
+        dir_a_num = 1 if dir_a else 0
+        self.debug_execute(f"SELECT * FROM hash_table WHERE dir_a = {dir_a_num} AND dir_key = {dir_key}")
+        return self.cur.fetchone() is not None
+
+    def del_all_hashes(self, dir_a: bool, dir_key: int):
+        """
+        Delete any of the 4 possible hashes of a given file.
+        :param dir_a:
+        :param dir_key:
+        :return:
+        """
+        dir_a_num = 1 if dir_a else 0
+        self.debug_execute(f"DELETE FROM hash_table WHERE dir_a = {dir_a_num} AND dir_key = {dir_key}")
+        return self.cur.fetchone() is not None
+
+    def update_hash(self, fhash: str, dir_a: bool, dir_key: int, rotation: int):
+        """
+        Update a hash in the hash table. (Not sure why I'd need the function but there it is)
+        :param fhash: hash to update
+        :param dir_a: if the file is in dir_a or dir_b
+        :param dir_key: key of the file in the directory table
+        :param rotation: rotation of the file
+        :return:
+        """
+        dir_a_num = 1 if dir_a else 0
+        self.debug_execute(f"UPDATE hash_table SET hash = '{fhash}' "
+                           f"WHERE dir_a = {dir_a_num} AND dir_key = {dir_key} AND rotation = {rotation}")
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # COMMON FUNCTIONS
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def debug_execute(self, statement: str, commit_now: bool = False):
+        """
+        Wrapper to print the infringing statement in case of an error.
+        :param statement: statement to execute
+        :return:
+        """
+        try:
+            self.cur.execute(statement)
+        except Exception as e:
+            print(f"Exception {e} with statement:\n{statement}")
+            raise e
+
+        # automatically commit.
+        if (datetime.datetime.now() - self.last_update).total_seconds() > 60 or commit_now or self.last_update is None:
+            self.con.commit()
+            self.last_update = datetime.datetime.now()
+
+    def connect(self, path):
+        """
+        Create Connection to Database.
+        :param path: path to database
+        :return:
+        """
+        self.con = sqlite3.connect(path)
+        self.cur = self.con.cursor()
+
+    @staticmethod
+    def to_b64(to_encode: Any):
+        """
+        Convert an object to a b64 string
+
+        :param to_encode: object to encode
+        :return: base64 string
+        """
+        json_str = json.dumps(to_encode)
+        bytes_string = json_str.encode("utf-8")
+        return base64.standard_b64encode(bytes_string)
+
+    @staticmethod
+    def from_b64(b64_string: str):
+        """
+        Convert a b64 string to a python object
+
+        :param b64_string: b64 encoded python object
+        :return: python object
+        """
+        bytes_string = base64.standard_b64decode(b64_string)
+        json_string = bytes_string.decode("utf-8")
+        return json.loads(json_string)
