@@ -769,6 +769,10 @@ class FastDifPy:
         # TODO remove database (if desired)
         print("Not implemented yet")
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # PROPERTIES
+    # ------------------------------------------------------------------------------------------------------------------
+
     @property
     def thumbnail_size_x(self):
         return self.__thumbnail_size_x
