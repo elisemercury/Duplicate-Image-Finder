@@ -319,6 +319,7 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
 def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: bool) -> bool:
     """
     Parallel implementation of first loop iteration.
+
     :param iq: input queue containing arguments dict or
     :param output: output queue containing only json strings of obj
     :param identifier: id of running thread
@@ -328,12 +329,13 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
     timeout = 0
 
     # try to use cupy if it is indicated by arguments
+    cupy_avail = False
     if try_cupy:
         try:
             import cupy
             cupy_avail = True
         except ImportError:
-            cupy_avail = False
+            pass
 
     # stay awake for 60s, otherwise kill
     while timeout < 60:
