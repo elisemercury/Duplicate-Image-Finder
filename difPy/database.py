@@ -86,56 +86,6 @@ class Database:
         config_string = self.to_b64(config)
         self.debug_execute(f"UPDATE config SET value = '{config_string}' WHERE name IS '{type_name}'")
 
-    def debug_execute(self, statement: str, commit_now: bool = False):
-        """
-        Wrapper to print the infringing statement in case of an error.
-        :param statement: statement to execute
-        :return:
-        """
-        try:
-            self.cur.execute(statement)
-        except Exception as e:
-            print(f"Exception {e} with statement:\n{statement}")
-            raise e
-
-        # automatically commit.
-        if (datetime.datetime.now() - self.last_update).total_seconds() > 60 or commit_now or self.last_update is None:
-            self.con.commit()
-            self.last_update = datetime.datetime.now()
-
-    def connect(self, path):
-        """
-        Create Connection to Database.
-        :param path: path to database
-        :return:
-        """
-        self.con = sqlite3.connect(path)
-        self.cur = self.con.cursor()
-
-    @staticmethod
-    def to_b64(to_encode: Any):
-        """
-        Convert an object to a b64 string
-
-        :param to_encode: object to encode
-        :return: base64 string
-        """
-        json_str = json.dumps(to_encode)
-        bytes_string = json_str.encode("utf-8")
-        return base64.standard_b64encode(bytes_string)
-
-    @staticmethod
-    def from_b64(b64_string: str):
-        """
-        Convert a b64 string to a python object
-
-        :param b64_string: b64 encoded python object
-        :return: python object
-        """
-        bytes_string = base64.standard_b64decode(b64_string)
-        json_string = bytes_string.decode("utf-8")
-        return json.loads(json_string)
-
     def config_table_exists(self):
         """
         Check the master table if the config table exists. DOES NOT VERIFY THE TABLE DEFINITION!
