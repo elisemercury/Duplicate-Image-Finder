@@ -511,7 +511,7 @@ class FastDifPy:
     def recursive_index(self, dir_a: bool = True, path: str = None, ignore_thumbnail: bool = True):
         """
         Recursively index the directories. This function is called by the index_the_dirs function.
-        :param ignore_thumbnail: If any directory at any level, starting with .thumb should be ignored.
+        :param ignore_thumbnail: If any directory at any level, starting with .temp_thumb should be ignored.
         :param dir_a: True -> Index dir A. False -> Index dir B
         :param path: The path to the current directory. This is used for recursion.
         :return:
@@ -527,8 +527,8 @@ class FastDifPy:
         for file_name in os.listdir(path):
             full_path = os.path.join(path, file_name)
 
-            # Thumbnail directory is called .thumbnails
-            if file_name.startswith(".thumb") and ignore_thumbnail:
+            # Thumbnail directory is called .temp_thumbnails
+            if file_name.startswith(".temp_thumb") and ignore_thumbnail:
                 continue
 
             # for directories, continue the recursion
