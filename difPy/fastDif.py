@@ -109,6 +109,7 @@ class PreprocessResults:
     hash_270: str
 
     error: str
+    dir_a: bool = True
 
     @staticmethod
     def from_json(json_string: str):
@@ -121,7 +122,8 @@ class PreprocessResults:
         keys = obj_dict.keys()
 
         target_keys = ["in_path", "out_path", "original_x", "original_y", "hash_0", "hash_90", "hash_180", "hash_270",
-                       "success", "error", "key"]
+                       "success", "error", "key", "dir_a"]
+
         if not all(x in keys for x in target_keys):
             raise ValueError("Provided Json String doesn't contain the necessary keys.")
 
@@ -135,10 +137,11 @@ class PreprocessResults:
                                  hash_180=obj_dict["hash_180"],
                                  hash_270=obj_dict["hash_270"],
                                  error=obj_dict["error"],
-                                 key=int(obj_dict["key"]))
+                                 key=int(obj_dict["key"]),
+                                 dir_a=obj_dict["dir_a"])
 
     @staticmethod
-    def error_obj(in_path: str, out_path: str, error: str, key: int):
+    def error_obj(in_path: str, out_path: str, error: str, key: int, dir_a: bool):
         return PreprocessResults(
             in_path=in_path,
             out_path=out_path,
@@ -151,10 +154,11 @@ class PreprocessResults:
             hash_180="<ERROR>",
             hash_270="<ERROR>",
             key=key,
+            dir_a=dir_a,
         )
 
     @staticmethod
-    def no_hash_init(in_path: str, out_path: str, original_x: int, original_y: int, key: int):
+    def no_hash_init(in_path: str, out_path: str, original_x: int, original_y: int, key: int, dir_a: bool):
         return PreprocessResults(
             in_path=in_path,
             out_path=out_path,
@@ -167,6 +171,7 @@ class PreprocessResults:
             hash_180="<EMPTY>",
             hash_270="<EMPTY>",
             key=key,
+            dir_a=dir_a,
         )
 
     def to_dict(self):
@@ -186,6 +191,7 @@ class PreprocessResults:
             "success": self.success,
             "error": self.error,
             "key": self.key,
+            "dir_a": self.dir_a,
         }
 
     def to_json(self):
