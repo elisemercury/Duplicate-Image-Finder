@@ -591,6 +591,8 @@ class FastDifPy:
 
     def first_loop_iteration(self, compute_thumbnails: bool = True, compute_hash: bool = False, amount: int = 4,
                              gpu_proc: int = 0, cpu_proc: int = 16):
+
+        # TODO MAKE EVERYTHING WITH ProcesspoolExecutor
         # store thumbnails if possible.
         if compute_hash:
             if amount == 0:
@@ -598,6 +600,8 @@ class FastDifPy:
 
             if amount > 7 or amount < -7:
                 raise ValueError("amount my only be in range [-7, 7]")
+
+            self.db.create_hash_table()
 
         # thumbnail are required to exist for both.
         if compute_thumbnails or compute_hash:
