@@ -389,11 +389,13 @@ class dif:
                 print("Could not delete file:", file, end="\r")
         print("\n***\nDeleted", deleted, "images.")
 
+
 def type_str_int(x):
     try:
         return int(x)
     except:
         return x
+
 
 # Parameters for when launching difPy via CLI
 if __name__ == "__main__":    
