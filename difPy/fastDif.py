@@ -593,7 +593,6 @@ class FastDifPy:
 
             task_queue.put(arg.to_json())
 
-
         # start processes for cpu
         for i in range(cpu_proc):
             p = mp.Process(target=parallel_resize, args=(task_queue, res_queue, i, False))
