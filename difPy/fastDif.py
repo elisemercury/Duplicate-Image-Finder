@@ -689,6 +689,12 @@ class FastDifPy:
                 print("Timeout reached, stopping.")
                 run = False
 
+        # adding Nones just for good measure.
+        counter = 0
+        while not task_queue.full() and counter < 1000:
+            task_queue.put(None)
+            counter += 1
+
         # all processes should be done now, iterating through and killing them if they're still alive.
         for i in range(len(cpu_handles)):
             p = cpu_handles[i]
