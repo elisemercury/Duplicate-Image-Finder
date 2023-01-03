@@ -496,6 +496,11 @@ class FastDifPy:
     #
 
     def index_the_dirs(self):
+        """
+        List all the files in directory_a and possibly directory_b and store the paths and filenames in the temporary
+        database.
+        :return:
+        """
         # create the tables in the database
         self.db.create_directory_tables(secondary_folder=self.p_root_dir_b is not None)
 
