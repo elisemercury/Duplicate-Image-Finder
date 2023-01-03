@@ -348,6 +348,7 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
 
     return True
 
+
 class FastDifPy:
     p_db: str
     __p_root_dir_a: str
@@ -548,8 +549,7 @@ class FastDifPy:
             return os.path.join(directory, name)
 
         name = self.db.generate_new_thumb_name(key, filename, dir_a=dir_a)
-        return os.path.join(directory, name
-
+        return os.path.join(directory, name)
 
     def first_loop_iteration(self, compute_thumbnails: bool = True, compute_hash: bool = False, amount: int = 4,
                              gpu_proc: int = 0, cpu_proc: int = 16):
