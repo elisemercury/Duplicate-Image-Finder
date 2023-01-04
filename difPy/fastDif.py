@@ -25,6 +25,188 @@ Features:
 # TODO Implement process stop recovery.
 
 
+class ImageProcessing:
+    identifier: int
+
+    image_a_path: str = None
+    image_b_path: str = None
+
+    thumb_a_path: str = None
+    thumb_b_path: str = None
+
+    image_a_matrix: np.ndarray = None
+    image_b_matrix: np.ndarray = None
+
+    size_x: int = 64
+    size_y: int = 64
+
+    processing_args: CompareImageArguments = None
+
+    error: str = None
+
+    def __init__(self, identifier: int):
+        """
+        Identifier provided by the parent process. Used to identify the process in the console.
+
+        :param identifier: process id (not pid)
+        """
+        self.identifier = identifier
+
+    def update_compare_args(self, args: CompareImageArguments):
+        """
+        Update the CompareImgageArguments object and update the class variables so the computations can be performed.
+        :param args: new CoompareImageArguments object to process
+        :return:
+        """
+        # TODO use os.stat to update a or b if the file has changed
+        self.processing_args = args
+        load_a = False
+        load_b = False
+
+        # reload Image A if thumb or image has changed
+        if self.image_a_path != args.img_a or self.thumb_a_path != args.thumb_a:
+            self.image_a_path = args.img_a
+            self.thumb_a_path = args.thumb_a
+            self.image_a_matrix = None
+            load_a = True
+
+        # reload Image B if thumb or image has changed
+        if self.image_b_path != args.img_b or self.thumb_b_path != args.thumb_b:
+            self.image_b_path = args.img_b
+            self.thumb_b_path = args.thumb_b
+            self.image_b_matrix = None
+            load_b = True
+
+        if self.size_x != args.size_x or self.size_y != args.size_y:
+            self.size_x = args.size_x
+            self.size_y = args.size_y
+            self.image_a_matrix = None
+            self.image_b_matrix = None
+            load_a = True
+            load_b = True
+
+        # load the images if the arguments change them.
+        if load_a:
+            self.load_image(True)
+        if load_b:
+            self.load_image(False)
+
+    def load_image(self, image_a: bool = True, perform_resize: bool = True):
+        """
+        Load image from file_system
+        :param image_a: if the image_a should be loaded or image_b
+        :param perform_resize: automatically resize image if they don't match the size.
+        :return:
+        """
+        source = "image_a" if image_a else "image_b"
+        image_path = self.image_b_path
+        thumbnail_path = self.thumb_b_path
+
+        # load the image_a stuff if the image_a is set.
+        if image_a:
+            image_path = self.image_a_path
+            thumbnail_path = self.thumb_a_path
+
+        if thumbnail_path is not None and os.path.exists(thumbnail_path):
+            result, err_str, rescale = self.__image_loader(thumbnail_path, f"{source} thumbnail")
+
+            # The thumbnail size matches and no error occurred while loading it. Storing the result and returning.
+            if not rescale and err_str == "":
+                if image_a:
+                    self.image_a_matrix = result
+                else:
+                    self.image_b_matrix = result
+                return
+
+            if err_str != "":
+                print(f"{self.identifier: 02}: {err_str}")
+
+        # At this point thumbnail loading failed or the thumbnail was not computed. Load the image and resize if given
+        # by args.
+        if not os.path.exists(image_path):
+            # the main image is the last solution, and we will store the error and return immediately if the error is
+            # found.
+            self.error = f"Error {source} failed to load because the file does not exist."
+            return
+
+        # load the image and return immediately if an error occurred.
+        result, err_str, rescale = self.__image_loader(image_path, f"{source} original")
+        if err_str != "":
+            self.error = err_str
+            return
+
+        if image_a:
+            self.image_a_matrix = result
+        else:
+            self.image_b_matrix = result
+
+        # return of we are not allowed to resize, or we don't need to.
+        if not perform_resize or not rescale:
+            return
+
+        # resize the image
+        self.resize_image(image_a)
+
+    def __image_loader(self, img_path: str, source: str) -> Tuple[Union[np.ndarray, None], str, bool]:
+        """
+        Private function that handles the basic loading and type conversion for an image. Errors are returned as a
+        result and not stored in the class because if you load thumbnails, the error has not to be as severe as to
+        prevent the computation from completing. That's why it's returned and the caller needs to detmine what
+        happens with the error.
+
+        :param img_path: path to load from.
+        :param source: the source of the image. Used for the error message
+        :return:
+        """
+        # load from fs
+        try:
+            img = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8), cv2.IMREAD_COLOR)
+        except Exception as e:
+            err_str = f"Error {source} failed to load with:\n {e}"
+            return None, err_str, False
+
+        # assert type
+        if type(img) != np.ndarray:
+            err_str = f"Error {source} failed to load because the image is not of type np.ndarray"
+            return None, err_str, False
+
+        # convert grayscale to rgb
+        if len(img.shape) == 2:
+            img = skimage.color.gray2rgb(img)
+
+        # assert length of image
+        img = img[..., 0:3]
+
+        # if one aspect is not matching, rescale the image
+        scale = img.shape[0] != self.size_x or img.shape[1] != self.size_y
+        return img, "", scale
+
+    def resize_image(self, image_a: bool = True) -> Tuple[Union[np.ndarray, None], str]:
+        """
+        Resize image to image_size provided in the CompareImageArguments object.
+        :param image_a:
+        :return:
+        """
+        try:
+            if image_a:
+                self.image_a_matrix = cv2.resize(self.image_a_matrix, (self.size_x, self.size_y))
+            else:
+                self.image_b_matrix = cv2.resize(self.image_b_matrix, (self.size_x, self.size_y))
+        except Exception as e:
+            self.error = f"Error resizing image failed with:\n {e}"
+
+
+
+
+def compare_images(args: CompareImageArguments) -> CompareImageResults:
+    """
+    Compare two images and return the result.
+    :param args: arguments to parse
+    :return: result of the comparison
+    """
+
+    # check the thumbnail
+
 
 
 def process_image_cuda(args: PreprocessArguments) -> PreprocessResults:
