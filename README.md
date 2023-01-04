@@ -3,6 +3,7 @@
 ![PyPIv](https://img.shields.io/pypi/v/difPy)
 ![PyPI status](https://img.shields.io/pypi/status/difPy)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/difPy)
+[![Downloads](https://static.pepy.tech/badge/difpy)](https://pepy.tech/project/difpy)
 ![PyPI - License](https://img.shields.io/pypi/l/difPy)
 <img src="https://img.shields.io/badge/dif-Py-blue?style=flat&logo=python&labelColor=white&logoWidth=20.svg/"></a>
 
@@ -151,7 +152,13 @@ difPy_stats_xxx.json
 
 -------
 
-***
 <p align="center"><b>
 :thought_balloon: Also want to be featured in the "Related Projects" section? Check our <a href="https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy#be-featured-as-difpy-related-project">contributor guidelines</a> to find out how!
 </b></p>
+
+-------
+
+<p align="center"><b>
+We :heart: Open Source 
+</b></p>
+
