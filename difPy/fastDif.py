@@ -23,6 +23,12 @@ Features:
 - Use of file names / zero difference to detect images which differ only in the metadata.  # TODO for later
 """
 
+# TODO test cuda functionality
+# TODO create unified handler for the parallel functions
+# TODO Create functions related for the general comparison of the images. (loop 2)
+# TODO Move the hash etc to the ImageProcessing Class
+# TODO Make a skeleton for the parallel process
+# TODO Test the whole shit.
 # TODO Implement process stop recovery.
 
 
