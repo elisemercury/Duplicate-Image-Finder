@@ -251,10 +251,50 @@ class ImageProcessing:
                 self.image_b_matrix = cv2.resize(self.image_b_matrix, dsize=(self.size_x, self.size_y),
                                                  interpolation=cv2.INTER_CUBIC)
         except Exception as e:
-            self.error = f"Error resizing image failed with:\n {e}"
+            self.error = f"Error resizing {img_str} failed with:\n {e}"
 
+    def img_rot(self, img_a: bool = True):
+        """
+        Rotate image by 90 degrees.
+        :param img_a: if the image_a should be rotated or image_b
+        :return:
+        """
+        img_str = "image_a" if img_a else "image_b"
+        try:
+            if img_a:
+                self.image_a_matrix = np.rot90(self.image_a_matrix, k=1, axes=(0, 1))
+            else:
+                self.image_b_matrix = np.rot90(self.image_b_matrix, k=1, axes=(0, 1))
+        except Exception as e:
+            self.error = f"Error rotating {img_str} failed with:\n {e}"
 
+    def compare_images(self):
+        """
+        Compare the images and store the result in the class.
+        :return:
+        """
+        # check if the images are loaded
+        if self.image_a_matrix is None:
+            self.error = "Error image_a is not loaded."
+            return
+        if self.image_b_matrix is None:
+            self.error = "Error image_b is not loaded."
+            return
 
+        # compare 0 degrees
+        self.diff_0 = self.compare_func(self.image_a_matrix, self.image_b_matrix)
+
+        # compare 90 degrees
+        self.img_rot(True)
+        self.diff_90 = self.compare_func(self.image_a_matrix, self.image_b_matrix)
+
+        # compare 180 degrees
+        self.img_rot(True)
+        self.diff_180 = self.compare_func(self.image_a_matrix, self.image_b_matrix)
+
+        # compare 270 degrees
+        self.img_rot(True)
+        self.diff_270 = self.compare_func(self.image_a_matrix, self.image_b_matrix)
 
 def compare_images(args: CompareImageArguments) -> CompareImageResults:
     """
