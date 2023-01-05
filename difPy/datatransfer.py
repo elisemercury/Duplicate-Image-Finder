@@ -194,6 +194,9 @@ class CompareImageArguments:
     compare_threshold: float
     store_path: str
 
+    size_x: int
+    size_y: int
+
     is_dir_b: bool = False
 
     @staticmethod
@@ -207,7 +210,7 @@ class CompareImageArguments:
         keys = obj_dict.keys()
 
         target_keys = ["img_a", "img_b", "thumb_a", "thumb_b", "key_a", "key_b", "store_compare", "compare_threshold",
-                       "is_dir_b", "store_path"]
+                       "is_dir_b", "store_path", "size_x", "size_y"]
 
         if not all(x in keys for x in target_keys):
             raise ValueError("Provided Json String doesn't contain the necessary keys.")
@@ -221,7 +224,10 @@ class CompareImageArguments:
                                      store_compare=obj_dict["store_compare"],
                                      compare_threshold=obj_dict["compare_threshold"],
                                      is_dir_b=obj_dict["is_dir_b"],
-                                     store_path=obj_dict["store_path"])
+                                     store_path=obj_dict["store_path"],
+                                     size_x=obj_dict["size_x"],
+                                     size_y=obj_dict["size_y"],
+                                     )
 
     def to_dict(self):
         """
@@ -239,6 +245,8 @@ class CompareImageArguments:
             "compare_threshold": self.compare_threshold,
             "is_dir_b": self.is_dir_b,
             "store_path": self.store_path,
+            "size_x": self.size_x,
+            "size_y": self.size_y,
         }
 
     def to_json(self):
