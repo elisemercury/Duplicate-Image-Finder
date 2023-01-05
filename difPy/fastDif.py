@@ -236,17 +236,20 @@ class ImageProcessing:
         scale = img.shape[0] != self.size_x or img.shape[1] != self.size_y
         return img, "", scale
 
-    def resize_image(self, image_a: bool = True) -> Tuple[Union[np.ndarray, None], str]:
+    def resize_image(self, image_a: bool = True):
         """
         Resize image to image_size provided in the CompareImageArguments object.
-        :param image_a:
+        :param image_a: if the image_a should be resized or image_b
         :return:
         """
+        img_str = "image_a" if image_a else "image_b"
         try:
             if image_a:
-                self.image_a_matrix = cv2.resize(self.image_a_matrix, (self.size_x, self.size_y))
+                self.image_a_matrix = cv2.resize(self.image_a_matrix, dsize=(self.size_x, self.size_y),
+                                                 interpolation=cv2.INTER_CUBIC)
             else:
-                self.image_b_matrix = cv2.resize(self.image_b_matrix, (self.size_x, self.size_y))
+                self.image_b_matrix = cv2.resize(self.image_b_matrix, dsize=(self.size_x, self.size_y),
+                                                 interpolation=cv2.INTER_CUBIC)
         except Exception as e:
             self.error = f"Error resizing image failed with:\n {e}"
 
