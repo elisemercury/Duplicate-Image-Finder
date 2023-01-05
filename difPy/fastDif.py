@@ -81,6 +81,31 @@ class ImageProcessing:
         :param comp: comparison function to use. If none is provided, the default is used.
         """
         self.identifier = identifier
+        if comp is not None:
+            self.compare_func = comp
+        else:
+            self.compare_func = self.mse
+
+    def reset_diff(self):
+        """
+        Utility to reset the diff values.
+        :return:
+        """
+        self.diff_0 = 0
+        self.diff_90 = 0
+        self.diff_180 = 0
+        self.diff_270 = 0
+
+    @staticmethod
+    def mse(image_a: np.ndarray, image_b: np.ndarray) -> float:
+        """
+        The mean squared error, which is the base for the other metrics.
+        """
+        difference = image_a.astype("float") - image_b.astype("float")
+        sq_diff = np.square(difference)
+        sum_diff = np.sum(sq_diff)
+        px_count = image_a.shape[0] * image_a.shape[1]
+        return sum_diff / px_count
 
     def update_compare_args(self, args: CompareImageArguments):
         """
