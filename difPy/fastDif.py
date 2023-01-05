@@ -353,6 +353,102 @@ def process_image_cuda(args: PreprocessArguments) -> PreprocessResults:
     return process_image(args, xp=cp)
 
 
+def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: bool) -> bool:
+    """
+    Parallel implementation of first loop iteration.
+
+    :param iq: input queue containing arguments dict or
+    :param output: output queue containing only json strings of obj
+    :param identifier: id of running thread
+    :param try_cupy: check if cupy is available and use cupy instead.
+    :return: True, running was successful and no error encountered, otherwise exit without return or return False
+    """
+    timeout = 0
+
+    # try to use cupy if it is indicated by arguments
+    cupy_avail = False
+    if try_cupy:
+        try:
+            import cupy
+            cupy_avail = True
+        except ImportError:
+            pass
+
+    # stay awake for 60s, otherwise kill
+    while timeout < 60:
+        try:
+            args_str = iq.get(timeout=1)
+        except queue.Empty:
+            timeout += 1
+            continue
+
+        if args_str is None:
+            print(f"{identifier:03} Terminating")
+            break
+
+        args = PreprocessArguments.from_json(args_str)
+        timeout = 0
+
+        if cupy_avail:
+            result = process_image_cuda(args)
+        else:
+            result = process_image(args)
+        print(f"{identifier:03}: Done with {os.path.basename(args.in_path)}")
+
+        # Sending the result to the handler
+        output.put(result.to_json())
+
+    return True
+
+
+def paralell_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy: bool) -> bool:
+    """
+    Parallel implementation of first loop iteration.
+
+    :param in_q: input queue containing arguments dict or
+    :param out_q: output queue containing only json strings of obj
+    :param identifier: id of running thread
+    :param try_cupy: check if cupy is available and use cupy instead.
+    :return: True, running was successful and no error encountered, otherwise exit without return or return False
+    """
+    timeout = 0
+
+    # try to use cupy if it is indicated by arguments
+    cupy_avail = False
+    if try_cupy:
+        try:
+            import cupy
+            cupy_avail = True
+        except ImportError:
+            pass
+
+    # stay awake for 60s, otherwise kill
+    while timeout < 60:
+        try:
+            args_str = in_q.get(timeout=1)
+        except queue.Empty:
+            timeout += 1
+            continue
+
+        if args_str is None:
+            print(f"{identifier:03} Terminating")
+            break
+
+        args = CompareImageArguments.from_json(args_str)
+        timeout = 0
+
+        if cupy_avail:
+            result = compare_images_cuda(args)
+        else:
+            result = compare_images(args)
+        print(f"{identifier:03}: Done with {os.path.basename(args.in_path)}")
+
+        # Sending the result to the handler
+        out_q.put(result.to_json())
+
+    return True
+
+
 def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
     """
     Perform the preprocessing on the image.
@@ -457,54 +553,6 @@ def process_image(args: PreprocessArguments, xp=np) -> PreprocessResults:
     except Exception as e:
         return PreprocessResults.error_obj(in_path=args.in_path, out_path=args.out_path, error=f"Error: {e}",
                                            key=args.key, dir_a=args.dir_a)
-
-
-def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: bool) -> bool:
-    """
-    Parallel implementation of first loop iteration.
-
-    :param iq: input queue containing arguments dict or
-    :param output: output queue containing only json strings of obj
-    :param identifier: id of running thread
-    :param try_cupy: check if cupy is available and use cupy instead.
-    :return: True, running was successful and no error encountered, otherwise exit without return or return False
-    """
-    timeout = 0
-
-    # try to use cupy if it is indicated by arguments
-    cupy_avail = False
-    if try_cupy:
-        try:
-            import cupy
-            cupy_avail = True
-        except ImportError:
-            pass
-
-    # stay awake for 60s, otherwise kill
-    while timeout < 60:
-        try:
-            args_str = iq.get(timeout=1)
-        except queue.Empty:
-            timeout += 1
-            continue
-
-        if args_str is None:
-            print(f"{identifier:03} Terminating")
-            break
-
-        args = PreprocessArguments.from_json(args_str)
-        timeout = 0
-
-        if cupy_avail:
-            result = process_image_cuda(args)
-        else:
-            result = process_image(args)
-        print(f"{identifier:03}: Done with {os.path.basename(args.in_path)}")
-
-        # Sending the result to the handler
-        output.put(result.to_json())
-
-    return True
 
 
 class FastDifPy:
