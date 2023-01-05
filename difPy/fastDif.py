@@ -58,6 +58,11 @@ class ImageProcessing:
     size_x: int = 64
     size_y: int = 64
 
+    diff_0: int = 0
+    diff_90: int = 0
+    diff_180: int = 0
+    diff_270: int = 0
+
     processing_args: CompareImageArguments = None
 
     error: str = None
