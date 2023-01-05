@@ -265,7 +265,7 @@ class CompareImageResults:
     error: str
     success: bool
 
-    avg_diff: float
+    min_avg_diff: float
 
     @staticmethod
     def from_json(json_string: str):
@@ -277,7 +277,7 @@ class CompareImageResults:
         obj_dict = json.loads(json_string)
         keys = obj_dict.keys()
 
-        target_keys = ["key_a", "key_b", "error", "success", "avg_diff"]
+        target_keys = ["key_a", "key_b", "error", "success", "min_avg_diff"]
 
         if not all(x in keys for x in target_keys):
             raise ValueError("Provided Json String doesn't contain the necessary keys.")
@@ -286,7 +286,7 @@ class CompareImageResults:
                                    key_b=int(obj_dict["key_b"]),
                                    error=obj_dict["error"],
                                    success=obj_dict["success"],
-                                   avg_diff=obj_dict["avg_diff"])
+                                   min_avg_diff=obj_dict["min_avg_diff"])
 
     def to_dict(self):
         """
@@ -298,7 +298,7 @@ class CompareImageResults:
             "key_b": self.key_b,
             "error": self.error,
             "success": self.success,
-            "avg_diff": self.avg_diff,
+            "min_avg_diff": self.min_avg_diff,
         }
 
     def to_json(self):
