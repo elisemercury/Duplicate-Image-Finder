@@ -67,7 +67,9 @@ class ImageProcessing:
 
     error: str = None
 
-    def __init__(self, identifier: int):
+    compare_func = None
+
+    def __init__(self, identifier: int, comp: FunctionType = None):
         """
         Identifier provided by the parent process. Used to identify the process in the console.
 
