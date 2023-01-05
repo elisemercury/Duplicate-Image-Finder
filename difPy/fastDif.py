@@ -33,6 +33,17 @@ Features:
 
 
 class ImageProcessing:
+    """
+    This class Contains the functions to process a single image or a pari of images.
+
+    The intent of this class is to be instantiated in the parallel processes running as slaves. It gets passed the
+    arguments from the slave and then has the ability to reuse parts of the computation from before (say you have an
+    all to all comparison, you can have one slave keep one image constant and iterate through the others.)
+
+    The class needs to be aware of the availability of cuda / cupy and use it if indicated by the slave running the
+    class.
+    """
+    # TODO Make class Cupy compatible
     identifier: int
 
     image_a_path: str = None
