@@ -10,6 +10,7 @@ import skimage.color
 import multiprocessing as mp
 import queue
 from datatransfer import *
+from types import FunctionType
 
 """
 Fast implementation of the DifPy Library.
