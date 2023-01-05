@@ -296,15 +296,53 @@ class ImageProcessing:
         self.img_rot(True)
         self.diff_270 = self.compare_func(self.image_a_matrix, self.image_b_matrix)
 
-def compare_images(args: CompareImageArguments) -> CompareImageResults:
-    """
-    Compare two images and return the result.
-    :param args: arguments to parse
-    :return: result of the comparison
-    """
+        # rotate back for reuse.
+        self.img_rot(True)
 
-    # check the thumbnail
+    def create_compare_result(self):
+        """
+        Create a CompareImageResult object from the class.
+        :return:
+        """
+        min_diff = min(self.diff_0, self.diff_90, self.diff_180, self.diff_270)
+        return CompareImageResults(key_a=self.processing_args.key_a,
+                                   key_b=self.processing_args.key_b,
+                                   error=self.error,
+                                   success=self.error == "",
+                                   min_avg_diff=min_diff)
 
+    def store_plt_on_threashold(self):
+        """
+        Shorthand to store the plot if the threshold is reached and the storing of the plot is desired.
+        :return:
+        """
+        min_diff = min(self.diff_0, self.diff_90, self.diff_180, self.diff_270)
+        if self.processing_args.store_compare and self.processing_args.compare_threshold < min_diff:
+            self.store_plt()
+
+    def create_compare_plot(self):
+        """
+        Create a plot of the two images that are deemed to be similar and store it in predifined path.
+        :return:
+        """
+        fig = plt.figure()
+        min_diff = min(self.diff_0, self.diff_90, self.diff_180, self.diff_270)
+        plt.suptitle("MSE: %.2f" % (min_diff))
+
+        # plot first image
+        ax = fig.add_subplot(1, 2, 1)
+        plt.imshow(self.image_a_matrix, cmap=plt.cm.gray)
+        plt.axis("off")
+
+        # plot second image
+        ax = fig.add_subplot(1, 2, 2)
+        plt.imshow(self.image_b_matrix, cmap=plt.cm.gray)
+        plt.axis("off")
+
+        plt.show(block=False)
+        # show the images
+        plt.savefig(self.processing_args.store_path)
+        plt.close()
 
 
 def process_image_cuda(args: PreprocessArguments) -> PreprocessResults:
