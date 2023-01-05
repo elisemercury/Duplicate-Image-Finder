@@ -73,7 +73,12 @@ class ImageProcessing:
         """
         Identifier provided by the parent process. Used to identify the process in the console.
 
+        Specification of comparison:
+        Input: two np.ndarray of the same shape. (the images)
+        Output: float value of the computed difference.
+
         :param identifier: process id (not pid)
+        :param comp: comparison function to use. If none is provided, the default is used.
         """
         self.identifier = identifier
 
