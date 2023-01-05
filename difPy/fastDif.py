@@ -676,16 +676,6 @@ class FastDifPy:
         }
         self.db.create_config(type_name="main_config", config=temp_config)
 
-    # Perform two loops.
-    # First loop:
-    # - load the metadata / paths of the images i.e. (image size)
-    # - If desired, compute the thumbnail of the image
-    # - if desired compute the hash of the image
-
-    # Second loop
-    # - compress the images (if not thumbnails were calculated)
-    #
-
     def index_the_dirs(self):
         """
         List all the files in directory_a and possibly directory_b and store the paths and filenames in the temporary
