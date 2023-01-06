@@ -324,6 +324,17 @@ class ImageProcessing:
         scale = img.shape[0] != self.target_size_x or img.shape[1] != self.target_size_y
         return img, "", scale
 
+    def store_image(self, img_a: bool = True):
+        """
+        Stores the image to file given by the thumbnail path. This will OVERWRITE a preexisting image.
+        :param img_a: if image_matrix_a or image_matrix_b is to be stored to its respective thumbnail path.
+        :return:
+        """
+        if img_a:
+            cv2.imwrite(self.thumb_a_path, self.image_a_matrix)
+        else:
+            cv2.imwrite(self.thumb_b_path, self.image_b_matrix)
+
     def resize_image(self, image_a: bool = True):
         """
         Resize image to image_size provided in the CompareImageArguments object.
