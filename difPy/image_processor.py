@@ -408,9 +408,9 @@ class ImageProcessing:
                                    key_b=self.processing_args.key_b,
                                    error=self.error,
                                    success=self.error == "",
-                                   min_avg_diff=min_diff)
+                                   min_avg_diff=min_diff if self.error == "" else -1.0)
 
-    def store_plt_on_threashold(self):
+    def store_plt_on_threshold(self):
         """
         Shorthand to store the plot if the threshold is reached and the storing of the plot is desired.
         :return:
