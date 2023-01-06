@@ -442,3 +442,72 @@ class ImageProcessing:
         # show the images
         plt.savefig(self.processing_args.store_path)
         plt.close()
+
+    def compute_img_hashes(self, img_a: bool = True):
+        """
+        Compute hash_prefix for duplicate detection.
+        :param img_a: If image a should be hashed or image b
+        :return:
+        """
+        # load from attributes
+        if img_a:
+            image_mat = np.copy(self.image_a_matrix)
+            default_path = self.thumb_a_path
+            name = "image a"
+        else:
+            image_mat = np.copy(self.image_b_matrix)
+            default_path = self.thumb_b_path
+            name = "image b"
+
+        # should be sanitized by the main process.
+        assert 8 > self.preprocessing_args.amount > -8, "amount exceeding range"
+
+        # compute_new_paths
+        p, e = os.path.splitext(default_path)
+        path_0 = f"{p}_0{e}"
+        path_90 = f"{p}_90{e}"
+        path_180 = f"{p}_180{e}"
+        path_270 = f"{p}_270{e}"
+
+        try:
+            # shift only if the amount is non-zero
+            if self.preprocessing_args.amount > 0:
+                np.right_shift(image_mat, self.preprocessing_args.amount)
+            elif self.preprocessing_args.amount < 0:
+                np.left_shift(image_mat, abs(self.preprocessing_args.amount))
+
+            # store rot0 with shift
+            cv2.imwrite(path_0, image_mat)
+
+            # rot 90
+            np.rot90(image_mat, k=1, axes=(0, 1))
+            cv2.imwrite(path_90, image_mat)
+
+            # rot 180
+            np.rot90(image_mat, k=1, axes=(0, 1))
+            cv2.imwrite(path_180, image_mat)
+
+            # rot 270
+            np.rot90(image_mat, k=1, axes=(0, 1))
+            cv2.imwrite(path_270, image_mat)
+
+            # need to compute file hash since writing the
+            hash_0 = hash_file(path_0)
+            hash_90 = hash_file(path_90)
+            hash_180 = hash_file(path_180)
+            hash_270 = hash_file(path_270)
+
+            # shouldn't be allowed to fail
+            os.remove(path_0)
+            os.remove(path_90)
+            os.remove(path_180)
+            os.remove(path_270)
+
+        except Exception as e:
+            self.error = f"Error hashing {name}:\n {e}"
+            return
+
+        self.hash_0 = hash_0
+        self.hash_90 = hash_90
+        self.hash_180 = hash_180
+        self.hash_270 = hash_270
