@@ -275,6 +275,9 @@ class ImageProcessing:
             self.error = err_str
             return
 
+        # store image size
+        self.original_size_x, self.original_size_y, _ = np.shape(result)
+
         if image_a:
             self.image_a_matrix = result
         else:
