@@ -124,6 +124,74 @@ class ImageProcessing:
         px_count = image_a.shape[0] * image_a.shape[1]
         return sum_diff / px_count
 
+    def update_preprocess_args(self, args: PreprocessArguments):
+        """
+        Loads the PreprocessArguments and updates the class attributes accordingly.
+        :param args:
+        :return:
+        """
+        self.preprocessing_args = args
+        load = False
+
+        if self.image_a_path != args.in_path:
+            load = True
+            self.image_a_matrix = None
+            self.image_a_path = args.in_path
+            self.thumb_a_path = args.out_path
+
+        if self.target_size_x != args.size_x or self.target_size_y != args.size_y:
+            load = True
+            self.target_size_x = args.size_x
+            self.target_size_y = args.size_y
+            self.image_a_matrix = None
+
+        if load:
+            self.load_image(image_a=True, perform_resize=False)
+
+    def create_error_preprocess_result(self):
+        """
+        Create an PreprocessResults object given the existence of an error
+        :return:
+        """
+        return PreprocessResults.error_obj(in_path=self.preprocessing_args.in_path,
+                                           out_path=self.preprocessing_args.out_path,
+                                           error=self.error,
+                                           key=self.preprocessing_args.key,
+                                           dir_a=self.preprocessing_args.dir_a
+                                           )
+
+    def create_no_hash_preprocess_result(self):
+        """
+        Create a PreprocessResults object given no computed hashed to be returned
+        :return:
+        """
+        return PreprocessResults.no_hash_init(in_path=self.preprocessing_args.in_path,
+                                              out_path=self.preprocessing_args.out_path,
+                                              original_x=self.original_size_x,
+                                              original_y=self.original_size_y,
+                                              key=self.preprocessing_args.key,
+                                              dir_a=self.preprocessing_args.dir_a,
+                                              )
+
+    def create_full_preprocess_result(self):
+        """
+        Create a fully populated preprocess results object.
+        :return:
+        """
+        return PreprocessResults(
+            in_path=self.preprocessing_args.in_path,
+            out_path=self.preprocessing_args.out_path,
+            success=True,
+            error="<EMPTY>",
+            original_x=self.original_size_x,
+            original_y=self.original_size_y,
+            hash_0=self.hash_0,
+            hash_90=self.hash_90,
+            hash_180=self.hash_180,
+            hash_270=self.hash_270,
+            key=self.preprocessing_args.key
+        )
+
     def update_compare_args(self, args: CompareImageArguments):
         """
         Update the CompareImgageArguments object and update the class variables so the computations can be performed.
