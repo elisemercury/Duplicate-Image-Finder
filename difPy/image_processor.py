@@ -74,7 +74,13 @@ class ImageProcessing:
     diff_180: float = 0
     diff_270: float = 0
 
+    hash_0: str = ""
+    hash_90: str = ""
+    hash_180: str = ""
+    hash_270: str = ""
+
     processing_args: CompareImageArguments = None
+    preprocessing_args: PreprocessArguments = None
 
     error: str = None
 
