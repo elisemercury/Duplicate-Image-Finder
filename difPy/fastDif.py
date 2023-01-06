@@ -1,16 +1,11 @@
 from database import Database
-from matplotlib import pyplot as plt
 import os
-from typing import Tuple
+from typing import List
 import warnings
 from utils import *
-import numpy as np
-import cv2
-import skimage.color
 import multiprocessing as mp
 import queue
 from datatransfer import *
-from types import FunctionType
 
 """
 Fast implementation of the DifPy Library.
