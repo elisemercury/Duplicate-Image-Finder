@@ -63,8 +63,11 @@ class ImageProcessing:
     image_a_matrix: Union[np.ndarray, None] = None
     image_b_matrix: Union[np.ndarray, None] = None
 
-    size_x: int = 64
-    size_y: int = 64
+    target_size_x: int = 64
+    target_size_y: int = 64
+
+    original_size_x: int = 0
+    original_size_y: int = 0
 
     diff_0: float = 0
     diff_90: float = 0
