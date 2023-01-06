@@ -143,9 +143,9 @@ class ImageProcessing:
             self.image_b_matrix = None
             load_b = True
 
-        if self.size_x != args.size_x or self.size_y != args.size_y:
-            self.size_x = args.size_x
-            self.size_y = args.size_y
+        if self.target_size_x != args.size_x or self.target_size_y != args.size_y:
+            self.target_size_x = args.size_x
+            self.target_size_y = args.size_y
             self.image_a_matrix = None
             self.image_b_matrix = None
             load_a = True
@@ -244,7 +244,7 @@ class ImageProcessing:
         img = img[..., 0:3]
 
         # if one aspect is not matching, rescale the image
-        scale = img.shape[0] != self.size_x or img.shape[1] != self.size_y
+        scale = img.shape[0] != self.target_size_x or img.shape[1] != self.target_size_y
         return img, "", scale
 
     def resize_image(self, image_a: bool = True):
@@ -256,10 +256,10 @@ class ImageProcessing:
         img_str = "image_a" if image_a else "image_b"
         try:
             if image_a:
-                self.image_a_matrix = cv2.resize(self.image_a_matrix, dsize=(self.size_x, self.size_y),
+                self.image_a_matrix = cv2.resize(self.image_a_matrix, dsize=(self.target_size_x, self.target_size_y),
                                                  interpolation=cv2.INTER_CUBIC)
             else:
-                self.image_b_matrix = cv2.resize(self.image_b_matrix, dsize=(self.size_x, self.size_y),
+                self.image_b_matrix = cv2.resize(self.image_b_matrix, dsize=(self.target_size_x, self.target_size_y),
                                                  interpolation=cv2.INTER_CUBIC)
         except Exception as e:
             self.error = f"Error resizing {img_str} failed with:\n {e}"
