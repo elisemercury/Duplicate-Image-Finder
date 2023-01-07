@@ -132,11 +132,7 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
     # try to use cupy if it is indicated by arguments
     cupy_avail = False
     if try_cupy:
-        try:
-            import cupy
-            cupy_avail = True
-        except ImportError:
-            pass
+        print("Cupy version currently not implemented")
 
     # stay awake for 60s, otherwise kill
     while timeout < 60:
@@ -153,10 +149,6 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
         args = CompareImageArguments.from_json(args_str)
         timeout = 0
 
-        if cupy_avail:
-            result = compare_images_cuda(args)
-        else:
-            result = compare_images(args)
         print(f"{identifier:03}: Done with {os.path.basename(args.in_path)}")
 
         # Sending the result to the handler
