@@ -6,6 +6,7 @@ from utils import *
 import multiprocessing as mp
 import queue
 from datatransfer import *
+from image_processor import ImageProcessing
 
 """
 Fast implementation of the DifPy Library.
