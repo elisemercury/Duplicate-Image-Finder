@@ -30,7 +30,7 @@ Features:
 # TODO Reset Processing Class if the arguments are switched.
 
 
-def process_image(proc: ImageProcessing, args: PreprocessArguments) -> PreprocessResults:
+def cpu_process_image(proc: ImageProcessing, args: PreprocessArguments) -> PreprocessResults:
     """
     Function to execute preprocessing with the ImageProcessing Class
     # TODO WARNING in docs that an error in the course of processing if it was not fatal, will be treated as fatal.
