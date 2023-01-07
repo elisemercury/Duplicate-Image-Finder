@@ -124,14 +124,17 @@ class ImageProcessing:
         px_count = image_a.shape[0] * image_a.shape[1]
         return sum_diff / px_count
 
-    def update_preprocess_args(self, args: PreprocessArguments):
+    def update_preprocess_args(self, args: PreprocessArguments, load: bool = True):
         """
         Loads the PreprocessArguments and updates the class attributes accordingly.
-        :param args:
+        Also resets any previously occurred errors.
+
+        :param args: arguments to fill into attributes
+        :param load: if the image should be loaded with the after updating the args through the update function.
         :return:
         """
         self.preprocessing_args = args
-        load = False
+        self.error = ""
 
         if self.image_a_path != args.in_path:
             load = True
