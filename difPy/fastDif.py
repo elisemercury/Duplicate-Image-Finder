@@ -172,6 +172,17 @@ class FastDifPy:
 
     db: Database
 
+    # relative to child processes
+    first_loop_in: mp.Queue = None  # the tasks sent to the child processes
+    first_loop_out: mp.Queue = None  # the results coming from the child processes
+
+    second_loop_in: List[mp.Queue] = None
+    second_loop_out: mp.Queue = None
+    second_loop_queue_status: List[dict] = None
+
+    cpu_handles = None
+    gpu_handles = None
+
     def __init__(self, directory_a: str, directory_b: str = None, test_db: bool = True):
         """
         Provide the directories to be searched. If a different implementation of the database is used,
