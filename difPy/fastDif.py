@@ -29,119 +29,50 @@ Features:
 # TODO Harakiri method. More reckless method.
 # TODO Reset Processing Class if the arguments are switched.
 
-class ImageProcessing:
+
+def process_image(proc: ImageProcessing, args: PreprocessArguments) -> PreprocessResults:
     """
-    This class Contains the functions to process a single image or a pari of images.
+    Function to execute preprocessing with the ImageProcessing Class
+    # TODO WARNING in docs that an error in the course of processing if it was not fatal, will be treated as fatal.
 
-    The intent of this class is to be instantiated in the parallel processes running as slaves. It gets passed the
-    arguments from the slave and then has the ability to reuse parts of the computation from before (say you have an
-    all to all comparison, you can have one slave keep one image constant and iterate through the others.)
-
-    The class needs to be aware of the availability of cuda / cupy and use it if indicated by the slave running the
-    class.
+    :param proc: the ImageProcessing class to retain information (not really necessary currently)
+    :param args: arguments loaded from the queue
+    :return: PreprocessingResult
     """
-    # TODO Make class Cupy compatible
-    identifier: int
+    # update arguments and load image
+    proc.update_preprocess_args(args=args)
 
-    image_a_path: str = None
-    image_b_path: str = None
+    # check for error
+    if proc.error != "":
+        return proc.create_error_preprocess_result()
 
-    thumb_a_path: str = None
-    thumb_b_path: str = None
+    # return here if only the aspect ratio is desired.
+    if not args.compute_hash and not args.store_thumb:
+        return proc.create_no_hash_preprocess_result()
 
-    image_a_matrix: np.ndarray = None
-    image_b_matrix: np.ndarray = None
+    # storing image if desired.
+    if args.store_thumb:
+        proc.store_image(img_a=True)
 
-    size_x: int = 64
-    size_y: int = 64
+    # for safety, returning with error here. It could be possible to continue even if an error
+    # occurred while storing the file.
+    if proc.error != "":
+        return proc.create_error_preprocess_result()
 
-    diff_0: int = 0
-    diff_90: int = 0
-    diff_180: int = 0
-    diff_270: int = 0
+    # return if no hash is desired.
+    if not args.compute_hash:
+        return proc.create_no_hash_preprocess_result()
 
-    processing_args: CompareImageArguments = None
+    # compute hash
+    proc.compute_img_hashes(img_a=True)
 
-    error: str = None
+    # check for errors again
+    if proc.error != "":
+        return proc.create_error_preprocess_result()
 
-    compare_func = None
+    # full result return
+    return proc.create_full_preprocess_result()
 
-    def __init__(self, identifier: int, comp: FunctionType = None):
-        """
-        Identifier provided by the parent process. Used to identify the process in the console.
-
-        Specification of comparison:
-        Input: two np.ndarray of the same shape. (the images)
-        Output: float value of the computed difference.
-
-        :param identifier: process id (not pid)
-        :param comp: comparison function to use. If none is provided, the default is used.
-        """
-        self.identifier = identifier
-        if comp is not None:
-            self.compare_func = comp
-        else:
-            self.compare_func = self.mse
-
-    def reset_diff(self):
-        """
-        Utility to reset the diff values.
-        :return:
-        """
-        self.diff_0 = 0
-        self.diff_90 = 0
-        self.diff_180 = 0
-        self.diff_270 = 0
-
-    @staticmethod
-    def mse(image_a: np.ndarray, image_b: np.ndarray) -> float:
-        """
-        The mean squared error, which is the base for the other metrics.
-        """
-        difference = image_a.astype("float") - image_b.astype("float")
-        sq_diff = np.square(difference)
-        sum_diff = np.sum(sq_diff)
-        px_count = image_a.shape[0] * image_a.shape[1]
-        return sum_diff / px_count
-
-    def update_compare_args(self, args: CompareImageArguments):
-        """
-        Update the CompareImgageArguments object and update the class variables so the computations can be performed.
-        :param args: new CoompareImageArguments object to process
-        :return:
-        """
-        # TODO use os.stat to update a or b if the file has changed
-        self.processing_args = args
-        load_a = False
-        load_b = False
-
-        # reload Image A if thumb or image has changed
-        if self.image_a_path != args.img_a or self.thumb_a_path != args.thumb_a:
-            self.image_a_path = args.img_a
-            self.thumb_a_path = args.thumb_a
-            self.image_a_matrix = None
-            load_a = True
-
-        # reload Image B if thumb or image has changed
-        if self.image_b_path != args.img_b or self.thumb_b_path != args.thumb_b:
-            self.image_b_path = args.img_b
-            self.thumb_b_path = args.thumb_b
-            self.image_b_matrix = None
-            load_b = True
-
-        if self.size_x != args.size_x or self.size_y != args.size_y:
-            self.size_x = args.size_x
-            self.size_y = args.size_y
-            self.image_a_matrix = None
-            self.image_b_matrix = None
-            load_a = True
-            load_b = True
-
-        # load the images if the arguments change them.
-        if load_a:
-            self.load_image(True)
-        if load_b:
-            self.load_image(False)
 
     def load_image(self, image_a: bool = True, perform_resize: bool = True):
         """
