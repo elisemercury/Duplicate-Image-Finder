@@ -472,7 +472,9 @@ class Database:
     def debug_execute(self, statement: str, commit_now: bool = False):
         """
         Wrapper to print the infringing statement in case of an error.
+
         :param statement: statement to execute
+        :param commit_now: If after execution a commit should be executed.
         :return:
         """
         try:
