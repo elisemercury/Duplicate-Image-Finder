@@ -404,6 +404,7 @@ class FastDifPy:
 
         # thumbnail are required to exist for both.
         if compute_thumbnails or compute_hash:
+            self.db.create_thumb_table(secondary_folder=self.p_root_dir_b is not None)
             self.check_create_thumbnail_dir()
 
         cpu_handles = []
