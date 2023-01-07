@@ -26,7 +26,8 @@ Features:
 # TODO Implement process stop recovery.
 # TODO single processing handler
 # TODO add handler in main function for second foor loop
-# TOdO Harakiri method. More reckless method.
+# TODO Harakiri method. More reckless method.
+# TODO Reset Processing Class if the arguments are switched.
 
 class ImageProcessing:
     """
