@@ -408,8 +408,8 @@ class FastDifPy:
         cpu_handles = []
         gpu_handles = []
 
-        task_queue = mp.Queue(maxsize=(cpu_proc + gpu_proc) * 2)
-        res_queue = mp.Queue()
+        self.first_loop_in = mp.Queue(maxsize=(cpu_proc + gpu_proc) * 2)
+        self.first_loop_out = mp.Queue()
 
         # prefill loop
         for i in range(cpu_proc + gpu_proc):
@@ -431,17 +431,17 @@ class FastDifPy:
                 size_y=self.thumbnail_size_y,
             )
 
-            task_queue.put(arg.to_json())
+            self.first_loop_in.put(arg.to_json())
 
         # start processes for cpu
         for i in range(cpu_proc):
-            p = mp.Process(target=parallel_resize, args=(task_queue, res_queue, i, False))
+            p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, False))
             p.start()
             cpu_handles.append(p)
 
         # start processes for gpu
         for i in range(cpu_proc, gpu_proc + cpu_proc):
-            p = mp.Process(target=parallel_resize, args=(task_queue, res_queue, i, True))
+            p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, True))
             p.start()
             gpu_handles.append(p)
 
@@ -452,13 +452,13 @@ class FastDifPy:
 
         # handle the running state of the loop
         while run:
-            if self.handle_result_of_first_loop(res_queue, compute_hash):
+            if self.handle_result_of_first_loop(self.first_loop_out, compute_hash):
                 task = self.db.get_next_to_process()
 
                 # if there's no task left, stop the loop.
                 if task is None:
                     none_counter += 1
-                    task_queue.put(None)
+                    self.first_loop_in.put(None)
 
                 else:
                     # generate a new argument
@@ -474,7 +474,7 @@ class FastDifPy:
                         size_y=self.thumbnail_size_y,
                     )
 
-                    task_queue.put(arg.to_json())
+                    self.first_loop_in.put(arg.to_json())
                     timeout = 0
             else:
                 timeout += 1
@@ -490,8 +490,8 @@ class FastDifPy:
 
         # adding Nones just for good measure.
         counter = 0
-        while not task_queue.full() and counter < 1000:
-            task_queue.put(None)
+        while not self.first_loop_in.full() and counter < 1000:
+            self.first_loop_in.put(None)
             counter += 1
 
         # all processes should be done now, iterating through and killing them if they're still alive.
@@ -515,10 +515,10 @@ class FastDifPy:
 
         # try to handle any remaining results that are in the queue.
         for _ in range((cpu_proc + gpu_proc) * 2):
-            if not self.handle_result_of_first_loop(res_queue, compute_hash):
+            if not self.handle_result_of_first_loop(self.first_loop_out, compute_hash):
                 break
 
-        assert res_queue.empty(), "Result queue is not empty after all processes have been killed."
+        assert self.first_loop_out.empty(), "Result queue is not empty after all processes have been killed."
         print("All Images have been preprocessed.")
 
     def handle_result_of_first_loop(self, res_q: mp.Queue, compute_hash: bool) -> bool:
