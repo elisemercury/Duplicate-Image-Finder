@@ -491,6 +491,7 @@ class Database:
     def connect(self, path):
         """
         Create Connection to Database.
+
         :param path: path to database
         :return:
         """
@@ -514,8 +515,8 @@ class Database:
         """
         Convert a b64 string to a python object
 
-        :param b64_string: b64 encoded python object
-        :return: python object
+        :param b64_string: a b64 encoded python object
+        :return: a python object
         """
         bytes_string = base64.standard_b64decode(b64_string)
         json_string = bytes_string.decode("utf-8")
