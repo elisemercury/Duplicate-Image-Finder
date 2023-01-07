@@ -469,6 +469,134 @@ class Database:
     # ERROR TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
+    def create_dif_table(self, purge: bool = False) :
+        """
+        Create the dif table. If purge is true, drop a preexisting dif table.
+
+        :param purge: if True, purge the table before creating it.
+        :return:
+        """
+        if purge:
+            if self.test_dif_table_existence():
+                self.drop_dif_table()
+
+        self.debug_execute("CREATE TABLE dif_table ("
+                           "key INTEGER PRIMARY KEY AUTOINCREMENT , "
+                           "key_a INTEGER NOT NULL , "
+                           "key_b INTEGER NOT NULL ,"
+                           "dif REAL CHECK (dif_table.dif > 0),"
+                           "b_dir_b INTEGER CHECK (dif_table.b_dir_b >= 0 AND dif_table.b_dir_b <= 1) DEFAULT 0) ")
+
+    def test_dif_table_existence(self):
+        """
+        Check if the dif table exists. DOES NOT VERIFY THE TABLE DEFINITION!
+        :return:
+        """
+        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'dif_table'")
+        return self.cur.fetchone() is not None
+
+    def drop_dif_table(self):
+        """
+        Drop the dif table.
+        :return:
+        """
+        self.debug_execute(f"DROP TABLE dif_table")
+
+    def insert_dif(self, key_a: int, key_b: int, dif: float, b_dir_b: bool = False) -> bool:
+        """
+        Insert a new row into the database. If the value exists already, return False, else return True
+
+        :param key_a: key of first image in directory_X table
+        :param key_b: key of second image in directory_X table
+        :param dif: difference between the images.
+        :param b_dir_b: if the second image came from dir_b
+        :return: bool if the insert was successful or the key pair existed already.
+        """
+        if self.get_by_pair(key_a=key_a, key_b=key_b) is not None:
+            return False
+
+        self.debug_execute(f"INSERT INTO dif_table (key_a, key_b, dif, b_dir_b) "
+                           f"VALUES ({key_a}, {key_b}, {dif}, {1 if b_dir_b else 0})")
+        return True
+
+    def get_by_pair(self, key_a: int, key_b: int):
+        """
+        Get the row matching the pair of keys. Return the row wrapped in a dict or None if it doesn't exist.
+
+        :param key_a: key of first image in directory_X table
+        :param key_b: key of second image in directory_X table
+        :return: None, nothing exists, dict of matching row
+        """
+        self.debug_execute(f"SELECT * FROM dif_table WHERE key_a = {key_a} AND key_b = {key_b}")
+        res = self.cur.fetchone()
+
+        if res is None:
+            return None
+
+        return self.all_to_dict_dif(res)
+
+    @staticmethod
+    def all_to_dict_dif(row: tuple):
+        return {
+            "key": row[0],
+            "key_a": row[1],
+            "key_b": row[2],
+            "dif": row[3],
+            "b_dir_b": row[4],
+        }
+
+    def get_by_table_key(self, key: int):
+        """
+        Get a row by the table key. Return the row wrapped in a dict tor None if it doesn't exist.
+
+        :param key: unique key in the dif table.
+        :return: None, nothing exists, dict of matching row.
+        """
+        self.debug_execute(f"SELECT * FROM dif_table WHERE key = {key}")
+        res = self.cur.fetchone()
+
+        if res is None:
+            return None
+
+        return self.all_to_dict_dif(res)
+
+    def update_pair_row(self, key_a: int, key_b: int, dif: float = None, b_dir_b: bool = None) -> bool:
+        """
+        Updates a pair with the new data. if the data is not specified, the preexisting data is used.
+        Return true if the update was successful. Return False if the row didn't exist.
+
+        :param key_a: key of first image in directory_X table
+        :param key_b: key of second image in directory_X table
+        :param dif: difference measurement
+        :param b_dir_b: if the second image is from dir b or not.
+        :return: if update was successful
+        """
+
+        if b_dir_b is None and dif is None:
+            print("WARNING: Update function called without anything to oupdate.")
+            return True
+
+        # get the previous row.
+        prev_row = self.get_by_pair(key_a=key_a, key_b=key_b)
+
+        if prev_row is None:
+            return False
+
+        if b_dir_b is None:
+            b_dir_b = prev_row["b_dir_b"]
+
+        if dif is None:
+            dif = prev_row["dif"]
+
+        self.debug_execute(f"UPDATE dif_table SET b_dir_b = {b_dir_b}, dif = {dif} WHERE key_a = {key_a} AND "
+                           f"key_b = {key_b}")
+
+        return True
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # COMMON FUNCTIONS
+    # ------------------------------------------------------------------------------------------------------------------
+
     def debug_execute(self, statement: str, commit_now: bool = False):
         """
         Wrapper to print the infringing statement in case of an error.
