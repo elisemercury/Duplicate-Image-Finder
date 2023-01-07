@@ -336,10 +336,15 @@ class ImageProcessing:
         :param img_a: if image_matrix_a or image_matrix_b is to be stored to its respective thumbnail path.
         :return:
         """
-        if img_a:
-            cv2.imwrite(self.thumb_a_path, self.image_a_matrix)
-        else:
-            cv2.imwrite(self.thumb_b_path, self.image_b_matrix)
+        try:
+            if img_a:
+                cv2.imwrite(self.thumb_a_path, self.image_a_matrix)
+                name = "image a"
+            else:
+                cv2.imwrite(self.thumb_b_path, self.image_b_matrix)
+                name = "image b"
+        except Exception as e:
+            self.error = f"Failed to save {name} to File with error: \n{e}"
 
     def resize_image(self, image_a: bool = True):
         """
