@@ -315,10 +315,7 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
         args = PreprocessArguments.from_json(args_str)
         timeout = 0
 
-        if cupy_avail:
-            result = process_image_cuda(args)
-        else:
-            result = process_image(args)
+        result = cpu_process_image(img_proc, args)
         print(f"{identifier:03}: Done with {os.path.basename(args.in_path)}")
 
         # Sending the result to the handler
