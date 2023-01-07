@@ -197,12 +197,15 @@ class ImageProcessing:
 
     def update_compare_args(self, args: CompareImageArguments):
         """
-        Update the CompareImgageArguments object and update the class variables so the computations can be performed.
+        Update the CompareImageArguments object and update the class variables so the computations can be performed.
+        Also resets any previously occurred errors.
+
         :param args: new CoompareImageArguments object to process
         :return:
         """
         # TODO use os.stat to update a or b if the file has changed
         self.processing_args = args
+        self.error = ""
         load_a = False
         load_b = False
 
