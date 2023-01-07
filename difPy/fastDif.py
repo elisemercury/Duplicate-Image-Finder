@@ -117,7 +117,7 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
     return True
 
 
-def paralell_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy: bool) -> bool:
+def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy: bool) -> bool:
     """
     Parallel implementation of first loop iteration.
 
