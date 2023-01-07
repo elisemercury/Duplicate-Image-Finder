@@ -466,7 +466,7 @@ class Database:
                            f"WHERE dir_a = {dir_a_num} AND dir_key = {dir_key} AND rotation = {rotation}")
 
     # ------------------------------------------------------------------------------------------------------------------
-    # COMMON FUNCTIONS
+    # ERROR TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
     def debug_execute(self, statement: str, commit_now: bool = False):
