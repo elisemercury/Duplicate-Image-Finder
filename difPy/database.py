@@ -343,13 +343,12 @@ class Database:
         free = False
 
         name, ext = os.path.splitext(file_name)
-        thumb_name = f"thumb_{index:03}_{name}"
+        thumb_name = f"{name}_thumb_{index:03}{ext}"
 
         while not free:
             if self.thumb_name_exists(thumb_name, dir_a):
                 index += 1
-                name, ext = os.path.splitext(file_name)
-                thumb_name = f"thumb_{index:03}_{name}"
+                thumb_name = f"{name}_thumb_{index:03}{ext}"
             else:
                 free = True
 
