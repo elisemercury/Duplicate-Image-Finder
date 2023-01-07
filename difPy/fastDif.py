@@ -296,11 +296,9 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
     # try to use cupy if it is indicated by arguments
     cupy_avail = False
     if try_cupy:
-        try:
-            import cupy
-            cupy_avail = True
-        except ImportError:
-            pass
+        print("Cupy version currenetly not implemented")
+
+    img_proc = ImageProcessing(identifier=identifier)
 
     # stay awake for 60s, otherwise kill
     while timeout < 60:
