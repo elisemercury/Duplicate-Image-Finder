@@ -570,6 +570,123 @@ class FastDifPy:
         # TODO remove database (if desired)
         print("Not implemented yet")
 
+    def second_loop_iteration(self, similarity_threshold: float, make_diff_plots: bool, default_diff_location: str,
+                            only_matching_aspect: bool, only_same_hash: bool, gpu_proc: int = 0, cpu_proc: int = 16):
+
+        self.cpu_handles = []
+        self.gpu_handles = []
+
+        # create queues
+        self.second_loop_out = mp.Queue()
+        self.second_loop_in = [mp.Queue(100) for _ in range(cpu_proc + gpu_proc)]
+
+        child_args = [(self.second_loop_in[i], self.second_loop_out, i, False if i < cpu_proc else True)
+                      for i in range(gpu_proc, cpu_proc)]
+
+        # prefill
+
+
+        # create process pool.
+        ex = ProcessPoolExecutor(max_workers=cpu_proc + gpu_proc)
+
+        # starting all processes
+        for i in range(cpu_proc):
+            self.cpu_handles.append(ex.submit(parallel_compare, child_args[i]))
+
+        for i in range(cpu_proc, cpu_proc + gpu_proc):
+            self.gpu_handles.append(ex.submit(parallel_compare, child_args[i]))
+
+        done = False
+
+        # update everything
+        while not done:
+            # update the queues and store if there are more tasks to process
+            done = not self.update_queues()
+
+            # exit the while loop if all children have exited.
+            _, _, _, all_exited = self.check_children(cpu=cpu_proc > 0, gpu=gpu_proc > 0)
+            if all_exited:
+                done = True
+
+        # check if it was the children's fault
+        _, all_errored, _, _ = self.check_children(cpu=cpu_proc > 0, gpu=gpu_proc > 0)
+
+        if all_errored:
+            raise RuntimeError("All child processes exited with an Error")
+
+        if self.join_all_children():
+            print("All child processes terminated sucessfully and without errors")
+
+        ex.shutdown()
+
+        # check if the tasks were empty.
+        assert not self.update_queues(), "Existed without having run out of tasks and without all processes " \
+                                         "having stopped."
+
+    def join_all_children(self):
+        success = True
+
+        for f in self.gpu_handles:
+            success = success and f.result()
+
+        for g in self.cpu_handles:
+            success = success and g.result()
+
+        return success
+
+    def check_children(self, gpu: bool = False, cpu: bool = False):
+        # error, all_error, exited, all_exited
+        error = False
+        all_error = True
+        exited = False
+        all_exited = True
+
+        # info, results can be fetched twice
+        # check on the gpu tasks
+        if gpu:
+            error, all_error, exited, all_exited = self.check_futures(self.gpu_handles)
+
+        if cpu:
+            er, a_er, ex, a_ex = self.check_futures(self.cpu_handles)
+            error = error or er
+            all_error = all_error and a_er
+            exited = exited or ex
+            all_exited = all_exited and a_ex
+
+        return error, all_error, exited, all_exited
+
+    @staticmethod
+    def check_futures(futs: List[Future]) -> Tuple[bool, bool, bool, bool]:
+        error = False
+        all_error = True
+        exited = False
+        all_exited = True
+
+        for fut in futs:
+            # if it is running, it has not exited and not errored
+            if not fut.running():
+                e = None
+
+                # try to fetch the error of the task
+                try:
+                    e = fut.exception(timeout=1)
+                except TimeoutError:
+                    print("Failed to get exception from Process")
+
+                # update the flags
+                if e is None:
+                    all_error = False
+                else:
+                    print(f"Error occurred: {e}")
+                    error = True
+
+                exited = exited or fut.done()
+
+            else:
+                all_error = False
+                all_exited = False
+
+        return error, all_error, exited, all_exited
     # ------------------------------------------------------------------------------------------------------------------
     # PROPERTIES
     # ------------------------------------------------------------------------------------------------------------------
