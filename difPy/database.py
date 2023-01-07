@@ -452,17 +452,17 @@ class Database:
         self.debug_execute(f"DELETE FROM hash_table WHERE dir_a = {dir_a_num} AND dir_key = {dir_key}")
         return self.cur.fetchone() is not None
 
-    def update_hash(self, fhash: str, dir_a: bool, dir_key: int, rotation: int):
+    def update_hash(self, file_hash: str, dir_a: bool, dir_key: int, rotation: int):
         """
         Update a hash in the hash table. (Not sure why I'd need the function but there it is)
-        :param fhash: hash to update
+        :param file_hash: hash to update
         :param dir_a: if the file is in dir_a or dir_b
         :param dir_key: key of the file in the directory table
         :param rotation: rotation of the file
         :return:
         """
         dir_a_num = 1 if dir_a else 0
-        self.debug_execute(f"UPDATE hash_table SET hash = '{fhash}' "
+        self.debug_execute(f"UPDATE hash_table SET hash = '{file_hash}' "
                            f"WHERE dir_a = {dir_a_num} AND dir_key = {dir_key} AND rotation = {rotation}")
 
     # ------------------------------------------------------------------------------------------------------------------
