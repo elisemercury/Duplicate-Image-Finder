@@ -419,7 +419,9 @@ class ImageProcessing:
                                    key_b=self.processing_args.key_b,
                                    error=self.error,
                                    success=self.error == "",
-                                   min_avg_diff=min_diff if self.error == "" else -1.0)
+                                   min_avg_diff=min_diff if self.error == "" else 100,
+                                   is_dir_b=self.processing_args.is_dir_b,
+                                   )
 
     def store_plt_on_threshold(self):
         """
