@@ -275,6 +275,26 @@ class Database:
         # return None is the fall through and the default
         return None
 
+    def fetch_many_after_key(self, directory_a: bool = True, starting: int = None, count=100) -> List[dict]:
+        """
+        Fetch count number of rows from a table a or table b starting at a specific key (WHERE key > starting)
+
+        :param directory_a: True use directory_a table else directory_b
+        :param starting: select everything with key greater than that
+        :param count: number of entries to return
+        :return: List[dict] rows wrapped in dict
+        """
+        tbl_name = "directory_a" if directory_a else "directory_b"
+
+        # start at the beginning
+        if starting is None:
+            self.debug_execute(f"SELECT * FROM {tbl_name} ORDER BY key ASC")
+            return Database.wrap_many_dict_dir(rows=self.cur.fetchmany(count), dir_a=directory_a)
+
+        # start from specific point
+        self.debug_execute(f"SELECT * FROM {tbl_name} WHERE key > {starting} ORDER BY key ASC")
+        return self.cur.fetchmany(count)
+
     # ------------------------------------------------------------------------------------------------------------------
     # THUMBNAIL FILENAME TABLE
     # ------------------------------------------------------------------------------------------------------------------
