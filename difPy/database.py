@@ -2,7 +2,7 @@ import os
 import sqlite3
 import base64
 import json
-from typing import Any, Union
+from typing import Any, Union, List
 import datetime
 
 """
@@ -164,6 +164,13 @@ class Database:
                 "py": row[6],
                 "dir_a": dir_a
                 }
+
+    @staticmethod
+    def wrap_many_dict_dir(rows: List[tuple], dir_a: bool = True):
+        result = []
+        for row in rows:
+            result.append(Database.all_to_dict_dir(row, dir_a=dir_a))
+        return result
 
     def test_dir_table_existence(self, dir_a: bool = True):
         """
