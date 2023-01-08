@@ -589,6 +589,8 @@ class Database:
             "key_b": row[2],
             "dif": row[3],
             "b_dir_b": row[4],
+            "error": row[5],
+            "success": row[6]
         }
 
     def get_by_table_key(self, key: int):
