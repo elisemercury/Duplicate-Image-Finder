@@ -496,7 +496,7 @@ class Database:
     # ERROR TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
-    def create_dif_table(self, purge: bool = False) :
+    def create_dif_table(self, purge: bool = False):
         """
         Create the dif table. If purge is true, drop a preexisting dif table.
 
