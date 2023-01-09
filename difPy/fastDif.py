@@ -20,15 +20,22 @@ Features:
 - Use of file names / zero difference to detect images which differ only in the metadata.  # TODO for later
 """
 
+
 # TODO test cuda functionality
 # TODO create unified handler for the parallel functions
 # TODO Make a skeleton for the parallel process
 # TODO Test the whole shit.
-# TODO Implement process stop recovery.
 # TODO single processing handler
-# TODO add handler in main function for second foor loop
-# TODO Harakiri method. More reckless method.
+# TODO add handler in main function for second for loop
 # TODO Reset Processing Class if the arguments are switched.
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# FEATURES
+# ----------------------------------------------------------------------------------------------------------------------
+# TODO Implement process stop recovery.
+# TODO Range in which the aspects must lay for matching_aspect to trigger
+# TODO Harakiri method. More reckless method.
 
 
 def cpu_process_image(proc: ImageProcessing, args: PreprocessArguments) -> PreprocessResults:
