@@ -16,8 +16,6 @@ Features:
 - Use Parallelization to use multicore CPUs
 - Use of aspect rotation to ignore images with non-matching aspect ratio
 - Use hash based deduplication to find duplicates with color grading
-- Use of binary differentiation to detect hard file duplicates  # TODO for later
-- Use of file names / zero difference to detect images which differ only in the metadata.  # TODO for later
 """
 
 
@@ -36,6 +34,8 @@ Features:
 # TODO Implement process stop recovery.
 # TODO Range in which the aspects must lay for matching_aspect to trigger
 # TODO Harakiri method. More reckless method.
+# TODO Use of binary differentiation to detect hard file duplicates
+# TODO  Use of file names / zero difference to detect images which differ only in the metadata.
 
 
 def cpu_process_image(proc: ImageProcessing, args: PreprocessArguments) -> PreprocessResults:
