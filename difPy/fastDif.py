@@ -637,7 +637,7 @@ class FastDifPy:
             raise RuntimeError("All child processes exited with an Error")
 
         if self.join_all_children():
-            print("All child processes terminated sucessfully and without errors")
+            print("All child processes terminated successfully and without errors")
 
         ex.shutdown()
 
