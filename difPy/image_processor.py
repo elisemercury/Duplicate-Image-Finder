@@ -419,7 +419,7 @@ class ImageProcessing:
                                    key_b=self.processing_args.key_b,
                                    error=self.error,
                                    success=self.error == "",
-                                   min_avg_diff=min_diff if self.error == "" else 100,
+                                   min_avg_diff=min_diff if self.error == "" else 10000,
                                    is_dir_b=self.processing_args.is_dir_b,
                                    )
 
