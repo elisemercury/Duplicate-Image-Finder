@@ -231,8 +231,8 @@ class FastDifPy:
             elif temp_b.startswith(temp_a):
                 raise ValueError(f"{directory_b} is a subdirectory of {directory_a}")
 
-        self.p_root_dir_b = directory_a
         self.p_root_dir_b = directory_b
+        self.p_root_dir_a = directory_a
 
         # proceed with the database if the default is used.
         if test_db:
