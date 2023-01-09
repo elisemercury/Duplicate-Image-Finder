@@ -779,6 +779,11 @@ class FastDifPy:
         if os.path.exists(value):
             self.__p_root_dir_b = value
             self.__thumb_dir_b = os.path.join(self.__p_root_dir_b, ".temp_thumbnails")
+            self.__has_dir_b = True
+        else:
+            self.__p_root_dir_b = None
+            self.__thumb_dir_b = None
+            self.__has_dir_b = False
 
     @property
     def thumb_dir_a(self):
@@ -787,3 +792,17 @@ class FastDifPy:
     @property
     def thumb_dir_b(self):
         return self.__thumb_dir_b
+
+    @property
+    def has_dir_b(self):
+        return self.__has_dir_b
+
+    @property
+    def similarity_threshold(self):
+        return self.similarity_threshold
+
+    @similarity_threshold.setter
+    def similarity_threshold(self, value):
+        if type(value) is not float or value < 0:
+            raise ValueError("similarity threshold needs to be float and greater than 0.")
+        self.__similarity_threshold = value
