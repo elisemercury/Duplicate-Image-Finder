@@ -176,6 +176,10 @@ class FastDifPy:
     __thumbnail_size_x = 64
     __thumbnail_size_y = 64
 
+    __similarity_threshold = 200
+
+    __has_dir_b: bool = False
+
     supported_file_types = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".gif", ".webp"}
 
     db: Database
@@ -186,7 +190,14 @@ class FastDifPy:
 
     second_loop_in: List[mp.Queue] = None
     second_loop_out: mp.Queue = None
-    second_loop_queue_status: List[dict] = None
+    
+    second_loop_queue_status: Union[List[dict], dict] = None
+    second_loop_base_a: bool = True
+
+    has_thumb_a: bool = False
+    has_thumb_b: bool = False
+    matching_aspect: bool = False
+    make_diff_plots: bool = False
 
     cpu_handles = None
     gpu_handles = None
