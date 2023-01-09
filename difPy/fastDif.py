@@ -353,27 +353,31 @@ class FastDifPy:
                 if os.path.splitext(full_path)[1] in self.supported_file_types:
                     self.db.add_file(full_path, file_name, dir_a)
 
-    def estimate_disk_usage(self):
+    def estimate_disk_usage(self, print_results: bool = True) -> Tuple[int, int]:
         """
         Estimate the diskusage of the thumbnail directory given the compressed image size.
-        :return:
+        :param print_results: print the results to console
+        :return: byte_count_a, byte_count_b
         """
         dir_a_count = self.db.get_dir_count(True)
-        dir_b_count = self.db.get_dir_count(False)
+        dir_b_count = self.db.get_dir_count(False) if self.has_dir_b else 0
 
         byte_count_a = dir_a_count * self.__thumbnail_size_x * self.__thumbnail_size_y * 3
         byte_count_b = dir_b_count * self.__thumbnail_size_x * self.__thumbnail_size_y * 3
 
         target = max(len(self.p_root_dir_a), len(self.p_root_dir_b), len(self.p_root_dir_b) + len(self.p_root_dir_a))
 
-        print(
-            f"Estimated disk usage by {fill(str(len(self.p_root_dir_a)), target)}: " + h(byte_count_a, "B") + " bytes"
-        )
-        print(
-            f"Estimated disk usage by {fill(str(len(self.p_root_dir_b)), target)}: " + h(byte_count_b, "B") + " bytes"
-        )
-        print(f"Estimated disk usage by {fill('the two dirs ', target)}: " + h(byte_count_b + byte_count_a,
-                                                                               "B") + "bytes")
+        if print_results:
+            print(
+                f"Estimated disk usage by {fill(str(len(self.p_root_dir_a)), target)}: " + h(byte_count_a, "B") +
+                " bytes")
+            print(
+                f"Estimated disk usage by {fill(str(len(self.p_root_dir_b)), target)}: " + h(byte_count_b, "B") +
+                " bytes")
+            print(f"Estimated disk usage by {fill('the two dirs ', target)}: " +
+                  h(byte_count_b + byte_count_a, "B") + "bytes")
+
+        return byte_count_a, byte_count_b
 
     def check_create_thumbnail_dir(self):
         """
