@@ -293,7 +293,7 @@ class Database:
 
         # start from specific point
         self.debug_execute(f"SELECT * FROM {tbl_name} WHERE key > {starting} ORDER BY key ASC")
-        return self.cur.fetchmany(count)
+        return Database.wrap_many_dict_dir(rows=self.cur.fetchmany(count), dir_a=directory_a)
 
     # ------------------------------------------------------------------------------------------------------------------
     # THUMBNAIL FILENAME TABLE
