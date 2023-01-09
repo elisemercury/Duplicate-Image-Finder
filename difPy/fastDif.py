@@ -646,6 +646,11 @@ class FastDifPy:
                                          "having stopped."
 
     def join_all_children(self):
+        """
+        Check the results of all spawned processes and verify they produced a True as a result ergo, they computed
+        successfully.
+        :return:
+        """
         success = True
 
         for f in self.gpu_handles:
@@ -657,6 +662,19 @@ class FastDifPy:
         return success
 
     def check_children(self, gpu: bool = False, cpu: bool = False):
+        """
+        Iterator over specified child processes and verify if any or all exited and produced an error.
+
+        If nothing is selected, teh default is ,
+        all_error is true,
+        all_exited is true,
+        error is false and
+        exited is false.
+
+        :param gpu: Test the gpu processes
+        :param cpu: Test the cpu processes
+        :return:
+        """
         # error, all_error, exited, all_exited
         error = False
         all_error = True
@@ -709,6 +727,7 @@ class FastDifPy:
                 all_exited = False
 
         return error, all_error, exited, all_exited
+
     # ------------------------------------------------------------------------------------------------------------------
     # PROPERTIES
     # ------------------------------------------------------------------------------------------------------------------
