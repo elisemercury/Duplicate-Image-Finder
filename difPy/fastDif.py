@@ -676,7 +676,7 @@ class FastDifPy:
         if self.join_all_children():
             print("All child processes terminated successfully and without errors")
 
-        ex.shutdown()
+        ex.shutdown(cancel_futures=True)
 
         # check if the tasks were empty.
         assert not self.update_queues(), "Existed without having run out of tasks and without all processes " \
