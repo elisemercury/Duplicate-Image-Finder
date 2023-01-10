@@ -592,8 +592,45 @@ class FastDifPy:
         # TODO remove database (if desired)
         print("Not implemented yet")
 
-    def second_loop_iteration(self, similarity_threshold: float, make_diff_plots: bool, default_diff_location: str,
-                            only_matching_aspect: bool, only_same_hash: bool, gpu_proc: int = 0, cpu_proc: int = 16):
+    def create_plot_dir(self, diff_location: str):
+        raise NotImplementedError("Plots are not implemented yet")
+        if diff_location is None:
+            raise ValueError("If plots are to be generated, an output folder needs to be specified.")
+        if not os.path.isdir(diff_location):
+            raise ValueError("Plot location doesn't specify a valid directory path")
+
+    def generate_plot_path(self):
+        raise NotImplementedError("Not implemented")
+        return "/temp.png"
+
+    # TODO matching hash
+    def second_loop_iteration(self, only_matching_aspect: bool = False, make_diff_plots: bool = False,
+                              similarity_threshold: float = 200, gpu_proc: int = 0, cpu_proc: int = 16,
+                              diff_location: str = None):
+        """
+        Similarity old values: high - 0.15, medium 200, low 1000
+        :param only_matching_aspect:
+        :param make_diff_plots:
+        :param similarity_threshold:
+        :param gpu_proc:
+        :param cpu_proc:
+        :param diff_location:
+        :return:
+        """
+        # storing arguments in attributes to reduce number of args of function
+        self.matching_aspect = only_matching_aspect
+        self.make_diff_plots = make_diff_plots
+
+        self.has_thumb_a = self.db.test_thumb_table_existence(dir_a=True)
+        self.has_thumb_b = self.db.test_thumb_table_existence(dir_a=False)
+
+        if make_diff_plots:
+            self.create_plot_dir(diff_location=diff_location)
+
+            if similarity_threshold < 0:
+                raise ValueError("Similarity needs to be greater than 0")
+
+        self.similarity_threshold = similarity_threshold
 
         self.cpu_handles = []
         self.gpu_handles = []
