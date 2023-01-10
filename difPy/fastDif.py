@@ -682,6 +682,325 @@ class FastDifPy:
         assert not self.update_queues(), "Existed without having run out of tasks and without all processes " \
                                          "having stopped."
 
+    def update_queues(self):
+        results = self.__refill_queues()
+
+        self.handle_results_second_queue(results)
+
+    def __refill_queues(self):
+        # testing if the
+        if type(self.second_loop_queue_status) is dict:
+            return self.__refill_queues_non_optimized()
+
+        assert type(self.second_loop_queue_status) is list, f"Unexpected type of second_loop_queue_status: " \
+                                                            f"{type(self.second_loop_queue_status).__name__}, " \
+                                                            f"valid are list and dict"
+
+    def __refill_queues_non_optimized(self, init: bool = False):
+        """
+        Refill the queues with the non optimized algorithm which just stupidly goes along.
+
+        :param init: if init, start all loops from 0 and initialize the status to dict
+        :return:
+        """
+        if not init:
+            last_a = self.second_loop_queue_status["last_a"]
+            last_b = self.second_loop_queue_status["last_b"]
+        else:
+            # start from zero since we want to walk along the entire list.
+            last_a = None
+            last_b = None
+
+        procs = len(self.second_loop_in)
+        queue_index = 0
+
+        add_count = 0
+
+        start_a = 0
+        start_b = 0
+
+        # things that can happen independently of b
+        rows_a = self.db.fetch_many_after_key(directory_a=True, count=max(procs, 100))
+        rows_b = rows_a
+
+        # get start index of constant rows_a
+        if not init:
+            # cannot be issue with last_a being None since for that init should be true which it cannot here.
+            for i in range(len(rows_a)):
+                if rows_a[i]["key"] == last_a:
+                    start_a = i
+
+        # We have a dir_b, replace rows_b with actual rows form that table
+        if self.has_dir_b:
+            # fetching rows from table b
+            rows_b = self.db.fetch_many_after_key(directory_a=False, count=max(procs, 100))
+
+        # get start index
+        if not init:
+            for i in range(len(rows_b)):
+                if rows_b[i]["key"] == last_b:
+                    start_b = i
+
+            # check if we have processed every entry. if so, return False, since we have not added anything to the
+            # queues.
+            if start_a == len(rows_a) - 1 and start_b == len(rows_b) - 1:
+                return 0
+
+        for i in range(start_a, len(rows_a)):
+            if i != start_a:
+                start_b = int(self.has_dir_b) * (i + 1)  # i + 1 if not dir b, else 0
+
+            for j in range(start_b, len(rows_a)):
+                # All queues full, no need to continue
+                if self.second_loop_in[queue_index].full():
+                    break
+
+                row_a = rows_a[i]
+                row_b = rows_b[j]
+
+                if self.schedule_pair(row_a=row_a, row_b=row_b, queue_index=queue_index):
+                    # update the remaining loop variables
+                    queue_index = (queue_index + 1) % procs
+                    add_count += 1
+
+                last_a = row_a["key"]
+                last_b = row_b["key"]
+
+        # store the current indices to be sure. The update loop function would trigger and throw the remaining
+        # stuff out.
+        self.second_loop_queue_status = {"last_a": last_a, "last_b": last_b}
+        return add_count
+
+    def init_queues(self, procs: int):
+        # from a fetch the first set of images
+        rows = self.db.fetch_many_after_key(directory_a=True, count=procs)
+        self.second_loop_base_a = True
+
+        # check if folder a has enough, so we can iterate using the files as fixed during an iteration and then switch
+        # the file.
+        if len(rows) < procs:
+            if self.has_dir_b:
+                rows = self.db.fetch_many_after_key(directory_a=False, count=procs)
+                if len(rows) < procs:
+                    self.__refill_queues_non_optimized(init=True)
+                else:
+                    self.second_loop_base_a = False
+            else:
+                self.__refill_queues_non_optimized(init=True)
+
+        # populating the files of the second loop.
+        self.second_loop_queue_status = []
+
+        if self.second_loop_base_a:
+            for row in rows:
+                temp = {"row_a": row, "last_key": None if self.has_dir_b else row["key"], "thumb_path_a": None}
+
+                if self.has_thumb_a:
+                    result = self.db.get_thumb_name(key=row["key"], dir_a=True)
+                    temp["thumb_path_a"] = result[1] if result is not None else None  # populate if the result is valid
+
+                self.second_loop_queue_status.append(temp)
+        else:
+            for row in rows:
+                temp = {"row_b": row, "last_key": None, "thumb_path_b": None}
+
+                if self.has_thumb_b:
+                    result = self.db.get_thumb_name(key=row["key"], dir_a=False)
+                    temp["thumb_path_b"] = result[1] if result is not None else None  # populate if the result is valid
+
+                self.second_loop_queue_status.append(temp)
+
+        # TODO slow implementation, needs to be optimized for speed later.
+        #   reuse the results of the db queries for later.
+
+        for p in range(procs):
+            # fetch possible candidates for the row.
+            row_a, row_b = self.__fetch_rows(p=p)
+
+            inserted_count = 0
+            not_full = True
+            while not_full:
+                # break if the queue is full
+                if self.second_loop_in[p].full():
+                    break
+
+                if self.second_loop_base_a:
+                    for i in range(len(row_b)):
+                        inserted = self.schedule_pair(row_a=self.second_loop_queue_status[p]["row_a"],
+                                                      row_b=row_b[i], queue_index=p)
+                        inserted_count += 1 * int(inserted)
+
+                else:
+                    for i in range(len(row_a)):
+                        inserted = self.schedule_pair(row_a=row_a[i], row_b=self.second_loop_queue_status[p]["row_b"],
+                                                      queue_index=p)
+                        inserted_count += 1 * int(inserted)
+
+                # update last key
+                if self.has_dir_b:
+                    if not self.second_loop_base_a:
+                        self.second_loop_queue_status[p]["last_key"] = row_a[-1]["key"]
+                    else:
+                        self.second_loop_queue_status[p]["last_key"] = row_b[-1]["key"]
+                else:
+                    self.second_loop_queue_status[p]["last_key"] = row_b[-1]["key"]
+
+                row_a, row_b = self.__fetch_rows(p=p)
+
+                # try to increment key. If the increment method returns False, then no more keys are available, so
+                # stop trying to add more to the queue
+                if len(row_a) == 0 and len(row_b) == 0:
+                    if not self.__increment_fixed_image(p=p):
+                        break
+
+                if inserted_count > 100:
+                    not_full = False
+
+    def __increment_fixed_image(self, p: int):
+        # TODO implement smart algoritm to find next image for the process that is now done.
+        next_key = 0
+
+        # get the limit for the next key
+        for i in range(len(self.second_loop_queue_status)):
+            if self.has_dir_b:
+                if not self.second_loop_base_a:
+                    next_key = max(self.second_loop_queue_status[p]["row_b"]["key"], next_key)
+                    continue
+
+            next_key = max(self.second_loop_queue_status[p]["row_a"]["key"], next_key)
+
+        # process case, when we're looking to move the dir_b
+        if self.has_dir_b:
+            if not self.second_loop_base_a:
+                rows = self.db.fetch_many_after_key(directory_a=False, starting=next_key, count=1)
+
+                # no completely unprocessed key found
+                if len(rows) == 0:
+                    if not self.second_loop_in[p].full():
+                        self.second_loop_in[p].put(None)
+                    return False
+
+                # fetch thumbnail path
+                thumb_path = None
+                if self.db.test_thumb_table_existence(dir_a=False):
+                    thumb_path = self.db.get_thumb_name(key=rows[0]["key"], dir_a=False)
+
+                # update the dict
+                self.second_loop_queue_status[p] = {"row_b": rows[0], "last_key": None, "thumb_path_a": thumb_path}
+                return True
+
+        rows = self.db.fetch_many_after_key(directory_a=True, starting=next_key, count=1)
+
+        # no completely unprocessed key found
+        if len(rows) == 0:
+            if not self.second_loop_in[p].full():
+                self.second_loop_in[p].put(None)
+            return False
+
+        # fetch thumbnail path
+        thumb_path = None
+        if self.db.test_thumb_table_existence(dir_a=True):
+            thumb_path = self.db.get_thumb_name(key=rows[0]["key"], dir_a=True)
+
+        # update the dict
+        self.second_loop_queue_status[p] = {"row_a": rows[0], "last_key": None, "thumb_path_a": thumb_path}
+        return True
+
+    def __fetch_rows(self, p: int, count: int = 100) -> Tuple[list, list]:
+        """
+        Fetch the next up to 100 rows for the ingest process into the children.
+
+        :param p: Index of the process
+        :return:
+        """
+        row_a = []
+        row_b = []
+        assert type(self.second_loop_queue_status) is list, "__fetch_rows called with not_optimized process"
+
+        if self.has_dir_b:
+            if not self.second_loop_base_a:
+                row_a = self.db.fetch_many_after_key(directory_a=True, count=count,
+                                                     starting=self.second_loop_queue_status[p]["last_key"])
+            else:
+                row_b = self.db.fetch_many_after_key(directory_a=False, count=count,
+                                                     starting=self.second_loop_queue_status[p]["last_key"])
+        else:
+            row_b = self.db.fetch_many_after_key(directory_a=True, count=count,
+                                                 starting=self.second_loop_queue_status[p]["last_key"])
+        return row_a, row_b
+
+    def schedule_pair(self, row_a: dict, row_b: dict, queue_index: int):
+        thumb_a_path = None
+        thumb_b_path = None
+
+        # fetching thumbnails if they exist
+        if self.has_thumb_a:
+            thumb_a_path = self.db.get_thumb_name(key=row_a["key"], dir_a=True)
+
+        if self.has_thumb_b:
+            thumb_b_path = self.db.get_thumb_name(key=row_b["key"], dir_a=False)
+
+        # performing match if desired
+        if self.matching_aspect:
+            if not self.match_aspect(row_a=row_a, row_b=row_b):
+                return False
+
+        # Aspect matches => Create Task object and send to process
+        CompareImageArguments(
+            img_a=row_a["path"],
+            img_b=row_b["path"],
+            thumb_a=thumb_a_path,
+            thumb_b=thumb_b_path,
+            key_a=row_a["key"],
+            key_b=row_b["key"],
+            store_path=self.generate_plot_path(),
+            store_compare=self.make_diff_plots,
+            compare_threshold=self.similarity_threshold,
+            size_x=self.thumbnail_size_x,
+            size_y=self.thumbnail_size_y,
+            is_dir_b=self.has_dir_b
+        )
+
+        # send task to process
+        self.second_loop_in[queue_index].put(CompareImageArguments.to_json())
+        return True
+
+    @staticmethod
+    def match_aspect(row_a: dict, row_b: dict):
+        if row_a["px"] == row_b["px"] and row_a["py"] == row_b["py"]:
+            return True
+        elif row_a["px"] == row_b["py"] and row_a["py"] == row_b["px"]:
+            return True
+        return False
+
+    def handle_results_second_queue(self, max_number: int):
+        """
+        Dequeue up to max_number of entries of the result queue of the second loop and insert the results into the
+        database.
+
+        :param max_number: maximum number of elements to dequeue
+        :return:
+        """
+        # TODO test for existence (for stop recovery)
+        for i in range(max_number):
+            try:
+                res = self.second_loop_out.get(timeout=0.1)
+            except TimeoutError:
+                return i
+
+            assert type(res) is str, "Result of comparison was not string"
+            res_obj = CompareImageResults.from_json(res)
+
+            # store in database
+            if res_obj.success:
+                self.db.insert_dif_success(key_a=res_obj.key_a, key_b=res_obj.key_b, dif=res_obj.min_avg_diff,
+                                           b_dir_b=res_obj.is_dir_b)
+            else:
+                self.db.insert_dif_error(key_a=res_obj.key_a, key_b=res_obj.key_b, error=res_obj.error,
+                                         b_dir_b=res_obj.is_dir_b)
+
+        return max_number
+
     def join_all_children(self):
         """
         Check the results of all spawned processes and verify they produced a True as a result ergo, they computed
