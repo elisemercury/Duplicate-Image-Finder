@@ -643,7 +643,7 @@ class FastDifPy:
                       for i in range(gpu_proc, cpu_proc)]
 
         # prefill
-
+        self.init_queues(procs=gpu_proc + cpu_proc)
 
         # create process pool.
         ex = ProcessPoolExecutor(max_workers=cpu_proc + gpu_proc)
