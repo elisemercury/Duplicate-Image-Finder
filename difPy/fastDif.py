@@ -142,6 +142,7 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
     if try_cupy:
         print("Cupy version currently not implemented")
 
+    processor = ImageProcessing(identifier=identifier)
     # stay awake for 60s, otherwise kill
     while timeout < 60:
         try:
@@ -156,6 +157,11 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
 
         args = CompareImageArguments.from_json(args_str)
         timeout = 0
+
+        processor.update_compare_args(args)
+        processor.compare_images()
+        processor.store_plt_on_threshold()
+        result = processor.create_compare_result()
 
         print(f"{identifier:03}: Done with {os.path.basename(args.in_path)}")
 
