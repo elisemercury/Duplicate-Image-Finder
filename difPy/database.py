@@ -590,7 +590,7 @@ class Database:
                            "key INTEGER PRIMARY KEY AUTOINCREMENT , "
                            "key_a INTEGER NOT NULL , "
                            "key_b INTEGER NOT NULL ,"
-                           "dif REAL CHECK (dif_table.dif > 0) DEFAULT 10000,"
+                           "dif REAL CHECK (dif_table.dif > -1) DEFAULT -1,"
                            "b_dir_b INTEGER CHECK (dif_table.b_dir_b >= 0 AND dif_table.b_dir_b <= 1) DEFAULT 0,"
                            "error TEXT,"
                            "success INT CHECK (dif_table.success >= 0 AND dif_table.success <= 1)) ")
