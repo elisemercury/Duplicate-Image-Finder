@@ -398,6 +398,85 @@ class Database:
         return self.cur.fetchone() is not None
 
     # ------------------------------------------------------------------------------------------------------------------
+    # PLOT TABLE
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def create_plot_table(self, purge: bool = False):
+        """
+        Create tables which contain the filenames of the plots ( to make sure there's no collisions ahead of time)
+
+        :param purge: if True, purge the tables before creating them.
+        :return:
+        """
+
+        # Drop the tables if purge is set
+        if purge:
+            print("Purging preexisting indexes of directories.")
+
+            if self.test_plot_table_existence():
+                print("Dropping directory A table.")
+                self.drop_plot()
+
+        self.debug_execute("CREATE TABLE plots ( key INTEGER PRIMARY KEY, key_a INTEGER, key_b INTEGER)")
+
+    def test_plot_table_existence(self):
+        """
+        Check the table for thumbnails of directory X, exists. DOES NOT VERIFY THE TABLE DEFINITION!
+        :return:
+        """
+        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'plots'")
+        return self.cur.fetchone() is not None
+
+    def drop_plot(self):
+        """
+        Drop a table related to the thumbnails of a directory.
+        :return:
+        """
+        self.debug_execute(f"DROP TABLE plots")
+
+    def get_plot_name(self, key_a: int, key_b: int):
+        """
+        Get the thumbnail name associated with the key.
+        :param key_a: key to search the thumbnail path for
+        :param key_b: if the key is to be searched in the directory_a or directory_b table.
+        :return:
+        """
+        self.debug_execute(f"SELECT * FROM plots WHERE key_a = {key_a} AND key_b = {key_b}")
+        return self.cur.fetchone()
+
+    def make_plot_name(self, key_a: int, key_b: int) -> str:
+        """
+        Generate a new free name for a file. If a file name is taken, will retry a limited number of times again.
+
+        :param key_a: key in the directory_X tables
+        :param key_b: file name for which to generate the thumbnail name
+        :return: filename associated with the two keys.
+        """
+        res = self.get_plot_name(key_a=key_a, key_b=key_b)
+
+        if res is not None:
+            return f"{res[0]}.png"
+
+        self.debug_execute(f"INSERT INTO plots (key_a, key_b) VALUES ({key_a}, {key_b})")
+        return self.make_plot_name(key_a=key_a, key_b=key_b)
+
+    def get_plot_associated_keys(self, file_name: str) -> Union[tuple, None]:
+        """
+        Given a file name returns the associated keys in to said plot (if not apparent by the filename I need to put
+        in the titles.
+
+        :param file_name: File name to get the two keys from.
+        :return: row (tuple) or None
+        """
+        try:
+            db_key = int(os.path.splitext(os.path.basename(file_name))[0])
+        except ValueError:
+            return None
+
+        self.debug_execute(f"SELECT * FROM plots WHERE key = {db_key}")
+        return self.cur.fetchone()
+
+    # ------------------------------------------------------------------------------------------------------------------
     # HASH TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
