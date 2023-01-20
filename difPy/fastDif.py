@@ -598,16 +598,16 @@ class FastDifPy:
         # TODO remove database (if desired)
         print("Not implemented yet")
 
-    def create_plot_dir(self, diff_location: str):
-        raise NotImplementedError("Plots are not implemented yet")
+    def create_plot_dir(self, diff_location: str, purge: bool = False):
         if diff_location is None:
             raise ValueError("If plots are to be generated, an output folder needs to be specified.")
         if not os.path.isdir(diff_location):
             raise ValueError("Plot location doesn't specify a valid directory path")
 
-    def generate_plot_path(self):
-        raise NotImplementedError("Not implemented")
-        return "/temp.png"
+        if not os.path.exists(diff_location):
+            os.makedirs(diff_location)
+
+        self.db.create_plot_table(purge=purge)
 
     # TODO matching hash
     def second_loop_iteration(self, only_matching_aspect: bool = False, make_diff_plots: bool = False,
