@@ -393,7 +393,7 @@ class FastDifPy:
         if not os.path.exists(self.thumb_dir_a):
             os.makedirs(self.thumb_dir_a)
 
-        if self.has_dir_b and not os.path.exists(self.__thumb_dir_b):
+        if self.has_dir_b and not os.path.exists(self.thumb_dir_b):
             os.makedirs(self.thumb_dir_b)
 
     def generate_thumbnail_path(self, key: int, filename: str, dir_a: bool):
