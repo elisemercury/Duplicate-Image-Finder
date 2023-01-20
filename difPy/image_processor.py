@@ -434,12 +434,13 @@ class ImageProcessing:
 
     def create_compare_plot(self):
         """
-        Create a plot of the two images that are deemed to be similar and store it in predifined path.
+        Create a plot of the two images that are deemed to be similar and store it in predefined path.
         :return:
         """
+        # TODO revisite plot
         fig = plt.figure()
         min_diff = min(self.diff_0, self.diff_90, self.diff_180, self.diff_270)
-        plt.suptitle("MSE: %.2f" % (min_diff))
+        plt.suptitle(f"MSE: {min_diff:.2f}")
 
         # plot first image
         ax = fig.add_subplot(1, 2, 1)
