@@ -282,7 +282,7 @@ class ImageProcessing:
             return
 
         # store image size
-        self.original_size_x, self.original_size_y, _ = np.shape(result)
+        self.original_size_y, self.original_size_x, _ = np.shape(result)
 
         if image_a:
             self.image_a_matrix = result
