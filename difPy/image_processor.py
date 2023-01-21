@@ -495,15 +495,15 @@ class ImageProcessing:
             cv2.imwrite(path_0, image_mat)
 
             # rot 90
-            np.rot90(image_mat, k=1, axes=(0, 1))
+            image_mat = np.rot90(image_mat, k=1, axes=(0, 1))
             cv2.imwrite(path_90, image_mat)
 
             # rot 180
-            np.rot90(image_mat, k=1, axes=(0, 1))
+            image_mat = np.rot90(image_mat, k=1, axes=(0, 1))
             cv2.imwrite(path_180, image_mat)
 
             # rot 270
-            np.rot90(image_mat, k=1, axes=(0, 1))
+            image_mat = np.rot90(image_mat, k=1, axes=(0, 1))
             cv2.imwrite(path_270, image_mat)
 
             # need to compute file hash since writing the
