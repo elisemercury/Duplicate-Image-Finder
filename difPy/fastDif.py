@@ -63,6 +63,9 @@ def cpu_process_image(proc: ImageProcessing, args: PreprocessArguments) -> Prepr
     if not args.compute_hash and not args.store_thumb:
         return proc.create_no_hash_preprocess_result()
 
+    # resize image
+    proc.resize_image(image_a=True)
+
     # storing image if desired.
     if args.store_thumb:
         proc.store_image(img_a=True)
