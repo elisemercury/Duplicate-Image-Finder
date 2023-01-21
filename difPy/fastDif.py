@@ -1,12 +1,12 @@
-from database import Database
+from difPy.database import Database
 import os
 from typing import List, Tuple
 import warnings
-from utils import *
+from difPy.utils import *
 import multiprocessing as mp
 import queue
-from datatransfer import *
-from image_processor import ImageProcessing
+from difPy.datatransfer import *
+from difPy.image_processor import ImageProcessing
 from concurrent.futures import ProcessPoolExecutor, Future
 
 """
