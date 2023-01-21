@@ -1,6 +1,6 @@
 import numpy as np
 from types import FunctionType
-from datatransfer import *
+from difPy.datatransfer import *
 import os
 from typing import Tuple, Union
 import cv2
