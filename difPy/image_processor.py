@@ -487,9 +487,9 @@ class ImageProcessing:
         try:
             # shift only if the amount is non-zero
             if self.preprocessing_args.amount > 0:
-                np.right_shift(image_mat, self.preprocessing_args.amount)
+                image_mat = np.right_shift(image_mat, self.preprocessing_args.amount)
             elif self.preprocessing_args.amount < 0:
-                np.left_shift(image_mat, abs(self.preprocessing_args.amount))
+                image_mat = np.left_shift(image_mat, abs(self.preprocessing_args.amount))
 
             # store rot0 with shift
             cv2.imwrite(path_0, image_mat)
