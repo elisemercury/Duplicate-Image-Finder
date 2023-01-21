@@ -130,7 +130,7 @@ class ImageProcessing:
         Also resets any previously occurred errors.
 
         :param args: arguments to fill into attributes
-        :param load: if the image should be loaded with the after updating the args through the update function.
+        :param load: if the image should be loaded after updating the args through the update function.
         :return:
         """
         self.preprocessing_args = args
