@@ -34,6 +34,28 @@ def hash_file(path) -> str:
     return result
 
 
+def walking_hash(mat: np.ndarray) -> str:
+    """
+    Given an multidimensional numpy array, walk along each axis in descending order and add each element to the hash
+
+    :param mat: multidimensional array
+    :return: hash of array
+    """
+
+    sha256_hash = hashlib.sha256()
+
+    def walk(hobj, array):
+        # if we're at a leaf, update the hash
+        if len(np.shape(array)) == 0:
+            hobj.update(array)
+            return
+
+        for x in array:
+            walk(hobj, x)
+
+    walk(sha256_hash, mat)
+    return sha256_hash.hexdigest()
+
 def fill(base: str, length: int, fill_char: str = " ", left: bool = True) -> str:
     """
     Fill a string with a character to a certain length.
