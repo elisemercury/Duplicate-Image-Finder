@@ -541,6 +541,40 @@ class FastDifPy:
         assert self.first_loop_out.empty(), "Result queue is not empty after all processes have been killed."
         print("All Images have been preprocessed.")
 
+    def __generate_first_loop_obj(self, amount: int, compute_hash: bool, compute_thumbnails: bool) \
+            -> Union[PreprocessArguments, None]:
+        """
+        Short wrapper function which creates the PreprocessingArguments and updates the DB.
+
+        :param amount: shift amount for hash
+        :param compute_hash: if hash is to be computed
+        :param compute_thumbnails: if thumbnail is to be computed and stored
+        :return: PreprocessingArguments (on success), None if nothing was found.
+        """
+        task = self.db.get_next_to_process()
+
+        # if there's no task left, stop the loop.
+        if task is None:
+            return None
+
+        # generate a new argument
+        arg = PreprocessArguments(
+            amount=amount,
+            key=task["key"],
+            in_path=task["path"],
+            out_path=self.generate_thumbnail_path(dir_a=task["dir_a"], filename=task["filename"],
+                                                  key=task["key"]),
+            compute_hash=compute_hash,
+            store_thumb=compute_thumbnails,
+            size_x=self.thumbnail_size_x,
+            size_y=self.thumbnail_size_y,
+        )
+        self.db.mark_processing(task)
+
+        self.first_loop_in.put(arg.to_json())
+
+        return arg
+
     def handle_result_of_first_loop(self, res_q: mp.Queue, compute_hash: bool) -> bool:
         """
         Dequeues a result of the results queue and updates the database accordingly.
