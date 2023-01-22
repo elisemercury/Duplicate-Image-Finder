@@ -362,7 +362,7 @@ class FastDifPy:
 
             # for directories, continue the recursion
             if os.path.isdir(full_path):
-                self.recursive_index(dir_a, full_path)
+                self.__recursive_index(dir_a, full_path)
 
             if os.path.isfile(full_path):
                 # check if the file is supported, then add it to the database
