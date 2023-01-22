@@ -1,3 +1,4 @@
+import time
 from difPy.database import Database
 import os
 from typing import List, Tuple
