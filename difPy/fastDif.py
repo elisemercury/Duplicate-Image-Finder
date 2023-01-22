@@ -224,7 +224,8 @@ class FastDifPy:
         :param directory_a: first directory to search for differentiation.
         :param directory_b: second directory to compare against. Otherwise, comparison will be done against directory
         itself.
-        :param test_db: Weather or not the code should test for the presence of the default sqlite database.
+        :param test_db: Test and create a sqlite db for the processing. Should be left off if a different implementation
+        is used
         """
 
         if not os.path.isdir(directory_a):
