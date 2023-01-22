@@ -420,14 +420,14 @@ class FastDifPy:
         :return: the thumbnail path.
         """
         name = self.db.get_thumb_name(key, dir_a=dir_a)
-        directory = self.thumb_dir_a if dir_a else self.__thumb_dir_b
+        directory = self.thumb_dir_a if dir_a else self.thumb_dir_b
 
         # return the name if it existed already
         if name is not None:
-            return os.path.join(directory, name)
+            return os.path.join(directory, name[1])
 
         name = self.db.generate_new_thumb_name(key, filename, dir_a=dir_a)
-        return os.path.join(directory, name)
+        return os.path.join(directory, name[1])
 
     def first_loop_iteration(self, compute_thumbnails: bool = True, compute_hash: bool = False, amount: int = 4,
                              gpu_proc: int = 0, cpu_proc: int = 16):
