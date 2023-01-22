@@ -430,7 +430,7 @@ class FastDifPy:
         return os.path.join(directory, name[1])
 
     def first_loop_iteration(self, compute_thumbnails: bool = True, compute_hash: bool = False, amount: int = 4,
-                             gpu_proc: int = 0, cpu_proc: int = 16):
+                             gpu_proc: int = 0, cpu_proc: int = 16, purge: bool = True):
 
         # TODO MAKE EVERYTHING WITH ProcesspoolExecutor
         # store thumbnails if possible.
@@ -441,11 +441,11 @@ class FastDifPy:
             if amount > 7 or amount < -7:
                 raise ValueError("amount my only be in range [-7, 7]")
 
-            self.db.create_hash_table()
+            self.db.create_hash_table(purge=purge)
 
         # thumbnail are required to exist for both.
         if compute_thumbnails or compute_hash:
-            self.db.create_thumb_table(secondary_folder=self.p_root_dir_b is not None)
+            self.db.create_thumb_table(secondary_folder=self.has_dir_b)
             self.check_create_thumbnail_dir()
 
         cpu_handles = []
@@ -456,23 +456,12 @@ class FastDifPy:
 
         # prefill loop
         for i in range(cpu_proc + gpu_proc):
-            task = self.db.get_next_to_process()
+            arg = self.__generate_first_loop_obj(amount=amount, compute_hash=compute_hash,
+                                                 compute_thumbnails=compute_thumbnails)
 
             # stop if there's nothing left to do.
-            if task is None:
+            if arg is None:
                 break
-
-            # generate a new argument
-            arg = PreprocessArguments(
-                amount=amount,
-                key=task["key"],
-                in_path=task["path"],
-                out_path=self.generate_thumbnail_path(dir_a=task["dir_a"], filename=task["filename"], key=task["key"]),
-                compute_hash=compute_hash,
-                store_thumb=compute_thumbnails,
-                size_x=self.thumbnail_size_x,
-                size_y=self.thumbnail_size_y,
-            )
 
             self.first_loop_in.put(arg.to_json())
 
@@ -496,30 +485,18 @@ class FastDifPy:
         # handle the running state of the loop
         while run:
             if self.handle_result_of_first_loop(self.first_loop_out, compute_hash):
-                task = self.db.get_next_to_process()
+                arg = self.__generate_first_loop_obj(amount, compute_hash, compute_thumbnails)
 
                 # if there's no task left, stop the loop.
-                if task is None:
+                if arg is None:
                     none_counter += 1
                     self.first_loop_in.put(None)
 
                 else:
-                    # generate a new argument
-                    arg = PreprocessArguments(
-                        amount=amount,
-                        key=task["key"],
-                        in_path=task["path"],
-                        out_path=self.generate_thumbnail_path(dir_a=task["dir_a"], filename=task["filename"],
-                                                              key=task["key"]),
-                        compute_hash=compute_hash,
-                        store_thumb=compute_thumbnails,
-                        size_x=self.thumbnail_size_x,
-                        size_y=self.thumbnail_size_y,
-                    )
-
                     self.first_loop_in.put(arg.to_json())
                     timeout = 0
             else:
+                time.sleep(1)
                 timeout += 1
 
             # if this point is reached, all processes should be done and the queues empty.
