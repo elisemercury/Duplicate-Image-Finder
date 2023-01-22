@@ -266,7 +266,7 @@ class FastDifPy:
         """
         db_a = os.path.join(self.p_root_dir_a, "diff.db")
         dir_b = self.p_root_dir_b  # can be none
-        db_b = os.path.join(dir_b, "diff.db")
+        db_b = os.path.join(dir_b, "diff.db") if self.has_dir_b else None
         matching_config = False
 
         if os.path.exists(db_a):
@@ -331,13 +331,13 @@ class FastDifPy:
         :return:
         """
         # create the tables in the database
-        self.db.create_directory_tables(secondary_folder=self.p_root_dir_b is not None)
+        self.db.create_directory_tables(secondary_folder=self.has_dir_b)
 
-        self.recursive_index(True)
-        if self.p_root_dir_b is not None:
-            self.recursive_index(False)
+        self.__recursive_index(True)
+        if self.has_dir_b:
+            self.__recursive_index(False)
 
-    def recursive_index(self, dir_a: bool = True, path: str = None, ignore_thumbnail: bool = True):
+    def __recursive_index(self, dir_a: bool = True, path: str = None, ignore_thumbnail: bool = True):
         """
         Recursively index the directories. This function is called by the index_the_dirs function.
         :param ignore_thumbnail: If any directory at any level, starting with .temp_thumb should be ignored.
