@@ -126,7 +126,7 @@ class Database:
             "path TEXT , "
             "filename TEXT, "
             "error TEXT DEFAULT '<EMPTY>',"
-            "proc_suc INTEGER DEFAULT -1 CHECK ( directory_a.proc_suc >= -1 AND directory_a.proc_suc <= 1 ) ,"
+            "proc_suc INTEGER DEFAULT -1 CHECK ( directory_a.proc_suc >= -2 AND directory_a.proc_suc <= 1 ) ,"
             "px INTEGER DEFAULT -1 CHECK (directory_a.px >= -1), "
             "py INTEGER DEFAULT -1 CHECK (directory_a.py >= -1))"
         )
@@ -139,7 +139,7 @@ class Database:
                 "path TEXT , "
                 "filename TEXT, "
                 "error TEXT DEFAULT '<EMPTY>',"
-                "proc_suc INTEGER DEFAULT -1 CHECK ( directory_b.proc_suc >= -1 AND directory_b.proc_suc <= 1 ) ,"
+                "proc_suc INTEGER DEFAULT -1 CHECK ( directory_b.proc_suc >= -2 AND directory_b.proc_suc <= 1 ) ,"
                 "px INTEGER DEFAULT -1 CHECK (directory_b.px >= -1), "
                 "py INTEGER DEFAULT -1 CHECK (directory_b.py >= -1))"
             )
