@@ -411,7 +411,7 @@ class Database:
                 index += 1
                 thumb_name = f"{name}_thumb_{index:03}{ext}"
             else:
-                free = True
+                break
 
             if index > retry_limit:
                 raise ValueError(f"Filename '{file_name}' is too common, it has been used {retry_limit} times.")
