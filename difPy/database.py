@@ -36,6 +36,7 @@ class Database:
     def create_config(self, config: dict, type_name: str) -> bool:
         """
         Create the config table and insert a config dictionary.
+
         :param config: config dict
         :param type_name: name under which config is stored
         :return: bool -> insert successful or not (key already exists)
@@ -57,6 +58,7 @@ class Database:
     def get_config(self, type_name: str) -> Union[dict, None]:
         """
         Get the config dictionary from the database.
+
         :param type_name: name under which config is stored
         :return: config dict or None if not found
         """
@@ -71,6 +73,7 @@ class Database:
     def delete_config(self, type_name: str):
         """
         Delete the config from the database.
+
         :param type_name: name under which config is stored
         :return:
         """
@@ -79,6 +82,7 @@ class Database:
     def update_config(self, config: dict, type_name: str):
         """
         Update the config to the database.
+
         :param config: config dict
         :param type_name: name under which config is stored
         :return:
@@ -89,6 +93,7 @@ class Database:
     def config_table_exists(self):
         """
         Check the master table if the config table exists. DOES NOT VERIFY THE TABLE DEFINITION!
+
         :return:
         """
         self.cur.execute("SELECT * FROM sqlite_master WHERE tbl_name IS 'config'")
@@ -148,6 +153,7 @@ class Database:
     def all_to_dict_dir(row: Union[tuple, None], dir_a: bool = True):
         """
         Takes the result of a 'SELECT *' from a directory table and turns the tuple into a dict
+
         :param row: tuple to turn into dict
         :param dir_a: if the file was in directory a or directory b
         :return:
@@ -175,6 +181,7 @@ class Database:
     def test_dir_table_existence(self, dir_a: bool = True):
         """
         Check the table for directory X, exists. DOES NOT VERIFY THE TABLE DEFINITION!
+
         :param dir_a: True if dir_a, False if dir_b
         :return:
         """
@@ -185,6 +192,7 @@ class Database:
     def drop_dir(self, dir_a: bool = True):
         """
         Drop a table related to the directories.
+
         :param dir_a: if True, drop dir A table, else drop dir b table.
         :return:
         """
@@ -194,6 +202,7 @@ class Database:
     def add_file(self, path: str, filename: str, dir_a: bool = True):
         """
         Add a file to the database.
+
         :param path: path to file, including filename (e.g. /home/user/file.txt)
         :param filename: filename (e.g. file.txt) // For faster searching
         :param dir_a: if True, add to dir_a, else add to dir_b
@@ -206,6 +215,7 @@ class Database:
     def get_dir_count(self, dir_a: bool = True):
         """
         Get the number of files in the directory.
+
         :param dir_a: if True, get count of dir_a, else get count of dir_b
         :return:
         """
@@ -217,6 +227,7 @@ class Database:
         """
         Set the flag for success of the file with the matching key. Set it in either table_a or table_b.
         Error not updated.
+
         :param key: file identifier which is to be updated
         :param dir_a: TRUE <=> update directory_a, ELSE update directory_b
         :param px: x count of pixels
@@ -230,6 +241,7 @@ class Database:
         """
         Set the flag for error of the file with the matching key. Set it in either table_a or table_b
         Error is stored in plane text atm (It might be necessary to store it in b64.
+
         :param key: file identifier which is to be updated
         :param dir_a: TRUE <=> update directory_a, ELSE update directory_b
         :param msg: error message created when attempting to process the file.
@@ -241,6 +253,7 @@ class Database:
         """
         Get an unprocessed entry from (one) of the directory table (s). Returns None per default to signify that
         there's nothing to be computed.
+
         :return: Next one to compute or None
         """
         if not self.a_done:
@@ -328,6 +341,7 @@ class Database:
     def test_thumb_table_existence(self, dir_a: bool = True):
         """
         Check the table for thumbnails of directory X, exists. DOES NOT VERIFY THE TABLE DEFINITION!
+
         :param dir_a: True if dir_a, False if dir_b
         :return:
         """
@@ -338,6 +352,7 @@ class Database:
     def drop_thumb(self, dir_a: bool = True):
         """
         Drop a table related to the thumbnails of a directory.
+
         :param dir_a: if True, drop thumb A table, else drop thumb b table.
         :return:
         """
@@ -347,6 +362,7 @@ class Database:
     def get_thumb_name(self, key: int, dir_a: bool):
         """
         Get the thumbnail name associated with the key.
+
         :param key: key to search the thumbnail path for
         :param dir_a: if the key is to be searched in the directory_a or directory_b table.
         :return:
@@ -422,6 +438,7 @@ class Database:
     def test_plot_table_existence(self):
         """
         Check the table for thumbnails of directory X, exists. DOES NOT VERIFY THE TABLE DEFINITION!
+
         :return:
         """
         self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'plots'")
@@ -430,6 +447,7 @@ class Database:
     def drop_plot(self):
         """
         Drop a table related to the thumbnails of a directory.
+
         :return:
         """
         self.debug_execute(f"DROP TABLE plots")
@@ -437,6 +455,7 @@ class Database:
     def get_plot_name(self, key_a: int, key_b: int):
         """
         Get the thumbnail name associated with the key.
+
         :param key_a: key to search the thumbnail path for
         :param key_b: if the key is to be searched in the directory_a or directory_b table.
         :return:
@@ -483,6 +502,7 @@ class Database:
     def create_hash_table(self, purge: bool = False) :
         """
         Create the config table and insert a config dictionary.
+
         :param purge: if True, purge the table before creating it.
         :return:
         """
@@ -500,6 +520,7 @@ class Database:
     def test_hash_table_existence(self):
         """
         Check if the hash table exists. DOES NOT VERIFY THE TABLE DEFINITION!
+
         :return:
         """
         self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'hash_table'")
@@ -508,6 +529,7 @@ class Database:
     def drop_hash_table(self):
         """
         Drop the hash table.
+
         :return:
         """
         self.debug_execute(f"DROP TABLE hash_table")
@@ -515,6 +537,7 @@ class Database:
     def insert_hash(self, fhash: str, dir_a: bool, dir_key: int, rotation: int):
         """
         Insert a hash into the hash table.
+
         :param fhash: hash to insert
         :param dir_a: if the file is in dir_a or dir_b
         :param dir_key: key of the file in the directory table
@@ -528,6 +551,7 @@ class Database:
     def has_all_hashes(self, dir_a: bool, dir_key: int):
         """
         Check if a file has a hash.
+
         :param dir_a: if the file is in dir_a or dir_b
         :param dir_key: key of the file in the directory table
         :return: if a file has all 4 entries.
@@ -539,6 +563,7 @@ class Database:
     def has_any_hash(self, dir_a: bool, dir_key: int):
         """
         Check if a file has a hash.
+
         :param dir_a: if the file is in dir_a or dir_b
         :param dir_key: key of the file in the directory table
         :return: if a file has any entry.
@@ -550,6 +575,7 @@ class Database:
     def del_all_hashes(self, dir_a: bool, dir_key: int):
         """
         Delete any of the 4 possible hashes of a given file.
+
         :param dir_a:
         :param dir_key:
         :return:
@@ -561,6 +587,7 @@ class Database:
     def update_hash(self, file_hash: str, dir_a: bool, dir_key: int, rotation: int):
         """
         Update a hash in the hash table. (Not sure why I'd need the function but there it is)
+
         :param file_hash: hash to update
         :param dir_a: if the file is in dir_a or dir_b
         :param dir_key: key of the file in the directory table
@@ -598,6 +625,7 @@ class Database:
     def test_dif_table_existence(self):
         """
         Check if the dif table exists. DOES NOT VERIFY THE TABLE DEFINITION!
+
         :return:
         """
         self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'dif_table'")
@@ -606,6 +634,7 @@ class Database:
     def drop_dif_table(self):
         """
         Drop the dif table.
+
         :return:
         """
         self.debug_execute(f"DROP TABLE dif_table")
