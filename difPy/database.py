@@ -21,7 +21,7 @@ class Database:
     b_done: bool
     has_b: Union[bool, None]
 
-    last_update: datetime.datetime = None
+    last_update: datetime.datetime = datetime.datetime.now()
 
     def __init__(self, path):
         self.connect(path)
