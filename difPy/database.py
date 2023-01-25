@@ -62,11 +62,11 @@ class Database:
         """
         self.debug_execute(f"SELECT value FROM config WHERE name IS '{type_name}'")
 
-        value = self.cur.fetchone()[0]
-        if value is None:
+        row = self.cur.fetchone()
+        if row is None:
             return None
 
-        return self.from_b64(value)
+        return self.from_b64(row[0])
 
     def delete_config(self, type_name: str):
         """
