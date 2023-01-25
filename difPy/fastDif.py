@@ -427,7 +427,7 @@ class FastDifPy:
             return os.path.join(directory, name[1])
 
         name = self.db.generate_new_thumb_name(key, filename, dir_a=dir_a)
-        return os.path.join(directory, name[1])
+        return os.path.join(directory, name)
 
     def first_loop_iteration(self, compute_thumbnails: bool = True, compute_hash: bool = False, amount: int = 4,
                              gpu_proc: int = 0, cpu_proc: int = 16, purge: bool = True):
