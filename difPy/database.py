@@ -254,7 +254,8 @@ class Database:
         :param msg: error message created when attempting to process the file.
         """
         tbl_name = "directory_a" if dir_a else "directory_b"
-        self.debug_execute(f"UPDATE {tbl_name} SET proc_suc = 0, error='{msg}' WHERE key = {key}")
+        msg_b64 = base64.b64encode(msg.encode("utf-8")).decode("ascii")
+        self.debug_execute(f"UPDATE {tbl_name} SET proc_suc = 0, error='{msg_b64}' WHERE key = {key}")
 
     def get_next_to_process(self):
         """
