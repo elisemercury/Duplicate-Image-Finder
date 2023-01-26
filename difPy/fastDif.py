@@ -816,12 +816,12 @@ class FastDifPy:
 
         return inserted if inserted > 0 else None
 
-    def __refill_queues_small_non_optimized(self, init: bool = False):
+    def __refill_queues_small_non_optimized(self, init: bool = False) -> Union[int, None]:
         """
         Refill the queues with the non optimized algorithm which just stupidly goes along.
 
         :param init: if init, start all loops from 0 and initialize the status to dict
-        :return:
+        :return: number of images inserted into queues.
         """
         if not init:
             last_a = self.second_loop_queue_status["last_a"]
@@ -831,6 +831,7 @@ class FastDifPy:
             last_a = None
             last_b = None
 
+        # initialize loop vars
         procs = len(self.second_loop_in)
         queue_index = 0
 
@@ -866,6 +867,7 @@ class FastDifPy:
             if start_a == len(rows_a) - 1 and start_b == len(rows_b) - 1:
                 return 0
 
+        # since the number of entries is small, we can just perform a basic packaged for loop.
         for i in range(start_a, len(rows_a)):
             if i != start_a:
                 start_b = int(self.has_dir_b) * (i + 1)  # i + 1 if not dir b, else 0
@@ -889,7 +891,7 @@ class FastDifPy:
         # store the current indices to be sure. The update loop function would trigger and throw the remaining
         # stuff out.
         self.second_loop_queue_status = {"last_a": last_a, "last_b": last_b}
-        return add_count
+        return add_count if add_count > 0 else None
 
     def init_queues(self, procs: int):
         # from a fetch the first set of images
