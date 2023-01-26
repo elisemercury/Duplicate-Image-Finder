@@ -534,8 +534,11 @@ class FastDifPy:
         for i in range(len(cpu_handles)):
             p = cpu_handles[i]
             try:
-                print(f"Trying to join process {i} Process State is {p.is_alive()}")
-                p.join(60)
+                print(f"Trying to join process {i} Process Alive State is {p.is_alive()}")
+                p.join(1)
+                if p.is_alive():
+                    print(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
+                    p.kill()
             except TimeoutError:
                 print(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
                 p.kill()
@@ -544,13 +547,16 @@ class FastDifPy:
             p = gpu_handles[i]
             try:
                 print(f"Trying to join process {i + cpu_proc} Process State is {p.is_alive()}")
-                p.join(60)
+                p.join(1)
+                if p.is_alive():
+                    print(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
+                    p.kill()
             except TimeoutError:
                 print(f"Process {i + cpu_proc} timed out. Alive state: {p.is_alive()}; killing it.")
                 p.kill()
 
         # try to handle any remaining results that are in the queue.
-        for _ in range((cpu_proc + gpu_proc) * 2):
+        for i in range((cpu_proc + gpu_proc) * 2 + self.first_loop_out.qsize()):
             if not self.handle_result_of_first_loop(self.first_loop_out, compute_hash):
                 break
 
