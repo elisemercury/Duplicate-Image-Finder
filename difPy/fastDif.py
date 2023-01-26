@@ -935,6 +935,13 @@ class FastDifPy:
         self.__refill_queues_optimized()
 
     def __increment_fixed_image(self, p: int):
+        """
+        Given a process p, it searches for the next 'row' in the matching matrix to find the next key to keep constant
+        for the process p
+
+        :param p: index of process spec in self.second_loop_queue_status
+        :return: True -> free image found, False, -> no new image found.
+        """
         # TODO implement smart algoritm to find next image for the process that is now done.
         next_key = 0
 
