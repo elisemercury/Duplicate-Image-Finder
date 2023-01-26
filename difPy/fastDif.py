@@ -1096,23 +1096,35 @@ class FastDifPy:
 
         # we have a max_number
         for i in range(max_number):
-            try:
-                res = self.second_loop_out.get(timeout=0.1)
-            except TimeoutError:
+            if not self.__process_one_second_result():
                 return i
 
-            assert type(res) is str, "Result of comparison was not string"
-            res_obj = CompareImageResults.from_json(res)
-
-            # store in database
-            if res_obj.success:
-                self.db.insert_dif_success(key_a=res_obj.key_a, key_b=res_obj.key_b, dif=res_obj.min_avg_diff,
-                                           b_dir_b=res_obj.is_dir_b)
-            else:
-                self.db.insert_dif_error(key_a=res_obj.key_a, key_b=res_obj.key_b, error=res_obj.error,
-                                         b_dir_b=res_obj.is_dir_b)
-
         return max_number
+
+    def __process_one_second_result(self) -> bool:
+        """
+        Perform dequeue of one element of the second process results queue. Insert the result into the database
+        subsequently.
+
+        :return: True -> inserted one element, False, timeout reached for fetching the next element.
+        (Useful to prevent infinite loops)
+        """
+        try:
+            res = self.second_loop_out.get(timeout=0.1)
+        except TimeoutError:
+            return False
+
+        assert type(res) is str, "Result of comparison was not string"
+        res_obj = CompareImageResults.from_json(res)
+
+        # store in database
+        if res_obj.success:
+            self.db.insert_dif_success(key_a=res_obj.key_a, key_b=res_obj.key_b, dif=res_obj.min_avg_diff,
+                                       b_dir_b=res_obj.is_dir_b)
+        else:
+            self.db.insert_dif_error(key_a=res_obj.key_a, key_b=res_obj.key_b, error=res_obj.error,
+                                     b_dir_b=res_obj.is_dir_b)
+        return True
 
     def join_all_children(self):
         """
