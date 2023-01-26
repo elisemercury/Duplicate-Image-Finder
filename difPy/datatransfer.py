@@ -199,6 +199,23 @@ class CompareImageArguments:
 
     is_dir_b: bool = False
 
+    # short-circuiting arguments
+    img_a_size_x: Union[int, None] = None
+    img_a_size_y: Union[int, None] = None
+
+    img_b_size_x: Union[int, None] = None
+    img_b_size_y: Union[int, None] = None
+
+    img_a_hash_0:   Union[str, None] = None
+    img_a_hash_90:  Union[str, None] = None
+    img_a_hash_180: Union[str, None] = None
+    img_a_hash_270: Union[str, None] = None
+
+    img_b_hash_0:   Union[str, None] = None
+    img_b_hash_90:  Union[str, None] = None
+    img_b_hash_180: Union[str, None] = None
+    img_b_hash_270: Union[str, None] = None
+
     @staticmethod
     def from_json(json_string: str):
         """
