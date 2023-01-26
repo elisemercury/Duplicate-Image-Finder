@@ -1061,6 +1061,13 @@ class FastDifPy:
 
     @staticmethod
     def match_aspect(row_a: dict, row_b: dict):
+        """
+        Match the result of two select queries with dict wrapping and make sure the aspect ratio matches at all.
+
+        :param row_a: first dict of row
+        :param row_b: second dict of row
+        :return:
+        """
         if row_a["px"] == row_b["px"] and row_a["py"] == row_b["py"]:
             return True
         elif row_a["px"] == row_b["py"] and row_a["py"] == row_b["px"]:
