@@ -1040,14 +1040,14 @@ class FastDifPy:
                 return False
 
         # Aspect matches => Create Task object and send to process
-        CompareImageArguments(
+        arg = CompareImageArguments(
             img_a=row_a["path"],
             img_b=row_b["path"],
             thumb_a=thumb_a_path,
             thumb_b=thumb_b_path,
             key_a=row_a["key"],
             key_b=row_b["key"],
-            store_path=self.generate_plot_path(),
+            store_path=self.db.make_plot_name(key_a=row_a["key"], key_b=row_b["key"]) if self.make_diff_plots else None,
             store_compare=self.make_diff_plots,
             compare_threshold=self.similarity_threshold,
             size_x=self.thumbnail_size_x,
@@ -1056,7 +1056,7 @@ class FastDifPy:
         )
 
         # send task to process
-        self.second_loop_in[queue_index].put(CompareImageArguments.to_json())
+        self.second_loop_in[queue_index].put(arg.to_json())
         return True
 
     @staticmethod
