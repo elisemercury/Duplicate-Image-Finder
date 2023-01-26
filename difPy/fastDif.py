@@ -904,11 +904,11 @@ class FastDifPy:
             if self.has_dir_b:
                 rows = self.db.fetch_many_after_key(directory_a=False, count=procs)
                 if len(rows) < procs:
-                    self.__refill_queues_non_optimized(init=True)
+                    self.__refill_queues_small_non_optimized(init=True)
                 else:
                     self.second_loop_base_a = False
             else:
-                self.__refill_queues_non_optimized(init=True)
+                self.__refill_queues_small_non_optimized(init=True)
 
         # populating the files of the second loop.
         self.second_loop_queue_status = []
