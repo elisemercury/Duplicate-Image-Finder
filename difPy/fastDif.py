@@ -1202,7 +1202,7 @@ class FastDifPy:
 
     @property
     def similarity_threshold(self):
-        return self.similarity_threshold
+        return self.__similarity_threshold
 
     @similarity_threshold.setter
     def similarity_threshold(self, value):
