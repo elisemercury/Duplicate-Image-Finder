@@ -739,7 +739,7 @@ class FastDifPy:
 
         self.handle_results_second_queue(results)
 
-    def __refill_queues(self):
+    def __refill_queues(self) -> Union[int, None]:
         """
         Call to either the optimized or non optimized filler.
 
