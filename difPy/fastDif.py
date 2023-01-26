@@ -1083,6 +1083,18 @@ class FastDifPy:
         :return: -> Number actually dequeued elements
         """
         # TODO test for existence (for stop recovery)
+        if max_number is None:
+            number_dequeues = 0
+
+            while not self.second_loop_out.empty():
+                if not self.__process_one_second_result():
+                    return number_dequeues
+
+                number_dequeues += 1
+
+            return number_dequeues
+
+        # we have a max_number
         for i in range(max_number):
             try:
                 res = self.second_loop_out.get(timeout=0.1)
