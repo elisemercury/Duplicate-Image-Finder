@@ -154,6 +154,7 @@ class ImageProcessing:
     def create_error_preprocess_result(self):
         """
         Create an PreprocessResults object given the existence of an error
+
         :return:
         """
         return PreprocessResults.error_obj(in_path=self.preprocessing_args.in_path,
@@ -166,6 +167,7 @@ class ImageProcessing:
     def create_no_hash_preprocess_result(self):
         """
         Create a PreprocessResults object given no computed hashed to be returned
+
         :return:
         """
         return PreprocessResults.no_hash_init(in_path=self.preprocessing_args.in_path,
@@ -179,6 +181,7 @@ class ImageProcessing:
     def create_full_preprocess_result(self):
         """
         Create a fully populated preprocess results object.
+
         :return:
         """
         return PreprocessResults(
@@ -240,6 +243,7 @@ class ImageProcessing:
     def load_image(self, image_a: bool = True, perform_resize: bool = True):
         """
         Load image from file_system
+
         :param image_a: if the image_a should be loaded or image_b
         :param perform_resize: automatically resize image if they don't match the size.
         :return:
@@ -333,6 +337,7 @@ class ImageProcessing:
     def store_image(self, img_a: bool = True):
         """
         Stores the image to file given by the thumbnail path. This will OVERWRITE a preexisting image.
+
         :param img_a: if image_matrix_a or image_matrix_b is to be stored to its respective thumbnail path.
         :return:
         """
@@ -350,6 +355,7 @@ class ImageProcessing:
     def resize_image(self, image_a: bool = True):
         """
         Resize image to image_size provided in the CompareImageArguments object.
+
         :param image_a: if the image_a should be resized or image_b
         :return:
         """
@@ -367,6 +373,7 @@ class ImageProcessing:
     def img_rot(self, img_a: bool = True):
         """
         Rotate image by 90 degrees.
+
         :param img_a: if the image_a should be rotated or image_b
         :return:
         """
@@ -382,6 +389,7 @@ class ImageProcessing:
     def compare_images(self):
         """
         Compare the images and store the result in the class.
+
         :return:
         """
         # check if the images are loaded
@@ -413,6 +421,7 @@ class ImageProcessing:
     def create_compare_result(self):
         """
         Create a CompareImageResult object from the class.
+
         :return:
         """
         min_diff = min(self.diff_0, self.diff_90, self.diff_180, self.diff_270)
@@ -427,6 +436,7 @@ class ImageProcessing:
     def store_plt_on_threshold(self):
         """
         Shorthand to store the plot if the threshold is reached and the storing of the plot is desired.
+
         :return:
         """
         min_diff = min(self.diff_0, self.diff_90, self.diff_180, self.diff_270)
@@ -436,6 +446,7 @@ class ImageProcessing:
     def create_compare_plot(self):
         """
         Create a plot of the two images that are deemed to be similar and store it in predefined path.
+
         :return:
         """
         # TODO revisite plot
@@ -461,6 +472,7 @@ class ImageProcessing:
     def compute_img_hashes(self, img_a: bool = True):
         """
         Compute hash_prefix for duplicate detection.
+
         :param img_a: If image a should be hashed or image b
         :return:
         """
