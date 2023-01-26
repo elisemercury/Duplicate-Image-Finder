@@ -1015,6 +1015,15 @@ class FastDifPy:
         return row_a, row_b
 
     def schedule_pair(self, row_a: dict, row_b: dict, queue_index: int):
+        """
+        Given two rows from the database, performs the checks necessary to schedule them. If they pass, send them to the
+        respective queue.
+
+        :param row_a: first row (from dir_a)
+        :param row_b: second row (form dir_a or dir_b)
+        :param queue_index: index of the queue to insert into.
+        :return:
+        """
         thumb_a_path = None
         thumb_b_path = None
 
