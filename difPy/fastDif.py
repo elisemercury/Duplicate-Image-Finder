@@ -170,6 +170,18 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
         args = CompareImageArguments.from_json(args_str)
         timeout = 0
 
+        # short_circuiting
+        result = ImageProcessing.short_circuit(args=args, sc_size=sc_size, sc_hash=sc_hash)
+        if result is not None:
+            assert type(result) is CompareImageResults, f"Unexpected Return Type of Short Circuiting function. \n" \
+                                                        f"CompareImageResults expected, got {type(result).__name__}"
+
+            print(f"{identifier:03}: Done with {os.path.basename(args.in_path)} - short circuiting")
+
+            # Sending the result to the handler
+            out_q.put(result.to_json())
+            continue
+
         processor.update_compare_args(args)
         processor.compare_images()
         processor.store_plt_on_threshold()
