@@ -1074,13 +1074,13 @@ class FastDifPy:
             return True
         return False
 
-    def handle_results_second_queue(self, max_number: int):
+    def handle_results_second_queue(self, max_number: int = None):
         """
         Dequeue up to max_number of entries of the result queue of the second loop and insert the results into the
         database.
 
-        :param max_number: maximum number of elements to dequeue
-        :return:
+        :param max_number: maximum number of elements to dequeue, if None, dequeue until queue is empty.
+        :return: -> Number actually dequeued elements
         """
         # TODO test for existence (for stop recovery)
         for i in range(max_number):
