@@ -300,6 +300,73 @@ class ImageProcessing:
         # resize the image
         self.resize_image(image_a)
 
+    @staticmethod
+    def short_circuit(args: CompareImageArguments, sc_size: bool, sc_hash: bool):
+        """
+        Perform short circuit execution on the side of the slave. Allows for faster processing on the side of the
+        database.
+
+        The behaviour, if the arguments for short-circuiting are not provided is that the program will continue as
+        usual but emit a warning so the programmer is aware that an error occurred.
+
+        :param args: the CompareImageArguments to be short-circuited.
+        :param sc_size: if the size should be used as an indicator on which to short circuit
+        :param sc_hash: if the hash should be used as an indicator on which to short circuit
+        :return:
+        """
+        # faster if is outside.
+        if sc_size:
+            if args.img_a_size_x is None or args.img_a_size_y is None \
+                    or args.img_b_size_x is None or args.img_b_size_y is None:
+
+                print("WARNING: Size based short-circuiting initiated without providing a hash")
+                return None
+
+            # matching aspects search for positive result and negate the answer.
+            if not ((args.img_a_size_x == args.img_b_size_x and args.img_a_size_y == args.img_b_size_y)
+                    or (args.img_a_size_x == args.img_b_size_y and args.img_a_size_y == args.img_b_size_x)):
+                # Need to create an instance...
+                return CompareImageResults(key_a=args.key_a,
+                                           key_b=args.key_b,
+                                           error="",
+                                           success=True,
+                                           min_avg_diff=-1,
+                                           is_dir_b=args.is_dir_b,
+                                           )  # genuine -1 difference
+
+        # checking the hashes.
+        if sc_hash:
+            img_a_hash = [args.img_a_hash_0, args.img_a_hash_90, args.img_a_hash_180, args.img_a_hash_270]
+            img_b_hash = [args.img_b_hash_0, args.img_b_hash_90, args.img_b_hash_180, args.img_b_hash_270]
+
+            # make sure the fields are populated
+            for hb in img_b_hash:
+                if hb is None:
+                    print("WARNING: Hash based short-circuiting initiated without providing a hash")
+                    return None
+
+            # make sure the fields are populated and perform the all to all comparison at the same time.
+            for ha in img_a_hash:
+                if ha is None:
+                    print("WARNING: Hash based short-circuiting initiated without providing a hash")
+                    return None
+
+                for hb in img_b_hash:
+                    # Hashes match, we proceed with the comparison
+                    if ha == hb:
+                        return None
+
+            return CompareImageResults(key_a=args.key_a,
+                                       key_b=args.key_b,
+                                       error="",
+                                       success=True,
+                                       min_avg_diff=-1,
+                                       is_dir_b=args.is_dir_b,
+                                       )  # genuine -1 difference
+
+        # Nothing selected, don't return anything.
+        return None
+
     def __image_loader(self, img_path: str, source: str) -> Tuple[Union[np.ndarray, None], str, bool]:
         """
         Private function that handles the basic loading and type conversion for an image. Errors are returned as a
