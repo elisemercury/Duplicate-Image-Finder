@@ -1179,14 +1179,17 @@ class FastDifPy:
 
     @p_root_dir_b.setter
     def p_root_dir_b(self, value):
-        if os.path.exists(value):
+        if value is None:
+            self.__p_root_dir_b = None
+            self.__thumb_dir_b = None
+            self.__has_dir_b = False
+
+        elif os.path.exists(value):
             self.__p_root_dir_b = value
             self.__thumb_dir_b = os.path.join(self.__p_root_dir_b, ".temp_thumbnails")
             self.__has_dir_b = True
         else:
-            self.__p_root_dir_b = None
-            self.__thumb_dir_b = None
-            self.__has_dir_b = False
+            raise ValueError("The root dir b is not None yet it doesn't exist")
 
     @property
     def thumb_dir_a(self):
