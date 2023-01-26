@@ -740,9 +740,14 @@ class FastDifPy:
         self.handle_results_second_queue(results)
 
     def __refill_queues(self):
+        """
+        Call to either the optimized or non optimized filler.
+
+        :return:
+        """
         # testing if the
         if type(self.second_loop_queue_status) is dict:
-            return self.__refill_queues_non_optimized()
+            return self.__refill_queues_small_non_optimized()
 
         assert type(self.second_loop_queue_status) is list, f"Unexpected type of second_loop_queue_status: " \
                                                             f"{type(self.second_loop_queue_status).__name__}, " \
