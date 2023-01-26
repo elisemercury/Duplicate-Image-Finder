@@ -932,51 +932,7 @@ class FastDifPy:
 
                 self.second_loop_queue_status.append(temp)
 
-        # TODO slow implementation, needs to be optimized for speed later.
-        #   reuse the results of the db queries for later.
-
-        for p in range(procs):
-            # fetch possible candidates for the row.
-            row_a, row_b = self.__fetch_rows(p=p)
-
-            inserted_count = 0
-            not_full = True
-            while not_full:
-                # break if the queue is full
-                if self.second_loop_in[p].full():
-                    break
-
-                if self.second_loop_base_a:
-                    for i in range(len(row_b)):
-                        inserted = self.schedule_pair(row_a=self.second_loop_queue_status[p]["row_a"],
-                                                      row_b=row_b[i], queue_index=p)
-                        inserted_count += 1 * int(inserted)
-
-                else:
-                    for i in range(len(row_a)):
-                        inserted = self.schedule_pair(row_a=row_a[i], row_b=self.second_loop_queue_status[p]["row_b"],
-                                                      queue_index=p)
-                        inserted_count += 1 * int(inserted)
-
-                # update last key
-                if self.has_dir_b:
-                    if not self.second_loop_base_a:
-                        self.second_loop_queue_status[p]["last_key"] = row_a[-1]["key"]
-                    else:
-                        self.second_loop_queue_status[p]["last_key"] = row_b[-1]["key"]
-                else:
-                    self.second_loop_queue_status[p]["last_key"] = row_b[-1]["key"]
-
-                row_a, row_b = self.__fetch_rows(p=p)
-
-                # try to increment key. If the increment method returns False, then no more keys are available, so
-                # stop trying to add more to the queue
-                if len(row_a) == 0 and len(row_b) == 0:
-                    if not self.__increment_fixed_image(p=p):
-                        break
-
-                if inserted_count > 100:
-                    not_full = False
+        self.__refill_queues_optimized()
 
     def __increment_fixed_image(self, p: int):
         # TODO implement smart algoritm to find next image for the process that is now done.
