@@ -1155,7 +1155,7 @@ class FastDifPy:
 
         :param gpu: Test the gpu processes
         :param cpu: Test the cpu processes
-        :return:
+        :return: error, all_error, exited, all_exited
         """
         # error, all_error, exited, all_exited
         error = False
