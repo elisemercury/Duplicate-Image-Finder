@@ -416,6 +416,7 @@ class FastDifPy:
     def check_create_thumbnail_dir(self):
         """
         Create the thumbnail directories if they don't exist already.
+
         :return:
         """
         if not os.path.exists(self.thumb_dir_a):
@@ -1050,6 +1051,7 @@ class FastDifPy:
         """
         Check the results of all spawned processes and verify they produced a True as a result ergo, they computed
         successfully.
+
         :return:
         """
         success = True
