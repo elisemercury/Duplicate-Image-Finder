@@ -657,7 +657,7 @@ class FastDifPy:
 
     # TODO matching hash
     def second_loop_iteration(self, only_matching_aspect: bool = False, make_diff_plots: bool = False,
-                              similarity_threshold: float = 200, gpu_proc: int = 0, cpu_proc: int = 16,
+                              similarity_threshold: float = 200.0, gpu_proc: int = 0, cpu_proc: int = 16,
                               diff_location: str = None):
         """
         Similarity old values: high - 0.15, medium 200, low 1000
@@ -753,7 +753,70 @@ class FastDifPy:
                                                             f"{type(self.second_loop_queue_status).__name__}, " \
                                                             f"valid are list and dict"
 
-    def __refill_queues_non_optimized(self, init: bool = False):
+        return self.__refill_queues_optimized()
+
+    def __refill_queues_optimized(self):
+        """
+        Performs the optimized filling of the queues.
+
+        :return:
+        """
+        inserted = 0
+        for p in range(len(self.second_loop_in)):
+            # fetch possible candidates for the row.
+            row_a, row_b = self.__fetch_rows(p=p)
+
+            try:
+                inserted_count = 100 - self.second_loop_in[p].qsize()
+
+            # exception can occur on Unix Systems like MacOS because they don't implement sem_getvalue()
+            # docs: https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue
+            except NotImplementedError:
+                inserted_count = 100
+
+            not_full = True
+            while not_full:
+                # break if the queue is full
+                if self.second_loop_in[p].full():
+                    break
+
+                if self.second_loop_base_a:
+                    for i in range(len(row_b)):
+                        inserted = self.schedule_pair(row_a=self.second_loop_queue_status[p]["row_a"],
+                                                      row_b=row_b[i], queue_index=p)
+                        inserted_count -= 1 * int(inserted)
+                        inserted += 1
+
+                else:
+                    for i in range(len(row_a)):
+                        inserted = self.schedule_pair(row_a=row_a[i], row_b=self.second_loop_queue_status[p]["row_b"],
+                                                      queue_index=p)
+                        inserted_count -= 1 * int(inserted)
+                        inserted += 1
+
+                # update last key
+                if self.has_dir_b:
+                    if not self.second_loop_base_a:
+                        self.second_loop_queue_status[p]["last_key"] = row_a[-1]["key"]
+                    else:
+                        self.second_loop_queue_status[p]["last_key"] = row_b[-1]["key"]
+                else:
+                    self.second_loop_queue_status[p]["last_key"] = row_b[-1]["key"]
+
+                row_a, row_b = self.__fetch_rows(p=p)
+
+                # try to increment key. If the increment method returns False, then no more keys are available, so
+                # stop trying to add more to the queue
+                if len(row_a) == 0 and len(row_b) == 0:
+                    if not self.__increment_fixed_image(p=p):
+                        break
+
+                if inserted_count <= 0:
+                    not_full = False
+
+        return inserted if inserted > 0 else None
+
+    def __refill_queues_small_non_optimized(self, init: bool = False):
         """
         Refill the queues with the non optimized algorithm which just stupidly goes along.
 
