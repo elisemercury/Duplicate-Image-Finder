@@ -134,7 +134,8 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
     return True
 
 
-def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy: bool) -> bool:
+def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy: bool,
+                     sc_size: bool = False, sc_hash: bool = False) -> bool:
     """
     Parallel implementation of first loop iteration.
 
@@ -142,6 +143,8 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
     :param out_q: output queue containing only json strings of obj
     :param identifier: id of running thread
     :param try_cupy: check if cupy is available and use cupy instead.
+    :param sc_size: Perform short_circuiting logic with image size
+    :param sc_hash: Perform shirt_circuiting logic with image hashes.
     :return: True, running was successful and no error encountered, otherwise exit without return or return False
     """
     timeout = 0
