@@ -1227,31 +1227,31 @@ class FastDifPy:
         return error, all_error, exited, all_exited
 
     @staticmethod
-    def check_futures(futs: List[Future]) -> Tuple[bool, bool, bool, bool]:
-        error = False
-        all_error = True
+    def check_processes(processes: List[mp.Process]) -> Tuple[bool, bool, bool, bool]:
+        """
+        Given a list of Futures, check for errors and if they are done.
+
+        :param processes: List of futures to check
+        :return: exited, all_exited
+        """
         exited = False
         all_exited = True
+        error = False
+        all_error = False
 
-        for fut in futs:
+        for p in processes:
             # if it is running, it has not exited and not errored
-            if not fut.running():
-                e = None
+            if not p.is_alive():
+                e = p.exitcode
 
-                # try to fetch the error of the task
-                try:
-                    e = fut.exception(timeout=1)
-                except TimeoutError:
-                    print("Failed to get exception from Process")
+                if e is not None:
+                    if e != 0:
+                        error = True
+                    else:
+                        all_error = False
 
-                # update the flags
-                if e is None:
-                    all_error = False
                 else:
-                    print(f"Error occurred: {e}")
-                    error = True
-
-                exited = exited or fut.done()
+                    print("WARNING: process is not alive but no exit code available")
 
             else:
                 all_error = False
