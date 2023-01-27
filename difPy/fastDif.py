@@ -637,13 +637,14 @@ class FastDifPy:
         self.db.create_plot_table(purge=purge)
 
     # TODO matching hash
-    def second_loop_iteration(self, only_matching_aspect: bool = False, make_diff_plots: bool = False,
-                              similarity_threshold: float = 200.0, gpu_proc: int = 0, cpu_proc: int = 16,
-                              diff_location: str = None):
+    def second_loop_iteration(self, only_matching_aspect: bool = False, only_matching_hash: bool = False,
+                              make_diff_plots: bool = False, similarity_threshold: float = 200.0, gpu_proc: int = 0,
+                              cpu_proc: int = 16, diff_location: str = None):
         """
         Similarity old values: high - 0.15, medium 200, low 1000
 
         :param only_matching_aspect:
+        :param only_matching_hash:
         :param make_diff_plots:
         :param similarity_threshold:
         :param gpu_proc:
