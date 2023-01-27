@@ -42,7 +42,7 @@ Features:
 # TODO might be faster if the short circuiting is performed by the children? Though it seems a little counter
 #   counter intuitive since we can perform that computation unhindered yet we are still probably
 #   bottle-necked by the slow db
-
+# TODO keyboard shortcuts pyinput
 
 def cpu_process_image(proc: ImageProcessing, args: PreprocessArguments) -> PreprocessResults:
     """
