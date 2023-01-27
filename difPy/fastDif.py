@@ -718,14 +718,15 @@ class FastDifPy:
         if all_errored:
             raise RuntimeError("All child processes exited with an Error")
 
-        if self.join_all_children():
-            print("All child processes terminated successfully and without errors")
+        self.join_all_children()
+        print("All child processes terminated")
 
-        ex.shutdown(cancel_futures=True)
+        # handle last results:
+        self.handle_results_second_queue()
 
         # check if the tasks were empty.
-        assert not self.update_queues(), "Existed without having run out of tasks and without all processes " \
-                                         "having stopped."
+        assert not self.handle_results_second_queue(), "Existed without having run out of tasks and without all processes " \
+                                                       "having stopped."
 
     def update_queues(self):
         results = self.__refill_queues()
