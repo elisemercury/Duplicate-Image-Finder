@@ -25,7 +25,6 @@ Features:
 # TODO Make a skeleton for the parallel process
 # TODO Test the whole shit.
 # TODO single processing handler
-# TODO add handler in main function for second for loop
 # TODO Reset Processing Class if the arguments are switched.
 
 
@@ -37,8 +36,6 @@ Features:
 # TODO Harakiri method. More reckless method.
 # TODO Use of binary differentiation to detect hard file duplicates
 # TODO  Use of file names / zero difference to detect images which differ only in the metadata.
-# TODO slow implementation, needs to be optimized for speed later.
-#   reuse the results of the db queries for later.
 # TODO might be faster if the short circuiting is performed by the children? Though it seems a little counter
 #   counter intuitive since we can perform that computation unhindered yet we are still probably
 #   bottle-necked by the slow db
