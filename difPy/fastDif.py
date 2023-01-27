@@ -587,7 +587,7 @@ class FastDifPy:
         """
         # retrieve the result from the queue
         try:
-            res = res_q.get(block=False)
+            res = res_q.get(timeout=1.0)
         except queue.Empty:
             return False
 
