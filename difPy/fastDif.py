@@ -1128,7 +1128,7 @@ class FastDifPy:
         """
         try:
             res = self.second_loop_out.get(timeout=0.1)
-        except TimeoutError:
+        except queue.Empty:
             return False
 
         assert type(res) is str, "Result of comparison was not string"
@@ -1142,6 +1142,21 @@ class FastDifPy:
             self.db.insert_dif_error(key_a=res_obj.key_a, key_b=res_obj.key_b, error=res_obj.error,
                                      b_dir_b=res_obj.is_dir_b)
         return True
+
+    def send_termination_signal(self, first_loop: bool = False):
+        """
+        Sends None in the queues to the child processes, which is the termination signal for them.
+
+        :param first_loop: if the termination signal needs to be sent to the children of the first or the second loop
+        :return:
+        """
+        if first_loop:
+            for i in range((len(self.cpu_handles) + len(self.gpu_handles))* 4):
+                self.first_loop_in.put(None)
+
+            return
+        for q in self.second_loop_in:
+            [q.put(None) for _ in range(4)]
 
     def join_all_children(self):
         """
