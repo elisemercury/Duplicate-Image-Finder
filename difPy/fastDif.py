@@ -682,15 +682,16 @@ class FastDifPy:
         # prefill
         self.init_queues(procs=gpu_proc + cpu_proc)
 
-        # create process pool.
-        ex = ProcessPoolExecutor(max_workers=cpu_proc + gpu_proc)
-
         # starting all processes
         for i in range(cpu_proc):
-            self.cpu_handles.append(ex.submit(parallel_compare, child_args[i]))
+            p = mp.Process(target=parallel_compare, args=child_args[i])
+            p.start()
+            self.cpu_handles.append(p)
 
         for i in range(cpu_proc, cpu_proc + gpu_proc):
-            self.gpu_handles.append(ex.submit(parallel_compare, child_args[i]))
+            p = mp.Process(target=parallel_resize, args=child_args[i])
+            p.start()
+            self.gpu_handles.append(p)
 
         done = False
 
