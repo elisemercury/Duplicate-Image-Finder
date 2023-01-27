@@ -913,13 +913,17 @@ class FastDifPy:
         # the file.
         if len(rows) < procs:
             if self.has_dir_b:
+
+                # trying to use the directory b as a fixed directory
                 rows = self.db.fetch_many_after_key(directory_a=False, count=procs)
                 if len(rows) < procs:
                     self.__refill_queues_small_non_optimized(init=True)
+                    return
                 else:
                     self.second_loop_base_a = False
             else:
                 self.__refill_queues_small_non_optimized(init=True)
+                return
 
         # populating the files of the second loop.
         self.second_loop_queue_status = []
