@@ -1259,6 +1259,16 @@ class FastDifPy:
 
         return error, all_error, exited, all_exited
 
+    def get_thumb_path_from_db(self, key: int, dir_a: bool):
+        thumb_name = self.db.get_thumb_name(key=key, dir_a=dir_a)
+
+        # exit immediately if the file doesn't exist
+        if thumb_name is None:
+            return None
+
+        thumb_dir = self.thumb_dir_a if dir_a else self.thumb_dir_b
+        return os.path.join(thumb_dir, thumb_name[1])
+
     # ------------------------------------------------------------------------------------------------------------------
     # PROPERTIES
     # ------------------------------------------------------------------------------------------------------------------
