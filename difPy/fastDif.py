@@ -472,10 +472,10 @@ class FastDifPy:
             self.db.create_thumb_table(secondary_folder=self.has_dir_b)
             self.check_create_thumbnail_dir()
 
-        cpu_handles = []
-        gpu_handles = []
+        self.cpu_handles = []
+        self.gpu_handles = []
 
-        self.first_loop_in = mp.Queue(maxsize=(cpu_proc + gpu_proc) * 2)
+        self.first_loop_in = mp.Queue()
         self.first_loop_out = mp.Queue()
 
         # prefill loop
@@ -493,13 +493,13 @@ class FastDifPy:
         for i in range(cpu_proc):
             p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, False))
             p.start()
-            cpu_handles.append(p)
+            self.cpu_handles.append(p)
 
         # start processes for gpu
         for i in range(cpu_proc, gpu_proc + cpu_proc):
             p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, True))
             p.start()
-            gpu_handles.append(p)
+            self.gpu_handles.append(p)
 
         # turn main loop into handler and perform monitoring of the threads.
         run = True
