@@ -811,7 +811,15 @@ class FastDifPy:
                 # try to increment key. If the increment method returns False, then no more keys are available, so
                 # stop trying to add more to the queue
                 if len(row_a) == 0 and len(row_b) == 0:
+                    # we don't have any images left to process.
                     if not self.__increment_fixed_image(p=p):
+                        break
+
+                    row_a, row_b = self.__fetch_rows(p=p)
+
+                    # case when we are at the last image (which can only be compared against itself, ergo nothing to do)spo
+                    if len(row_a) == 0 and len(row_b) == 0:
+                        print("End of Images Reached")
                         break
 
                 if inserted_count <= 0:
