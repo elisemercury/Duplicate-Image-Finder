@@ -957,7 +957,7 @@ class FastDifPy:
         :param p: index of process spec in self.second_loop_queue_status
         :return: True -> free image found, False, -> no new image found.
         """
-        # TODO implement smart algoritm to find next image for the process that is now done.
+        # TODO implement smart algorithm to find next image for the process that is now done.
         next_key = 0
 
         # get the limit for the next key
