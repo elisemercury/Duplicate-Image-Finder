@@ -730,8 +730,7 @@ class FastDifPy:
 
     def update_queues(self):
         results = self.__refill_queues()
-
-        self.handle_results_second_queue(results)
+        return self.handle_results_second_queue(results)
 
     def __refill_queues(self) -> Union[int, None]:
         """
