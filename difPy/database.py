@@ -671,7 +671,7 @@ class Database:
             return False
 
         self.debug_execute(f"INSERT INTO dif_table (key_a, key_b, dif, b_dir_b, success) "
-                           f"VALUES ({key_a}, {key_b}, {dif}, {1 if b_dir_b else 0, 1}, 1)")
+                           f"VALUES ({key_a}, {key_b}, {dif}, {1 if b_dir_b else 0}, 1)")
         return True
 
     def insert_dif_error(self, key_a: int, key_b: int, error: str, b_dir_b: bool = False) -> bool:
