@@ -176,8 +176,9 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
             assert type(result) is CompareImageResults, f"Unexpected Return Type of Short Circuiting function. \n" \
                                                         f"CompareImageResults expected, got {type(result).__name__}"
 
-            print(f"{identifier:03}: Done with {os.path.basename(args.img_a)} and "
-                  f"{os.path.basename(args.img_b)} - short circuiting")
+            if debug:
+                print(f"{identifier:03}: Done with {os.path.basename(args.img_a)} and "
+                      f"{os.path.basename(args.img_b)} - short circuiting")
 
             # Sending the result to the handler
             out_q.put(result.to_json())
@@ -188,7 +189,8 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
         processor.store_plt_on_threshold()
         result = processor.create_compare_result()
 
-        print(f"{identifier:03}: Done with {os.path.basename(args.img_a)} and {os.path.basename(args.img_b)}")
+        if debug:
+            print(f"{identifier:03}: Done with {os.path.basename(args.img_a)} and {os.path.basename(args.img_b)}")
 
         # Sending the result to the handler
         out_q.put(result.to_json())
