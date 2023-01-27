@@ -759,6 +759,11 @@ class FastDifPy:
             # fetch possible candidates for the row.
             row_a, row_b = self.__fetch_rows(p=p)
 
+            # if the rows are empty => Nothing left to do, skip updating for this process
+            if len(row_a) == 0 and len(row_b) == 0:
+                self.second_loop_in[p].put(None)
+                continue
+
             try:
                 inserted_count = 100 - self.second_loop_in[p].qsize()
 
