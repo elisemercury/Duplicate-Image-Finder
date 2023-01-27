@@ -234,7 +234,9 @@ class CompareImageArguments:
         keys = obj_dict.keys()
 
         target_keys = ["img_a", "img_b", "thumb_a", "thumb_b", "key_a", "key_b", "store_compare", "compare_threshold",
-                       "is_dir_b", "store_path", "size_x", "size_y"]
+                       "is_dir_b", "store_path", "size_x", "size_y", "img_a_size_x", "img_a_size_y", "img_b_size_x",
+                       "img_b_size_y", "img_a_hash_0", "img_a_hash_90", "img_a_hash_180", "img_a_hash_270",
+                       "img_b_hash_0", "img_b_hash_90", "img_b_hash_180", "img_b_hash_270", ]
 
         if not all(x in keys for x in target_keys):
             raise ValueError("Provided Json String doesn't contain the necessary keys.")
@@ -251,6 +253,18 @@ class CompareImageArguments:
                                      store_path=obj_dict["store_path"],
                                      size_x=obj_dict["size_x"],
                                      size_y=obj_dict["size_y"],
+                                     img_a_size_x=obj_dict["img_a_size_x"],
+                                     img_a_size_y=obj_dict["img_a_size_x"],
+                                     img_b_size_x=obj_dict["img_a_size_y"],
+                                     img_b_size_y=obj_dict["img_b_size_x"],
+                                     img_a_hash_0=obj_dict["img_b_size_y"],
+                                     img_a_hash_90=obj_dict["img_a_hash_0"],
+                                     img_a_hash_180=obj_dict["img_a_hash_90"],
+                                     img_a_hash_270=obj_dict["img_a_hash_180"],
+                                     img_b_hash_0=obj_dict["img_a_hash_270"],
+                                     img_b_hash_90=obj_dict["img_b_hash_0"],
+                                     img_b_hash_180=obj_dict["img_b_hash_90"],
+                                     img_b_hash_270=obj_dict["img_b_hash_180"],
                                      )
 
     def to_dict(self):
@@ -272,6 +286,18 @@ class CompareImageArguments:
             "store_path": self.store_path,
             "size_x": self.size_x,
             "size_y": self.size_y,
+            "img_a_size_x": self.img_a_size_x,
+            "img_a_size_y": self.img_a_size_y,
+            "img_b_size_x": self.img_b_size_x,
+            "img_b_size_y": self.img_b_size_y,
+            "img_a_hash_0": self.img_a_hash_0,
+            "img_a_hash_90": self.img_a_hash_90,
+            "img_a_hash_180": self.img_a_hash_180,
+            "img_a_hash_270": self.img_a_hash_270,
+            "img_b_hash_0": self.img_b_hash_0,
+            "img_b_hash_90": self.img_b_hash_90,
+            "img_b_hash_180": self.img_b_hash_180,
+            "img_b_hash_270": self.img_b_hash_270,
         }
 
     def to_json(self):
