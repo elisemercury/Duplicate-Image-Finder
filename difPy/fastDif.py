@@ -532,36 +532,8 @@ class FastDifPy:
                 print("Timeout reached, stopping.")
                 run = False
 
-        # adding Nones just for good measure.
-        counter = 0
-        while not self.first_loop_in.full() and counter < 1000:
-            self.first_loop_in.put(None)
-            counter += 1
-
-        # all processes should be done now, iterating through and killing them if they're still alive.
-        for i in range(len(cpu_handles)):
-            p = cpu_handles[i]
-            try:
-                print(f"Trying to join process {i} Process Alive State is {p.is_alive()}")
-                p.join(1)
-                if p.is_alive():
-                    print(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
-                    p.kill()
-            except TimeoutError:
-                print(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
-                p.kill()
-
-        for i in range(len(gpu_handles)):
-            p = gpu_handles[i]
-            try:
-                print(f"Trying to join process {i + cpu_proc} Process State is {p.is_alive()}")
-                p.join(1)
-                if p.is_alive():
-                    print(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
-                    p.kill()
-            except TimeoutError:
-                print(f"Process {i + cpu_proc} timed out. Alive state: {p.is_alive()}; killing it.")
-                p.kill()
+        self.send_termination_signal(first_loop=True)
+        self.join_all_children()
 
         # try to handle any remaining results that are in the queue.
         for i in range((cpu_proc + gpu_proc) * 2 + self.first_loop_out.qsize()):
