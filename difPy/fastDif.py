@@ -694,7 +694,7 @@ class FastDifPy:
             self.gpu_handles.append(p)
 
         done = False
-
+        count = 0
         # update everything
         while not done:
             # update the queues and store if there are more tasks to process
