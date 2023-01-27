@@ -1049,10 +1049,9 @@ class FastDifPy:
 
         # fetching thumbnails if they exist
         if self.has_thumb_a:
-            thumb_a_path = self.db.get_thumb_name(key=row_a["key"], dir_a=True)
-
+            thumb_a_path = self.get_thumb_path_from_db(key=row_a["key"], dir_a=True)
         if self.has_thumb_b:
-            thumb_b_path = self.db.get_thumb_name(key=row_b["key"], dir_a=False)
+            thumb_b_path = self.get_thumb_path_from_db(key=row_b["key"], dir_a=False)
 
         # performing match if desired
         if self.matching_aspect:
