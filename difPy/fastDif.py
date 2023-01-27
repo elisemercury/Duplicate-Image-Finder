@@ -1017,13 +1017,18 @@ class FastDifPy:
         row_b = []
         assert type(self.second_loop_queue_status) is list, "__fetch_rows called with not_optimized process"
 
+        # we have a directory b
         if self.has_dir_b:
+
+            # we don't keep the images of dir_a fixed but the ones of dir_b
             if not self.second_loop_base_a:
                 row_a = self.db.fetch_many_after_key(directory_a=True, count=count,
                                                      starting=self.second_loop_queue_status[p]["last_key"])
+            # we keep the images of dir a fixed
             else:
                 row_b = self.db.fetch_many_after_key(directory_a=False, count=count,
                                                      starting=self.second_loop_queue_status[p]["last_key"])
+        # we don't have a directory b
         else:
             row_b = self.db.fetch_many_after_key(directory_a=True, count=count,
                                                  starting=self.second_loop_queue_status[p]["last_key"])
