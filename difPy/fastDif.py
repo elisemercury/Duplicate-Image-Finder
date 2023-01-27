@@ -323,8 +323,9 @@ class FastDifPy:
     def get_progress_from_db(self):
         """
         Loads the progress state from the database.
-        WARNING: The programm WILL NOT reindex the files. If you added files in the meantime, the files are NOT going
+        WARNING: The program WILL NOT reindex the files. If you added files in the meantime, the files are NOT going
         compared against!
+
         :return:
         """
 
@@ -334,6 +335,7 @@ class FastDifPy:
     def write_config(self):
         """
         Write the initial config to the database.
+
         :return:
         """
         temp_config = {
