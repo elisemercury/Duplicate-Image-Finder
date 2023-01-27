@@ -348,6 +348,7 @@ class FastDifPy:
         """
         List all the files in directory_a and possibly directory_b and store the paths and filenames in the temporary
         database.
+
         :return:
         """
         # create the tables in the database
@@ -360,6 +361,7 @@ class FastDifPy:
     def __recursive_index(self, dir_a: bool = True, path: str = None, ignore_thumbnail: bool = True):
         """
         Recursively index the directories. This function is called by the index_the_dirs function.
+
         :param ignore_thumbnail: If any directory at any level, starting with .temp_thumb should be ignored.
         :param dir_a: True -> Index dir A. False -> Index dir B
         :param path: The path to the current directory. This is used for recursion.
@@ -392,6 +394,7 @@ class FastDifPy:
     def estimate_disk_usage(self, print_results: bool = True) -> Tuple[int, int]:
         """
         Estimate the diskusage of the thumbnail directory given the compressed image size.
+
         :param print_results: print the results to console
         :return: byte_count_a, byte_count_b
         """
@@ -605,6 +608,7 @@ class FastDifPy:
     def handle_result_of_first_loop(self, res_q: mp.Queue, compute_hash: bool) -> bool:
         """
         Dequeues a result of the results queue and updates the database accordingly.
+
         :param res_q: results queue
         :param compute_hash: if the hash was computed
         :return: if a result was handled.
@@ -666,6 +670,7 @@ class FastDifPy:
                               diff_location: str = None):
         """
         Similarity old values: high - 0.15, medium 200, low 1000
+
         :param only_matching_aspect:
         :param make_diff_plots:
         :param similarity_threshold:
