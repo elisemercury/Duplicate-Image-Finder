@@ -773,6 +773,7 @@ class FastDifPy:
                 inserted_count = 100
 
             not_full = True
+            iterations = 0
             while not_full:
                 # break if the queue is full
                 if self.second_loop_in[p].full():
@@ -780,17 +781,21 @@ class FastDifPy:
 
                 if self.second_loop_base_a:
                     for i in range(len(row_b)):
-                        inserted = self.schedule_pair(row_a=self.second_loop_queue_status[p]["row_a"],
-                                                      row_b=row_b[i], queue_index=p)
-                        inserted_count -= 1 * int(inserted)
-                        inserted += 1
+                        insertion_success = self.schedule_pair(row_a=self.second_loop_queue_status[p]["row_a"],
+                                                               row_b=row_b[i], queue_index=p)
+                        inserted_count -= int(insertion_success)
+                        inserted += int(insertion_success)
 
                 else:
                     for i in range(len(row_a)):
-                        inserted = self.schedule_pair(row_a=row_a[i], row_b=self.second_loop_queue_status[p]["row_b"],
-                                                      queue_index=p)
-                        inserted_count -= 1 * int(inserted)
-                        inserted += 1
+                        insertion_success = self.schedule_pair(row_a=row_a[i],
+                                                               row_b=self.second_loop_queue_status[p]["row_b"],
+                                                               queue_index=p)
+                        inserted_count -= int(insertion_success)
+                        inserted += int(insertion_success)
+
+                # print(f"Row lengths: row_a {len(row_a)}, row_b {len(row_b)}, iteration {iterations}")
+                iterations += 1
 
                 # update last key
                 if self.has_dir_b:
