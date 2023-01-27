@@ -1003,7 +1003,7 @@ class FastDifPy:
             thumb_path = self.db.get_thumb_name(key=rows[0]["key"], dir_a=True)
 
         # update the dict
-        self.second_loop_queue_status[p] = {"row_a": rows[0], "last_key": None, "thumb_path_a": thumb_path}
+        self.second_loop_queue_status[p] = {"row_a": rows[0], "last_key": rows[0]["key"], "thumb_path_a": thumb_path}
         return True
 
     def __fetch_rows(self, p: int, count: int = 100) -> Tuple[list, list]:
