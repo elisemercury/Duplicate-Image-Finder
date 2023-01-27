@@ -1215,10 +1215,10 @@ class FastDifPy:
         # info, results can be fetched twice
         # check on the gpu tasks
         if gpu:
-            error, all_error, exited, all_exited = self.check_futures(self.gpu_handles)
+            error, all_error, exited, all_exited = self.check_processes(self.gpu_handles)
 
         if cpu:
-            er, a_er, ex, a_ex = self.check_futures(self.cpu_handles)
+            er, a_er, ex, a_ex = self.check_processes(self.cpu_handles)
             error = error or er
             all_error = all_error and a_er
             exited = exited or ex
