@@ -23,6 +23,7 @@ class PreprocessArguments:
     def from_json(json_string: str):
         """
         Create a PreprocessArguments object from a json dict. (jsonified by the to_json method of the class)
+
         :param json_string: string to convert to object.
         :return:
         """
@@ -47,6 +48,7 @@ class PreprocessArguments:
     def to_dict(self):
         """
         Convert object to dict
+
         :return:
         """
         return {
@@ -64,6 +66,7 @@ class PreprocessArguments:
     def to_json(self):
         """
         Convert an Object into json string.
+
         :return:
         """
         return json.dumps(self.to_dict())
@@ -93,6 +96,7 @@ class PreprocessResults:
         """
         Create the PreprocessResults Object from a json dict (jsonified by the to_json method of the object)
         :param json_string: string to convert to object.
+
         :return:
         """
         obj_dict = json.loads(json_string)
@@ -154,6 +158,7 @@ class PreprocessResults:
     def to_dict(self):
         """
         Convert object to dict representation
+
         :return:
         """
         return {
@@ -174,6 +179,7 @@ class PreprocessResults:
     def to_json(self):
         """
         Converts an object into json string.
+
         :return:
         """
         return json.dumps(self.to_dict())
@@ -221,6 +227,7 @@ class CompareImageArguments:
         """
         Create the CompareImageArguments Object from a json dict (jsonified by the to_json method of the object)
         :param json_string: string to convert to object.
+
         :return:
         """
         obj_dict = json.loads(json_string)
@@ -249,6 +256,7 @@ class CompareImageArguments:
     def to_dict(self):
         """
         Convert object to dict representation
+
         :return:
         """
         return {
@@ -269,6 +277,7 @@ class CompareImageArguments:
     def to_json(self):
         """
         Convert object to json string
+
         :return:
         """
         return json.dumps(self.to_dict())
@@ -289,6 +298,7 @@ class CompareImageResults:
     def from_json(json_string: str):
         """
         Create the CompareImageResults Object from a json dict (jsonified by the to_json method of the object)
+
         :param json_string: string to convert to object.
         :return:
         """
@@ -310,6 +320,7 @@ class CompareImageResults:
     def to_dict(self):
         """
         Convert object to dict representation
+
         :return:
         """
         return {
@@ -324,6 +335,7 @@ class CompareImageResults:
     def to_json(self):
         """
         Convert object to json string
+
         :return:
         """
         return json.dumps(self.to_dict())
