@@ -1093,7 +1093,7 @@ class FastDifPy:
             return True
         return False
 
-    def handle_results_second_queue(self, max_number: int = None):
+    def handle_results_second_queue(self, max_number: int = None) -> int:
         """
         Dequeue up to max_number of entries of the result queue of the second loop and insert the results into the
         database.
@@ -1105,13 +1105,11 @@ class FastDifPy:
         if max_number is None:
             number_dequeues = 0
 
-            while not self.second_loop_out.empty():
+            while True:
                 if not self.__process_one_second_result():
                     return number_dequeues
 
                 number_dequeues += 1
-
-            return number_dequeues
 
         # we have a max_number
         for i in range(max_number):
