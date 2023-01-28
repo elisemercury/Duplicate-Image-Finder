@@ -1152,7 +1152,7 @@ class FastDifPy:
         :return:
         """
         if first_loop:
-            for i in range((len(self.cpu_handles) + len(self.gpu_handles))* 4):
+            for i in range((len(self.cpu_handles) + len(self.gpu_handles)) * 4):
                 self.first_loop_in.put(None)
 
             return
