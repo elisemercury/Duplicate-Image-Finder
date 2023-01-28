@@ -629,6 +629,7 @@ class FastDifPy:
         if not os.path.exists(diff_location):
             os.makedirs(diff_location)
 
+        self.plot_output_dir = diff_location
         self.db.create_plot_table(purge=purge)
 
     # TODO matching hash
