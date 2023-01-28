@@ -1053,7 +1053,7 @@ class FastDifPy:
             thumb_b=thumb_b_path,
             key_a=row_a["key"],
             key_b=row_b["key"],
-            store_path=self.db.make_plot_name(key_a=row_a["key"], key_b=row_b["key"]) if self.make_diff_plots else None,
+            store_path=self.create_plt_name(key_a=row_a["key"], key_b=row_b["key"]),
             store_compare=self.make_diff_plots,
             compare_threshold=self.similarity_threshold,
             size_x=self.thumbnail_size_x,
@@ -1064,6 +1064,20 @@ class FastDifPy:
         # send task to process
         self.second_loop_in[queue_index].put(arg.to_json())
         return True
+
+    def create_plt_name(self, key_a: int, key_b: int) -> Union[None, str]:
+        """
+        Small function to create a fully qualified path to store the plots.
+
+        :param key_a: key if the first image
+        :param key_b: key of the second image
+        :return: path to the plot or None
+        """
+        if not self.make_diff_plots:
+            return None
+
+        nm = self.db.make_plot_name(key_a=key_a, key_b=key_b)
+        return os.path.join(self.plot_output_dir, nm)
 
     @staticmethod
     def match_aspect(row_a: dict, row_b: dict):
