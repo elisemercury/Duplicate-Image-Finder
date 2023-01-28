@@ -1028,11 +1028,17 @@ class FastDifPy:
         thumb_a_path = None
         thumb_b_path = None
 
-        # fetching thumbnails if they exist
-        if self.has_thumb_a:
-            thumb_a_path = self.get_thumb_path_from_db(key=row_a["key"], dir_a=True)
-        if self.has_thumb_b:
-            thumb_b_path = self.get_thumb_path_from_db(key=row_b["key"], dir_a=False)
+        if self.has_dir_b:
+            if self.has_thumb_a:
+                thumb_a_path = self.get_thumb_path_from_db(key=row_a["key"], dir_a=True)
+            if self.has_thumb_b:
+                thumb_b_path = self.get_thumb_path_from_db(key=row_b["key"], dir_a=False)
+
+        else:
+            # all to all one dir
+            if self.has_thumb_a:
+                thumb_a_path = self.get_thumb_path_from_db(key=row_a["key"], dir_a=True)
+                thumb_b_path = self.get_thumb_path_from_db(key=row_b["key"], dir_a=True)
 
         # performing match if desired
         if self.matching_aspect:
