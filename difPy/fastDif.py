@@ -658,6 +658,9 @@ class FastDifPy:
         if make_diff_plots:
             self.create_plot_dir(diff_location=diff_location)
 
+            if type(similarity_threshold) is int:
+                similarity_threshold = float(similarity_threshold)
+
             if similarity_threshold < 0:
                 raise ValueError("Similarity needs to be greater than 0")
 
