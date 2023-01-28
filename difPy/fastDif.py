@@ -217,7 +217,7 @@ class FastDifPy:
 
     second_loop_in: List[mp.Queue] = None
     second_loop_out: mp.Queue = None
-    
+
     second_loop_queue_status: Union[List[dict], dict] = None
     second_loop_base_a: bool = True
 
@@ -225,6 +225,7 @@ class FastDifPy:
     has_thumb_b: bool = False
     matching_aspect: bool = False
     make_diff_plots: bool = False
+    plot_output_dir: str = None
 
     cpu_handles = None
     gpu_handles = None
