@@ -507,7 +507,7 @@ class ImageProcessing:
         :return:
         """
         min_diff = min(self.diff_0, self.diff_90, self.diff_180, self.diff_270)
-        if self.processing_args.store_compare and self.processing_args.compare_threshold < min_diff:
+        if self.processing_args.store_compare and self.processing_args.compare_threshold > min_diff:
             self.create_compare_plot()
 
     def create_compare_plot(self):
