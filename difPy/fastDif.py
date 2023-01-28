@@ -724,8 +724,8 @@ class FastDifPy:
         self.handle_results_second_queue()
 
         # check if the tasks were empty.
-        assert not self.handle_results_second_queue(), "Existed without having run out of tasks and without all processes " \
-                                                       "having stopped."
+        assert not self.handle_results_second_queue(), "Existed without having run out of tasks and without all " \
+                                                       "processes having stopped."
 
     def update_queues(self):
         results = self.__refill_queues()
@@ -816,7 +816,8 @@ class FastDifPy:
 
                     row_a, row_b = self.__fetch_rows(p=p)
 
-                    # case when we are at the last image (which can only be compared against itself, ergo nothing to do)spo
+                    # case when we are at the last image (which can only be compared against itself,
+                    # ergo nothing to do)
                     if len(row_a) == 0 and len(row_b) == 0:
                         print("End of Images Reached")
                         break
