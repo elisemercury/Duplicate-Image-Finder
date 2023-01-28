@@ -523,15 +523,18 @@ class ImageProcessing:
 
         # plot first image
         ax = fig.add_subplot(1, 2, 1)
+        ax.title.set_text(os.path.basename(self.processing_args.img_a))
         plt.imshow(self.image_a_matrix, cmap=plt.cm.gray)
         plt.axis("off")
 
         # plot second image
         ax = fig.add_subplot(1, 2, 2)
+        ax.title.set_text(os.path.basename(self.processing_args.img_b))
         plt.imshow(self.image_b_matrix, cmap=plt.cm.gray)
         plt.axis("off")
 
-        plt.show(block=False)
+        # Don't show plot, clears the figure and an empty plot is aved.
+        # plt.show(block=False)
         # show the images
         plt.savefig(self.processing_args.store_path)
         plt.close()
