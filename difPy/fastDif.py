@@ -929,20 +929,12 @@ class FastDifPy:
 
         if self.second_loop_base_a:
             for row in rows:
-                temp = {"row_a": row, "last_key": None if self.has_dir_b else row["key"], "thumb_path_a": None}
-
-                if self.has_thumb_a:
-                    result = self.db.get_thumb_name(key=row["key"], dir_a=True)
-                    temp["thumb_path_a"] = result[1] if result is not None else None  # populate if the result is valid
+                temp = {"row_a": row, "last_key": None if self.has_dir_b else row["key"]}
 
                 self.second_loop_queue_status.append(temp)
         else:
             for row in rows:
-                temp = {"row_b": row, "last_key": None, "thumb_path_b": None}
-
-                if self.has_thumb_b:
-                    result = self.db.get_thumb_name(key=row["key"], dir_a=False)
-                    temp["thumb_path_b"] = result[1] if result is not None else None  # populate if the result is valid
+                temp = {"row_b": row, "last_key": None}
 
                 self.second_loop_queue_status.append(temp)
 
@@ -979,13 +971,8 @@ class FastDifPy:
                         self.second_loop_in[p].put(None)
                     return False
 
-                # fetch thumbnail path
-                thumb_path = None
-                if self.db.test_thumb_table_existence(dir_a=False):
-                    thumb_path = self.db.get_thumb_name(key=rows[0]["key"], dir_a=False)
-
                 # update the dict
-                self.second_loop_queue_status[p] = {"row_b": rows[0], "last_key": None, "thumb_path_a": thumb_path}
+                self.second_loop_queue_status[p] = {"row_b": rows[0], "last_key": None}
                 return True
 
         rows = self.db.fetch_many_after_key(directory_a=True, starting=next_key, count=1)
@@ -996,13 +983,8 @@ class FastDifPy:
                 self.second_loop_in[p].put(None)
             return False
 
-        # fetch thumbnail path
-        thumb_path = None
-        if self.db.test_thumb_table_existence(dir_a=True):
-            thumb_path = self.db.get_thumb_name(key=rows[0]["key"], dir_a=True)
-
         # update the dict
-        self.second_loop_queue_status[p] = {"row_a": rows[0], "last_key": rows[0]["key"], "thumb_path_a": thumb_path}
+        self.second_loop_queue_status[p] = {"row_a": rows[0], "last_key": rows[0]["key"]}
         return True
 
     def __fetch_rows(self, p: int, count: int = 100) -> Tuple[list, list]:
