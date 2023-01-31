@@ -564,19 +564,19 @@ class Database:
         """
         self.debug_execute(f"DROP TABLE hash_table")
 
-    def insert_hash(self, fhash: str, dir_a: bool, dir_key: int, rotation: int):
+    def insert_hash(self, file_hash: str, dir_a: bool, dir_key: int, rotation: int):
         """
         Insert a hash into the hash table.
 
-        :param fhash: hash to insert
+        :param file_hash: hash to insert
         :param dir_a: if the file is in dir_a or dir_b
         :param dir_key: key of the file in the directory table
         :param rotation: rotation of the file
         :return:
         """
         dir_a_num = 1 if dir_a else 0
-        self.debug_execute(f"INSERT INTO hash_table (hash, dir_a, dir_key, rotation) VALUES ('{fhash}', {dir_a_num},"
-                           f" {dir_key}, {rotation})")
+        self.debug_execute(f"INSERT INTO hash_table (hash, dir_a, dir_key, rotation) VALUES ('{file_hash}', "
+                           f"{dir_a_num}, {dir_key}, {rotation})")
 
     def has_all_hashes(self, dir_a: bool, dir_key: int):
         """
