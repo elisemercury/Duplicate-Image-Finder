@@ -220,6 +220,7 @@ class FastDifPy:
     second_loop_queue_status: Union[List[dict], dict] = None
     second_loop_base_a: bool = True
 
+    matching_hash: bool = False
     has_thumb_a: bool = False
     has_thumb_b: bool = False
     matching_aspect: bool = False
