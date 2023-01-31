@@ -657,6 +657,7 @@ class FastDifPy:
         # storing arguments in attributes to reduce number of args of function
         self.matching_aspect = only_matching_aspect
         self.make_diff_plots = make_diff_plots
+        self.matching_hash = only_matching_hash
 
         self.has_thumb_a = self.db.test_thumb_table_existence(dir_a=True)
         self.has_thumb_b = self.db.test_thumb_table_existence(dir_a=False)
@@ -678,17 +679,16 @@ class FastDifPy:
         # create queues
         self.second_loop_out = mp.Queue()
         self.second_loop_in = mp.Queue()
+
         if not self.less_optimized:
             self.second_loop_in = [mp.Queue() for _ in range(cpu_proc + gpu_proc)]
-
-        self.db.create_dif_table()
-
-        if self.less_optimized:
-            child_args = [(self.second_loop_in, self.second_loop_out, i, False if i < cpu_proc else True)
-                          for i in range(gpu_proc + cpu_proc)]
-        else:
             child_args = [(self.second_loop_in[i], self.second_loop_out, i, False if i < cpu_proc else True)
                           for i in range(gpu_proc + cpu_proc)]
+        else:
+            child_args = [(self.second_loop_in, self.second_loop_out, i, False if i < cpu_proc else True)
+                          for i in range(gpu_proc + cpu_proc)]
+
+        self.db.create_dif_table()
 
         # prefill
         self.__init_queues(procs=gpu_proc + cpu_proc)
