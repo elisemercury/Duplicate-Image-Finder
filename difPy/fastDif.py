@@ -833,16 +833,15 @@ class FastDifPy:
         :param init: if init, start all loops from 0 and initialize the status to dict
         :return: number of images inserted into queues.
         """
+        last_a = None
+        last_b = None
+
         if not init:
             last_a = self.second_loop_queue_status["last_a"]
             last_b = self.second_loop_queue_status["last_b"]
-        else:
-            # start from zero since we want to walk along the entire list.
-            last_a = None
-            last_b = None
 
         # initialize loop vars
-        procs = len(self.second_loop_in)
+        procs = len(self.cpu_handles) + len(self.gpu_handles)
         queue_index = 0
 
         add_count = 0
