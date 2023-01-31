@@ -675,7 +675,7 @@ class FastDifPy:
         self.db.create_dif_table()
 
         child_args = [(self.second_loop_in[i], self.second_loop_out, i, False if i < cpu_proc else True)
-                      for i in range(gpu_proc, cpu_proc)]
+                      for i in range(gpu_proc + cpu_proc)]
 
         # prefill
         self.init_queues(procs=gpu_proc + cpu_proc)
