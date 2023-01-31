@@ -8,7 +8,6 @@ import multiprocessing as mp
 import queue
 from difPy.datatransfer import *
 from difPy.image_processor import ImageProcessing
-from concurrent.futures import ProcessPoolExecutor, Future
 
 """
 Fast implementation of the DifPy Library.
