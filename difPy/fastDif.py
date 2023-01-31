@@ -214,7 +214,7 @@ class FastDifPy:
     first_loop_in: mp.Queue = None  # the tasks sent to the child processes
     first_loop_out: mp.Queue = None  # the results coming from the child processes
 
-    second_loop_in: List[mp.Queue] = None
+    second_loop_in: Union[List[mp.Queue], mp.Queue] = None
     second_loop_out: mp.Queue = None
 
     second_loop_queue_status: Union[List[dict], dict] = None
@@ -228,6 +228,8 @@ class FastDifPy:
 
     cpu_handles = None
     gpu_handles = None
+
+    less_optimized: bool = False
 
     def __init__(self, directory_a: str, directory_b: str = None, test_db: bool = True):
         """
@@ -670,15 +672,21 @@ class FastDifPy:
 
         # create queues
         self.second_loop_out = mp.Queue()
-        self.second_loop_in = [mp.Queue() for _ in range(cpu_proc + gpu_proc)]
+        self.second_loop_in = mp.Queue()
+        if not self.less_optimized:
+            self.second_loop_in = [mp.Queue() for _ in range(cpu_proc + gpu_proc)]
 
         self.db.create_dif_table()
 
-        child_args = [(self.second_loop_in[i], self.second_loop_out, i, False if i < cpu_proc else True)
-                      for i in range(gpu_proc + cpu_proc)]
+        if self.less_optimized:
+            child_args = [(self.second_loop_in, self.second_loop_out, i, False if i < cpu_proc else True)
+                          for i in range(gpu_proc + cpu_proc)]
+        else:
+            child_args = [(self.second_loop_in[i], self.second_loop_out, i, False if i < cpu_proc else True)
+                          for i in range(gpu_proc + cpu_proc)]
 
         # prefill
-        self.init_queues(procs=gpu_proc + cpu_proc)
+        self.__init_queues(procs=gpu_proc + cpu_proc)
 
         # starting all processes
         for i in range(cpu_proc):
@@ -902,7 +910,114 @@ class FastDifPy:
         self.second_loop_queue_status = {"last_a": last_a, "last_b": last_b}
         return add_count if add_count > 0 else None
 
-    def init_queues(self, procs: int):
+    def __refill_queues_non_optimized(self, init: bool = False) -> Union[int, None]:
+        """
+        Refilling queues without the load optimized algorithm.
+
+        :param init: Create new status, and initialize the dict
+        :return: number of images inserted into queues.
+        """
+        assert self.less_optimized, "This functions needs to be called in the less_optimized mode since it assumes " \
+                                    "that the attribute second_loop_in is of type mp.Queue and not List[mp.Queue]"
+        # initialize loop vars
+        procs = len(self.cpu_handles) + len(self.gpu_handles)
+
+        add_count = 0
+        current_count = 0
+
+        last_a = None
+        last_b = None
+
+        if not init:
+            last_a = self.second_loop_queue_status["last_a"]
+            last_b = self.second_loop_queue_status["last_b"]
+
+        if not init:
+            current_a = self.db.fetch_one_key(key=last_a, directory_a=True)
+            next_a = self.db.fetch_many_after_key(directory_a=True, starting=last_a, count=1)
+            if len(next_a) == 0:
+                next_a = None
+        else:
+            # Case of init
+            rows = self.db.fetch_many_after_key(directory_a=True, starting=last_a, count=2)
+            if len(rows) == 0:
+                raise ValueError("No Rows in Directory A Table")
+
+            elif len(rows) == 1:
+                current_a = rows[0]
+                next_a = None
+
+            else:
+                current_a = rows[0]
+                next_a = rows[1]
+
+        while add_count < procs * 100:
+
+            # fetch the rows for the next queue
+            if self.has_dir_b:
+                rows_b = self.db.fetch_many_after_key(directory_a=False, starting=last_b, count=100 * procs)
+            else:
+                rows_b = self.db.fetch_many_after_key(directory_a=True, starting=last_b, count=100 * procs)
+
+            # end reached. increment the indexes
+            if len(rows_b) == 0:
+                # We have reached the end.
+                if next_a is None:
+                    self.second_loop_queue_status = {"last_a": last_a, "last_b": last_b}
+                    return add_count if add_count > 0 else None
+
+                # increment the variables.
+                current_a = next_a
+                last_a = current_a["key"]
+                rows = self.db.fetch_many_after_key(directory_a=True, starting=last_a, count=1)
+
+                # resetting the next rows
+                if len(rows) == 0:
+                    next_a = None
+                else:
+                    next_a = rows[0]
+
+                last_b = None
+
+                # updating the last_b bc we can save us some effort if we don't compute the all to all but the triangle
+                # matrix.
+                if not self.has_dir_b:
+                    last_b = last_a
+
+                # We go back to the beginning just for good measure.
+                continue
+
+            # scheduling the rows
+            for i in range(len(rows_b)):
+                row = rows_b[i]
+
+                if self.second_loop_in.full():
+                    if i != 0:
+                        # updating the last_b entry
+                        last_b = rows_b[i-1]["key"]
+
+                    current_count = 0
+                    continue
+
+                success = self.schedule_pair(row_a=current_a, row_b=row, queue_index=None)
+                current_count += int(success)
+                add_count += int(success)
+
+                # limit reached
+                if current_count >= 100:
+                    if i != 0:
+                        # updating the last_b entry
+                        last_b = rows_b[i - 1]["key"]
+
+                    current_count = 0
+                    continue
+
+            last_b = rows_b[-1]["key"]
+
+        self.second_loop_queue_status = {"last_a": last_a, "last_b": last_b}
+        return add_count if add_count > 0 else None
+
+    def __init_queues(self, procs: int):
         # from a fetch the first set of images
         rows = self.db.fetch_many_after_key(directory_a=True, count=procs)
         self.second_loop_base_a = True
@@ -922,6 +1037,11 @@ class FastDifPy:
             else:
                 self.__refill_queues_small_non_optimized(init=True)
                 return
+
+        # we are using less optimized, so we are going straight for the not optimized algorithm.
+        if self.less_optimized:
+            self.__refill_queues_non_optimized(init=True)
+            return
 
         # populating the files of the second loop.
         self.second_loop_queue_status = []
@@ -1014,7 +1134,7 @@ class FastDifPy:
                                                  starting=self.second_loop_queue_status[p]["last_key"])
         return row_a, row_b
 
-    def schedule_pair(self, row_a: dict, row_b: dict, queue_index: int):
+    def schedule_pair(self, row_a: dict, row_b: dict, queue_index: Union[None, int]):
         """
         Given two rows from the database, performs the checks necessary to schedule them. If they pass, send them to the
         respective queue.
@@ -1061,7 +1181,10 @@ class FastDifPy:
         )
 
         # send task to process
-        self.second_loop_in[queue_index].put(arg.to_json())
+        if not self.less_optimized:
+            self.second_loop_in[queue_index].put(arg.to_json())
+        else:
+            self.second_loop_in.put(arg.to_json())
         return True
 
     def create_plt_name(self, key_a: int, key_b: int) -> Union[None, str]:
