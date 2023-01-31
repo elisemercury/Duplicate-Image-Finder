@@ -628,6 +628,30 @@ class Database:
         self.debug_execute(f"UPDATE hash_table SET hash = '{file_hash}' "
                            f"WHERE dir_a = {dir_a_num} AND dir_key = {dir_key} AND rotation = {rotation}")
 
+    def get_hash_of_key(self, key: int, dir_a: bool = True) -> tuple:
+        """
+        Get the hashes associated with a certain image.
+
+        :param key: the key of the image in the directory table
+        :param dir_a: if the image is in directory a or not.
+        :return: [Hash 0, Hash 90, Hash 180, Hash 270]
+        """
+        dir_a_num = 1 if dir_a else 0
+        self.debug_execute(f"SELECT hash, rotation FROM hash_table WHERE dir_key = {key} AND dir_a = {dir_a_num} "
+                           f"ORDER BY rotation ASC ")
+        rows = self.cur.fetchmany(4)
+
+        # if there's a row missing, add
+        if len(rows) < 4:
+            return None, None, None, None
+
+        assert rows[0][1] == 0, "First Rotation not 0 degrees."
+        assert rows[1][1] == 90, "Second Rotation not 90 degrees."
+        assert rows[2][1] == 180, "First Rotation not 180 degrees."
+        assert rows[3][1] == 270, "First Rotation not 270 degrees."
+
+        return rows[0][0], rows[1][0], rows[2][0], rows[3][0]
+
     # ------------------------------------------------------------------------------------------------------------------
     # ERROR TABLE
     # ------------------------------------------------------------------------------------------------------------------
