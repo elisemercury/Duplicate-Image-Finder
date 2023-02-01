@@ -746,6 +746,8 @@ class FastDifPy:
         assert not self.handle_results_second_queue(), "Existed without having run out of tasks and without all " \
                                                        "processes having stopped."
 
+        self.db.con.commit()
+
     def update_queues(self):
         results = self.__refill_queues()
         return self.handle_results_second_queue(results)
