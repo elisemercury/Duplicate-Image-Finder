@@ -644,7 +644,7 @@ class FastDifPy:
     # TODO matching hash
     def second_loop_iteration(self, only_matching_aspect: bool = False, only_matching_hash: bool = False,
                               make_diff_plots: bool = False, similarity_threshold: float = 200.0, gpu_proc: int = 0,
-                              cpu_proc: int = 16, diff_location: str = None):
+                              cpu_proc: int = None, diff_location: str = None):
         """
         Similarity old values: high - 0.15, medium 200, low 1000
 
@@ -657,6 +657,10 @@ class FastDifPy:
         :param diff_location:
         :return:
         """
+        assert gpu_proc >= 0, "Number of GPU Processes needs to be greater than zero"
+        if cpu_proc is None:
+            cpu_proc = mp.cpu_count()
+
         # storing arguments in attributes to reduce number of args of function
         self.matching_aspect = only_matching_aspect
         self.make_diff_plots = make_diff_plots
