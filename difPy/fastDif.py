@@ -451,9 +451,12 @@ class FastDifPy:
         return os.path.join(directory, name)
 
     def first_loop_iteration(self, compute_thumbnails: bool = True, compute_hash: bool = False, amount: int = 4,
-                             gpu_proc: int = 0, cpu_proc: int = 16, purge: bool = True):
+                             gpu_proc: int = 0, cpu_proc: int = None, purge: bool = True):
 
-        # TODO MAKE EVERYTHING WITH ProcesspoolExecutor
+        assert gpu_proc >= 0, "Number of GPU Processes needs to be greater than zero"
+        if cpu_proc is None:
+            cpu_proc = mp.cpu_count()
+
         # store thumbnails if possible.
         if compute_hash:
             if amount == 0:
