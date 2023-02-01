@@ -1387,7 +1387,14 @@ class FastDifPy:
 
         return error, all_error, exited, all_exited
 
-    def get_thumb_path_from_db(self, key: int, dir_a: bool):
+    def get_thumb_path_from_db(self, key: int, dir_a: bool) -> Union[None, str]:
+        """
+        Get a new thumbnail name from the database. Combine it with the specified path from this object.
+
+        :param key: key in directory table
+        :param dir_a: if the file is in directory a
+        :return: thumbnail path or None
+        """
         thumb_name = self.db.get_thumb_name(key=key, dir_a=dir_a)
 
         # exit immediately if the file doesn't exist
