@@ -453,10 +453,38 @@ class FastDifPy:
 
     def first_loop_iteration(self, compute_thumbnails: bool = True, compute_hash: bool = False, amount: int = 4,
                              gpu_proc: int = 0, cpu_proc: int = None, purge: bool = True):
+        """
+        Perform the preprocessing step. I.e. compute hashes, get image sizes, resize the images and store the
+        thumbnails.
+
+        ----------------------------------------------------------------------------------------------------------------
+
+        Hashing:
+        After the image has been resized, the bits of each r, g and b value are shifted by the amount specified in the
+        amount parameter. If the amount is greater than 0, the bytes are right shifted, if the amount is smaller than 0,
+        the pixels are left shifted.
+
+        ----------------------------------------------------------------------------------------------------------------
+
+        The program doesn't support hdr image formates and only allocates one byte per channel per pixel. Consequently
+        10bit images for example are not supported. They are downconverted. # TODO Verify!!!
+
+
+        :param compute_thumbnails: Resize images and store them temporarely
+        :param compute_hash: Compute hashes of the image
+        :param amount: shift amount before hash
+        :param gpu_proc: number of processes using gpu [not implemented]
+        :param cpu_proc: number of cpu processes. Default number of system cores.
+        :param purge: if the database should be purged before the loop runs.
+        :return:
+        """
 
         assert gpu_proc >= 0, "Number of GPU Processes needs to be greater than zero"
         if cpu_proc is None:
             cpu_proc = mp.cpu_count()
+
+        if gpu_proc > 0:
+            print("Currently not implemented, adding to cpu procs.")
 
         # store thumbnails if possible.
         if compute_hash:
