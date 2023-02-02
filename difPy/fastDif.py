@@ -37,6 +37,7 @@ Features:
 # TODO  Use of file names / zero difference to detect images which differ only in the metadata.
 # TODO keyboard shortcuts pyinput
 
+
 def cpu_process_image(proc: ImageProcessing, args: PreprocessArguments) -> PreprocessResults:
     """
     Function to execute preprocessing with the ImageProcessing Class
