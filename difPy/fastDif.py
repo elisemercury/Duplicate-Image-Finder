@@ -1009,7 +1009,7 @@ class FastDifPy:
                 if self.second_loop_in.full():
                     if i != 0:
                         # updating the last_b entry
-                        last_b = rows_b[i-1]["key"]
+                        last_b = rows_b[i - 1]["key"]
 
                     current_count = 0
                     continue
