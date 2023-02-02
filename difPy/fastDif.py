@@ -608,7 +608,7 @@ class FastDifPy:
 
     def handle_result_of_first_loop(self, res_q: mp.Queue, compute_hash: bool) -> bool:
         """
-        Dequeues a result of the results queue and updates the database accordingly.
+        Dequeues a result of the first loop results queue and updates the database accordingly.
 
         :param res_q: results queue
         :param compute_hash: if the hash was computed
@@ -654,11 +654,24 @@ class FastDifPy:
         return True
 
     def clean_up(self):
+        """
+        Remove thumbnails and db.
+
+        :return:
+        """
         # TODO remove the thumbnails
         # TODO remove database (if desired)
         print("Not implemented yet")
 
     def create_plot_dir(self, diff_location: str, purge: bool = False):
+        """
+        Verifies the provided directory, creates if it doesn't exist.
+        Initializes the Database for plot names as well.
+
+        :param diff_location: path to plot where the plots are to be saved
+        :param purge: purge the plot database before running.
+        :return:
+        """
         if diff_location is None:
             raise ValueError("If plots are to be generated, an output folder needs to be specified.")
         if not os.path.isdir(diff_location):
