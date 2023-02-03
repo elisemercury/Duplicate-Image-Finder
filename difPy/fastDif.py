@@ -1015,10 +1015,7 @@ class FastDifPy:
         while add_count < procs * 100:
 
             # fetch the rows for the next queue
-            if self.has_dir_b:
-                rows_b = self.db.fetch_many_after_key(directory_a=False, starting=last_b, count=100 * procs)
-            else:
-                rows_b = self.db.fetch_many_after_key(directory_a=True, starting=last_b, count=100 * procs)
+            rows_b = self.db.fetch_many_after_key(directory_a=not self.__has_dir_b, starting=last_b, count=100 * procs)
 
             # end reached. increment the indexes
             if len(rows_b) == 0:
