@@ -1076,6 +1076,12 @@ class FastDifPy:
         return add_count if add_count > 0 else None
 
     def __init_queues(self, procs: int):
+        """
+        Initialize the state describing variables as well as the queues for the second loop.
+
+        :param procs: number of processes that are running
+        :return:
+        """
         # from a fetch the first set of images
         rows = self.db.fetch_many_after_key(directory_a=True, count=procs)
         self.second_loop_base_a = True
