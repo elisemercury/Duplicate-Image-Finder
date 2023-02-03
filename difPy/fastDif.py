@@ -562,14 +562,19 @@ class FastDifPy:
                 run = False
 
         self.send_termination_signal(first_loop=True)
-        self.join_all_children()
 
+        counter = 0
         # try to handle any remaining results that are in the queue.
-        for i in range((cpu_proc + gpu_proc) * 2 + self.first_loop_out.qsize()):
+        while counter < 5:
             if not self.handle_result_of_first_loop(self.first_loop_out, compute_hash):
-                break
+                counter += 1
+                continue
 
-        assert self.first_loop_out.empty(), "Result queue is not empty after all processes have been killed."
+            counter = 0
+
+        self.join_all_children()
+        assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
+                                            f"Remaining: {self.first_loop_out.qsize()}"
         print("All Images have been preprocessed.")
 
     def __generate_first_loop_obj(self, amount: int, compute_hash: bool, compute_thumbnails: bool) \
