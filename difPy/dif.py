@@ -15,12 +15,13 @@ import collections
 from pathlib import Path
 import argparse
 import json
+import shutil
 import warnings
 warnings.filterwarnings('ignore')
 
 class dif:
 
-    def __init__(self, directory_A, directory_B=None, recursive=True, similarity="normal", px_size=50, show_progress=True, show_output=False, delete=False, silent_del=False):
+    def __init__(self, directory_A, directory_B=None, recursive=True, similarity="normal", px_size=50, show_progress=True, show_output=False, delete=False, silent_del=False, mv_to=None):
         """
         directory_A (str)........folder path to search for duplicate/similar images
         directory_B (str)........second folder path to search for duplicate/similar images
@@ -95,8 +96,11 @@ class dif:
 
         
         if len(result) != 0:
-            # optional delete images
-            if delete:
+            # optional move images
+            if mv_to:
+                dif._move_imgs(set(lower_quality), mv_to)
+            elif delete:
+                # optional delete images
                 if not silent_del:
                     usr = input("Are you sure you want to delete all lower resolution duplicate images? \nThis cannot be undone. (y/n)")
                     if str(usr) == "y":
@@ -401,6 +405,20 @@ class dif:
                 print("Could not delete file:", file, end="\r")
         print("\n***\nDeleted", deleted, "images.")
 
+    # Function for Moving the lower quality images that were found after the search
+    def _move_imgs(lower_quality_set, location):
+        mv = 0
+        # move lower quality images
+        for file in lower_quality_set:
+            print("\move in progress...", end="\r")
+            try:
+                shutil.move(file, location)
+                print("move file:", file, end="\r")
+                mv += 1
+            except:
+                print("Could not move file:", file, end="\r")
+        print("\n***\Moved", mv, "images.")
+
 def type_str_int(x):
     try:
         return int(x)
@@ -421,13 +439,16 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--show_output", type=bool, help='(optional) Shows the comapred images in real-time.', required=False, nargs='?', choices=[True, False], default=False)
     parser.add_argument("-d", "--delete", type=bool, help='(optional) Deletes all duplicate images with lower quality.', required=False, nargs='?', choices=[True, False], default=False)
     parser.add_argument("-D", "--silent_del", type=bool, help='(optional) Supresses the user confirmation when deleting images.', required=False, nargs='?', choices=[True, False], default=False)
+    parser.add_argument("-M", "--move_to", type=str, help='(optional) Move dups to given directory.', required=False, nargs='?', default=None)
     args = parser.parse_args()
     print(f"args {args}")
+
     # initialize difPy
     search = dif(directory_A=args.directory_A, directory_B=args.directory_B,
                  recursive=args.recursive, similarity=args.similarity, px_size=args.px_size, 
                  show_output=args.show_output, show_progress=args.show_progress, 
-                 delete=args.delete, silent_del=args.silent_del)
+                 delete=args.delete, silent_del=args.silent_del,
+                 mv_to=args.mv_to)
 
     # create filenames for the output files
     timestamp =str(time.time()).replace(".", "_")
