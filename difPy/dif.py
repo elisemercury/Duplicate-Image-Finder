@@ -21,7 +21,7 @@ warnings.filterwarnings('ignore')
 
 class dif:
 
-    def __init__(self, directory_A, directory_B=None, recursive=True, similarity="normal", px_size=50, show_progress=True, show_output=False, delete=False, silent_del=False, mv_to=None):
+    def __init__(self, directory_A, directory_B=None, recursive=True, similarity="normal", px_size=50, show_progress=True, show_output=False, delete=False, silent_del=False, move_to=None):
         """
         directory_A (str)........folder path to search for duplicate/similar images
         directory_B (str)........second folder path to search for duplicate/similar images
@@ -97,8 +97,8 @@ class dif:
         
         if len(result) != 0:
             # optional move images
-            if mv_to:
-                dif._move_imgs(set(lower_quality), mv_to)
+            if move_to:
+                dif._move_imgs(set(lower_quality), move_to)
             elif delete:
                 # optional delete images
                 if not silent_del:
@@ -448,7 +448,7 @@ if __name__ == "__main__":
                  recursive=args.recursive, similarity=args.similarity, px_size=args.px_size, 
                  show_output=args.show_output, show_progress=args.show_progress, 
                  delete=args.delete, silent_del=args.silent_del,
-                 mv_to=args.mv_to)
+                 move_to=args.move_to)
 
     # create filenames for the output files
     timestamp =str(time.time()).replace(".", "_")
