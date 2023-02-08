@@ -1466,6 +1466,128 @@ class FastDifPy:
         thumb_dir = self.thumb_dir_a if dir_a else self.thumb_dir_b
         return os.path.join(thumb_dir, thumb_name[1])
 
+    def build_lose_duplicate_cluster(self, similarity: float = None):
+        """
+        Function generates a list of dicts containing duplicates. Each dict in the list satisfies that there exists at
+        least ONE path between each two images. It is NOT guaranteed that within a cluster each pair of images matches
+        the similarity threshold.
+
+        This function is implemented in RAM only. If the dataset to deduplicate is too large, it is possible that this $
+        function fails due to insufficient memory. A Database driven solution might exist in the future.
+        # TODO link DB solution.
+
+        Alternatively, there's also the functionality to create a process which reads out the database and fills a
+        queue. That way each pair of duplicates images can be processed separately by an external application.
+
+        :param similarity: The average difference between the pixels that should be allowed. If left empty, it reuses
+        the value from the call to second_loop_iteration
+        :return:
+        """
+        if similarity is None:
+            similarity = self.similarity_threshold
+
+        if similarity <= 0:
+            raise ValueError("No Similarity provided and / or similarity_threshold from second loop not usable.")
+
+        all_duplicate_pairs = self.db.get_all_matching_pairs(similarity)
+
+        clusters: Dict[str, list] = {}
+        cluster_id: dict = {}
+
+        next_id = 0
+        count = 0
+        for row in all_duplicate_pairs:
+            if count % 100 == 0:
+                print(f"Done with {count}", end="\r", flush=True)
+            count += 1
+
+            # get the data from the rows
+            key_a = row[1]
+            key_b = row[2]
+            b_dir_b = row[3]  # could be realized through self.has_dir_B
+
+            # prepare for the data structure of ram
+            graph_key_a = f"a_{key_a}"
+            graph_key_b = f"a_{key_b}" * b_dir_b + f"b_{key_b}" * (1 - b_dir_b)
+
+            # get the cluster for the keys
+            cluster_id_a = cluster_id.get(graph_key_a)
+            cluster_id_b = cluster_id.get(graph_key_b)
+
+            next_id = self.process_pair(cluster_id_a, cluster_id_b, next_id, clusters, cluster_id,
+                                        graph_key_a, graph_key_b)
+
+    @staticmethod
+    def process_pair(cluster_id_a: str, cluster_id_b: str, next_id: int, clusters: Dict[str, list], cluster_id: dict,
+                     graph_key_a: str, graph_key_b: str):
+        """
+        Given a pair of graph_keys and cluster_ids, update the clusters and the cluster_ids dict accordingly.
+
+        :param cluster_id_a: The id of the cluster in which graph_key_a is.
+        :param cluster_id_b: The id of the cluster in which graph_key_b is.
+        :param next_id: The next cluster_id that should be used if a new one was to be created
+        :param clusters: Dict containing the clusters. [cluster_id, list of graph_keys]
+        :param cluster_id: Dict containing the cluster_ids of every graph_key
+        :param graph_key_a: The key of image a in correct format
+        :param graph_key_b: The key of image b in correct format
+        :return: the next id.
+        """
+
+        # No key is in a cluster, creating a new one.
+        if cluster_id_a is None and cluster_id_b is None:
+            new_cluster_id = str(next_id)
+
+            clusters[new_cluster_id] = [graph_key_a, graph_key_b]
+            cluster_id[graph_key_a] = new_cluster_id
+            cluster_id[graph_key_b] = new_cluster_id
+            return next_id + 1
+
+        # We add image_a to the cluster in which image_b is located.
+        elif cluster_id_a is None and cluster_id_b is not None:
+            clusters[cluster_id_b].append(graph_key_a)
+            cluster_id[graph_key_a] = cluster_id_b
+            return next_id
+
+        # We add image_b to the cluster in which image_a is located
+        elif cluster_id_a is not None and cluster_id_b is None:
+            clusters[cluster_id_a].append(graph_key_b)
+            cluster_id[graph_key_b] = cluster_id_a
+
+        # We have two clusters that need to be merged. or a duplicate row
+        else:
+            if cluster_id_a == cluster_id_b:
+                print("WARNING: Duplicate row found!!!\n")
+
+            # We merge the two clusters into one.
+            else:
+                print("DEBUGGING; Merging clusters\n")
+                # Select the smaller cluster to merge it into the larger cluster
+                if len(clusters[cluster_id_a]) < len(clusters[cluster_id_b]):
+
+                    # changing the cluster id
+                    for graph_key in clusters[cluster_id_a]:
+                        cluster_id[graph_key] = cluster_id_b
+
+                    # copy the stuff over.
+                    clusters[cluster_id_b].extend(clusters[cluster_id_a])
+
+                    # dropping cluster_a
+                    del clusters[cluster_id_a]
+
+                else:
+                    # changing the cluster id
+                    for graph_key in clusters[cluster_id_b]:
+                        cluster_id[graph_key] = cluster_id_a
+
+                    # copy the stuff over.
+                    clusters[cluster_id_a].extend(clusters[cluster_id_b])
+
+                    # dropping cluster_a
+                    del clusters[cluster_id_b]
+                return next_id
+
+    def find_best_image(self, ):
+
     # ------------------------------------------------------------------------------------------------------------------
     # PROPERTIES
     # ------------------------------------------------------------------------------------------------------------------
