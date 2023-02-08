@@ -803,6 +803,17 @@ class Database:
 
         return True
 
+    def get_all_matching_pairs(self, threshold: float):
+        """
+        Fetches all pairs in the dif table matching the threshold and which terminated successfully.
+
+        :param threshold: in avg diff.
+        :return:
+        """
+        self.debug_execute(f"SELECT * FROM dif_table WHERE dif >= 0 AND dif < {threshold}")
+        return self.cur.fetchall()
+
+
     # ------------------------------------------------------------------------------------------------------------------
     # COMMON FUNCTIONS
     # ------------------------------------------------------------------------------------------------------------------
