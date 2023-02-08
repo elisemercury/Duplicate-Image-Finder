@@ -221,6 +221,7 @@ class FastDifPy:
     second_loop_queue_status: Union[List[dict], dict] = None
     second_loop_base_a: bool = True
 
+    # argument storage
     matching_hash: bool = False
     has_thumb_a: bool = False
     has_thumb_b: bool = False
@@ -228,6 +229,7 @@ class FastDifPy:
     make_diff_plots: bool = False
     plot_output_dir: str = None
 
+    # multiprocessing handles
     cpu_handles = None
     gpu_handles = None
 
