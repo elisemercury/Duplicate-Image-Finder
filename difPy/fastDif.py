@@ -796,6 +796,7 @@ class FastDifPy:
                                                        "processes having stopped."
 
         self.db.con.commit()
+        print("Data should be committed")
 
     def update_queues(self):
         results = self.__refill_queues()
