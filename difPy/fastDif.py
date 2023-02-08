@@ -1,7 +1,7 @@
 import time
 from difPy.database import Database
 import os
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 import warnings
 from difPy.utils import *
 import multiprocessing as mp
