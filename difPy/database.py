@@ -659,7 +659,7 @@ class Database:
     def create_dif_table(self, purge: bool = False):
         """
         Create the dif table. If purge is true, drop a preexisting dif table.
-
+        # TODO need to store thee question of something is dir b in other place.
         :param purge: if True, purge the table before creating it.
         :return:
         """
