@@ -195,7 +195,7 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
     return True
 
 
-def find_best_image(filepaths: list, comparator: FunctionType = None):
+def find_best_image(args: Tuple[list, FunctionType]):
     """
     Function which selects the best image out of a list. It is assumed that the images are all deemed to be duplicates.
     The comparator is a function taking two string arguments, representing two *absolute* filepaths.
@@ -208,11 +208,11 @@ def find_best_image(filepaths: list, comparator: FunctionType = None):
     def simple_comp(fpa: str, fpb: str):
         return os.stat(fpa).st_size < os.stat(fpb).st_size
 
-    :param filepaths: list of absolute filepaths
-    :param comparator: comparison function.
-    :return: {"filename": <best image>, "location": <path to best image>, "duplicates": list of abs filepaths of
-                duplicates}
+    :param args: The arguments as tuple. list: list of absolute filepaths, comparator: function to compare files with.
+    :return: {"filename": <best image>, "location": <path to best image>}, list of the duplicates
     """
+    filepaths = args[0]
+    comparator = args[1]
     current_best = filepaths[0]
 
     # comparator if nothing is provided.
