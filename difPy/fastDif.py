@@ -1525,11 +1525,11 @@ class FastDifPy:
     def build_lose_duplicate_cluster(self, similarity: float = None):
         """
         Function generates a list of dicts containing duplicates. Each dict in the list satisfies that there exists at
-        least ONE path between each two images. It is NOT guaranteed that within a cluster each pair of images matches
-        the similarity threshold.
+        least **one** path between each two images. It is **not** guaranteed that within a cluster each pair of images
+        matches the similarity threshold.
 
-        This function is implemented in RAM only. If the dataset to deduplicate is too large, it is possible that this $
-        function fails due to insufficient memory. A Database driven solution might exist in the future.
+        This function is implemented in **RAM** only. If the dataset to deduplicate is too large, it is possible that
+        this function fails due to insufficient memory. A Database driven solution might exist in the future.
         # TODO link DB solution.
 
         Alternatively, there's also the functionality to create a process which reads out the database and fills a
