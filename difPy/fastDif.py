@@ -23,9 +23,6 @@ Features:
 
 
 # TODO test cuda functionality
-# TODO create unified handler for the parallel functions
-# TODO Make a skeleton for the parallel process
-# TODO Test the whole shit.
 # TODO single processing handler
 # TODO Reset Processing Class if the arguments are switched.
 
