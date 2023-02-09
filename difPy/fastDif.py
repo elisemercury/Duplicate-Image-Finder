@@ -1644,7 +1644,48 @@ class FastDifPy:
                     del clusters[cluster_id_b]
                 return next_id
 
-    def find_best_image(self, ):
+    def find_best_image(self, cluster: Dict[str, list], comparator: FunctionType = None):
+        """
+        Given a dict of clusters, go through the clusters and determine the best image based on a comparator function.
+
+        :param comparator: function to use to determine best image in set of duplicates.
+        :param cluster: dict containing lists.
+        :return: dict containing the diplicate clusters and a list of all lower quality image filepaths.
+        """
+        fp_list = []
+        for cluster_id, images in cluster.items():
+            if len(images) > 1000:
+                print("DEBUG: Excessive amount of duplicates found.")
+
+            if len(images) == 0:
+                print("WARNING: Found empty images list")
+
+            filepaths = []
+
+            for image in images:
+                directory, key = image.split("_")
+                info = self.db.fetch_one_key(key=key, directory_a=directory == "a")
+                filepaths.append(info["path"])
+
+            fp_list.append((filepaths, comparator))
+
+        # create an executor
+        ppe = ProcessPoolExecutor()
+        results = ppe.map(find_best_image, fp_list)
+
+        # process results
+        lower_quality = []
+        output = {}
+        for result in results:
+            # unpacking tuple
+            res_dict, dups = result
+
+            # updating global info.
+            lower_quality.extend(dups)
+            res_dict["duplicates"] = dups
+            output[datetime.datetime.utcnow().timestamp()] = res_dict
+
+        return output, lower_quality
 
     # ------------------------------------------------------------------------------------------------------------------
     # PROPERTIES
