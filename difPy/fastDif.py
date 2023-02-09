@@ -195,6 +195,49 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
     return True
 
 
+def find_best_image(filepaths: list, comparator: FunctionType = None):
+    """
+    Function which selects the best image out of a list. It is assumed that the images are all deemed to be duplicates.
+    The comparator is a function taking two string arguments, representing two *absolute* filepaths.
+    Because the comparison is only happening once, function must impose a *total order* on the files.
+
+    --------------------------------------------------------------------------------------------------------------------
+
+    If no function is provided, the default is file size:
+
+    def simple_comp(fpa: str, fpb: str):
+        return os.stat(fpa).st_size < os.stat(fpb).st_size
+
+    :param filepaths: list of absolute filepaths
+    :param comparator: comparison function.
+    :return: {"filename": <best image>, "location": <path to best image>, "duplicates": list of abs filepaths of
+                duplicates}
+    """
+    current_best = filepaths[0]
+
+    # comparator if nothing is provided.
+    def simple_comp(fpa: str, fpb: str):
+        return os.stat(fpa).st_size < os.stat(fpb).st_size
+
+    if comparator is None:
+        comparator = simple_comp
+
+    # get best image based on comparator
+    for i in range(1,  len(filepaths)):
+        if comparator(current_best, filepaths[i]):
+            current_best = filepaths[i]
+
+    result = {"filename": os.path.basename(current_best), "location": current_best, "duplicates": []}
+    duplicates = []
+
+    for fp in filepaths:
+        if fp == current_best:
+            continue
+        duplicates.append(fp)
+
+    return result, duplicates
+
+
 class FastDifPy:
     p_db: str
     __p_root_dir_a: str
