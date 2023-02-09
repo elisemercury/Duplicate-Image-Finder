@@ -1,4 +1,5 @@
 import datetime
+import shutil
 import time
 from difPy.database import Database
 import os
@@ -252,7 +253,7 @@ class FastDifPy:
 
     supported_file_types = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".gif", ".webp"}
 
-    db: Database
+    db: Union[Database, None]
 
     # relative to child processes
     first_loop_in: mp.Queue = None  # the tasks sent to the child processes
@@ -703,14 +704,31 @@ class FastDifPy:
         self.db.con.commit()
         return True
 
-    def clean_up(self):
+    def clean_up(self, thumbs: bool = True, db: bool = True):
         """
         Remove thumbnails and db.
 
+        :param thumbs: Delete Thumbnail directories
+        :param db: Delete Database
         :return:
         """
-        # TODO remove the thumbnails
-        # TODO remove database (if desired)
+        if thumbs:
+            print("Deleting Thumbnails")
+            try:
+                shutil.rmtree(self.thumb_dir_a)
+                print(f"Deleted {self.thumb_dir_a}")
+            except FileNotFoundError:
+                pass
+            try:
+                shutil.rmtree(self.thumb_dir_b)
+                print(f"Deleted {self.thumb_dir_b}")
+            except FileNotFoundError:
+                pass
+
+        if db:
+            self.db.disconnect()
+            self.db = None
+
         print("Not implemented yet")
 
     def create_plot_dir(self, diff_location: str, purge: bool = False):
