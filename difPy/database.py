@@ -847,6 +847,14 @@ class Database:
         self.con = sqlite3.connect(path)
         self.cur = self.con.cursor()
 
+    def disconnect(self):
+        """
+        Disconnect from the Database
+        :return:
+        """
+        self.con.commit()
+        self.con.close()
+
     @staticmethod
     def to_b64(to_encode: Any):
         """
