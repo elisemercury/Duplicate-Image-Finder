@@ -1560,11 +1560,11 @@ class FastDifPy:
             # get the data from the rows
             key_a = row[1]
             key_b = row[2]
-            b_dir_b = row[3]  # could be realized through self.has_dir_B
+            b_dir_b = int(row[3])  # could be realized through self.has_dir_B
 
             # prepare for the data structure of ram
             graph_key_a = f"a_{key_a}"
-            graph_key_b = f"a_{key_b}" * b_dir_b + f"b_{key_b}" * (1 - b_dir_b)
+            graph_key_b = f"b_{key_b}" * b_dir_b + f"a_{key_b}" * (1 - b_dir_b)
 
             # get the cluster for the keys
             cluster_id_a = cluster_id.get(graph_key_a)
@@ -1572,6 +1572,8 @@ class FastDifPy:
 
             next_id = self.process_pair(cluster_id_a, cluster_id_b, next_id, clusters, cluster_id,
                                         graph_key_a, graph_key_b)
+
+        return clusters
 
     @staticmethod
     def process_pair(cluster_id_a: str, cluster_id_b: str, next_id: int, clusters: Dict[str, list], cluster_id: dict,
