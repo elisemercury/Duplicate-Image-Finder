@@ -758,13 +758,13 @@ class FastDifPy:
         """
         Similarity old values: high - 0.15, medium 200, low 1000
 
-        :param only_matching_aspect:
-        :param only_matching_hash:
-        :param make_diff_plots:
-        :param similarity_threshold:
-        :param gpu_proc:
-        :param cpu_proc:
-        :param diff_location:
+        :param only_matching_aspect: The images must match precisely in their size (in px)
+        :param only_matching_hash: The images must have at least one matching hash.
+        :param make_diff_plots: If the images which are duplicates should be plotted.
+        :param similarity_threshold: The mean square average between pictures for them to be considered identical.
+        :param gpu_proc: number of gpu processes. (Currently not implemented)
+        :param cpu_proc: number of cpu processes. Default number of cpus on the system.
+        :param diff_location: Where the plots should be stored (needs to be provided if make_diff_plots is true)
         :return:
         """
         assert gpu_proc >= 0, "Number of GPU Processes needs to be greater than zero"
