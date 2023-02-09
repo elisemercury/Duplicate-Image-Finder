@@ -335,7 +335,7 @@ class Database:
         :return:
         """
         tbl_name = "directory_a" if directory_a else "directory_b"
-        self.debug_execute(f"SELECT * FROM {tbl_name} WHERE key = {id}")
+        self.debug_execute(f"SELECT * FROM {tbl_name} WHERE key = {key}")
         return self.all_to_dict_dir(self.cur.fetchone(), dir_a=directory_a)
 
     # ------------------------------------------------------------------------------------------------------------------
