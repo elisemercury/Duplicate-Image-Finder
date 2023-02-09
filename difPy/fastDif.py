@@ -1586,8 +1586,8 @@ class FastDifPy:
         :param next_id: The next cluster_id that should be used if a new one was to be created
         :param clusters: Dict containing the clusters. [cluster_id, list of graph_keys]
         :param cluster_id: Dict containing the cluster_ids of every graph_key
-        :param graph_key_a: The key of image a in correct format
-        :param graph_key_b: The key of image b in correct format
+        :param graph_key_a: The key of image_a in correct format
+        :param graph_key_b: The key of image_b in correct format
         :return: the next id.
         """
 
