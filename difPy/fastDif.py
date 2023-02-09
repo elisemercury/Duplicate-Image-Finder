@@ -1512,6 +1512,16 @@ class FastDifPy:
         thumb_dir = self.thumb_dir_a if dir_a else self.thumb_dir_b
         return os.path.join(thumb_dir, thumb_name[1])
 
+    def get_duplicates(self, similarity: float = None):
+        """
+        Builds the duplicates clusters. The function returns the
+
+        :param similarity:
+        :return:
+        """
+        clusters = self.build_lose_duplicate_cluster(similarity)
+        return self.find_best_image(clusters)
+
     def build_lose_duplicate_cluster(self, similarity: float = None):
         """
         Function generates a list of dicts containing duplicates. Each dict in the list satisfies that there exists at
