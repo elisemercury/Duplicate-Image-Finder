@@ -724,7 +724,7 @@ class Database:
             return False
 
         self.debug_execute(f"INSERT INTO dif_table (key_a, key_b, b_dir_b, success, error) "
-                           f"VALUES ({key_a}, {key_b}, {1 if b_dir_b else 0, 1}, 0, '{error}')")
+                           f"VALUES ({key_a}, {key_b}, {1 if b_dir_b else 0}, 0, '{error}')")
         return True
 
     def get_by_pair(self, key_a: int, key_b: int):
