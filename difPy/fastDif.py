@@ -1622,10 +1622,10 @@ class FastDifPy:
 
         This function is implemented in **RAM** only. If the dataset to deduplicate is too large, it is possible that
         this function fails due to insufficient memory. A Database driven solution might exist in the future.
-        # TODO link DB solution.
 
         Alternatively, there's also the functionality to create a process which reads out the database and fills a
         queue. That way each pair of duplicates images can be processed separately by an external application.
+        See *spawn_duplicate_worker*
 
         :param similarity: The average difference between the pixels that should be allowed. If left empty, it reuses
         the value from the call to second_loop_iteration
