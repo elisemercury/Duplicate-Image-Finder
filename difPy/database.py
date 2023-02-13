@@ -745,6 +745,9 @@ class Database:
 
     @staticmethod
     def all_to_dict_dif(row: tuple):
+        if row is None:
+            return None
+
         return {
             "key": row[0],
             "key_a": row[1],
