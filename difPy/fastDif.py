@@ -1538,6 +1538,82 @@ class FastDifPy:
         clusters = self.build_lose_duplicate_cluster(similarity)
         return self.find_best_image(clusters)
 
+    def spawn_duplicate_worker(self, queue_size: int = 1000, start_id: int = None, threshold: float = 200) \
+            -> Tuple[mp.Queue, th.Thread]:
+        """
+        Function creates a worker thread which continuously enqueues dicts of each matching pair into the returned
+        transfer queue.
+
+        The queue will contain dicts with the following keys:
+        key: id of that dif pair in the dif table. (can be provided as start id)
+        key_a: key of the first file in the directory table
+        key_b: key of the second file in the directory table
+        b_dir_b: if the second file is in the b directory or the a directory
+        path_X: path to file a or b
+        filename_X: filename of file a or b
+        px_X: horizontal pixel count of file a or b
+        py_X: vertical pixel count of file a or b
+
+        :param queue_size: max_size the queue can reach
+        :param start_id: from which key the thread should start adding the matching pairs
+                (in case the process got stopped)
+        :param threshold: differernce value below something must lay for it to be considered to be a duplicate.
+        :return: queue containing dicts of the matching pairs, thread object that is filling the queue.
+        """
+        transfer_queue = mp.Queue(maxsize=queue_size)
+        process = th.Thread(target=self.continuous_dequeue_worker, args=(transfer_queue, start_id, threshold))
+        process.start()
+        return transfer_queue, process
+
+    def continuous_dequeue_worker(self, out_queue: mp.Queue, start: int = None, threshold: float = 200):
+        """
+        Worker function for get_duplicates. Performs the fetching from db, wrapping in dicts and putting in queue.
+
+        The queue will contain dicts with the following keys:
+        key: id of that dif pair in the dif table. (can be provided as start id)
+        key_a: key of the first file in the directory table
+        key_b: key of the second file in the directory table
+        b_dir_b: if the second file is in the b directory or the a directory
+        path_X: path to file a or b
+        filename_X: filename of file a or b
+        px_X: horizontal pixel count of file a or b
+        py_X: vertical pixel count of file a or b
+
+        :param out_queue: queue to put the wrapped results into
+        :param start: starting key in dif table
+        :param threshold: measurement under which the difference must lay.
+        :return: None
+        """
+        # get initial number of pairs and make sure they are not empty.
+        pairs = self.db.get_many_pairs(threshold=threshold, start_key=start)
+        if len(pairs) == 0:
+            return
+
+        while True:
+            # process each pair and put it in a queue.
+            for p in pairs:
+                key_a = self.db.fetch_one_key(key=p["key_a"], directory_a=True)
+                key_b = self.db.fetch_one_key(key=p["key_b"], directory_a=not p["b_dir_b"])
+                p["path_a"] = key_a["path_a"]
+                p["filename_a"] = key_a["filename_a"]
+                p["px_a"] = key_a["px_a"]
+                p["py_a"] = key_a["py_a"]
+                p["path_b"] = key_b["path_b"]
+                p["filename_b"] = key_b["filename_b"]
+                p["px_b"] = key_b["px_b"]
+                p["py_b"] = key_b["py_b"]
+                del p["dif"]
+                del p["error"]
+                del p["success"]
+
+                out_queue.put(p, block=True)
+
+            last_key = pairs[-1]["key"]
+            pairs = self.db.get_many_pairs(threshold=threshold, start_key=last_key)
+
+            if len(pairs) == 0:
+                return
+
     def build_lose_duplicate_cluster(self, similarity: float = None):
         """
         Function generates a list of dicts containing duplicates. Each dict in the list satisfies that there exists at
