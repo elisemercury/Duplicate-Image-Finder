@@ -758,6 +758,19 @@ class Database:
             "success": row[6]
         }
 
+    @staticmethod
+    def wrap_many_dict_dif(rows: List[tuple]):
+        """
+        Wraps a list of rows in dictionaries.
+
+        :param rows: rows to wrap
+        :return:
+        """
+        result = []
+        for row in rows:
+            result.append(Database.all_to_dict_dif(row))
+        return result
+
     def get_by_table_key(self, key: int):
         """
         Get a row by the table key. Return the row wrapped in a dict tor None if it doesn't exist.
