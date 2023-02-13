@@ -829,6 +829,24 @@ class Database:
         self.debug_execute(f"SELECT * FROM dif_table WHERE dif >= 0 AND dif < {threshold}")
         return self.cur.fetchall()
 
+    def get_many_pairs(self, threshold: float, start_key: int = None, count: int = 1000):
+        """
+        Fetch duplicate pairs from the database. If a start is provided, selecting anything going further from there.
+
+        :param count: number of pairs to fetch.
+        :param threshold: below what the dif value needs to be.
+        :param start_key: larger than that the diff needs to be.
+        :return: tuples from
+        """
+        # fetching from the beginning
+        if start_key is None:
+            self.debug_execute(f"SELECT * FROM dif_table WHERE dif >= 0 AND dif < {threshold} ORDER BY key ASC")
+            return self.cur.fetchmany(count)
+
+        # fetching from starting key.
+        self.debug_execute(f"SELECT * FROM dif_table WHERE dif >= 0 AND dif < {threshold} AND key > {start_key} "
+                           f"ORDER BY key ASC")
+        return self.wrap_many_dict_dif(self.cur.fetchmany(count))
 
     # ------------------------------------------------------------------------------------------------------------------
     # COMMON FUNCTIONS
