@@ -206,7 +206,6 @@ class ImageProcessing:
         :param args: new CoompareImageArguments object to process
         :return:
         """
-        # TODO use os.stat to update a or b if the file has changed
         self.processing_args = args
         self.error = ""
         load_a = False
