@@ -195,7 +195,7 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
     return True
 
 
-def find_best_image(args: Tuple[list, FunctionType]):
+def find_best_image(args: Tuple[list, FunctionType]) -> Tuple[dict, list]:
     """
     Function which selects the best image out of a list. It is assumed that the images are all deemed to be duplicates.
     The comparator is a function taking two string arguments, representing two *absolute* filepaths.
