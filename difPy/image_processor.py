@@ -515,7 +515,6 @@ class ImageProcessing:
 
         :return:
         """
-        # TODO revisite plot
         fig = plt.figure()
         min_diff = min(self.diff_0, self.diff_90, self.diff_180, self.diff_270)
         plt.suptitle(f"MSE: {min_diff:.2f}")
