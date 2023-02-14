@@ -370,12 +370,12 @@ class ImageProcessing:
         """
         Private function that handles the basic loading and type conversion for an image. Errors are returned as a
         result and not stored in the class because if you load thumbnails, the error has not to be as severe as to
-        prevent the computation from completing. That's why it's returned and the caller needs to detmine what
+        prevent the computation from completing. That's why it's returned and the caller needs to determine what
         happens with the error.
 
         :param img_path: path to load from.
         :param source: the source of the image. Used for the error message
-        :return:
+        :return: image or none, error message, if image needs to be rescaled
         """
         # load from fs
         try:
