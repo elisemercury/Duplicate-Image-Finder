@@ -135,6 +135,7 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
     """
     Parallel implementation of first loop iteration.
 
+    :param debug: adds more print statements to get an overview about the executing workers.
     :param in_q: input queue containing arguments dict or
     :param out_q: output queue containing only json strings of obj
     :param identifier: id of running thread
