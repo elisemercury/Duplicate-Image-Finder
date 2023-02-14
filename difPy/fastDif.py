@@ -730,8 +730,8 @@ class FastDifPy:
         if db:
             self.db.disconnect()
             self.db = None
-
-        print("Not implemented yet")
+            os.remove(self.db.path)
+            print("Deleted temporary database")
 
     def create_plot_dir(self, diff_location: str, purge: bool = False):
         """
