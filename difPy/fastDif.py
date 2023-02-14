@@ -1536,7 +1536,7 @@ class FastDifPy:
         :param similarity:
         :return:
         """
-        clusters = self.build_lose_duplicate_cluster(similarity)
+        clusters = self.build_loose_duplicate_cluster(similarity)
         return self.find_best_image(clusters)
 
     def spawn_duplicate_worker(self, queue_size: int = 1000, start_id: int = None, threshold: float = 200) \
@@ -1615,7 +1615,7 @@ class FastDifPy:
             if len(pairs) == 0:
                 return
 
-    def build_lose_duplicate_cluster(self, similarity: float = None):
+    def build_loose_duplicate_cluster(self, similarity: float = None):
         """
         Function generates a list of dicts containing duplicates. Each dict in the list satisfies that there exists at
         least **one** path between each two images. It is **not** guaranteed that within a cluster each pair of images
