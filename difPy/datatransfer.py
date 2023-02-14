@@ -122,6 +122,16 @@ class PreprocessResults:
 
     @staticmethod
     def error_obj(in_path: str, out_path: str, error: str, key: int, dir_a: bool):
+        """
+        Wrapper for init method in case of error.
+
+        :param in_path: original source file
+        :param out_path: the thumbnail destination
+        :param error: encountered error
+        :param key: key of file in directory table
+        :param dir_a: if file was in dir a
+        :return:
+        """
         return PreprocessResults(
             in_path=in_path,
             out_path=out_path,
@@ -139,6 +149,18 @@ class PreprocessResults:
 
     @staticmethod
     def no_hash_init(in_path: str, out_path: str, original_x: int, original_y: int, key: int, dir_a: bool):
+        """
+        Wrapper for init method in case where no hashes were computed.
+
+
+        :param in_path: original source file
+        :param out_path: the thumbnail destination
+        :param key: key of file in directory table
+        :param dir_a: if file was in dir a
+        :param original_x: number of horizontal pixels
+        :param original_y: number of vertical pixels
+        :return:
+        """
         return PreprocessResults(
             in_path=in_path,
             out_path=out_path,
