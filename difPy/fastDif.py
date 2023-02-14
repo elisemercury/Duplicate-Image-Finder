@@ -38,6 +38,7 @@ Features:
 # TODO Use of binary differentiation to detect hard file duplicates
 # TODO  Use of file names / zero difference to detect images which differ only in the metadata.
 # TODO keyboard shortcuts pyinput
+# TODO different shift amounts for different colors.
 
 
 def cpu_process_image(proc: ImageProcessing, args: PreprocessArguments) -> PreprocessResults:

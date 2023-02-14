@@ -5,7 +5,6 @@ from typing import Union
 
 @dataclass
 class PreprocessArguments:
-    # TODO different amounts for different colors.
     key: int
     in_path: str
     out_path: str
