@@ -460,7 +460,7 @@ class Database:
     # HASH TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
-    def create_hash_table(self, purge: bool = False) :
+    def create_hash_table(self, purge: bool = False):
         """
         Create the config table and insert a config dictionary.
 
