@@ -700,8 +700,7 @@ class FastDifPy:
                                 rotation=270)
 
         # mark file as processed only if the other data was inserted.
-        self.db.update_dir_success(key=result_obj.key, dir_a=result_obj.dir_a, px=result_obj.original_x,
-                                   py=result_obj.original_y)
+        self.db.update_dir_success(key=result_obj.key, px=result_obj.original_x, py=result_obj.original_y)
 
         # to be sure commit here.
         self.db.con.commit()
