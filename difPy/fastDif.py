@@ -489,7 +489,7 @@ class FastDifPy:
         :param dir_a: if the file is located in directory a or b
         :return: the thumbnail path.
         """
-        name = self.db.get_thumb_name(key, dir_a=dir_a)
+        name = self.db.get_thumb_name(key)
         directory = self.thumb_dir_a if dir_a else self.thumb_dir_b
 
         # return the name if it existed already
@@ -1510,7 +1510,7 @@ class FastDifPy:
         :param dir_a: if the file is in directory a
         :return: thumbnail path or None
         """
-        thumb_name = self.db.get_thumb_name(key=key, dir_a=dir_a)
+        thumb_name = self.db.get_thumb_name(key=key)
 
         # exit immediately if the file doesn't exist
         if thumb_name is None:
