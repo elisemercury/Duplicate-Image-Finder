@@ -179,15 +179,13 @@ class Database:
         self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'directory'")
         return self.cur.fetchone() is not None
 
-    def drop_dir(self, dir_a: bool = True):
+    def drop_dir(self):
         """
         Drop a table related to the directories.
 
-        :param dir_a: if True, drop dir A table, else drop dir b table.
         :return:
         """
-        tbl_name = "directory_a" if dir_a else "directory_b"
-        self.debug_execute(f"DROP TABLE {tbl_name}")
+        self.debug_execute(f"DROP TABLE directory")
 
     def add_file(self, path: str, filename: str, dir_a: bool = True):
         """
