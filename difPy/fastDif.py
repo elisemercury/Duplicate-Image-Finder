@@ -1757,7 +1757,7 @@ class FastDifPy:
 
             for image in images:
                 directory, key = image.split("_")
-                info = self.db.fetch_one_key(key=key, directory_a=directory == "a")
+                info = self.db.fetch_one_key(key=key)
                 filepaths.append(info["path"])
 
             fp_list.append((filepaths, comparator))
