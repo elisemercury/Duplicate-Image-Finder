@@ -399,7 +399,7 @@ class FastDifPy:
         :return:
         """
         # create the tables in the database
-        self.db.create_directory_tables(secondary_folder=self.has_dir_b)
+        self.db.create_directory_tables()
 
         self.__recursive_index(True)
         if self.has_dir_b:
