@@ -306,18 +306,13 @@ class Database:
                            "dir_b INTEGER DEFAULT 0 CHECK (dir_b >= 0 AND dir_b <= 1),"
                            "UNIQUE (filename, dir_b)  )")
 
-        if secondary_folder:
-            self.debug_execute("CREATE TABLE thumb_b ( key INTEGER PRIMARY KEY, filename TEXT UNIQUE )")
-
-    def test_thumb_table_existence(self, dir_a: bool = True):
+    def test_thumb_table_existence(self):
         """
-        Check the table for thumbnails of directory X, exists. DOES NOT VERIFY THE TABLE DEFINITION!
+        Check the table for thumbnails of directory table, exists. DOES NOT VERIFY THE TABLE DEFINITION!
 
-        :param dir_a: True if dir_a, False if dir_b
         :return:
         """
-        tbl_name = "thumb_a" if dir_a else "thumb_b"
-        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS '{tbl_name}'")
+        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'thumb'")
         return self.cur.fetchone() is not None
 
     def drop_thumb(self, dir_a: bool = True):
