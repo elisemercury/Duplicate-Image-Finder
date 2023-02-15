@@ -289,11 +289,10 @@ class Database:
     # THUMBNAIL FILENAME TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
-    def create_thumb_table(self, secondary_folder: bool = False, purge: bool = False):
+    def create_thumb_table(self, purge: bool = False):
         """
         Create tables which contain the names of the thumbnails ( to make sure there's no collisions ahead of time)
 
-        :param secondary_folder: if True, create a table for the secondary folder as well.
         :param purge: if True, purge the tables before creating them.
         :return:
         """
@@ -304,13 +303,13 @@ class Database:
 
             if self.test_thumb_table_existence(True):
                 print("Dropping directory A table.")
-                self.drop_thumb(True)
+                self.drop_thumb()
 
-            if self.test_thumb_table_existence(False):
-                print("Dropping directory B table.")
-                self.drop_thumb(False)
-
-        self.debug_execute("CREATE TABLE thumb_a ( key INTEGER PRIMARY KEY, filename TEXT UNIQUE )")
+        self.debug_execute("CREATE TABLE thumb ( "
+                           "key INTEGER PRIMARY KEY, "
+                           "filename TEXT , "
+                           "dir_b INTEGER DEFAULT 0 CHECK (dir_b >= 0 AND dir_b <= 1),"
+                           "UNIQUE (filename, dir_b)  )")
 
         if secondary_folder:
             self.debug_execute("CREATE TABLE thumb_b ( key INTEGER PRIMARY KEY, filename TEXT UNIQUE )")
