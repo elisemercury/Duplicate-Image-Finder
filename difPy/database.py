@@ -170,15 +170,13 @@ class Database:
             result.append(Database.all_to_dict_dir(row))
         return result
 
-    def test_dir_table_existence(self, dir_a: bool = True):
+    def test_dir_table_existence(self):
         """
         Check the table for directory X, exists. DOES NOT VERIFY THE TABLE DEFINITION!
 
-        :param dir_a: True if dir_a, False if dir_b
         :return:
         """
-        tbl_name = "directory_a" if dir_a else "directory_b"
-        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS '{tbl_name}'")
+        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'directory'")
         return self.cur.fetchone() is not None
 
     def drop_dir(self, dir_a: bool = True):
