@@ -26,7 +26,6 @@ class Database:
         self.connect(path)
         self.a_done = False
         self.b_done = False
-        self.has_b = None
 
     # ------------------------------------------------------------------------------------------------------------------
     # CONFIG TABLE
