@@ -200,15 +200,18 @@ class Database:
         self.debug_execute(f"INSERT INTO directory (path, filename, dir_b) "
                            f"VALUES ('{path}', '{filename}', {0 if dir_a else 1})")
 
-    def get_dir_count(self, dir_a: bool = True):
+    def get_dir_count(self, dir_a: Union[bool, None] = None):
         """
-        Get the number of files in the directory.
+        Get the number of files in the directory table.
 
-        :param dir_a: if True, get count of dir_a, else get count of dir_b
+        :param dir_a: True, count of dir_a, False, count of dir_b, None count of both.
         :return:
         """
-        tbl_name = "directory_a" if dir_a else "directory_b"
-        self.debug_execute(f"SELECT COUNT(key) FROM {tbl_name}")
+        if dir_a is None:
+            self.debug_execute(f"SELECT COUNT(key) FROM directory")
+            return self.cur.fetchone()[0]
+
+        self.debug_execute(f"SELECT COUNT(key) FROM directory WHERE dir_b = {0 if dir_a else 1}")
         return self.cur.fetchone()[0]
 
     def update_dir_success(self, key: int, dir_a: bool = True, px: int = -1, py: int = -1):
