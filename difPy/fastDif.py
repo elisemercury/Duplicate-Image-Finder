@@ -680,7 +680,7 @@ class FastDifPy:
 
         # Handle the case when an error occurred.
         if not result_obj.success:
-            self.db.update_dir_error(key=result_obj.key, dir_a=result_obj.dir_a, msg=result_obj.error)
+            self.db.update_dir_error(key=result_obj.key, msg=result_obj.error)
             return True
 
         # store the hash if computed
