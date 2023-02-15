@@ -296,7 +296,7 @@ class Database:
         if purge:
             print("Purging preexisting indexes of directories.")
 
-            if self.test_thumb_table_existence(True):
+            if self.test_thumb_table_existence():
                 print("Dropping directory A table.")
                 self.drop_thumb()
 
