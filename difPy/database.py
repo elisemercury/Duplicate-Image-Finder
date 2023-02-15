@@ -226,18 +226,16 @@ class Database:
         """
         self.debug_execute(f"UPDATE directory SET proc_suc = 1, px = {px}, py = {py} WHERE key = {key}")
 
-    def update_dir_error(self, key: int, msg: str, dir_a: bool = True):
+    def update_dir_error(self, key: int, msg: str):
         """
         Set the flag for error of the file with the matching key. Set it in either table_a or table_b
         Error is stored in plane text atm (It might be necessary to store it in b64.
 
         :param key: file identifier which is to be updated
-        :param dir_a: TRUE <=> update directory_a, ELSE update directory_b
         :param msg: error message created when attempting to process the file.
         """
-        tbl_name = "directory_a" if dir_a else "directory_b"
         msg_b64 = base64.b64encode(msg.encode("utf-8")).decode("ascii")
-        self.debug_execute(f"UPDATE {tbl_name} SET proc_suc = 0, error='{msg_b64}' WHERE key = {key}")
+        self.debug_execute(f"UPDATE directory SET proc_suc = 0, error='{msg_b64}' WHERE key = {key}")
 
     def get_next_to_process(self):
         """
