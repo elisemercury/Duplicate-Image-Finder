@@ -239,42 +239,13 @@ class Database:
 
     def get_next_to_process(self):
         """
-        Get an unprocessed entry from (one) of the directory table (s). Returns None per default to signify that
-        there's nothing to be computed.
+        Get an unprocessed entry from the directory table. Returns None per default to signify that there's nothing to
+        be computed.
 
         :return: Next one to compute or None
         """
-        if not self.a_done:
-            self.debug_execute("SELECT * FROM directory_a WHERE proc_suc = -1")
-            res = self.cur.fetchone()
-
-            if res is None:
-                self.a_done = True
-
-            return self.all_to_dict_dir(res, dir_a=True)
-
-        # if the has_b attribute is not computed, set it here.
-        if self.has_b is None:
-            self.has_b = self.test_dir_table_existence(dir_a=False)
-
-            # Only needs to be eval. here since if it doesn't exist, we don't need to query the db. if it exists,
-            # there's no need to recheck the has condition every time.
-            if not self.has_b:
-                self.b_done = True
-                return None
-
-        # query b table
-        if not self.b_done:
-            self.debug_execute("SELECT * FROM directory_b WHERE proc_suc = -1")
-            res = self.cur.fetchone()
-
-            if res is None:
-                self.b_done = True
-
-            return self.all_to_dict_dir(res, dir_a=False)
-
-        # return None is the fall through and the default
-        return None
+        self.debug_execute("SELECT * FROM directory WHERE proc_suc = -1")
+        return self.all_to_dict_dir(self.cur.fetchone())
 
     def mark_processing(self, task: dict):
         """
