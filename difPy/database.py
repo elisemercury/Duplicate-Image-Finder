@@ -214,19 +214,17 @@ class Database:
         self.debug_execute(f"SELECT COUNT(key) FROM directory WHERE dir_b = {0 if dir_a else 1}")
         return self.cur.fetchone()[0]
 
-    def update_dir_success(self, key: int, dir_a: bool = True, px: int = -1, py: int = -1):
+    def update_dir_success(self, key: int, px: int = -1, py: int = -1):
         """
         Set the flag for success of the file with the matching key. Set it in either table_a or table_b.
         Error not updated.
 
         :param key: file identifier which is to be updated
-        :param dir_a: TRUE <=> update directory_a, ELSE update directory_b
         :param px: x count of pixels
         :param py: y count of pixels
         :return:
         """
-        tbl_name = "directory_a" if dir_a else "directory_b"
-        self.debug_execute(f"UPDATE {tbl_name} SET proc_suc = 1, px = {px}, py = {py} WHERE key = {key}")
+        self.debug_execute(f"UPDATE directory SET proc_suc = 1, px = {px}, py = {py} WHERE key = {key}")
 
     def update_dir_error(self, key: int, msg: str, dir_a: bool = True):
         """
