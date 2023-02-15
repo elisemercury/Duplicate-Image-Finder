@@ -275,17 +275,15 @@ class Database:
         self.debug_execute(f"SELECT * FROM directory WHERE key > {starting} AND dir_b = {dir_b} ORDER BY key ASC")
         return Database.wrap_many_dict_dir(rows=self.cur.fetchmany(count))
 
-    def fetch_one_key(self, key: int, directory_a: bool = True):
+    def fetch_one_key(self, key: int):
         """
         Fetch exactly the row matching the key and directory.
 
         :param key: the key of the row
-        :param directory_a: if the row is to be selected from directory a or b
         :return:
         """
-        tbl_name = "directory_a" if directory_a else "directory_b"
-        self.debug_execute(f"SELECT * FROM {tbl_name} WHERE key = {key}")
-        return self.all_to_dict_dir(self.cur.fetchone(), dir_a=directory_a)
+        self.debug_execute(f"SELECT * FROM directory WHERE key = {key}")
+        return self.all_to_dict_dir(self.cur.fetchone())
 
     # ------------------------------------------------------------------------------------------------------------------
     # THUMBNAIL FILENAME TABLE
