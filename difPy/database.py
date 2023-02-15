@@ -344,7 +344,6 @@ class Database:
         :return:
         """
         index = 0
-        tbl_name = "thumb_a" if dir_a else "thumb_b"
         free = False
 
         name, ext = os.path.splitext(file_name)
@@ -360,7 +359,8 @@ class Database:
             if index > retry_limit:
                 raise ValueError(f"Filename '{file_name}' is too common, it has been used {retry_limit} times.")
 
-        self.debug_execute(f"INSERT INTO {tbl_name} (key, filename) VALUES ({key}, '{thumb_name}')")
+        self.debug_execute(f"INSERT INTO thumb (key, filename, dir_b) "
+                           f"VALUES ({key}, '{thumb_name}', {0 if dir_a else 1})")
         return thumb_name
 
     def thumb_name_exists(self, thumb_name: str, dir_a: bool = True):
