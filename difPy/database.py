@@ -137,12 +137,11 @@ class Database:
         )
 
     @staticmethod
-    def all_to_dict_dir(row: Union[tuple, None], dir_a: bool = True):
+    def all_to_dict_dir(row: Union[tuple, None]):
         """
         Takes the result of a 'SELECT *' from a directory table and turns the tuple into a dict
 
         :param row: tuple to turn into dict
-        :param dir_a: if the file was in directory a or directory b
         :return:
         """
         if row is None:
@@ -155,7 +154,7 @@ class Database:
                 "proc_suc": row[4],
                 "px": row[5],
                 "py": row[6],
-                "dir_a": dir_a
+                "dir_a": row[7] == 0,
                 }
 
     @staticmethod
