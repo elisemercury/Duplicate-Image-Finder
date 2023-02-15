@@ -265,16 +265,15 @@ class Database:
         :param count: number of entries to return
         :return: List[dict] rows wrapped in dict
         """
-        tbl_name = "directory_a" if directory_a else "directory_b"
-
+        dir_b = 0 if directory_a else 1
         # start at the beginning
         if starting is None:
-            self.debug_execute(f"SELECT * FROM {tbl_name} ORDER BY key ASC")
-            return Database.wrap_many_dict_dir(rows=self.cur.fetchmany(count), dir_a=directory_a)
+            self.debug_execute(f"SELECT * FROM directory WHERE dir_b = {dir_b} ORDER BY key ASC")
+            return Database.wrap_many_dict_dir(rows=self.cur.fetchmany(count))
 
         # start from specific point
-        self.debug_execute(f"SELECT * FROM {tbl_name} WHERE key > {starting} ORDER BY key ASC")
-        return Database.wrap_many_dict_dir(rows=self.cur.fetchmany(count), dir_a=directory_a)
+        self.debug_execute(f"SELECT * FROM directory WHERE key > {starting} AND dir_b = {dir_b} ORDER BY key ASC")
+        return Database.wrap_many_dict_dir(rows=self.cur.fetchmany(count))
 
     def fetch_one_key(self, key: int, directory_a: bool = True):
         """
