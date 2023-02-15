@@ -1060,7 +1060,7 @@ class FastDifPy:
             last_b = self.second_loop_queue_status["last_b"]
 
         if not init:
-            current_a = self.db.fetch_one_key(key=last_a, directory_a=True)
+            current_a = self.db.fetch_one_key(key=last_a)
             next_a = self.db.fetch_many_after_key(directory_a=True, starting=last_a, count=1)
             if len(next_a) == 0:
                 next_a = None
