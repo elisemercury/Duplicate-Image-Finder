@@ -371,8 +371,7 @@ class Database:
         :param dir_a: if it is to be searched in dir a or dir b
         :return:
         """
-        tbl_name = "thumb_a" if dir_a else "thumb_b"
-        self.debug_execute(f"SELECT * FROM {tbl_name} WHERE filename IS '{thumb_name}'")
+        self.debug_execute(f"SELECT * FROM thumb WHERE filename IS '{thumb_name}' AND dir_b = {0 if dir_a else 1}")
         return self.cur.fetchone() is not None
 
     # ------------------------------------------------------------------------------------------------------------------
