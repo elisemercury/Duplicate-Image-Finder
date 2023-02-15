@@ -315,15 +315,13 @@ class Database:
         self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'thumb'")
         return self.cur.fetchone() is not None
 
-    def drop_thumb(self, dir_a: bool = True):
+    def drop_thumb(self):
         """
         Drop a table related to the thumbnails of a directory.
 
-        :param dir_a: if True, drop thumb A table, else drop thumb b table.
         :return:
         """
-        tbl_name = "thumb_a" if dir_a else "thumb_b"
-        self.debug_execute(f"DROP TABLE {tbl_name}")
+        self.debug_execute(f"DROP TABLE thumb")
 
     def get_thumb_name(self, key: int, dir_a: bool):
         """
