@@ -1593,8 +1593,8 @@ class FastDifPy:
         while True:
             # process each pair and put it in a queue.
             for p in pairs:
-                key_a = self.db.fetch_one_key(key=p["key_a"], directory_a=True)
-                key_b = self.db.fetch_one_key(key=p["key_b"], directory_a=not p["b_dir_b"])
+                key_a = self.db.fetch_one_key(key=p["key_a"])
+                key_b = self.db.fetch_one_key(key=p["key_b"])
                 p["path_a"] = key_a["path_a"]
                 p["filename_a"] = key_a["filename_a"]
                 p["px_a"] = key_a["px_a"]
