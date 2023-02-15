@@ -102,12 +102,11 @@ class Database:
     # DIRECTORY TABLES
     # ------------------------------------------------------------------------------------------------------------------
 
-    def create_directory_tables(self, secondary_folder: bool = False, purge: bool = True):
+    def create_directory_tables(self, purge: bool = True):
         """
         Create the directory tables. Default for purge is true, to recompute it in case the program is stopped during 
         indexing. ASSUMPTION: Indexing is a very fast operation. TODO Handle Stop mid Indexing.
 
-        :param secondary_folder: if True, create a table for the secondary folder as well.
         :param purge: if True, purge the tables before creating them.
         :return:
         """
@@ -125,28 +124,17 @@ class Database:
                 self.drop_dir(False)
 
         self.debug_execute(
-            "CREATE TABLE directory_a ("
+            "CREATE TABLE directory ("
             "key INTEGER PRIMARY KEY AUTOINCREMENT, "
             "path TEXT , "
             "filename TEXT, "
-            "error TEXT DEFAULT '<EMPTY>',"
-            "proc_suc INTEGER DEFAULT -1 CHECK ( directory_a.proc_suc >= -2 AND directory_a.proc_suc <= 1 ) ,"
-            "px INTEGER DEFAULT -1 CHECK (directory_a.px >= -1), "
-            "py INTEGER DEFAULT -1 CHECK (directory_a.py >= -1))"
+            "error TEXT,"
+            "proc_suc INTEGER DEFAULT -1 CHECK ( directory.proc_suc >= -2 AND directory.proc_suc <= 1 ) ,"
+            "px INTEGER DEFAULT -1 CHECK (directory.px >= -1), "
+            "py INTEGER DEFAULT -1 CHECK (directory.py >= -1),"
+            "dir_b INTEGER DEFAULT 0 CHECK (directory.dir_b >= 0 AND directory.dir_b <= 1),"
+            "UNIQUE (path, dir_b))"
         )
-
-        if secondary_folder:
-            self.has_b = True
-            self.debug_execute(
-                "CREATE TABLE directory_b ("
-                "key INTEGER PRIMARY KEY AUTOINCREMENT, "
-                "path TEXT , "
-                "filename TEXT, "
-                "error TEXT DEFAULT '<EMPTY>',"
-                "proc_suc INTEGER DEFAULT -1 CHECK ( directory_b.proc_suc >= -2 AND directory_b.proc_suc <= 1 ) ,"
-                "px INTEGER DEFAULT -1 CHECK (directory_b.px >= -1), "
-                "py INTEGER DEFAULT -1 CHECK (directory_b.py >= -1))"
-            )
 
     @staticmethod
     def all_to_dict_dir(row: Union[tuple, None], dir_a: bool = True):
