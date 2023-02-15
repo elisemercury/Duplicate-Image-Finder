@@ -114,13 +114,9 @@ class Database:
         if purge:
             print("Purging preexisting indexes of directories.")
 
-            if self.test_dir_table_existence(True):
-                print("Dropping directory A table.")
-                self.drop_dir(True)
-
-            if self.test_dir_table_existence(False):
-                print("Dropping directory B table.")
-                self.drop_dir(False)
+            if self.test_dir_table_existence():
+                print("Dropping directory table.")
+                self.drop_dir()
 
         self.debug_execute(
             "CREATE TABLE directory ("
