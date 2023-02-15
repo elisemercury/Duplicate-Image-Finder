@@ -2,7 +2,6 @@
 difPy - Python package for finding duplicate or similar images within folders 
 https://github.com/elisemercury/Duplicate-Image-Finder
 """
-
 import skimage.color
 from glob import glob
 import matplotlib.pyplot as plt
@@ -202,7 +201,6 @@ class _compute:
         mse /= float(img_A.shape[0] * img_A.shape[1])
         return mse
 
-
 class _search:
 
     def _matches(imgs_matrices, id_by_location, similarity, show_output, show_progress):
@@ -337,8 +335,6 @@ class _help:
                     print("Could not delete file:", file, end="\r")
         print(f"\n***\nDeleted {delete_count} image file(s).")
 
-    
-
 def _type_str_int(x):
     # TODO check if can be added to help class
     # Helper function to make the CLI accept int and str type inputs for the similarity parameter
@@ -346,7 +342,6 @@ def _type_str_int(x):
         return int(x)
     except:
         return x
-
 
 if __name__ == "__main__":
     # Parameters for when launching difPy via CLI
@@ -363,7 +358,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # initialize difPy
-    search = from_files(*args.directory, 
+    search = dif(*args.directory, 
                         recursive=args.recursive, similarity=args.similarity, px_size=args.px_size, 
                         show_output=args.show_output, show_progress=args.show_progress, 
                         delete=args.delete, silent_del=args.silent_del)
