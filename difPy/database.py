@@ -158,17 +158,16 @@ class Database:
                 }
 
     @staticmethod
-    def wrap_many_dict_dir(rows: List[tuple], dir_a: bool = True):
+    def wrap_many_dict_dir(rows: List[tuple]):
         """
         Wraps a list of rows in dictionaries.
 
         :param rows: rows to wrap
-        :param dir_a: if the rows were from directory_a
         :return:
         """
         result = []
         for row in rows:
-            result.append(Database.all_to_dict_dir(row, dir_a=dir_a))
+            result.append(Database.all_to_dict_dir(row))
         return result
 
     def test_dir_table_existence(self, dir_a: bool = True):
