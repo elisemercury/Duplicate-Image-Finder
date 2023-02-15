@@ -197,8 +197,8 @@ class Database:
         :return:
         """
 
-        tbl_name = "directory_a" if dir_a else "directory_b"
-        self.debug_execute(f"INSERT INTO {tbl_name} (path, filename) VALUES ('{path}', '{filename}')")
+        self.debug_execute(f"INSERT INTO directory (path, filename, dir_b) "
+                           f"VALUES ('{path}', '{filename}', {0 if dir_a else 1})")
 
     def get_dir_count(self, dir_a: bool = True):
         """
