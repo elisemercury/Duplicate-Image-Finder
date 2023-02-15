@@ -19,7 +19,6 @@ class Database:
 
     a_done: bool
     b_done: bool
-    has_b: Union[bool, None]
 
     last_update: datetime.datetime = datetime.datetime.now()
 
@@ -888,6 +887,16 @@ class Database:
         """
         self.con.commit()
         self.con.close()
+
+    @property
+    def has_b(self):
+        """
+        Executes an SQL statement to detect if there are any entries in directory b.
+
+        :return: bool
+        """
+        self.debug_execute("SELECT * FROM directory WHERE dir_b > 0")
+        return self.cur.fetchone() is not None
 
     @staticmethod
     def to_b64(to_encode: Any):
