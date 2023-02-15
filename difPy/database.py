@@ -323,16 +323,14 @@ class Database:
         """
         self.debug_execute(f"DROP TABLE thumb")
 
-    def get_thumb_name(self, key: int, dir_a: bool):
+    def get_thumb_name(self, key: int):
         """
         Get the thumbnail name associated with the key.
 
         :param key: key to search the thumbnail path for
-        :param dir_a: if the key is to be searched in the directory_a or directory_b table.
         :return:
         """
-        tbl_name = "thumb_a" if dir_a else "thumb_b"
-        self.debug_execute(f"SELECT * FROM {tbl_name} WHERE key = {key}")
+        self.debug_execute(f"SELECT * FROM thumb WHERE key = {key}")
         return self.cur.fetchone()
 
     def generate_new_thumb_name(self, key: int, file_name: str, retry_limit: int = 1000, dir_a: bool = True):
