@@ -270,8 +270,7 @@ class FastDifPy:
 
     # argument storage
     matching_hash: bool = False
-    has_thumb_a: bool = False
-    has_thumb_b: bool = False
+    has_thumb: bool = False
     matching_aspect: bool = False
     make_diff_plots: bool = False
     plot_output_dir: str = None
@@ -778,8 +777,7 @@ class FastDifPy:
         self.make_diff_plots = make_diff_plots
         self.matching_hash = only_matching_hash
 
-        self.has_thumb_a = self.db.test_thumb_table_existence(dir_a=True)
-        self.has_thumb_b = self.db.test_thumb_table_existence(dir_a=False)
+        self.has_thumb = self.db.test_thumb_table_existence()
 
         if make_diff_plots:
             self.create_plot_dir(diff_location=diff_location)
@@ -1277,17 +1275,9 @@ class FastDifPy:
         thumb_a_path = None
         thumb_b_path = None
 
-        if self.has_dir_b:
-            if self.has_thumb_a:
-                thumb_a_path = self.get_thumb_path_from_db(key=row_a["key"], dir_a=True)
-            if self.has_thumb_b:
-                thumb_b_path = self.get_thumb_path_from_db(key=row_b["key"], dir_a=False)
-
-        else:
-            # all to all one dir
-            if self.has_thumb_a:
-                thumb_a_path = self.get_thumb_path_from_db(key=row_a["key"], dir_a=True)
-                thumb_b_path = self.get_thumb_path_from_db(key=row_b["key"], dir_a=True)
+        if self.has_thumb:
+            thumb_a_path = self.get_thumb_path_from_db(key=row_a["key"], dir_a=True)
+            thumb_b_path = self.get_thumb_path_from_db(key=row_b["key"], dir_a=True)
 
         # performing match if desired
         if self.matching_aspect:
