@@ -564,7 +564,7 @@ class Database:
 
     def create_hash_table(self, purge: bool = False):
         """
-        Create the config table and insert a config dictionary.
+        Create the hash table and purge preexisting table if desirerd.
 
         :param purge: if True, purge the table before creating it.
         :return:
