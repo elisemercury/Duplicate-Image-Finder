@@ -337,7 +337,7 @@ class FastDifPy:
         matching_config = False
 
         if os.path.exists(db_a):
-            temp_db = Database(db_a)
+            temp_db = SQLiteDatabase(db_a)
             cfg = temp_db.get_config('main_config')
 
             # verify the config matches the call arguments (in case the computation was stopped during the
@@ -351,7 +351,7 @@ class FastDifPy:
                     return True
 
         if dir_b is not None and os.path.exists(db_b):
-            temp_db = Database(db_b)
+            temp_db = SQLiteDatabase(db_b)
             cfg = temp_db.get_config('main_config')
 
             # verify the config matches the call arguments (in case the computation was stopped during the
