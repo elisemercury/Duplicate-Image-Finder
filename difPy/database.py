@@ -14,8 +14,7 @@ class Database:
         """
         Init function for your implementation of the database
         """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
+        pass
     # ------------------------------------------------------------------------------------------------------------------
     # CONFIG TABLE
     # ------------------------------------------------------------------------------------------------------------------
