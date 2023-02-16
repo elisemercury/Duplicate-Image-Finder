@@ -1544,7 +1544,7 @@ class FastDifPy:
         :param queue_size: max_size the queue can reach
         :param start_id: from which key the thread should start adding the matching pairs
                 (in case the process got stopped)
-        :param threshold: differernce value below something must lay for it to be considered to be a duplicate.
+        :param threshold: difference value below something must lay for it to be considered to be a duplicate.
         :return: queue containing dicts of the matching pairs, thread object that is filling the queue.
         """
         transfer_queue = mp.Queue(maxsize=queue_size)
