@@ -80,22 +80,6 @@ class Database:
 
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    def test_dir_table_existence(self):
-        """
-        Check the table for directory X, exists. DOES NOT VERIFY THE TABLE DEFINITION!
-
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def drop_dir(self):
-        """
-        Drop a table related to the directories.
-
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
     def add_file(self, path: str, filename: str, dir_a: bool = True):
         """
         Add a file to the database.
@@ -246,14 +230,6 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    def drop_thumb(self):
-        """
-        Drop a table related to the thumbnails of the directories.
-
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
     def get_thumb_name(self, key: int):
         """
         Get the thumbnail name associated with the key.
@@ -277,16 +253,6 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    def thumb_name_exists(self, thumb_name: str, dir_a: bool = True):
-        """
-        Check if the name exists already, given the name and the directory the file is in.
-
-        :param thumb_name: name to check
-        :param dir_a: if it is to be searched in dir a or dir b
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
     # ------------------------------------------------------------------------------------------------------------------
     # PLOT TABLE
     # ------------------------------------------------------------------------------------------------------------------
@@ -296,22 +262,6 @@ class Database:
         Create tables which contain the filenames of the plots (to make sure there's no collisions ahead of time)
 
         :param purge: if True, purge the tables before creating them.
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def test_plot_table_existence(self):
-        """
-        Check the table for plots, exists. DOES NOT VERIFY THE TABLE DEFINITION!
-
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def drop_plot(self):
-        """
-        Drop a table related to the plots.
-
         :return:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
@@ -359,31 +309,6 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    def test_hash_table_existence(self):
-        """
-        Check if the hash table exists. DOES NOT VERIFY THE TABLE DEFINITION!
-
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def drop_hash_table(self):
-        """
-        Drop the hash table.
-
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def add_increment_hash(self, file_hash: str):
-        """
-        Add the hash to database if it doesn't exist otherwise increment it.
-
-        :param file_hash: the hash to be inserted.
-        :return: The key of the hash.
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
     # ------------------------------------------------------------------------------------------------------------------
     # ERROR TABLE
     # ------------------------------------------------------------------------------------------------------------------
@@ -397,21 +322,6 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    def test_dif_table_existence(self) -> bool:
-        """
-        Check if the dif table exists. DOES NOT VERIFY THE TABLE DEFINITION!
-
-        :return: bool, True if the table exists
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def drop_dif_table(self):
-        """
-        Drop the dif table.
-
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
     def insert_dif_success(self, key_a: int, key_b: int, dif: float) -> bool:
         """
