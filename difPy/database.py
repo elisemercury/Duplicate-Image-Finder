@@ -500,7 +500,7 @@ class Database:
 
     def test_plot_table_existence(self):
         """
-        Check the table for thumbnails of directory X, exists. DOES NOT VERIFY THE TABLE DEFINITION!
+        Check the table for plots, exists. DOES NOT VERIFY THE TABLE DEFINITION!
 
         :return:
         """
@@ -509,7 +509,7 @@ class Database:
 
     def drop_plot(self):
         """
-        Drop a table related to the thumbnails of a directory.
+        Drop a table related to the plots.
 
         :return:
         """
@@ -517,10 +517,10 @@ class Database:
 
     def get_plot_name(self, key_a: int, key_b: int):
         """
-        Get the thumbnail name associated with the key.
+        Get the plot name associated with the two keys.
 
-        :param key_a: key to search the thumbnail path for
-        :param key_b: if the key is to be searched in the directory_a or directory_b table.
+        :param key_a: the first key provided to the dif table.
+        :param key_b: the second key provided in the dif table.
         :return:
         """
         self.debug_execute(f"SELECT * FROM plots WHERE key_a = {key_a} AND key_b = {key_b}")
@@ -528,10 +528,10 @@ class Database:
 
     def make_plot_name(self, key_a: int, key_b: int) -> str:
         """
-        Generate a new free name for a file. If a file name is taken, will retry a limited number of times again.
+        Generate a new free name for a file. Does not attempt to retry the filename.
 
-        :param key_a: key in the directory_X tables
-        :param key_b: file name for which to generate the thumbnail name
+        :param key_a: first key provided in the dif table
+        :param key_b: second key provided in the dif table
         :return: filename associated with the two keys.
         """
         res = self.get_plot_name(key_a=key_a, key_b=key_b)
