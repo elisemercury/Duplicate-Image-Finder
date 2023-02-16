@@ -386,7 +386,7 @@ class Database:
 
     def create_thumb_table(self, purge: bool = False):
         """
-        Create tables which contain the names of the thumbnails ( to make sure there's no collisions ahead of time)
+        Create tables which contain the names of the thumbnails (to make sure there's no collisions ahead of time)
 
         :param purge: if True, purge the tables before creating them.
         :return:
