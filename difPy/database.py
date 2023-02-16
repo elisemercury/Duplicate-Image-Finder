@@ -80,26 +80,6 @@ class Database:
 
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    @staticmethod
-    def all_to_dict_dir(row: Union[tuple, None]):
-        """
-        Takes the result of a 'SELECT *' from a directory table and turns the tuple into a dict
-
-        :param row: tuple to turn into dict
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    @staticmethod
-    def wrap_many_dict_dir(rows: List[tuple]):
-        """
-        Wraps a list of rows in dictionaries.
-
-        :param rows: rows to wrap
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
     def test_dir_table_existence(self):
         """
         Check the table for directory X, exists. DOES NOT VERIFY THE TABLE DEFINITION!
@@ -462,20 +442,6 @@ class Database:
         :param key_a: key of first image in directory_X table
         :param key_b: key of second image in directory_X table
         :return: None, nothing exists, dict of matching row
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    @staticmethod
-    def all_to_dict_dif(row: tuple):
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    @staticmethod
-    def wrap_many_dict_dif(rows: List[tuple]):
-        """
-        Wraps a list of rows in dictionaries.
-
-        :param rows: rows to wrap
-        :return:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
