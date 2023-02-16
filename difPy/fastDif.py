@@ -279,7 +279,9 @@ class FastDifPy:
     cpu_handles = None
     gpu_handles = None
 
+    # default config
     less_optimized: bool = False
+    retry_limit: int = 1000
 
     def __init__(self, directory_a: str, directory_b: str = None, test_db: bool = True):
         """
@@ -496,7 +498,7 @@ class FastDifPy:
         if name is not None:
             return os.path.join(directory, name[1])
 
-        name = self.db.generate_new_thumb_name(key, filename, dir_a=dir_a)
+        name = self.db.generate_new_thumb_name(key, filename, dir_a=dir_a, retry_limit=self.retry_limit)
         return os.path.join(directory, name)
 
     def first_loop_iteration(self, compute_thumbnails: bool = True, compute_hash: bool = False, amount: int = 4,
