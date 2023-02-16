@@ -172,7 +172,7 @@ class SQLiteDatabase(Database):
         """
         result = []
         for row in rows:
-            result.append(Database.all_to_dict_dir(row))
+            result.append(SQLiteDatabase.all_to_dict_dir(row))
         return result
 
     def test_dir_table_existence(self):
@@ -274,11 +274,11 @@ class SQLiteDatabase(Database):
         # start at the beginning
         if starting is None:
             self.debug_execute(f"SELECT * FROM directory WHERE dir_b = {dir_b} ORDER BY key ASC")
-            return Database.wrap_many_dict_dir(rows=self.cur.fetchmany(count))
+            return self.wrap_many_dict_dir(rows=self.cur.fetchmany(count))
 
         # start from specific point
         self.debug_execute(f"SELECT * FROM directory WHERE key > {starting} AND dir_b = {dir_b} ORDER BY key ASC")
-        return Database.wrap_many_dict_dir(rows=self.cur.fetchmany(count))
+        return self.wrap_many_dict_dir(rows=self.cur.fetchmany(count))
 
     def fetch_one_key(self, key: int):
         """
