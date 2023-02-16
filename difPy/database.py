@@ -542,7 +542,7 @@ class Database:
         self.debug_execute(f"INSERT INTO plots (key_a, key_b) VALUES ({key_a}, {key_b})")
         return self.make_plot_name(key_a=key_a, key_b=key_b)
 
-    def get_plot_associated_keys(self, file_name: str) -> Union[tuple, None]:
+    def get_associated_keys(self, file_name: str) -> Union[tuple, None]:
         """
         Given a file name returns the associated keys in to said plot (if not apparent by the filename I need to put
         in the titles.
