@@ -14,9 +14,9 @@
 ```python
 pip install difPy
 ```
-> :point_right: [NEW] difPy v3.0.0 has ben released! Count on signifcant **performance increases**, **new features** and **bug fixes**. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for a detailed listing. 
+> :point_right: :new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** has been released! Count on signifcant **performance increases**, **new features** and **bug fixes**. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for a detailed listing. 
 
-> :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [contributor guidelines](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy) for more information.
+> :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy) for more information.
 
 Read more on how the algorithm of difPy works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051).
 
@@ -40,6 +40,8 @@ Use the following function to make difPy search for duplicates within one specif
 from difPy import dif
 search = dif("C:/Path/to/Folder/")
 ``` 
+:new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** now supports **multi-folder search**!
+
 To search for duplicates within mutliple folders and their subfolders:
 
 ```python
@@ -68,6 +70,8 @@ search.result
  ...
 }
 ``` 
+:new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** now outputs the **MSE** value for each matched image!
+
 A **list** of duplicates/similar images that have the **lowest quality** among match groups: 
 
 ```python
@@ -77,7 +81,6 @@ search.lower_quality
 ["C:/Path/to/Image/duplicate_image1.jpg", 
  "C:/Path/to/Image/duplicate_image2.jpg", ...]
 ``` 
-
 A **JSON formatted collection** with statistics on the completed difPy process:
 
 ```python
@@ -96,6 +99,7 @@ search.stats
  "matches_found" : 852,
  "invalid_files" : 4}
 ``` 
+:new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** now outputs the count of **invalid files** in the target directory that could not be processed as images!
 
 ## Additional Parameters
 DifPy supports the following parameters:
@@ -124,15 +128,12 @@ dif.py [-h] -D DIRECTORY [-Z [OUTPUT_DIRECTORY]]
        [-d [{True,False}]] [-sd [{True,False}]]
 ```
 
-:bell: Since [version v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0), the CLI parameter `directory` has changed to `-D` and `silend_del` to `-sd`.
-
-
 | | Parameter | | Parameter |
 | :---: | ------ | :---: | ------ | 
 | `-D` | directory | `-p` | show_progress |  
 | `-Z` | output_directory | `-o` | show_output |
 | `-r`| recursive | `-d` | delete |
-| `-s` | similarity | `-D` | silent_del |
+| `-s` | similarity | `-sd` | silent_del |
 | `-px` | px_size | 
 
 When running from the CLI, the output of difPy is  written to files and saved in the working directory by default. To change the default output directory, specify the `-Z / -output_directory` parameter. The "xxx" in the output filenames is a unique timestamp:
@@ -147,30 +148,26 @@ difPy_stats_xxx.json
 
 ## Related Projects
 
-The below sections features third-party work that has been **built with** or **inspired by** difPy. We would like to express a big thank you for any contributions made to difPy.
+The below sections feature third-party work that has been **built with** or **inspired by** difPy. We would like to express a big thank you for any contributions made to difPy!
 
-<p align="center"><b>
-:thought_balloon: Also want to be featured in the "Related Projects" section? Check our <a href="https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy#be-featured-as-difpy-related-project">contributor guidelines</a> to find out how!
-</b></p>
+-------
 
-### I. DifPy as Webapp - by @prateekralhan
+### I. DifPy as Webapp
 
-[A Streamlit based Webapp to find duplicate images from single/multiple directories](https://github.com/prateekralhan/Streamlit-based-Duplicate-Images-Finder) - :dna: **built with difPy**
+[A Streamlit based Webapp to find duplicate images from single/multiple directories](https://github.com/prateekralhan/Streamlit-based-Duplicate-Images-Finder) by @prateekralhan - :dna: **built with difPy**
 
-**Single Directory** 📸✅
-![demo1](https://user-images.githubusercontent.com/29462447/174408835-438234d9-5ff6-4159-a5e3-b908d885a8bc.gif)
+<p align="left">
+  <img src="https://user-images.githubusercontent.com/29462447/174408835-438234d9-5ff6-4159-a5e3-b908d885a8bc.gif" width="800" title="Single Directory Example">
+</p>
 
-**Two directories** 📸✅
-![demo2](https://user-images.githubusercontent.com/29462447/174408842-5128838f-bf8f-43da-97d2-30a3264eb7af.gif)
+### II. photosdup - Mac Photos Tool to Find Duplicates
 
-### II. Mac Photos Tool to find Duplicates (photosdup) - by @peter-sk
-
-[Tool to scan a Mac Photos library for duplicates, thumbnails etc.](https://github.com/peter-sk/photosdup) - :sparkles: **inspired by difPy**
+[Tool to scan a Mac Photos library for duplicates, thumbnails etc.](https://github.com/peter-sk/photosdup) by @peter-sk - :sparkles: **inspired by difPy**
 
 -------
 
 <p align="center"><b>
-:thought_balloon: Also want to be featured in the "Related Projects" section? Check our <a href="https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy#be-featured-as-difpy-related-project">contributor guidelines</a> to find out how!
+:thought_balloon: Also want to be featured in the "Related Projects" section? Check our <a href="https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy#be-featured-as-difpy-related-project">Contributor Guidelines</a> to find out how!
 </b></p>
 
 -------
