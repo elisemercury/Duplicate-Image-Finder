@@ -310,7 +310,7 @@ class Database:
 
     def has_all_hashes(self, key: int):
         """
-        Check if a file has all hash.
+        Check if a file has all hashes populated.
 
         :param key: key of the file in the directory table
         :return: if a file has all 4 entries.
@@ -328,7 +328,7 @@ class Database:
 
     def has_any_hash(self, key: int):
         """
-        Check if a file has a hash.
+        Check if a file has any hash already populated.
 
         :param key: key of the file in the directory table
         :return: if a file has any entry.
