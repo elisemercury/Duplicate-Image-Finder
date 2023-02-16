@@ -364,7 +364,6 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-
     def update_pair_row(self, key_a: int, key_b: int, dif: float = None) -> bool:
         """
         Updates a pair with the new data. if the data is not specified, the preexisting data is used.
@@ -377,7 +376,6 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-
     def get_all_matching_pairs(self, threshold: float):
         """
         Fetches all pairs in the dif table matching the threshold and which terminated successfully.
@@ -386,7 +384,6 @@ class Database:
         :return:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
 
     def get_many_pairs(self, threshold: float, start_key: int = None, count: int = 1000):
         """
