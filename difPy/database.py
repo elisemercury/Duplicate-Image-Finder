@@ -641,11 +641,11 @@ class Database:
                            "success INT CHECK (dif_table.success >= 0 AND dif_table.success <= 1),"
                            "UNIQUE (key_a, key_b)) ")
 
-    def test_dif_table_existence(self):
+    def test_dif_table_existence(self) -> bool:
         """
         Check if the dif table exists. DOES NOT VERIFY THE TABLE DEFINITION!
 
-        :return:
+        :return: bool, True if the table exists
         """
         self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'dif_table'")
         return self.cur.fetchone() is not None
