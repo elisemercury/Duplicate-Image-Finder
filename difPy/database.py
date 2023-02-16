@@ -346,7 +346,7 @@ class Database:
 
     def del_all_hashes(self, key: int):
         """
-        Delete any of the 4 possible hashes of a given file.
+        Delete all the 4 possible hashes of a given file.
 
         :param key: key in the directory table
         :return:
