@@ -31,12 +31,12 @@ class dif:
         self.show_progress = _validate._show_progress(show_progress)
 
         start_time = time.time()  # TODO check if can be put into run
-        self.result, self.lower_quality, total_count, match_count, invalid_files = from_files._run(self)
+        self.result, self.lower_quality, total_count, match_count, invalid_files = dif._run(self)
         end_time = time.time()
 
         time_elapsed = np.round(end_time - start_time, 4)
-        self.stats = from_files._generate_stats(self, start_time=time.localtime(start_time), end_time=time.localtime(end_time), time_elapsed=time_elapsed, 
-                                     total_searched=total_count, total_matches=match_count, total_invalid=len(invalid_files))
+        self.stats = dif._generate_stats(self, start_time=time.localtime(start_time), end_time=time.localtime(end_time), time_elapsed=time_elapsed, 
+                                         total_searched=total_count, total_matches=match_count, total_invalid=len(invalid_files))
 
         print(f"Found {match_count} pair(s) of duplicate/similar image(s) in {time_elapsed} seconds.")
 
@@ -174,7 +174,6 @@ class _compute:
                 if show_progress:
                     _help._show_progress(count, total_count, task='preparing files')
                 if os.path.isdir(file):
-                    invalid_files.append(id)
                     count += 1
                 else:
                     try:
