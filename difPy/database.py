@@ -748,7 +748,7 @@ class Database:
 
         return self.all_to_dict_dif(res)
 
-    def update_pair_row(self, key_a: int, key_b: int, dif: float = None, b_dir_b: bool = None) -> bool:
+    def update_pair_row(self, key_a: int, key_b: int, dif: float = None) -> bool:
         """
         Updates a pair with the new data. if the data is not specified, the preexisting data is used.
         Return true if the update was successful. Return False if the row didn't exist.
@@ -756,13 +756,8 @@ class Database:
         :param key_a: key of first image in directory_X table
         :param key_b: key of second image in directory_X table
         :param dif: difference measurement
-        :param b_dir_b: if the second image is from dir b or not.
         :return: if update was successful
         """
-
-        if b_dir_b is None and dif is None:
-            print("WARNING: Update function called without anything to oupdate.")
-            return True
 
         # get the previous row.
         prev_row = self.get_by_pair(key_a=key_a, key_b=key_b)
@@ -770,13 +765,10 @@ class Database:
         if prev_row is None:
             return False
 
-        if b_dir_b is None:
-            b_dir_b = prev_row["b_dir_b"]
-
         if dif is None:
             dif = prev_row["dif"]
 
-        self.debug_execute(f"UPDATE dif_table SET b_dir_b = {b_dir_b}, dif = {dif} WHERE key_a = {key_a} AND "
+        self.debug_execute(f"UPDATE dif_table SET dif = {dif} WHERE key_a = {key_a} AND "
                            f"key_b = {key_b}")
 
         return True
