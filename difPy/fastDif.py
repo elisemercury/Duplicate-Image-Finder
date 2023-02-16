@@ -13,6 +13,7 @@ import queue
 from difPy.datatransfer import *
 from difPy.image_processor import ImageProcessing
 from concurrent.futures import ProcessPoolExecutor
+from difPy.sql_database import SQLiteDatabase
 
 """
 Fast implementation of the DifPy Library.
@@ -320,7 +321,7 @@ class FastDifPy:
         if test_db:
             if not self.test_for_db():
                 print("No matching database found. Creating new one.")
-                self.db = Database(os.path.join(self.p_root_dir_a, "diff.db"))
+                self.db = SQLiteDatabase(os.path.join(self.p_root_dir_a, "diff.db"))
                 self.write_config()
 
     def test_for_db(self):
