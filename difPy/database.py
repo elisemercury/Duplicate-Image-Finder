@@ -482,7 +482,7 @@ class Database:
 
     def create_plot_table(self, purge: bool = False):
         """
-        Create tables which contain the filenames of the plots ( to make sure there's no collisions ahead of time)
+        Create tables which contain the filenames of the plots (to make sure there's no collisions ahead of time)
 
         :param purge: if True, purge the tables before creating them.
         :return:
@@ -496,7 +496,7 @@ class Database:
                 print("Dropping directory A table.")
                 self.drop_plot()
 
-        self.debug_execute("CREATE TABLE plots ( key INTEGER PRIMARY KEY, key_a INTEGER, key_b INTEGER)")
+        self.debug_execute("CREATE TABLE plots ( key INTEGER PRIMARY KEY, key_a INTEGER, key_b INTEGER )")
 
     def test_plot_table_existence(self):
         """
