@@ -685,18 +685,14 @@ class FastDifPy:
         # store the hash if computed
         if compute_hash:
             # Drop hashes if they are only partly computed.
-            if not self.db.has_all_hashes(dir_a=result_obj.dir_a, dir_key=result_obj.key):
-                self.db.del_all_hashes(dir_a=result_obj.dir_a, dir_key=result_obj.key)
+            if self.db.has_any_hash(key=result_obj.key):
+                self.db.del_all_hashes(key=result_obj.key)
 
             # Store all hashes
-            self.db.insert_hash(dir_a=result_obj.dir_a, dir_key=result_obj.key, file_hash=result_obj.hash_0,
-                                rotation=0)
-            self.db.insert_hash(dir_a=result_obj.dir_a, dir_key=result_obj.key, file_hash=result_obj.hash_90,
-                                rotation=90)
-            self.db.insert_hash(dir_a=result_obj.dir_a, dir_key=result_obj.key, file_hash=result_obj.hash_180,
-                                rotation=180)
-            self.db.insert_hash(dir_a=result_obj.dir_a, dir_key=result_obj.key, file_hash=result_obj.hash_270,
-                                rotation=270)
+            self.db.insert_hash(key=result_obj.key, file_hash=result_obj.hash_0, rotation=0)
+            self.db.insert_hash(key=result_obj.key, file_hash=result_obj.hash_90, rotation=90)
+            self.db.insert_hash(key=result_obj.key, file_hash=result_obj.hash_180, rotation=180)
+            self.db.insert_hash(key=result_obj.key, file_hash=result_obj.hash_270, rotation=270)
 
         # mark file as processed only if the other data was inserted.
         self.db.update_dir_success(key=result_obj.key, px=result_obj.original_x, py=result_obj.original_y)
