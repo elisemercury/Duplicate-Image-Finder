@@ -481,10 +481,9 @@ class Database:
 
         self.debug_execute("CREATE TABLE hash_table ("
                            "key INTEGER PRIMARY KEY AUTOINCREMENT , "
-                           "hash TEXT , "
-                           "dir_a INTEGER CHECK ( hash_table.dir_a >= 0 AND hash_table.dir_a <= 1 ), "
-                           "dir_key INTEGER ,"
-                           "rotation INTEGER) ")
+                           "hash TEXT UNIQUE , "
+                           "count INTEGER CHECK (count >=0 ))"
+                           )
 
     def test_hash_table_existence(self):
         """
