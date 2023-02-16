@@ -128,6 +128,10 @@ class Database:
             "px INTEGER DEFAULT -1 CHECK (directory.px >= -1), "
             "py INTEGER DEFAULT -1 CHECK (directory.py >= -1),"
             "dir_b INTEGER DEFAULT 0 CHECK (directory.dir_b >= 0 AND directory.dir_b <= 1),"
+            "hash_0 INTEGER, "
+            "hash_90 INTEGER ,"
+            "hash_180 INTEGER , "
+            "hash_270 INTEGER ,  "
             "UNIQUE (path, dir_b))"
         )
 
@@ -150,6 +154,10 @@ class Database:
                 "px": row[5],
                 "py": row[6],
                 "dir_a": row[7] == 0,
+                "hash_0": row[8],
+                "hash_90": row[9],
+                "hash_180": row[10],
+                "hash_270": row[11],
                 }
 
     @staticmethod
