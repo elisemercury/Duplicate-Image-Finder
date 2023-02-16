@@ -288,6 +288,98 @@ class Database:
         self.debug_execute(f"SELECT * FROM directory WHERE key = {key}")
         return self.all_to_dict_dir(self.cur.fetchone())
 
+    def insert_hash(self, file_hash: str, key: int, rotation: int):
+        """
+        Insert a hash into the hash table.
+
+        :param file_hash: hash to insert
+        :param key: key of the file in the directory table
+        :param rotation: rotation of the file
+        :return:
+        """
+        # make sure the rotation matches
+        if rotation not in (0, 90, 180, 270):
+            raise ValueError(f"Unsupported rotation value {rotation}")
+
+        # update the hash table
+        hash_key = self.add_increment_hash(file_hash)
+
+        # update the directory table
+        row = f"hash_{rotation}"
+        self.debug_execute(f"UPDATE directory SET {row} = {hash_key} WHERE key = {key}")
+
+    def has_all_hashes(self, key: int):
+        """
+        Check if a file has all hash.
+
+        :param key: key of the file in the directory table
+        :return: if a file has all 4 entries.
+        """
+        self.debug_execute(f"SELECT hash_0, hash_90, hash_180, hash_270 FROM directory WHERE key = {key}")
+        row = self.cur.fetchone()
+
+        # check all values are set
+        for c in row:
+            if c is None:
+                return False
+
+        # return true if the for loop was unsuccessful.
+        return True
+
+    def has_any_hash(self, key: int):
+        """
+        Check if a file has a hash.
+
+        :param key: key of the file in the directory table
+        :return: if a file has any entry.
+        """
+        self.debug_execute(f"SELECT hash_0, hash_90, hash_180, hash_270 FROM directory WHERE key = {key}")
+        row = self.cur.fetchone()
+
+        # check all values are set
+        for c in row:
+            if c is not None:
+                return True
+
+        # return true if the for loop was unsuccessful.
+        return False
+
+    def del_all_hashes(self, key: int):
+        """
+        Delete any of the 4 possible hashes of a given file.
+
+        :param key: key in the directory table
+        :return:
+        """
+        print("WARNING: Deleting hashes, this is not matched with the hash table at the moment.")
+        self.debug_execute(f"UPDATE directory SET hash_0 = NULL, hash_90 = NULL, hash_180 = NULL, hash_270 = NULL "
+                           f"WHERE key = {key}")
+
+    def get_hash_of_key(self, key: int) -> list:
+        """
+        Get the hashes associated with a certain image.
+
+        :param key: the key of the image in the directory table
+        :return: [Hash 0, Hash 90, Hash 180, Hash 270]
+        """
+        self.debug_execute(f"SELECT hash_0, hash_90, hash_180, hash_270 FROM directory WHERE key = {key}")
+        cols = self.cur.fetchone()
+        hashes = [None, None, None, None]
+
+        # go through the hashes
+        for i in range(4):
+            entry = cols[i]
+
+            # get the data from the hash_table
+            self.debug_execute(f"SELECT hash FROM hash_table WHERE key = {entry}")
+            res = self.cur.fetchone()
+
+            # store the output
+            if res is not None:
+                hashes[i] = res[0]
+
+        return hashes
+
     # ------------------------------------------------------------------------------------------------------------------
     # THUMBNAIL FILENAME TABLE
     # ------------------------------------------------------------------------------------------------------------------
