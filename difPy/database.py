@@ -502,93 +502,26 @@ class Database:
         """
         self.debug_execute(f"DROP TABLE hash_table")
 
-    def insert_hash(self, file_hash: str, dir_a: bool, dir_key: int, rotation: int):
+    def add_increment_hash(self, file_hash: str):
         """
-        Insert a hash into the hash table.
+        Add the hash to database if it doesn't exist otherwise increment it.
 
-        :param file_hash: hash to insert
-        :param dir_a: if the file is in dir_a or dir_b
-        :param dir_key: key of the file in the directory table
-        :param rotation: rotation of the file
-        :return:
+        :param file_hash: the hash to be inserted.
+        :return: The key of the hash.
         """
-        dir_a_num = 1 if dir_a else 0
-        self.debug_execute(f"INSERT INTO hash_table (hash, dir_a, dir_key, rotation) VALUES ('{file_hash}', "
-                           f"{dir_a_num}, {dir_key}, {rotation})")
+        self.debug_execute(f"SELECT * FROM hash_table WHERE hash = '{file_hash}'")
 
-    def has_all_hashes(self, dir_a: bool, dir_key: int):
-        """
-        Check if a file has a hash.
+        # no entry in database, add it.
+        row = self.cur.fetchone()
+        if row is None:
+            self.cur.execute(f"INSERT INTO hash_table (hash, count) VALUES ('{file_hash}', 1)")
+            self.cur.execute(f"SELECT key FROM hash_table WHERE hash = '{file_hash}'")
+            return self.cur.fetchone()[0]
 
-        :param dir_a: if the file is in dir_a or dir_b
-        :param dir_key: key of the file in the directory table
-        :return: if a file has all 4 entries.
-        """
-        dir_a_num = 1 if dir_a else 0
-        self.debug_execute(f"SELECT * FROM hash_table WHERE dir_a = {dir_a_num} AND dir_key = {dir_key}")
-        return len(self.cur.fetchall()) == 4
-
-    def has_any_hash(self, dir_a: bool, dir_key: int):
-        """
-        Check if a file has a hash.
-
-        :param dir_a: if the file is in dir_a or dir_b
-        :param dir_key: key of the file in the directory table
-        :return: if a file has any entry.
-        """
-        dir_a_num = 1 if dir_a else 0
-        self.debug_execute(f"SELECT * FROM hash_table WHERE dir_a = {dir_a_num} AND dir_key = {dir_key}")
-        return self.cur.fetchone() is not None
-
-    def del_all_hashes(self, dir_a: bool, dir_key: int):
-        """
-        Delete any of the 4 possible hashes of a given file.
-
-        :param dir_a:
-        :param dir_key:
-        :return:
-        """
-        dir_a_num = 1 if dir_a else 0
-        self.debug_execute(f"DELETE FROM hash_table WHERE dir_a = {dir_a_num} AND dir_key = {dir_key}")
-        return self.cur.fetchone() is not None
-
-    def update_hash(self, file_hash: str, dir_a: bool, dir_key: int, rotation: int):
-        """
-        Update a hash in the hash table. (Not sure why I'd need the function but there it is)
-
-        :param file_hash: hash to update
-        :param dir_a: if the file is in dir_a or dir_b
-        :param dir_key: key of the file in the directory table
-        :param rotation: rotation of the file
-        :return:
-        """
-        dir_a_num = 1 if dir_a else 0
-        self.debug_execute(f"UPDATE hash_table SET hash = '{file_hash}' "
-                           f"WHERE dir_a = {dir_a_num} AND dir_key = {dir_key} AND rotation = {rotation}")
-
-    def get_hash_of_key(self, key: int, dir_a: bool = True) -> tuple:
-        """
-        Get the hashes associated with a certain image.
-
-        :param key: the key of the image in the directory table
-        :param dir_a: if the image is in directory a or not.
-        :return: [Hash 0, Hash 90, Hash 180, Hash 270]
-        """
-        dir_a_num = 1 if dir_a else 0
-        self.debug_execute(f"SELECT hash, rotation FROM hash_table WHERE dir_key = {key} AND dir_a = {dir_a_num} "
-                           f"ORDER BY rotation ASC ")
-        rows = self.cur.fetchmany(4)
-
-        # if there's a row missing, add
-        if len(rows) < 4:
-            return None, None, None, None
-
-        assert rows[0][1] == 0, "First Rotation not 0 degrees."
-        assert rows[1][1] == 90, "Second Rotation not 90 degrees."
-        assert rows[2][1] == 180, "First Rotation not 180 degrees."
-        assert rows[3][1] == 270, "First Rotation not 270 degrees."
-
-        return rows[0][0], rows[1][0], rows[2][0], rows[3][0]
+        # increment the key
+        key = row[0]
+        self.debug_execute(f"UPDATE hash_table SET count = {row[2] + 1} WHERE key = {key}")
+        return key
 
     # ------------------------------------------------------------------------------------------------------------------
     # ERROR TABLE
