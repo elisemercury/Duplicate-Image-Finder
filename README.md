@@ -40,9 +40,7 @@ Use the following function to make difPy search for duplicates within one specif
 from difPy import dif
 search = dif("C:/Path/to/Folder/")
 ``` 
-:new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** now supports **multi-folder search**!
-
-To search for duplicates within mutliple folders and their subfolders:
+:new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** now supports **multi-folder search**! To search for duplicates within mutliple folders and their subfolders:
 
 ```python
 from difPy import dif
