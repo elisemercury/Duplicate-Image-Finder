@@ -59,12 +59,12 @@ A **JSON formatted collection** of duplicates/similar images (i. e. **match grou
 search.result
 
 > Output:
-{20220819171549 : {"location" : "C:/Path/to/Image/image1.jpg"},
+{20220819171549 : {"location" : "C:/Path/to/Image/image1.jpg",
                    "matches" : {30270813251529 : "location": "C:/Path/to/Image/matched_image1.jpg",
                                                  "mse": 0.0},
                                {72214282557852 : "location": "C:/Path/to/Image/matched_image2.jpg",
                                                  "mse": 0.0},
-                                ... }
+                   ... }
  ...
 }
 ``` 
