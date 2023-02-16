@@ -417,7 +417,7 @@ class Database:
 
     def drop_thumb(self):
         """
-        Drop a table related to the thumbnails of a directory.
+        Drop a table related to the thumbnails of the directories.
 
         :return:
         """
@@ -436,6 +436,8 @@ class Database:
     def generate_new_thumb_name(self, key: int, file_name: str, retry_limit: int = 1000, dir_a: bool = True):
         """
         Generate a new free name for a file. If a file name is taken, will retry a limited number of times again.
+        The retry_limit is there to prevent a theoretically endless loop. If this was to trigger for you, update the
+        attribute in the FastDifPy class or write your own function.
 
         :param key: key in the directory_X tables
         :param file_name: file name for which to generate the thumbnail name
