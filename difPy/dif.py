@@ -142,8 +142,11 @@ class dif:
         if len(set(paths)) == 1:
             raise ValueError('An attempt to compare the directory with itself.')
         path1, path2 = paths
-        if path1.is_relative_to(path2) or path2.is_relative_to(path1):
-            raise ValueError('One directory belongs to another.')
+        common_path = os.path.commonpath(paths)
+        normalized_path1 = os.path.commonpath([path1])
+        normalized_path2 = os.path.commonpath([path2])
+        if common_path == normalized_path1 or common_path == normalized_path2:
+            raise ValueError('One directory belongs to another')
     
     # Function that creates a list of matrices for each image found in the folders
     def _create_imgs_matrix(directory, px_size, recursive, show_progress):
