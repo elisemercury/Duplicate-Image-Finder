@@ -716,9 +716,8 @@ class Database:
             "key_a": row[1],
             "key_b": row[2],
             "dif": row[3],
-            "b_dir_b": row[4],
-            "error": row[5],
-            "success": row[6]
+            "error": row[4],
+            "success": row[5]
         }
 
     @staticmethod
