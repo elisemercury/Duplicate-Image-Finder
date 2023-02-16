@@ -674,21 +674,20 @@ class Database:
                            f"VALUES ({key_a}, {key_b}, {dif}, 1)")
         return True
 
-    def insert_dif_error(self, key_a: int, key_b: int, error: str, b_dir_b: bool = False) -> bool:
+    def insert_dif_error(self, key_a: int, key_b: int, error: str) -> bool:
         """
         Insert a new row into the database. If the value exists already, return False, else return True
 
         :param key_a: key of first image in directory_X table
         :param key_b: key of second image in directory_X table
         :param error: error that occurred during processing.
-        :param b_dir_b: if the second image came from dir_b
         :return: bool if the insert was successful or the key pair existed already.
         """
         if self.get_by_pair(key_a=key_a, key_b=key_b) is not None:
             return False
 
-        self.debug_execute(f"INSERT INTO dif_table (key_a, key_b, b_dir_b, success, error) "
-                           f"VALUES ({key_a}, {key_b}, {1 if b_dir_b else 0}, 0, '{error}')")
+        self.debug_execute(f"INSERT INTO dif_table (key_a, key_b, success, error) "
+                           f"VALUES ({key_a}, {key_b}, 0, '{error}')")
         return True
 
     def get_by_pair(self, key_a: int, key_b: int):
