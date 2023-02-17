@@ -72,7 +72,7 @@ class dif:
                               "end_date": time.strftime("%Y-%m-%d", end_time),
                               "end_time": time.strftime("%H:%M:%S", end_time),
                               "seconds_elapsed": time_elapsed},
-                 "fast_search": self.fast_search
+                 "fast_search": self.fast_search,
                  "recursive": self.recursive,
                  "match_mse": self.similarity,
                  "files_searched": total_searched,

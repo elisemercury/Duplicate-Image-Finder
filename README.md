@@ -174,5 +174,5 @@ The below sections feature third-party work that has been **built with** or **in
 -------
 
 <p align="center"><b>
-We :heart: Open Source 
+We :heart: Open Source
 </b></p>
