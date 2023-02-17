@@ -19,12 +19,13 @@ warnings.filterwarnings('ignore')
 class dif:
     # Class that runs the difPy algortihm on file like objects
 
-    def __init__(self, *directory, recursive=True, similarity="normal", px_size=50, show_progress=True, show_output=False, delete=False, silent_del=False):
+    def __init__(self, *directory, fast_search=True, recursive=True, similarity="normal", px_size=50, show_progress=True, show_output=False, delete=False, silent_del=False):
         print("difPy process initializing...", end="\r")
         self.directory = _validate._directory_exist(directory)
         _validate._directory_unique(self.directory)
         self.recursive = _validate._recursive(recursive)
         self.similarity = _validate._similarity(similarity)
+        self.fast_search = _validate._fast_search(fast_search, self.similarity)
         self.px_size = _validate._px_size(px_size)
         self.delete, self.silent_del = _validate._delete(delete, silent_del)
         self.show_output = _validate._show_output(show_output)
@@ -59,7 +60,7 @@ class dif:
                 else:
                     break
         imgs_matrices, invalid_files = _compute._imgs_matrices(id_by_location, self.px_size, self.show_progress)
-        result, exlude_from_search, total_count, match_count = _search._matches(imgs_matrices, id_by_location, self.similarity, self.show_output, self.show_progress)
+        result, exlude_from_search, total_count, match_count = _search._matches(imgs_matrices, id_by_location, self.similarity, self.show_output, self.show_progress, self.fast_search)
         lower_quality = _search._lower_quality(result)
         return result, lower_quality, total_count, match_count, invalid_files
 
@@ -71,6 +72,7 @@ class dif:
                               "end_date": time.strftime("%Y-%m-%d", end_time),
                               "end_time": time.strftime("%H:%M:%S", end_time),
                               "seconds_elapsed": time_elapsed},
+                 "fast_search": self.fast_search
                  "recursive": self.recursive,
                  "match_mse": self.similarity,
                  "files_searched": total_searched,
@@ -91,6 +93,14 @@ class _validate:
     def _directory_unique(directory):
         if len(set(directory)) != len(directory):
             raise ValueError('Invalid directory parameters: an attempt to compare a directory with itself.')
+
+    def _fast_search(fast_search, similarity):
+        # Function that _validates the 'show_output' input parameter
+        if not isinstance(fast_search, bool):
+            raise Exception('Invalid value for "fast_search" parameter.')
+        if similarity > 200:
+            fast_search = False
+        return fast_search
 
     def _show_output(show_output):
         # Function that _validates the 'show_output' input parameter
@@ -202,7 +212,7 @@ class _compute:
 
 class _search:
 
-    def _matches(imgs_matrices, id_by_location, similarity, show_output, show_progress):
+    def _matches(imgs_matrices, id_by_location, similarity, show_output, show_progress, fast_search):
         # Function that searches the images on duplicates/similarity matches
         progress_count = 0
         match_count = 0
@@ -235,7 +245,8 @@ class _search:
                                 if show_output:
                                     _help._show_img_figs(matrix_A, matrix_B, mse)
                                     _help._show_file_info(id_by_location[id_A], id_by_location[id_B])
-                                exclude_from_search.append(id_B)
+                                if fast_search == True:
+                                    exclude_from_search.append(id_B)
                                 rotations = 4
                             else:
                                 rotations += 1
@@ -347,6 +358,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Find duplicate or similar images on your computer with difPy - https://github.com/elisemercury/Duplicate-Image-Finder')
     parser.add_argument("-D", "--directory", type=str, nargs='+', help='Directory to search for images.', required=True)
     parser.add_argument("-Z", "--output_directory", type=str, help='Output directory for the difPy result files. Default is working dir.', required=False, default=None)
+    parser.add_argument("-f", "--fast_search", type=str, help='Choose whether difPy should use its fast search algorithm.', required=False, default=None)
     parser.add_argument("-r", "--recursive", type=bool, help='Scan subfolders for duplicate images', required=False, choices=[True, False], default=True)
     parser.add_argument("-s", "--similarity", type=_type_str_int, help='Similarity grade.', required=False, default='normal')
     parser.add_argument("-px", "--px_size", type=int, help='Compression size of images in pixels.', required=False, default=50)
@@ -357,10 +369,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # initialize difPy
-    search = dif(*args.directory, 
-                        recursive=args.recursive, similarity=args.similarity, px_size=args.px_size, 
-                        show_output=args.show_output, show_progress=args.show_progress, 
-                        delete=args.delete, silent_del=args.silent_del)
+    search = dif(*args.directory, fast_search=args.fast_search,
+                recursive=args.recursive, similarity=args.similarity, px_size=args.px_size, 
+                show_output=args.show_output, show_progress=args.show_progress, 
+                delete=args.delete, silent_del=args.silent_del)
 
     # create filenames for the output files
     timestamp =str(time.time()).replace(".", "_")

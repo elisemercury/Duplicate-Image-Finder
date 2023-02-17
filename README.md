@@ -91,19 +91,20 @@ search.stats
                "end_date" : "2023-02-15",
                "end_time" : "18:44:38",
                "seconds_elapsed" : 18.6113},
+ "fast_search": True,
  "recursive" : True,
  "match_mse" : 200,
  "files_searched" : 1032,
  "matches_found" : 852,
  "invalid_files" : 4}
 ``` 
-:new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** now outputs the count of **invalid files** in the target directory that could not be processed as images!
+:new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** now outputs the count of **invalid files** in the target directory that could not be processed as images, as well information on whether `fast_search` was used.
 
 ## Additional Parameters
 DifPy supports the following parameters:
 
 ```python
-dif(*directory, recursive=True, similarity="normal", px_size=50, 
+dif(*directory, fast_search=True, recursive=True, similarity="normal", px_size=50, 
     show_progress=True, show_output=False, delete=False, silent_del=False)
 ```
 
@@ -120,7 +121,7 @@ python dif.py -D"C:/Path/to/Folder_A/" "C:/Path/to/Folder_B/" "C:/Path/to/Folder
 It supports the following arguments:
 
 ```python
-dif.py [-h] -D DIRECTORY [-Z [OUTPUT_DIRECTORY]] 
+dif.py [-h] -D DIRECTORY [-Z [OUTPUT_DIRECTORY]] [-f [FAST_SEARCH]]
        [-r [{True,False}]] [-s [{low,normal,high,int}]] [-px [PX_SIZE]] 
        [-p [{True,False}]] [-o [{True,False}]]
        [-d [{True,False}]] [-sd [{True,False}]]
@@ -128,11 +129,12 @@ dif.py [-h] -D DIRECTORY [-Z [OUTPUT_DIRECTORY]]
 
 | | Parameter | | Parameter |
 | :---: | ------ | :---: | ------ | 
-| `-D` | directory | `-p` | show_progress |  
-| `-Z` | output_directory | `-o` | show_output |
+| `-D` | directory | `-px` | px_size |  
+| `-Z` | output_directory | `-p` | show_progress |
+| `-f`| fast_search | `-o` | show_output |
 | `-r`| recursive | `-d` | delete |
-| `-s` | similarity | `-sd` | silent_del |
-| `-px` | px_size | 
+| `-s` | similarity |  `-sd` | silent_del |
+
 
 When running from the CLI, the output of difPy is  written to files and saved in the working directory by default. To change the default output directory, specify the `-Z / -output_directory` parameter. The "xxx" in the output filenames is a unique timestamp:
 
