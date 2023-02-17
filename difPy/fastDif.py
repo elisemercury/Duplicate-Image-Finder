@@ -752,7 +752,6 @@ class FastDifPy:
         self.plot_output_dir = diff_location
         self.db.create_plot_table(purge=purge)
 
-    # TODO matching hash
     def second_loop_iteration(self, only_matching_aspect: bool = False, only_matching_hash: bool = False,
                               make_diff_plots: bool = False, similarity_threshold: float = 200.0, gpu_proc: int = 0,
                               cpu_proc: int = None, diff_location: str = None):
