@@ -37,10 +37,11 @@ Features:
 # TODO Range in which the aspects must lay for matching_aspect to trigger
 # TODO Harakiri method. More reckless method.
 # TODO Use of binary differentiation to detect hard file duplicates
-# TODO  Use of file names / zero difference to detect images which differ only in the metadata.
+# TODO Use of file names / zero difference to detect images which differ only in the metadata.
 # TODO keyboard shortcuts pyinput
 # TODO different shift amounts for different colors.
-
+# TODO matching hash
+# TODO Extract hashing_data
 
 def cpu_process_image(proc: ImageProcessing, args: PreprocessArguments) -> PreprocessResults:
     """
