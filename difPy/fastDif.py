@@ -1516,13 +1516,16 @@ class FastDifPy:
         thumb_dir = self.thumb_dir_a if dir_a else self.thumb_dir_b
         return os.path.join(thumb_dir, thumb_name[1])
 
-    def get_duplicates(self, similarity: float = None):
+    def get_duplicates(self, similarity: float = None, dif_based: bool = True):
         """
         Builds the duplicates clusters. The function returns the
 
-        :param similarity:
+        :param similarity: amount that the dif amount needs to lay below.
+        :param dif_based: if the relative difference should be used or hash based matching should be done.
         :return:
         """
+        if not dif_based:
+            raise NotImplementedError("hash_based is in todos.")
         clusters = self.build_loose_duplicate_cluster(similarity)
         return self.find_best_image(clusters)
 
