@@ -98,7 +98,7 @@ search.stats
  "matches_found" : 852,
  "invalid_files" : 4}
 ``` 
-:new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** now outputs the count of **invalid files** in the target directory that could not be processed as images, as well information on whether `fast_search` was used.
+:new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** now outputs the count of **invalid files** in the target directory that could not be processed as images, as well information on whether difPy's **Fast Search Algorithm (FSA)** was used.
 
 ## Additional Parameters
 DifPy supports the following parameters:
@@ -107,6 +107,7 @@ DifPy supports the following parameters:
 dif(*directory, fast_search=True, recursive=True, similarity="normal", px_size=50, 
     show_progress=True, show_output=False, delete=False, silent_del=False)
 ```
+:new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** difPy now supports the use of its new **Fast Search Algortihm (FSA)**, capable of providing significant performance increases.
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
 
