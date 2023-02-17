@@ -14,7 +14,7 @@
 ```python
 pip install difPy
 ```
-> :point_right: :new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** has been released! Count on signifcant **performance increases**, **new features** and **bug fixes**. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for a detailed listing. 
+> :point_right: :new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** has been released! Count on signifcant **performance increases**, **new features** and **bug fixes**. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for a detailed listing. 
 
 > :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy) for more information.
 
@@ -40,7 +40,7 @@ Use the following function to make difPy search for duplicates within one specif
 from difPy import dif
 search = dif("C:/Path/to/Folder/")
 ``` 
-:new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** now supports **multi-folder search**! To search for duplicates within mutliple folders and their subfolders:
+:new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** now supports **multi-folder search**! To search for duplicates within mutliple folders and their subfolders:
 
 ```python
 from difPy import dif
@@ -68,7 +68,7 @@ search.result
  ...
 }
 ``` 
-:new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** now outputs the **MSE** value for each matched image!
+:new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** now outputs the **MSE** value for each matched image!
 
 A **list** of duplicates/similar images that have the **lowest quality** among match groups: 
 
@@ -98,7 +98,7 @@ search.stats
  "matches_found" : 852,
  "invalid_files" : 4}
 ``` 
-:new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** now outputs the count of **invalid files** in the target directory that could not be processed as images, as well information on whether difPy's **Fast Search Algorithm (FSA)** was used.
+:new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** now outputs the count of **invalid files** in the target directory that could not be processed as images, as well information on whether difPy's **Fast Search Algorithm (FSA)** was used.
 
 ## Additional Parameters
 DifPy supports the following parameters:
@@ -107,7 +107,7 @@ DifPy supports the following parameters:
 dif(*directory, fast_search=True, recursive=True, similarity="normal", px_size=50, 
     show_progress=True, show_output=False, delete=False, silent_del=False)
 ```
-:new: **[difPy v3.0.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.0)** difPy now supports the use of its new **Fast Search Algorithm (FSA)**, capable of providing significant performance increases.
+:new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** difPy now supports the use of its new **Fast Search Algorithm (FSA)**, capable of providing significant performance increases.
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
 
