@@ -60,7 +60,7 @@ class dif:
                 else:
                     break
         imgs_matrices, invalid_files = _compute._imgs_matrices(id_by_location, self.px_size, self.show_progress)
-        result, exlude_from_search, total_count, match_count = _search._matches(imgs_matrices, id_by_location, self.similarity, self.show_output, self.show_progress, self.fast_search)
+        result, exclude_from_search, total_count, match_count = _search._matches(imgs_matrices, id_by_location, self.similarity, self.show_output, self.show_progress, self.fast_search)
         lower_quality = _search._lower_quality(result)
         return result, lower_quality, total_count, match_count, invalid_files
 
