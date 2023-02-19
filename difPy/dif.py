@@ -245,7 +245,7 @@ class _search:
                                                                      'mse': mse }
                                 if show_output:
                                     _help._show_img_figs(matrix_A, matrix_B, mse)
-                                    _help._show_file_info(id_by_location[id_A], id_by_location[id_B])
+                                    _help._show_file_info(str(Path(id_by_location[id_A])), str(Path(id_by_location[id_B])))
                                 if fast_search == True:
                                     exclude_from_search.append(id_B)
                                 rotations = 4
@@ -290,8 +290,8 @@ class _help:
 
     def _show_file_info(img_A, img_B):
         # Function for printing filename info of plotted image files
-        img_A = "..." + str(img_A)[-45:]
-        img_B = "..." + str(img_B)[-45:]
+        img_A = f"...{img_A[-45:]}"
+        img_B = f"...{img_B[-45:]}"
         print(f"""Duplicate files:\n{img_A} and \n{img_B}\n""")
 
     def _rotate_img(img):
