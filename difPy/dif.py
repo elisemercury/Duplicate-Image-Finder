@@ -30,7 +30,7 @@ class dif:
         self.show_output = _validate._show_output(show_output)
         self.show_progress = _validate._show_progress(show_progress)
 
-        start_time = time.time()  # TODO check if can be put into run
+        start_time = time.time()
         self.result, self.lower_quality, total_count, match_count, invalid_files = dif._run(self)
         end_time = time.time()
 
