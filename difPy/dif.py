@@ -2,12 +2,11 @@
 difPy - Python package for finding duplicate or similar images within folders 
 https://github.com/elisemercury/Duplicate-Image-Finder
 """
-import skimage.color
 from glob import glob
 import matplotlib.pyplot as plt
 import uuid
 import numpy as np
-import cv2
+from PIL import Image
 import os
 import time
 from pathlib import Path
@@ -31,7 +30,7 @@ class dif:
         self.show_output = _validate._show_output(show_output)
         self.show_progress = _validate._show_progress(show_progress)
 
-        start_time = time.time()  # TODO check if can be put into run
+        start_time = time.time()
         self.result, self.lower_quality, total_count, match_count, invalid_files = dif._run(self)
         end_time = time.time()
 
@@ -97,7 +96,7 @@ class _validate:
     def _fast_search(fast_search, similarity):
         # Function that _validates the 'show_output' input parameter
         if not isinstance(fast_search, bool):
-            raise Exception('Invalid value for "fast_search" parameter.')
+            raise Exception('Invalid value for "fast_search" parameter: must be of type bool.')
         if similarity > 200:
             fast_search = False
         return fast_search
@@ -105,19 +104,19 @@ class _validate:
     def _show_output(show_output):
         # Function that _validates the 'show_output' input parameter
         if not isinstance(show_output, bool):
-            raise Exception('Invalid value for "show_output" parameter.')
+            raise Exception('Invalid value for "show_output" parameter: must be of type bool.')
         return show_output
 
     def _show_progress(show_progress):
         # Function that _validates the 'show_progress' input parameter
         if not isinstance(show_progress, bool):
-            raise Exception('Invalid value for "show_progress" parameter.')
+            raise Exception('Invalid value for "show_progress" parameter: must be of type bool.')
         return show_progress 
     
     def _recursive(recursive):
         # Function that _validates the 'recursive' input parameter
         if not isinstance(recursive, bool):
-            raise Exception('Invalid value for "recursive" parameter.')
+            raise Exception('Invalid value for "recursive" parameter: must be of type bool.')
         return recursive
     
     def _similarity(similarity):
@@ -126,34 +125,37 @@ class _validate:
             try:
                 similarity = float(similarity)
                 if similarity < 0:
-                  raise Exception('Invalid value for "similarity" parameter.')  
+                  raise Exception('Invalid value for "similarity" parameter: must be > 0.')  
                 else:
                     return similarity
             except:
-                raise Exception('Invalid value for "similarity" parameter.')
+                raise Exception('Invalid value for "similarity" parameter: must be of type float.')
         else: 
             if similarity == "low":
+                # low, search for duplicates, recommended, MSE <= 1000
                 similarity = 1000
-            # search for exact duplicate images, extremly sensitive, MSE < 0.1
             elif similarity == "high":
+                # high, search for exact duplicate images, extremly sensitive, MSE <= 0.1
                 similarity = 0.1
-            # normal, search for duplicates, recommended, MSE < 200
             else:
+                # normal, search for duplicates, recommended, MSE <= 200
                 similarity = 200
             return similarity
     
     def _px_size(px_size):
         # Function that _validates the 'px_size' input parameter   
+        if not isinstance(px_size, int):
+            raise Exception('Invalid value for "px_size" parameter: must be of type int.')
         if px_size < 10 or px_size > 5000:
-            raise Exception('Invalid value for "px_size" parameter.')
+            raise Exception('Invalid value for "px_size" parameter: must be between 10 and 5000.')
         return px_size
     
     def _delete(delete, silent_del):
         # Function that _validates the 'delete' and the 'silent_del' input parameter
         if not isinstance(delete, bool):
-            raise Exception('Invalid value for "delete" parameter.')
+            raise Exception('Invalid value for "delete" parameter: must be of type bool.')
         if not isinstance(silent_del, bool):
-            raise Exception('Invalid value for "silent_del" parameter.')
+            raise Exception('Invalid value for "silent_del" parameter: must be of type bool.')
         return delete, silent_del
 
 class _compute:
@@ -187,13 +189,12 @@ class _compute:
                     count += 1
                 else:
                     try:
-                        img = cv2.imdecode(np.fromfile(file, dtype=np.uint8), cv2.IMREAD_COLOR)
-                        if type(img) == np.ndarray:
-                            img = img[..., 0:3]
-                            img = cv2.resize(img, dsize=(px_size, px_size), interpolation=cv2.INTER_CUBIC)
-                            if len(img.shape) == 2:
-                                img = skimage.color.gray2rgb(img)
-                            imgs_matrices[id] = img
+                        img = Image.open(file)
+                        if img.getbands() != ('R', 'G', 'B'):
+                            img = img.convert('RGB')
+                        img = img.resize((px_size, px_size), resample=Image.Resampling.BICUBIC)
+                        img = np.asarray(img)
+                        imgs_matrices[id] = img
                     except:
                         invalid_files.append(id)
                     finally:
@@ -233,7 +234,7 @@ class _search:
                             if rotations != 0:
                                 matrix_B = _help._rotate_img(matrix_B)
                             mse = _compute._mse(matrix_A, matrix_B)
-                            if mse < similarity:
+                            if mse <= similarity:
                                 match_count += 1
                                 if id_A not in result.keys():
                                     result[id_A] = {'location': str(Path(id_by_location[id_A])),
