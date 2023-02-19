@@ -2,12 +2,11 @@
 difPy - Python package for finding duplicate or similar images within folders 
 https://github.com/elisemercury/Duplicate-Image-Finder
 """
-import skimage.color
 from glob import glob
 import matplotlib.pyplot as plt
 import uuid
 import numpy as np
-import cv2
+from PIL import Image
 import os
 import time
 from pathlib import Path
@@ -97,7 +96,7 @@ class _validate:
     def _fast_search(fast_search, similarity):
         # Function that _validates the 'show_output' input parameter
         if not isinstance(fast_search, bool):
-            raise Exception('Invalid value for "fast_search" parameter.')
+            raise Exception('Invalid value for "fast_search" parameter: must be of type bool.')
         if similarity > 200:
             fast_search = False
         return fast_search
@@ -105,19 +104,19 @@ class _validate:
     def _show_output(show_output):
         # Function that _validates the 'show_output' input parameter
         if not isinstance(show_output, bool):
-            raise Exception('Invalid value for "show_output" parameter.')
+            raise Exception('Invalid value for "show_output" parameter: must be of type bool.')
         return show_output
 
     def _show_progress(show_progress):
         # Function that _validates the 'show_progress' input parameter
         if not isinstance(show_progress, bool):
-            raise Exception('Invalid value for "show_progress" parameter.')
+            raise Exception('Invalid value for "show_progress" parameter: must be of type bool.')
         return show_progress 
     
     def _recursive(recursive):
         # Function that _validates the 'recursive' input parameter
         if not isinstance(recursive, bool):
-            raise Exception('Invalid value for "recursive" parameter.')
+            raise Exception('Invalid value for "recursive" parameter: must be of type bool.')
         return recursive
     
     def _similarity(similarity):
@@ -126,11 +125,11 @@ class _validate:
             try:
                 similarity = float(similarity)
                 if similarity < 0:
-                  raise Exception('Invalid value for "similarity" parameter.')  
+                  raise Exception('Invalid value for "similarity" parameter: must be > 0.')  
                 else:
                     return similarity
             except:
-                raise Exception('Invalid value for "similarity" parameter.')
+                raise Exception('Invalid value for "similarity" parameter: must be of type float.')
         else: 
             if similarity == "low":
                 similarity = 1000
@@ -144,16 +143,18 @@ class _validate:
     
     def _px_size(px_size):
         # Function that _validates the 'px_size' input parameter   
+        if not isinstance(px_size, int):
+            raise Exception('Invalid value for "px_size" parameter: must be of type int.')
         if px_size < 10 or px_size > 5000:
-            raise Exception('Invalid value for "px_size" parameter.')
+            raise Exception('Invalid value for "px_size" parameter: must be between 10 and 5000.')
         return px_size
     
     def _delete(delete, silent_del):
         # Function that _validates the 'delete' and the 'silent_del' input parameter
         if not isinstance(delete, bool):
-            raise Exception('Invalid value for "delete" parameter.')
+            raise Exception('Invalid value for "delete" parameter: must be of type bool.')
         if not isinstance(silent_del, bool):
-            raise Exception('Invalid value for "silent_del" parameter.')
+            raise Exception('Invalid value for "silent_del" parameter: must be of type bool.')
         return delete, silent_del
 
 class _compute:
@@ -187,13 +188,10 @@ class _compute:
                     count += 1
                 else:
                     try:
-                        img = cv2.imdecode(np.fromfile(file, dtype=np.uint8), cv2.IMREAD_COLOR)
-                        if type(img) == np.ndarray:
-                            img = img[..., 0:3]
-                            img = cv2.resize(img, dsize=(px_size, px_size), interpolation=cv2.INTER_CUBIC)
-                            if len(img.shape) == 2:
-                                img = skimage.color.gray2rgb(img)
-                            imgs_matrices[id] = img
+                        image = Image.open(file)
+                        image = image.resize((px_size, px_size), resample=Image.Resampling.BICUBIC)
+                        tensor = np.asarray(image)
+                        imgs_matrices[id] = tensor
                     except:
                         invalid_files.append(id)
                     finally:
