@@ -132,12 +132,13 @@ class _validate:
                 raise Exception('Invalid value for "similarity" parameter: must be of type float.')
         else: 
             if similarity == "low":
+                # low, search for duplicates, recommended, MSE <= 1000
                 similarity = 1000
-            # search for exact duplicate images, extremly sensitive, MSE < 0.1
             elif similarity == "high":
+                # high, search for exact duplicate images, extremly sensitive, MSE <= 0.1
                 similarity = 0.1
-            # normal, search for duplicates, recommended, MSE < 200
             else:
+                # normal, search for duplicates, recommended, MSE <= 200
                 similarity = 200
             return similarity
     
@@ -188,10 +189,12 @@ class _compute:
                     count += 1
                 else:
                     try:
-                        image = Image.open(file)
-                        image = image.resize((px_size, px_size), resample=Image.Resampling.BICUBIC)
-                        tensor = np.asarray(image)
-                        imgs_matrices[id] = tensor
+                        img = Image.open(file)
+                        if img.getbands() != ('R', 'G', 'B'):
+                            img = img.convert('RGB')
+                        img = img.resize((px_size, px_size), resample=Image.Resampling.BICUBIC)
+                        img = np.asarray(img)
+                        imgs_matrices[id] = img
                     except:
                         invalid_files.append(id)
                     finally:
@@ -231,7 +234,7 @@ class _search:
                             if rotations != 0:
                                 matrix_B = _help._rotate_img(matrix_B)
                             mse = _compute._mse(matrix_A, matrix_B)
-                            if mse < similarity:
+                            if mse <= similarity:
                                 match_count += 1
                                 if id_A not in result.keys():
                                     result[id_A] = {'location': str(Path(id_by_location[id_A])),
