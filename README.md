@@ -44,9 +44,9 @@ search = dif("C:/Path/to/Folder/")
 
 ```python
 from difPy import dif
-search = dif("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder_C/", ...)
+search = dif(["C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder_C/", ... ])
 ``` 
-Folder paths must be specified as a Python string.
+Folder paths must be specified as standalone Python strings, or within a Python list.
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
 
