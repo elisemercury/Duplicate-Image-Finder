@@ -20,7 +20,7 @@ Fast implementation of the DifPy Library.
 Features:
 - Use GPU to accelerate the comparison
 - Use Parallelization to use multicore CPUs
-- Use of aspect rotation to ignore images with non-matching aspect ratio
+- Use of aspect ration to ignore images with non-matching aspect ratio
 - Use hash based deduplication to find duplicates with color grading
 """
 
@@ -28,19 +28,15 @@ Features:
 # TODO test cuda functionality
 # TODO single processing handler
 # TODO Reset Processing Class if the arguments are switched.
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 # FEATURES
 # ----------------------------------------------------------------------------------------------------------------------
 # TODO Implement process stop recovery.
 # TODO Range in which the aspects must lay for matching_aspect to trigger
 # TODO Harakiri method. More reckless method.
-# TODO Use of binary differentiation to detect hard file duplicates
-# TODO Use of file names / zero difference to detect images which differ only in the metadata.
 # TODO keyboard shortcuts pyinput
 # TODO different shift amounts for different colors.
-# TODO matching hash
+# TODO Arbitrary hash matching function
 # TODO Extract hashing_data
 
 def cpu_process_image(proc: ImageProcessing, args: PreprocessArguments) -> PreprocessResults:
