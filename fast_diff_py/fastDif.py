@@ -698,7 +698,7 @@ class FastDifPy:
         self.db.update_dir_success(key=result_obj.key, px=result_obj.original_x, py=result_obj.original_y)
 
         # to be sure commit here.
-        self.db.con.commit()
+        self.db.commit()
         return True
 
     def clean_up(self, thumbs: bool = True, db: bool = True):
@@ -724,8 +724,8 @@ class FastDifPy:
 
         if db:
             self.db.disconnect()
+            self.db.free()
             self.db = None
-            os.remove(self.db.path)
             print("Deleted temporary database")
 
     def create_plot_dir(self, diff_location: str, purge: bool = False):
@@ -851,7 +851,7 @@ class FastDifPy:
         assert not self.handle_results_second_queue(), "Existed without having run out of tasks and without all " \
                                                        "processes having stopped."
 
-        self.db.con.commit()
+        self.db.commit()
         print("Data should be committed")
 
     def update_queues(self):
