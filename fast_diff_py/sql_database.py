@@ -878,3 +878,19 @@ class SQLiteDatabase(Database):
         bytes_string = base64.standard_b64decode(b64_string)
         json_string = bytes_string.decode("utf-8")
         return json.loads(json_string)
+
+    def commit(self):
+        """
+        Commit any not stored changes now to the filesystem.
+
+        :return:
+        """
+        self.con.commit()
+
+    def free(self):
+        """
+        Remove the database file from.
+
+        :return:
+        """
+        os.remove(self.path)
