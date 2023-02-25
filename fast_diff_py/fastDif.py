@@ -1,19 +1,19 @@
 import datetime
 import shutil
 import time
-from difPy.database import Database
+from fast_diff_py.database import Database
 import os
 from typing import List, Tuple, Dict
 from types import FunctionType
 import warnings
-from difPy.utils import *
+from fast_diff_py.utils import *
 import multiprocessing as mp
 import threading as th
 import queue
-from difPy.datatransfer import *
-from difPy.image_processor import ImageProcessing
+from fast_diff_py.datatransfer import *
+from fast_diff_py.image_processor import ImageProcessing
 from concurrent.futures import ProcessPoolExecutor
-from difPy.sql_database import SQLiteDatabase
+from fast_diff_py.sql_database import SQLiteDatabase
 
 """
 Fast implementation of the DifPy Library.

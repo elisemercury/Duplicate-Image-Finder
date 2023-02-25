@@ -1,5 +1,5 @@
 """
-difPy - Python package for finding duplicate or similar images within folders 
+fast_diff_py - Python package for finding duplicate or similar images within folders
 https://github.com/elisemercury/Duplicate-Image-Finder
 """
 
@@ -395,22 +395,22 @@ def type_str_int(x):
     except:
         return x
 
-# Parameters for when launching difPy via CLI
+# Parameters for when launching fast_diff_py via CLI
 if __name__ == "__main__":    
     # set CLI arguments
-    parser = argparse.ArgumentParser(description='Find duplicate or similar images on your computer with difPy - https://github.com/elisemercury/Duplicate-Image-Finder')
+    parser = argparse.ArgumentParser(description='Find duplicate or similar images on your computer with fast_diff_py - https://github.com/elisemercury/Duplicate-Image-Finder')
     parser.add_argument("-A", "--directory_A", type=str, help='Directory to search for images.', required=True)
     parser.add_argument("-B", "--directory_B", type=str, help='(optional) Second directory to search for images.', required=False, nargs='?', default=None)
-    parser.add_argument("-Z", "--output_directory", type=str, help='(optional) Output directory for the difPy result files. Default is working dir.', required=False, nargs='?', default=None)
+    parser.add_argument("-Z", "--output_directory", type=str, help='(optional) Output directory for the fast_diff_py result files. Default is working dir.', required=False, nargs='?', default=None)
     parser.add_argument("-s", "--similarity", type=type_str_int, help='(optional) Similarity grade.', required=False, nargs='?', default='normal')
     parser.add_argument("-px", "--px_size", type=int, help='(optional) Compression size of images in pixels.', required=False, nargs='?', default=50)
-    parser.add_argument("-p", "--show_progress", type=bool, help='(optional) Shows the real-time progress of difPy.', required=False, nargs='?', choices=[True, False], default=True)
+    parser.add_argument("-p", "--show_progress", type=bool, help='(optional) Shows the real-time progress of fast_diff_py.', required=False, nargs='?', choices=[True, False], default=True)
     parser.add_argument("-o", "--show_output", type=bool, help='(optional) Shows the comapred images in real-time.', required=False, nargs='?', choices=[True, False], default=False)
     parser.add_argument("-d", "--delete", type=bool, help='(optional) Deletes all duplicate images with lower quality.', required=False, nargs='?', choices=[True, False], default=False)
     parser.add_argument("-D", "--silent_del", type=bool, help='(optional) Supresses the user confirmation when deleting images.', required=False, nargs='?', choices=[True, False], default=False)
     args = parser.parse_args()
 
-    # initialize difPy
+    # initialize fast_diff_py
     search = dif(directory_A=args.directory_A, directory_B=args.directory_B,
                  similarity=args.similarity, px_size=args.px_size, 
                  show_output=args.show_output, show_progress=args.show_progress, 
@@ -439,4 +439,4 @@ if __name__ == "__main__":
     with open(os.path.join(dir, stats_file), "w") as file:
         json.dump(search.stats, file)
 
-    print(f"""\nSaved difPy results into folder {dir} and filenames:\n{result_file} \n{lq_file} \n{stats_file}""")
+    print(f"""\nSaved fast_diff_py results into folder {dir} and filenames:\n{result_file} \n{lq_file} \n{stats_file}""")

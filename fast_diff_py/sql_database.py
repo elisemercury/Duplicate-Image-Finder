@@ -4,7 +4,7 @@ import base64
 import json
 from typing import Any, Union, List
 import datetime
-from difPy.database import Database
+from fast_diff_py.database import Database
 
 """
 Default implementation of the Database.

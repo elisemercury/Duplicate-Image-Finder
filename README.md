@@ -37,13 +37,15 @@ DifPy does not compare images based on their hashes. It compares them based on t
 Use the following function to make difPy search for duplicates within one specific folder and its subfolders:
 
 ```python
-from difPy import dif
+from fast_diff_py import dif
+
 search = dif("C:/Path/to/Folder/")
 ``` 
 :new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** now supports **multi-folder search**! To search for duplicates within mutliple folders and their subfolders:
 
 ```python
-from difPy import dif
+from fast_diff_py import dif
+
 search = dif("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder_C/", ...)
 ``` 
 Folder paths must be specified as a Python string.
