@@ -515,7 +515,7 @@ class FastDifPy:
         ----------------------------------------------------------------------------------------------------------------
 
         The program doesn't support hdr image formats and only allocates one byte per channel per pixel. Consequently
-        10bit images for example are not supported. They are down-converted. # TODO Verify!!!
+        10bit images for example are not supported. They are probably down-converted. # TODO Verify!!!
 
 
         :param compute_thumbnails: Resize images and store them temporarily
