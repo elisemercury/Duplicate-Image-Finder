@@ -396,4 +396,26 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
+    def commit(self):
+        """
+        Commit any not stored changes now to the filesystem.
 
+        :return:
+        """
+        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
+
+    def disconnect(self):
+        """
+        Remove the connection to the Database so it can be cleared / deleted.
+
+        :return:
+        """
+        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
+
+    def free(self):
+        """
+        Removes the database from the filesystem.
+
+        :return:
+        """
+        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
