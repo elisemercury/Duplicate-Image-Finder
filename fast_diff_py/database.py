@@ -208,6 +208,16 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
+    def get_many_preprocessing_errors(self, start_key: int = None, count: int = 1000) -> List[dict]:
+        """
+        Get rows which contain errors. Wrapp the result in dicts and return them.
+        
+        :param start_key: Starting key.
+        :param count: Number of Results to be returned at maximum.
+        :return: 
+        """
+        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
+
     # ------------------------------------------------------------------------------------------------------------------
     # THUMBNAIL FILENAME TABLE
     # ------------------------------------------------------------------------------------------------------------------
@@ -393,6 +403,16 @@ class Database:
         :param threshold: below what the dif value needs to be.
         :param start_key: larger than that the diff needs to be.
         :return: tuples from
+        """
+        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
+
+    def get_many_diff_errors(self, start_key: int = None, count: int = 1000) -> List[dict]:
+        """
+        Get rows which contain errors. Wrapp the result in dicts and return them.
+
+        :param start_key: Starting key.
+        :param count: Number of Results to be returned at maximum.
+        :return:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
