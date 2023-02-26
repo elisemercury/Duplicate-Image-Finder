@@ -151,7 +151,7 @@ class SQLiteDatabase(Database):
         return {"key": row[0],
                 "path": row[1],
                 "filename": row[2],
-                "error": row[3],
+                "error": SQLiteDatabase.from_b64(row[3]) if row[3] is not None else None,
                 "proc_suc": row[4],
                 "px": row[5],
                 "py": row[6],
