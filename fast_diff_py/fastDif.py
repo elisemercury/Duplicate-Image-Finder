@@ -25,12 +25,12 @@ Features:
 """
 
 
-# TODO test cuda functionality
 # TODO single processing handler
 # TODO Reset Processing Class if the arguments are switched.
 # ----------------------------------------------------------------------------------------------------------------------
 # FEATURES
 # ----------------------------------------------------------------------------------------------------------------------
+# TODO implement Cuda image diff.
 # TODO Implement process stop recovery.
 # TODO Range in which the aspects must lay for matching_aspect to trigger
 # TODO Harakiri method. More reckless method.
