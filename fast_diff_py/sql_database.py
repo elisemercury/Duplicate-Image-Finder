@@ -382,6 +382,24 @@ class SQLiteDatabase(Database):
 
         return hashes
 
+    def get_many_preprocessing_errors(self, start_key: int = None, count: int = 1000) -> List[dict]:
+        """
+        Get rows which contain errors. Wrapp the result in dicts and return them.
+
+        :param start_key: Starting key.
+        :param count: Number of Results to be returned at maximum.
+        :return:
+        """
+        # fetching from the beginning
+        if start_key is None:
+            self.debug_execute(f"SELECT * FROM directory WHERE error IS NOT NULL ORDER BY key ASC")
+            return self.cur.fetchmany(count)
+
+        # fetching from starting key.
+        self.debug_execute(f"SELECT * FROM directory WHERE error IS NOT NULL AND key > {start_key} "
+                           f"ORDER BY key ASC")
+        return self.wrap_many_dict_dir(self.cur.fetchmany(count))
+
     # ------------------------------------------------------------------------------------------------------------------
     # THUMBNAIL FILENAME TABLE
     # ------------------------------------------------------------------------------------------------------------------
