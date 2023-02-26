@@ -655,8 +655,6 @@ class FastDifPy:
         )
         self.db.mark_processing(task)
 
-        self.first_loop_in.put(arg.to_json())
-
         return arg
 
     def handle_result_of_first_loop(self, res_q: mp.Queue, compute_hash: bool) -> bool:
