@@ -1599,6 +1599,34 @@ class FastDifPy:
             if len(pairs) == 0:
                 return
 
+    def spawn_duplicate_error_worker(self):
+        """
+        TODO Docstring
+        :return:
+        """
+        raise NotImplementedError("Need to implement that one")
+
+    def spawn_preprocessing_error_worker(self):
+        """
+        TODO Docstring
+        :return:
+        """
+        raise NotImplementedError("Need to implement that one")
+
+    def continuous_duplicate_error_worker(self):
+        """
+        TODO docstring
+        :return:
+        """
+        raise NotImplementedError("Need to implement that one")
+
+    def continuous_preprocessing_error_worker(self):
+        """
+        TODO docstring
+        :return:
+        """
+        raise NotImplementedError("Need to implement that one")
+
     def build_loose_duplicate_cluster(self, similarity: float = None):
         """
         Function generates a list of dicts containing duplicates. Each dict in the list satisfies that there exists at
