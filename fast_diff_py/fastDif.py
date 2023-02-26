@@ -1523,7 +1523,7 @@ class FastDifPy:
         clusters = self.build_loose_duplicate_cluster(similarity)
         return self.find_best_image(clusters)
 
-    def spawn_duplicate_worker(self, queue_size: int = 1000, start_id: int = None, threshold: float = 200) \
+    def spawn_duplicate_pair_worker(self, queue_size: int = 1000, start_id: int = None, threshold: float = 200) \
             -> Tuple[mp.Queue, th.Thread]:
         """
         Function creates a worker thread which continuously enqueues dicts of each matching pair into the returned
@@ -1546,11 +1546,11 @@ class FastDifPy:
         :return: queue containing dicts of the matching pairs, thread object that is filling the queue.
         """
         transfer_queue = mp.Queue(maxsize=queue_size)
-        process = th.Thread(target=self.continuous_dequeue_worker, args=(transfer_queue, start_id, threshold))
+        process = th.Thread(target=self.continuous_dif_pair_dequeue_worker, args=(transfer_queue, start_id, threshold))
         process.start()
         return transfer_queue, process
 
-    def continuous_dequeue_worker(self, out_queue: mp.Queue, start: int = None, threshold: float = 200):
+    def continuous_dif_pair_dequeue_worker(self, out_queue: mp.Queue, start: int = None, threshold: float = 200):
         """
         Worker function for get_duplicates. Performs the fetching from db, wrapping in dicts and putting in queue.
 
