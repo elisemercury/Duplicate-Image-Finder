@@ -750,7 +750,7 @@ class SQLiteDatabase(Database):
         """
         result = []
         for row in rows:
-            result.append(Database.all_to_dict_dif(row))
+            result.append(SQLiteDatabase.all_to_dict_dif(row))
         return result
 
     def get_by_table_key(self, key: int):
