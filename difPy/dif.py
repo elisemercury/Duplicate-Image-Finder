@@ -60,7 +60,7 @@ class dif:
 
         time_elapsed = np.round(end_time - start_time, 4)
         self.stats = dif._generate_stats(self, start_time=time.localtime(start_time), end_time=time.localtime(end_time), time_elapsed=time_elapsed, 
-                                         total_searched=total_count, total_matches=match_count, total_invalid=len(invalid_files))
+                                         total_searched=total_count, total_matches=match_count, invalid_files=invalid_files)
 
         print(f"Found {match_count} pair(s) of duplicate/similar image(s) in {time_elapsed} seconds.")
 
@@ -89,7 +89,7 @@ class dif:
         lower_quality = _search._lower_quality(result)
         return result, lower_quality, total_count, match_count, invalid_files
 
-    def _generate_stats(self, start_time, end_time, time_elapsed, total_searched, total_matches, total_invalid):
+    def _generate_stats(self, start_time, end_time, time_elapsed, total_searched, total_matches, invalid_files):
         """Generates stats of the difPy process.
         """
         stats = {"directory": self.directory,
@@ -103,7 +103,8 @@ class dif:
                  "match_mse": self.similarity,
                  "files_searched": total_searched,
                  "matches_found": total_matches,
-                 "invalid_files": total_invalid}
+                 "invalid_files": {"count": len(invalid_files),
+                                   "logs" : invalid_files}}
         return stats
 
 class _validate:
@@ -219,7 +220,7 @@ class _compute:
         count = 0
         total_count = len(id_by_location)
         imgs_matrices = {}
-        invalid_files = []
+        invalid_files = {}
         try:
             for id, file in id_by_location.items():
                 if show_progress:
@@ -231,11 +232,11 @@ class _compute:
                         img = Image.open(file)
                         if img.getbands() != ('R', 'G', 'B'):
                             img = img.convert('RGB')
-                        img = img.resize((px_size, px_size), resample=Image.Resampling.BICUBIC)
+                        img = img.resize((px_size, px_size), resample=Image.BICUBIC)
                         img = np.asarray(img)
                         imgs_matrices[id] = img
-                    except:
-                        invalid_files.append(id)
+                    except Exception as e:
+                        invalid_files[file] = e
                     finally:
                         count += 1
             for id in invalid_files:
