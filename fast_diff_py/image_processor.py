@@ -160,8 +160,7 @@ class ImageProcessing:
         return PreprocessResults.error_obj(in_path=self.preprocessing_args.in_path,
                                            out_path=self.preprocessing_args.out_path,
                                            error=self.error,
-                                           key=self.preprocessing_args.key,
-                                           dir_a=self.preprocessing_args.dir_a
+                                           key=self.preprocessing_args.key
                                            )
 
     def create_no_hash_preprocess_result(self):
@@ -174,8 +173,7 @@ class ImageProcessing:
                                               out_path=self.preprocessing_args.out_path,
                                               original_x=self.original_size_x,
                                               original_y=self.original_size_y,
-                                              key=self.preprocessing_args.key,
-                                              dir_a=self.preprocessing_args.dir_a,
+                                              key=self.preprocessing_args.key
                                               )
 
     def create_full_preprocess_result(self):
