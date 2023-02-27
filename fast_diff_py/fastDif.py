@@ -1573,6 +1573,9 @@ class FastDifPy:
         if len(pairs) == 0:
             return
 
+        # Perform with JOIN: TODO
+        # SELECT * FROM dif_table JOIN directory d on dif_table.key_a = d.key JOIN
+        # directory dd on dif_table.key_b = dd.key;
         while True:
             # process each pair and put it in a queue.
             for p in pairs:
@@ -1597,6 +1600,24 @@ class FastDifPy:
 
             if len(pairs) == 0:
                 return
+
+    def print_preprocessing_errors(self):
+        errors = True
+        last_key = None
+
+        # get the errors as long as there are any
+        while errors:
+            results = self.db.get_many_preprocessing_errors(start_key=last_key, count=1000)
+
+            if len(results) == 0:
+                errors = False
+
+            for r in results:
+                path = r['path']
+                error = r['error']
+                print(f"File {path} encountered error:\n{error}")
+
+        print("-"*120)
 
     def spawn_duplicate_error_worker(self):
         """
