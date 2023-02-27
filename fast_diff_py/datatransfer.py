@@ -326,7 +326,6 @@ class CompareImageResults:
     success: bool
 
     min_avg_diff: float
-    is_dir_b: bool
 
     @staticmethod
     def from_json(json_string: str):
@@ -348,8 +347,8 @@ class CompareImageResults:
                                    key_b=int(obj_dict["key_b"]),
                                    error=obj_dict["error"],
                                    success=obj_dict["success"],
-                                   min_avg_diff=obj_dict["min_avg_diff"],
-                                   is_dir_b=obj_dict["is_dir_b"])
+                                   min_avg_diff=obj_dict["min_avg_diff"]
+                                   )
 
     def to_dict(self):
         """
