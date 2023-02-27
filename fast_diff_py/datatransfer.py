@@ -115,7 +115,7 @@ class PreprocessResults:
                                  key=int(obj_dict["key"]))
 
     @staticmethod
-    def error_obj(in_path: str, out_path: str, error: str, key: int, dir_a: bool):
+    def error_obj(in_path: str, out_path: str, error: str, key: int):
         """
         Wrapper for init method in case of error.
 
@@ -141,7 +141,7 @@ class PreprocessResults:
         )
 
     @staticmethod
-    def no_hash_init(in_path: str, out_path: str, original_x: int, original_y: int, key: int, dir_a: bool):
+    def no_hash_init(in_path: str, out_path: str, original_x: int, original_y: int, key: int):
         """
         Wrapper for init method in case where no hashes were computed.
 
