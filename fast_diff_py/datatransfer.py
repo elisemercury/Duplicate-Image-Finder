@@ -84,7 +84,6 @@ class PreprocessResults:
     hash_270: str
 
     error: str
-    dir_a: bool = True
 
     @staticmethod
     def from_json(json_string: str):
@@ -98,7 +97,7 @@ class PreprocessResults:
         keys = obj_dict.keys()
 
         target_keys = ["in_path", "out_path", "original_x", "original_y", "hash_0", "hash_90", "hash_180", "hash_270",
-                       "success", "error", "key", "dir_a"]
+                       "success", "error", "key"]
 
         if not all(x in keys for x in target_keys):
             raise ValueError("Provided Json String doesn't contain the necessary keys.")
@@ -113,8 +112,7 @@ class PreprocessResults:
                                  hash_180=obj_dict["hash_180"],
                                  hash_270=obj_dict["hash_270"],
                                  error=obj_dict["error"],
-                                 key=int(obj_dict["key"]),
-                                 dir_a=obj_dict["dir_a"])
+                                 key=int(obj_dict["key"]))
 
     @staticmethod
     def error_obj(in_path: str, out_path: str, error: str, key: int, dir_a: bool):
@@ -140,7 +138,6 @@ class PreprocessResults:
             hash_180="<ERROR>",
             hash_270="<ERROR>",
             key=key,
-            dir_a=dir_a,
         )
 
     @staticmethod
@@ -169,7 +166,6 @@ class PreprocessResults:
             hash_180="<EMPTY>",
             hash_270="<EMPTY>",
             key=key,
-            dir_a=dir_a,
         )
 
     def to_dict(self):
@@ -190,7 +186,6 @@ class PreprocessResults:
             "success": self.success,
             "error": self.error,
             "key": self.key,
-            "dir_a": self.dir_a,
         }
 
     def to_json(self):
