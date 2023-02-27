@@ -215,8 +215,6 @@ class CompareImageArguments:
     size_x: int
     size_y: int
 
-    is_dir_b: bool = False
-
     # short-circuiting arguments
     img_a_size_x: Union[int, None] = None
     img_a_size_y: Union[int, None] = None
@@ -246,7 +244,7 @@ class CompareImageArguments:
         keys = obj_dict.keys()
 
         target_keys = ["img_a", "img_b", "thumb_a", "thumb_b", "key_a", "key_b", "store_compare", "compare_threshold",
-                       "is_dir_b", "store_path", "size_x", "size_y", "img_a_size_x", "img_a_size_y", "img_b_size_x",
+                       "store_path", "size_x", "size_y", "img_a_size_x", "img_a_size_y", "img_b_size_x",
                        "img_b_size_y", "img_a_hash_0", "img_a_hash_90", "img_a_hash_180", "img_a_hash_270",
                        "img_b_hash_0", "img_b_hash_90", "img_b_hash_180", "img_b_hash_270", ]
 
@@ -261,7 +259,6 @@ class CompareImageArguments:
                                      key_b=int(obj_dict["key_b"]),
                                      store_compare=obj_dict["store_compare"],
                                      compare_threshold=obj_dict["compare_threshold"],
-                                     is_dir_b=obj_dict["is_dir_b"],
                                      store_path=obj_dict["store_path"],
                                      size_x=obj_dict["size_x"],
                                      size_y=obj_dict["size_y"],
@@ -294,7 +291,6 @@ class CompareImageArguments:
             "key_b": self.key_b,
             "store_compare": self.store_compare,
             "compare_threshold": self.compare_threshold,
-            "is_dir_b": self.is_dir_b,
             "store_path": self.store_path,
             "size_x": self.size_x,
             "size_y": self.size_y,
