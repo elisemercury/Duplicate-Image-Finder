@@ -327,8 +327,7 @@ class ImageProcessing:
                                            key_b=args.key_b,
                                            error="",
                                            success=True,
-                                           min_avg_diff=-1,
-                                           is_dir_b=args.is_dir_b,
+                                           min_avg_diff=-1
                                            )  # genuine -1 difference
 
         # checking the hashes.
@@ -357,8 +356,7 @@ class ImageProcessing:
                                        key_b=args.key_b,
                                        error="",
                                        success=True,
-                                       min_avg_diff=-1,
-                                       is_dir_b=args.is_dir_b,
+                                       min_avg_diff=-1
                                        )  # genuine -1 difference
 
         # Nothing selected, don't return anything.
@@ -494,7 +492,6 @@ class ImageProcessing:
                                    error=self.error,
                                    success=self.error == "",
                                    min_avg_diff=min_diff if self.error == "" else -1,
-                                   is_dir_b=self.processing_args.is_dir_b,
                                    )
 
     def store_plt_on_threshold(self):
