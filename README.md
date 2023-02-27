@@ -96,7 +96,8 @@ search.stats
  "match_mse" : 200,
  "files_searched" : 1032,
  "matches_found" : 852,
- "invalid_files": {"count": 4, "logs": {...}}}
+ "invalid_files": {"count": 4, 
+                   "logs": {...}}}
 ``` 
 :new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** now outputs the count of **invalid files** in the target directory that could not be processed as images, as well as information on whether difPy's **Fast Search Algorithm (FSA)** was used.
 
