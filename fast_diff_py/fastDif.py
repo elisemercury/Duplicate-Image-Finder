@@ -1290,7 +1290,6 @@ class FastDifPy:
             compare_threshold=self.similarity_threshold,
             size_x=self.thumbnail_size_x,
             size_y=self.thumbnail_size_y,
-            is_dir_b=self.has_dir_b
         )
 
         # send task to process
