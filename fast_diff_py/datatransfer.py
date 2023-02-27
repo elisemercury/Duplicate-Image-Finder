@@ -339,7 +339,7 @@ class CompareImageResults:
         obj_dict = json.loads(json_string)
         keys = obj_dict.keys()
 
-        target_keys = ["key_a", "key_b", "error", "success", "min_avg_diff", "is_dir_b"]
+        target_keys = ["key_a", "key_b", "error", "success", "min_avg_diff"]
 
         if not all(x in keys for x in target_keys):
             raise ValueError("Provided Json String doesn't contain the necessary keys.")
@@ -363,7 +363,6 @@ class CompareImageResults:
             "error": self.error,
             "success": self.success,
             "min_avg_diff": self.min_avg_diff,
-            "is_dir_b": self.is_dir_b,
         }
 
     def to_json(self):
