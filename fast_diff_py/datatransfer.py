@@ -222,15 +222,15 @@ class CompareImageArguments:
     img_b_size_x: Union[int, None] = None
     img_b_size_y: Union[int, None] = None
 
-    img_a_hash_0:   Union[str, None] = None
-    img_a_hash_90:  Union[str, None] = None
-    img_a_hash_180: Union[str, None] = None
-    img_a_hash_270: Union[str, None] = None
+    img_a_hash_0:   Union[int, None] = None
+    img_a_hash_90:  Union[int, None] = None
+    img_a_hash_180: Union[int, None] = None
+    img_a_hash_270: Union[int, None] = None
 
-    img_b_hash_0:   Union[str, None] = None
-    img_b_hash_90:  Union[str, None] = None
-    img_b_hash_180: Union[str, None] = None
-    img_b_hash_270: Union[str, None] = None
+    img_b_hash_0:   Union[int, None] = None
+    img_b_hash_90:  Union[int, None] = None
+    img_b_hash_180: Union[int, None] = None
+    img_b_hash_270: Union[int, None] = None
 
     @staticmethod
     def from_json(json_string: str):
