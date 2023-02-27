@@ -16,7 +16,6 @@ class PreprocessArguments:
     store_thumb: bool
 
     amount: int
-    dir_a: bool = True
 
     @staticmethod
     def from_json(json_string: str):
@@ -29,8 +28,7 @@ class PreprocessArguments:
         obj_dict = json.loads(json_string)
         keys = obj_dict.keys()
 
-        target_keys = ["in_path", "out_path", "size_x", "size_y", "compute_hash", "amount", "store_thumb", "key",
-                       "dir_a"]
+        target_keys = ["in_path", "out_path", "size_x", "size_y", "compute_hash", "amount", "store_thumb", "key"]
         if not all(x in keys for x in target_keys):
             raise ValueError("Provided Json String doesn't contain the necessary keys.")
 
@@ -41,8 +39,7 @@ class PreprocessArguments:
                                    compute_hash=obj_dict["compute_hash"],
                                    amount=obj_dict["amount"],
                                    store_thumb=obj_dict["store_thumb"],
-                                   key=int(obj_dict["key"]),
-                                   dir_a=obj_dict["dir_a"])
+                                   key=int(obj_dict["key"]))
 
     def to_dict(self):
         """
@@ -59,7 +56,6 @@ class PreprocessArguments:
             "amount": self.amount,
             "store_thumb": self.store_thumb,
             "key": self.key,
-            "dir_a": self.dir_a,
         }
 
     def to_json(self):
