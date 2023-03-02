@@ -398,6 +398,7 @@ class SQLiteDatabase(Database):
         # fetching from starting key.
         self.debug_execute(f"SELECT * FROM directory WHERE error IS NOT NULL AND key > {start_key} "
                            f"ORDER BY key ASC")
+
         return self.wrap_many_dict_dir(self.cur.fetchmany(count))
 
     # ------------------------------------------------------------------------------------------------------------------
