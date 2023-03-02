@@ -1627,6 +1627,33 @@ class FastDifPy:
 
         print("-"*120)
 
+    def print_compare_errors(self):
+        """
+        Function fetches all errors that were encountered during the comparison of the files and prints them to the
+        console.
+
+        :return:
+        """
+        errors = True
+        last_key = None
+
+        while errors:
+            results = self.db.get_many_comparison_errors(start_key=last_key)
+
+            if len(results) == 0:
+                errors = False
+
+            for r in results:
+                path_a = r['a_path']
+                path_b = r['b_path']
+                error = r['error']
+                print(f"Comparison of Files {path_a} and {path_b} encountered error:\n{error}")
+
+            last_key = results[-1]['dif_key']
+
+        print("-"*120)
+
+
     def spawn_duplicate_error_worker(self):
         """
         TODO Docstring
