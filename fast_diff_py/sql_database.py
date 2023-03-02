@@ -823,6 +823,73 @@ class SQLiteDatabase(Database):
                            f"ORDER BY key ASC")
         return self.wrap_many_dict_dif(self.cur.fetchmany(count))
 
+    def get_many_comparison_errors(self, start_key: int = None, count: int = 1000) -> List[dict]:
+        """
+        Fetch up to count of errors in the dif table. Returns the key in the dif_table, two keys in the directory
+        table, the file paths to the compared files and the error message.
+
+        :param start_key: key in the dif_table to start from.
+        :param count:
+        :return:
+        """
+
+        # fetch from the beginning
+        if start_key is None:
+            self.debug_execute(f"SELECT dif_table.key, dif_table.key_a, dif_table.key_b,  a.path, b.path, "
+                               f"dif_table.error "
+                               f"FROM dif_table "
+                               f"JOIN directory a on dif_table.key_a = a.key "
+                               f"JOIN directory b on dif_table.key_b = b.key "
+                               f"WHERE dif_table.error IS NOT NULL ORDER BY dif_table.key ASC")
+
+            return self.wrap_many_errors_dif(self.cur.fetchmany(count))
+
+        # fetching from starting key.
+        self.debug_execute(f"SELECT dif_table.key, dif_table.key_a, dif_table.key_b,  a.path, b.path, "
+                           f"dif_table.error "
+                           f"FROM dif_table "
+                           f"JOIN directory a on dif_table.key_a = a.key "
+                           f"JOIN directory b on dif_table.key_b = b.key "
+                           f"WHERE dif_table.error IS NOT NULL ORDER BY dif_table.key ASC")
+
+        return self.wrap_many_errors_dif(self.cur.fetchmany(count))
+
+    @staticmethod
+    def error_to_dict(row: tuple = None) -> Union[dict, None]:
+        """
+        Wrapp the result of an error row which was previously created by using two joins on the keys.
+        It only contains the paths, keys in the dir table, key in the dif_table and the error string
+
+        :param row: row as tuple to wrap
+        :return: the row tuple wrapped with a dict for better readability
+        """
+        if row is None:
+            return None
+
+        return {
+            "dif_key": row[0],
+            "dir_key_a": row[1],
+            "dir_key_b": row[2],
+            "a_path": row[3],
+            "b_path": row[4],
+            "error": SQLiteDatabase.from_b64(row[5]),
+        }
+
+    @staticmethod
+    def wrap_many_errors_dif(rows: List[tuple]) -> List[dict]:
+        """
+        Wrap error rows in a dict.
+
+        :param rows: list of tuples that should be wrapped.
+        :return: list of wrapped rows in dict.
+        """
+        results = []
+
+        for row in rows:
+            results.append(SQLiteDatabase.error_to_dict(row))
+
+        return results
+
     # ------------------------------------------------------------------------------------------------------------------
     # COMMON FUNCTIONS
     # ------------------------------------------------------------------------------------------------------------------
