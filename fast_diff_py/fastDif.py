@@ -1602,6 +1602,12 @@ class FastDifPy:
                 return
 
     def print_preprocessing_errors(self):
+        """
+        Function fetches all errors that were encountered during the preprocessing phase and  prints them to the
+        console.
+
+        :return:
+        """
         errors = True
         last_key = None
 
