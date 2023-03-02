@@ -406,7 +406,7 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    def get_many_diff_errors(self, start_key: int = None, count: int = 1000) -> List[dict]:
+    def get_many_comparison_errors(self, start_key: int = None, count: int = 1000) -> List[dict]:
         """
         Get rows which contain errors. Wrapp the result in dicts and return them.
 
