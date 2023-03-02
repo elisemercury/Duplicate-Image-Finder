@@ -816,7 +816,7 @@ class SQLiteDatabase(Database):
         # fetching from the beginning
         if start_key is None:
             self.debug_execute(f"SELECT * FROM dif_table WHERE dif >= 0 AND dif < {threshold} ORDER BY key ASC")
-            return self.cur.fetchmany(count)
+            return self.wrap_many_dict_dif(self.cur.fetchmany(count))
 
         # fetching from starting key.
         self.debug_execute(f"SELECT * FROM dif_table WHERE dif >= 0 AND dif < {threshold} AND key > {start_key} "
