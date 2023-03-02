@@ -1623,6 +1623,8 @@ class FastDifPy:
                 error = r['error']
                 print(f"File {path} encountered error:\n{error}")
 
+            last_key = results[-1]['key']
+
         print("-"*120)
 
     def spawn_duplicate_error_worker(self):
