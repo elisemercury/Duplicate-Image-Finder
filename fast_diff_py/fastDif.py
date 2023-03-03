@@ -1794,11 +1794,13 @@ class FastDifPy:
         elif cluster_id_a is not None and cluster_id_b is None:
             clusters[cluster_id_a].append(graph_key_b)
             cluster_id[graph_key_b] = cluster_id_a
+            return next_id
 
         # We have two clusters that need to be merged. or a duplicate row
         else:
             if cluster_id_a == cluster_id_b:
                 self.logger.error("Duplicate row found!!!")
+                return next_id
 
             # We merge the two clusters into one.
             else:
