@@ -1,7 +1,4 @@
-API
+Test
 ===
 
-.. autosummary::
-   :toctree: generated
-
-   difPy
+Test
