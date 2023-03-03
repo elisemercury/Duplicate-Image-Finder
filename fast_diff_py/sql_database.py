@@ -354,7 +354,10 @@ class SQLiteDatabase(Database):
         :param key: key in the directory table
         :return:
         """
-        print("WARNING: Deleting hashes, this is not matched with the hash table at the moment.")
+        # TODO implement call with transactions to make sure coherancy between hash table count and directory table is
+        #  assured
+
+        self.logger.warning("Deleting hashes, this is not matched with the hash table at the moment.")
         self.debug_execute(f"UPDATE directory SET hash_0 = NULL, hash_90 = NULL, hash_180 = NULL, hash_270 = NULL "
                            f"WHERE key = {key}")
 
