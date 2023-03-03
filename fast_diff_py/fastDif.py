@@ -1427,25 +1427,25 @@ class FastDifPy:
         for i in range(len(self.cpu_handles)):
             p = self.cpu_handles[i]
             try:
-                print(f"Trying to join process {i} Process Alive State is {p.is_alive()}")
+                self.logger.info(f"Trying to join process {i} Process Alive State is {p.is_alive()}")
                 p.join(1)
                 if p.is_alive():
-                    print(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
+                    self.logger.info(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
                     p.kill()
             except TimeoutError:
-                print(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
+                self.logger.warning(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
                 p.kill()
 
         for i in range(len(self.gpu_handles)):
             p = self.gpu_handles[i]
             try:
-                print(f"Trying to join process {i + cpu_proc} Process State is {p.is_alive()}")
+                self.logger.info(f"Trying to join process {i + cpu_proc} Process State is {p.is_alive()}")
                 p.join(1)
                 if p.is_alive():
-                    print(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
+                    self.logger.info(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
                     p.kill()
             except TimeoutError:
-                print(f"Process {i + cpu_proc} timed out. Alive state: {p.is_alive()}; killing it.")
+                self.logger.warning(f"Process {i + cpu_proc} timed out. Alive state: {p.is_alive()}; killing it.")
                 p.kill()
 
     def check_children(self, gpu: bool = False, cpu: bool = False):
