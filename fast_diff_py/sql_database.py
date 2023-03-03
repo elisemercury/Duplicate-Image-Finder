@@ -17,17 +17,14 @@ class SQLiteDatabase(Database):
     path: str = None
     con: sqlite3.Connection = None
     cur: sqlite3.Cursor = None
-
-    a_done: bool
-    b_done: bool
+    path: str
 
     last_update: datetime.datetime = datetime.datetime.now()
 
     def __init__(self, path):
         super().__init__()
         self.connect(path)
-        self.a_done = False
-        self.b_done = False
+        self.path = path
 
     # ------------------------------------------------------------------------------------------------------------------
     # CONFIG TABLE
