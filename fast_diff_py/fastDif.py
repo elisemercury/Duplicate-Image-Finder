@@ -1482,8 +1482,7 @@ class FastDifPy:
 
         return error, all_error, exited, all_exited
 
-    @staticmethod
-    def check_processes(processes: List[mp.Process]) -> Tuple[bool, bool, bool, bool]:
+    def check_processes(self, processes: List[mp.Process]) -> Tuple[bool, bool, bool, bool]:
         """
         Given a list of Futures, check for errors and if they are done.
 
@@ -1507,7 +1506,7 @@ class FastDifPy:
                         all_error = False
 
                 else:
-                    print("WARNING: process is not alive but no exit code available")
+                    self.logger.warning("process is not alive but no exit code available")
 
             else:
                 all_error = False
