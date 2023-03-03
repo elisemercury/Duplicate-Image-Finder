@@ -396,7 +396,7 @@ class FastDifPy:
         """
 
         # TODO get the progress from the database
-        print("Not implemented yet")
+        raise NotImplementedError("Progress Recovery is currently not implemented yet.")
 
     def write_config(self):
         """
