@@ -1837,10 +1837,10 @@ class FastDifPy:
         fp_list = []
         for cluster_id, images in cluster.items():
             if len(images) > 1000:
-                print("DEBUG: Excessive amount of duplicates found.")
+                self.logger.debug("Excessive amount of duplicates found.")
 
             if len(images) == 0:
-                print("WARNING: Found empty images list")
+                self.logger.warning("Found empty images list")
 
             filepaths = []
 
