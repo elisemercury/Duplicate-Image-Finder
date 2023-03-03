@@ -1758,9 +1758,8 @@ class FastDifPy:
 
         return clusters
 
-    @staticmethod
-    def process_pair(cluster_id_a: str, cluster_id_b: str, next_id: int, clusters: Dict[str, list], cluster_id: dict,
-                     graph_key_a: str, graph_key_b: str):
+    def process_pair(self, cluster_id_a: str, cluster_id_b: str, next_id: int, clusters: Dict[str, list],
+                     cluster_id: dict, graph_key_a: str, graph_key_b: str):
         """
         Given a pair of graph_keys and cluster_ids, update the clusters and the cluster_ids dict accordingly.
 
