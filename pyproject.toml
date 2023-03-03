@@ -1,5 +1,5 @@
 [build-system]
-requires = ["matplotlib >= 3.5.3", "numpy >= 1.21.6", "Pillow >= 9.4.0"]
+requires = ["matplotlib >= 3.5.3", "numpy >= 1.21.1", "Pillow >= 9.4.0"]
 
 [project]
 name = "difPy"
