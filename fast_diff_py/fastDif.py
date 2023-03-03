@@ -845,16 +845,16 @@ class FastDifPy:
             # update the queues and store if there are more tasks to process
             current_count = self.update_queues()
             count += current_count
-            print(f"Number of Processed Images: {count}")
+            self.logger.info(f"Number of Processed Images: {count}")
 
             if current_count == 0:
-                print("Dequeued 0 elements, stopping")
+                self.logger.debug("Dequeued 0 elements, stopping")
                 done = True
 
             # exit the while loop if all children have exited.
             _, _, _, all_exited = self.check_children(cpu=cpu_proc > 0, gpu=gpu_proc > 0)
             if all_exited:
-                print("All Exited")
+                self.logger.debug("All Exited")
                 done = True
 
         # check if it was the children's fault
@@ -864,7 +864,7 @@ class FastDifPy:
             raise RuntimeError("All child processes exited with an Error")
 
         self.join_all_children()
-        print("All child processes terminated")
+        self.logger.debug("All child processes terminated")
 
         # handle last results:
         self.handle_results_second_queue()
@@ -874,7 +874,7 @@ class FastDifPy:
                                                        "processes having stopped."
 
         self.db.commit()
-        print("Data should be committed")
+        self.logger.debug("Data should be committed")
 
     def update_queues(self):
         results = self.__refill_queues()
