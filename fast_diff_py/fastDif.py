@@ -14,6 +14,7 @@ from fast_diff_py.datatransfer import *
 from fast_diff_py.image_processor import ImageProcessing
 from concurrent.futures import ProcessPoolExecutor
 from fast_diff_py.sql_database import SQLiteDatabase
+import logging
 
 """
 Fast implementation of the DifPy Library.
