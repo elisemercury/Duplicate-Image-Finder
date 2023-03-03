@@ -515,10 +515,10 @@ class SQLiteDatabase(Database):
 
         # Drop the tables if purge is set
         if purge:
-            print("Purging preexisting indexes of directories.")
+            self.logger.info("Purging preexisting indexes of directories.")
 
             if self.test_plot_table_existence():
-                print("Dropping directory A table.")
+                self.logger.info("Dropping directory A table.")
                 self.drop_plot()
 
         self.debug_execute("CREATE TABLE plots ( key INTEGER PRIMARY KEY, key_a INTEGER, key_b INTEGER )")
