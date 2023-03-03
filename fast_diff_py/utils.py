@@ -84,6 +84,9 @@ def h(x: int, unit: str, base2: bool = False) -> str:
     :param base2: use base 2 (1024) or base 10 (1000) for conversion
     """
 
+    if x == 0:
+        return f"{x} {unit}"
+
     if base2:
         digits = math.log2(x) / 10
 
