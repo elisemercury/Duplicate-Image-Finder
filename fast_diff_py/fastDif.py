@@ -1796,11 +1796,11 @@ class FastDifPy:
         # We have two clusters that need to be merged. or a duplicate row
         else:
             if cluster_id_a == cluster_id_b:
-                print("WARNING: Duplicate row found!!!\n")
+                self.logger.error("Duplicate row found!!!")
 
             # We merge the two clusters into one.
             else:
-                print("DEBUGGING; Merging clusters\n")
+                self.logger.debug("Merging clusters")
                 # Select the smaller cluster to merge it into the larger cluster
                 if len(clusters[cluster_id_a]) < len(clusters[cluster_id_b]):
 
