@@ -86,7 +86,7 @@ def cpu_process_image(proc: ImageProcessing, args: PreprocessArguments) -> Prepr
     return proc.create_full_preprocess_result()
 
 
-def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: bool) -> bool:
+def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: bool, verbose: bool = False) -> bool:
     """
     Parallel implementation of first loop iteration.
 
@@ -94,6 +94,7 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
     :param output: output queue containing only json strings of obj
     :param identifier: id of running thread
     :param try_cupy: check if cupy is available and use cupy instead.
+    :param verbose: If true, adds print statements.
     :return: True, running was successful and no error encountered, otherwise exit without return or return False
     """
     timeout = 0
@@ -101,7 +102,7 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
     # try to use cupy if it is indicated by arguments
     cupy_avail = False
     if try_cupy:
-        print("Cupy version currently not implemented")
+        warnings.warn(f"{identifier:03}: Cupy version currently not implemented")
 
     img_proc = ImageProcessing(identifier=identifier)
 
@@ -114,14 +115,16 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
             continue
 
         if args_str is None:
-            print(f"{identifier:03} Terminating")
+            if verbose:
+                print(f"{identifier:03} Terminating")
             break
 
         args = PreprocessArguments.from_json(args_str)
         timeout = 0
 
         result = cpu_process_image(img_proc, args)
-        print(f"{identifier:03}: Done with {os.path.basename(args.in_path)}")
+        if verbose:
+            print(f"{identifier:03}: Done with {os.path.basename(args.in_path)}")
 
         # Sending the result to the handler
         output.put(result.to_json())
