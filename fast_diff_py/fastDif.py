@@ -1950,3 +1950,90 @@ class FastDifPy:
         if type(value) is not float or value < 0:
             raise ValueError("similarity threshold needs to be float and greater than 0.")
         self.__similarity_threshold = value
+
+    @property
+    def verbose(self):
+        return self.__verbose
+
+    @verbose.setter
+    def verbose(self, value):
+        if type(value) is not bool:
+            raise TypeError("Verbose is a boolean")
+
+        self.__verbose = value
+
+        # update the logging level.
+        if self.__verbose:
+            self.stream_handler.setLevel(logging.INFO)
+        else:
+            self.stream_handler.setLevel(logging.WARNING)
+
+    def prepare_logging(self, console_level: int = logging.DEBUG, debug: bool = False):
+        """
+        Set's up logging for the class.
+
+        :param console_level: log level of the console. use logging.LEVEL for this.
+        :param debug: store the console log also inside a separate file.
+        :return:
+        """
+        self.logger = logging.getLogger("fast-diff-py")
+
+        # get location for the logs
+        fp = os.path.abspath(os.path.dirname(__file__))
+
+        # create two File handlers one for logging directly to file one for logging to Console
+        self.stream_handler = logging.StreamHandler()
+        self.file_handler = logging.FileHandler(os.path.join(fp, "execution.log"))
+
+        # create Formatter t o format the logging messages in the console and in the file
+        console_formatter = logging.Formatter('%(asctime)s - %(message)s')
+        file_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+        # add the formatters to the respective Handlers
+        self.stream_handler.setFormatter(console_formatter)
+        self.file_handler.setFormatter(file_formatter)
+
+        # Set the logging level to the Handlers
+        self.stream_handler.setLevel(console_level)
+        self.file_handler.setLevel(logging.WARNING)
+
+        # Add the logging Handlers to the logger instance
+        self.logger.addHandler(self.stream_handler)
+        self.logger.addHandler(self.file_handler)
+
+        # In case a Debug log is desired create another Handler, add the file formatter and add the Handler to the
+        # logger
+        if debug:
+            self.add_debug_logger(file_formatter, fp)
+
+        # We do not want to pollute the information of the above loggers, so we don't propagate
+        # We want our logger to emmit every message to all handlers, so we set it to DEBUG.
+        self.logger.propagate = False
+        self.logger.setLevel(logging.DEBUG)
+
+    def add_debug_logger(self, file_formatter: logging.Formatter, out_dir: str = None):
+        """
+        Function gets called if prepare_logging has debug set. It can be called alternatively later on during code
+        execution if one wants to get a preciser information about what is going on.
+
+        There can only be one debug logger at a time. If this function is called twice, the old logger will be removed
+        and the new one will be added. THIS MAY OVERWRITE THE DEBUG FILE IF THE __out_dir__ IS NOT SET!!!
+
+        :param file_formatter: the formatter with which to create the logs.
+        :param out_dir: Directory where the logs should be saved
+        :return:
+        """
+
+        if out_dir is None:
+            out_dir = os.path.abspath(os.path.dirname(__file__))
+
+        if self.debug_logger is None:
+            self.debug_logger = logging.FileHandler(os.path.join(out_dir, "debug_execution.log"))
+            self.debug_logger.setFormatter(file_formatter)
+            self.debug_logger.setLevel(logging.DEBUG)
+            self.logger.addHandler(self.debug_logger)
+
+        # remove eventually preexisting logger
+        else:
+            self.logger.removeHandler(self.debug_logger)
+            self.add_debug_logger(file_formatter, out_dir)
