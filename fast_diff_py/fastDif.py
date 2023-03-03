@@ -467,6 +467,11 @@ class FastDifPy:
         dir_a_count = self.db.get_dir_count(True)
         dir_b_count = self.db.get_dir_count(False) if self.has_dir_b else 0
 
+        if dir_b_count == 0:
+            comps = dir_a_count * dir_a_count / 2
+        else:
+            comps = dir_a_count * dir_b_count
+
         byte_count_a = dir_a_count * self.__thumbnail_size_x * self.__thumbnail_size_y * 3
         byte_count_b = dir_b_count * self.__thumbnail_size_x * self.__thumbnail_size_y * 3
 
@@ -484,6 +489,8 @@ class FastDifPy:
                     " bytes")
                 print(f"Estimated disk usage by {fill('the two dirs ', target)}: " +
                       h(byte_count_b + byte_count_a, "B") + "bytes")
+
+            print(f"Number of Images in Database {dir_a_count + dir_b_count}, Comparisons: {comps}")
 
         return byte_count_a, byte_count_b
 
