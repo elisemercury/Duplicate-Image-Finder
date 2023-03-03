@@ -984,3 +984,11 @@ class SQLiteDatabase(Database):
         :return:
         """
         os.remove(self.path)
+
+    def prepare_logging(self):
+        """
+        Get a logger, set the level and set the propagation.
+        """
+        self.logger = logging.getLogger("fast_diff_py.sql_database")
+        self.logger.propagate = True
+        self.logger.level = logging.DEBUG
