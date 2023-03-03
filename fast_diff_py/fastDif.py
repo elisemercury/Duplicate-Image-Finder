@@ -285,7 +285,15 @@ class FastDifPy:
     less_optimized: bool = False
     retry_limit: int = 1000
 
-    def __init__(self, directory_a: str, directory_b: str = None, test_db: bool = True):
+    # logger / CLI Output
+    logger: logging.Logger = None
+    file_handler: logging.FileHandler = None
+    stream_handler: logging.StreamHandler = None
+    debug_logger: logging.FileHandler = None
+
+    __verbose: bool = False
+
+    def __init__(self, directory_a: str, directory_b: str = None, test_db: bool = True, **kwargs):
         """
         Provide the directories to be searched. If a different implementation of the database is used,
         set the test_db to false.
@@ -295,6 +303,8 @@ class FastDifPy:
         itself.
         :param test_db: Test and create a sqlite db for the processing. Should be set to off, if a different
         implementation is used
+        *** kwarg:
+        debug: Enable Debug File in the logs.
         """
 
         if not os.path.isdir(directory_a):
@@ -318,10 +328,16 @@ class FastDifPy:
         self.p_root_dir_b = directory_b
         self.p_root_dir_a = directory_a
 
+        debug = False
+        if "debug" in kwargs.keys():
+            debug = kwargs.get("debug")
+
+        self.prepare_logging(debug=debug)
+
         # proceed with the database if the default is used.
         if test_db:
             if not self.test_for_db():
-                print("No matching database found. Creating new one.")
+                self.logger.info("No matching database found. Creating new one.")
                 self.db = SQLiteDatabase(os.path.join(self.p_root_dir_a, "diff.db"))
                 self.write_config()
 
