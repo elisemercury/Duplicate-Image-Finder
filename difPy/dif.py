@@ -19,7 +19,7 @@ class dif:
     """
     A class used to initialize and run difPy
     """
-    def __init__(self, *directory, fast_search=True, recursive=True, similarity="normal", px_size=50, show_progress=True, show_output=False, delete=False, silent_del=False):
+    def __init__(self, *directory, fast_search=True, recursive=True, similarity="normal", px_size=50, show_progress=True, show_output=False, delete=False, silent_del=False, logs=False):
         """
         Parameters
         ----------
@@ -28,7 +28,7 @@ class dif:
         fast_search : bool, optional
             Use Fast Search Algortihm (default is True)
         recursive : bool, optional
-            Search recuesively within the directories (default is True)
+            Search recursively within the directories (default is True)
         similarity : 'high', 'normal', 'low', float, optional
             Image similarity threshold (mse) (default is 'normal', 200)
         px_size : int, optional
@@ -40,7 +40,9 @@ class dif:
         delete : bool, optional
             Delete lower quality matches images (default is False)
         silent_del : bool, optional
-            Skip user confirmation when delete=True (default is False)        
+            Skip user confirmation when delete=True (default is False)
+        logs : bool, optional
+            Enable log collection for inavlid files in stats output    
         """
         print("difPy process initializing...", end="\r")
         self.directory = _validate._directory_type(directory)
@@ -53,6 +55,7 @@ class dif:
         self.delete, self.silent_del = _validate._delete(delete, silent_del)
         self.show_output = _validate._show_output(show_output)
         self.show_progress = _validate._show_progress(show_progress)
+        self.logs = _validate._logs(logs)
 
         start_time = time.time()
         self.result, self.lower_quality, total_count, match_count, invalid_files = dif._run(self)
@@ -92,6 +95,12 @@ class dif:
     def _generate_stats(self, start_time, end_time, time_elapsed, total_searched, total_matches, invalid_files):
         """Generates stats of the difPy process.
         """
+        if self.logs:
+            invalid_stats = {"count": len(invalid_files),
+                             "logs" : invalid_files}
+        else:
+            invalid_stats = {"count": len(invalid_files)}
+             
         stats = {"directory": self.directory,
                  "duration": {"start_date": time.strftime("%Y-%m-%d", start_time),
                               "start_time": time.strftime("%H:%M:%S", start_time),
@@ -103,8 +112,7 @@ class dif:
                  "match_mse": self.similarity,
                  "files_searched": total_searched,
                  "matches_found": total_matches,
-                 "invalid_files": {"count": len(invalid_files),
-                                   "logs" : invalid_files}}
+                 "invalid_files": invalid_stats}
         return stats
 
 class _validate:
@@ -196,6 +204,12 @@ class _validate:
             raise Exception('Invalid value for "silent_del" parameter: must be of type bool.')
         return delete, silent_del
 
+    def _logs(logs):
+        # Function that _validates the 'recursive' input parameter
+        if not isinstance(logs, bool):
+            raise Exception('Invalid value for "logs" parameter: must be of type bool.')
+        return logs
+
 class _compute:
     """
     A class used for difPy compute operations.
@@ -236,7 +250,10 @@ class _compute:
                         img = np.asarray(img)
                         imgs_matrices[id] = img
                     except Exception as e:
-                        invalid_files[file] = e
+                        if e.__class__.__name__== 'UnidentifiedImageError':
+                            invalid_files[str(Path(file))] = f'UnidentifiedImageError: file could not be identified as image.'
+                        else:
+                            invalid_files[str(Path(file))] = str(e)
                     finally:
                         count += 1
             for id in invalid_files:
@@ -419,13 +436,14 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--show_output", type=bool, help='Shows the comapred images in real-time.', required=False, choices=[True, False], default=False)
     parser.add_argument("-d", "--delete", type=bool, help='Deletes all duplicate images with lower quality.', required=False, choices=[True, False], default=False)
     parser.add_argument("-sd", "--silent_del", type=bool, help='Supresses the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
+    parser.add_argument("-l", "--logs", type=bool, help='Enables log collection for invalid files.', required=False, choices=[True, False], default=False)
     args = parser.parse_args()
 
     # initialize difPy
     search = dif(args.directory, fast_search=args.fast_search,
                 recursive=args.recursive, similarity=args.similarity, px_size=args.px_size, 
                 show_output=args.show_output, show_progress=args.show_progress, 
-                delete=args.delete, silent_del=args.silent_del)
+                delete=args.delete, silent_del=args.silent_del, logs=args.logs)
 
     # create filenames for the output files
     timestamp =str(time.time()).replace(".", "_")
