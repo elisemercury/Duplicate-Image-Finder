@@ -1736,7 +1736,8 @@ class FastDifPy:
         count = 0
         for row in all_duplicate_pairs:
             if count % 100 == 0:
-                print(f"Done with {count}", end="\r", flush=True)
+                if self.verbose:
+                    print(f"Done with {count}", end="\r", flush=True)
             count += 1
 
             # get the data from the rows
