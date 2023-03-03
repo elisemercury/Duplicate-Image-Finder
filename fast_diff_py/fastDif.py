@@ -1976,7 +1976,7 @@ class FastDifPy:
         :param debug: store the console log also inside a separate file.
         :return:
         """
-        self.logger = logging.getLogger("fast-diff-py")
+        self.logger = logging.getLogger("fast_diff_py")
 
         # get location for the logs
         fp = os.path.abspath(os.path.dirname(__file__))
