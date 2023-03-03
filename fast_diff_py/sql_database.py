@@ -22,11 +22,13 @@ class SQLiteDatabase(Database):
     path: str
 
     last_update: datetime.datetime = datetime.datetime.now()
+    logger: logging.Logger = None
 
     def __init__(self, path):
         super().__init__()
         self.connect(path)
         self.path = path
+        self.prepare_logging()
 
     # ------------------------------------------------------------------------------------------------------------------
     # CONFIG TABLE
