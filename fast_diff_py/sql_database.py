@@ -909,7 +909,7 @@ class SQLiteDatabase(Database):
         try:
             self.cur.execute(statement)
         except Exception as e:
-            print(f"Exception {e} with statement:\n{statement}")
+            self.logger.exception(f"Exception {e} with statement:\n{statement}")
             raise e
 
         # automatically commit.
