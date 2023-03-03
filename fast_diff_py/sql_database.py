@@ -419,10 +419,10 @@ class SQLiteDatabase(Database):
 
         # Drop the tables if purge is set
         if purge:
-            print("Purging preexisting indexes of directories.")
+            self.logger.info("Purging preexisting indexes of directories.")
 
             if self.test_thumb_table_existence():
-                print("Dropping directory A table.")
+                self.logger.info("Dropping directory A table.")
                 self.drop_thumb()
 
         self.debug_execute("CREATE TABLE thumb ( "
