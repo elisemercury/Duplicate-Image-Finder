@@ -17,11 +17,6 @@ Creating recipes
 
 To start using difPy use the ``dif()` function:
 
-.. autofunction:: test
-
-Test
-.. autoexception:: test
-
 For example:
 
 >>> import difPy
