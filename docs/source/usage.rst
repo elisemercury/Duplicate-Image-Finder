@@ -6,29 +6,23 @@ Usage
 Installation
 ------------
 
-To use Lumache, first install it using pip:
+To use difPy, first install it using pip:
 
 .. code-block:: console
 
-   (.venv) $ pip install lumache
+   (.venv) $ pip install difPy
 
 Creating recipes
 ----------------
 
-To retrieve a list of random ingredients,
-you can use the ``lumache.get_random_ingredients()`` function:
+To start using difPy use the ``dif()` function:
 
-.. autofunction:: lumache.get_random_ingredients
+.. autofunction:: test
 
-The ``kind`` parameter should be either ``"meat"``, ``"fish"``,
-or ``"veggies"``. Otherwise, :py:func:`lumache.get_random_ingredients`
-will raise an exception.
-
-.. autoexception:: lumache.InvalidKindError
+Test
+.. autoexception:: test
 
 For example:
 
->>> import lumache
->>> lumache.get_random_ingredients()
-['shells', 'gorgonzola', 'parsley']
+>>> import difPy
 
