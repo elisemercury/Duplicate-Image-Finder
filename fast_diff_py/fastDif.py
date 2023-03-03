@@ -942,7 +942,6 @@ class FastDifPy:
                         inserted_count -= int(insertion_success)
                         inserted += int(insertion_success)
 
-                # print(f"Row lengths: row_a {len(row_a)}, row_b {len(row_b)}, iteration {iterations}")
                 iterations += 1
 
                 # update last key
