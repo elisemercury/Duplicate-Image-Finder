@@ -133,11 +133,11 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
 
 
 def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy: bool,
-                     sc_size: bool = False, sc_hash: bool = False, debug: bool = False) -> bool:
+                     sc_size: bool = False, sc_hash: bool = False, verbose: bool = False) -> bool:
     """
     Parallel implementation of first loop iteration.
 
-    :param debug: adds more print statements to get an overview about the executing workers.
+    :param verbose: adds more print statements to get an overview about the executing workers.
     :param in_q: input queue containing arguments dict or
     :param out_q: output queue containing only json strings of obj
     :param identifier: id of running thread
@@ -151,7 +151,7 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
     # try to use cupy if it is indicated by arguments
     cupy_avail = False
     if try_cupy:
-        print("Cupy version currently not implemented")
+        warnings.warn(f"{identifier:03} Cupy version currently not implemented")
 
     processor = ImageProcessing(identifier=identifier)
     # stay awake for 60s, otherwise kill
@@ -175,7 +175,7 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
             assert type(result) is CompareImageResults, f"Unexpected Return Type of Short Circuiting function. \n" \
                                                         f"CompareImageResults expected, got {type(result).__name__}"
 
-            if debug:
+            if verbose:
                 print(f"{identifier:03}: Done with {os.path.basename(args.img_a)} and "
                       f"{os.path.basename(args.img_b)} - short circuiting")
 
@@ -188,7 +188,7 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
         processor.store_plt_on_threshold()
         result = processor.create_compare_result()
 
-        if debug:
+        if verbose:
             print(f"{identifier:03}: Done with {os.path.basename(args.img_a)} and {os.path.basename(args.img_b)}")
 
         # Sending the result to the handler
