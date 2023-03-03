@@ -967,7 +967,7 @@ class FastDifPy:
                     # case when we are at the last image (which can only be compared against itself,
                     # ergo nothing to do)
                     if len(row_a) == 0 and len(row_b) == 0:
-                        print("End of Images Reached")
+                        self.logger.debug("End of Images Reached")
                         break
 
                 if inserted_count <= 0:
