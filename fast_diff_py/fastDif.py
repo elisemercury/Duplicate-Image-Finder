@@ -552,12 +552,12 @@ class FastDifPy:
             cpu_proc = mp.cpu_count()
 
         if gpu_proc > 0:
-            print("Currently not implemented, adding to cpu procs.")
+            self.logger.warning("Currently not implemented, adding to cpu procs.")
 
         # store thumbnails if possible.
         if compute_hash:
             if amount == 0:
-                print("WARNING: amount 0, only EXACT duplicates are detected like this.")
+                self.logger.warning("amount 0, only EXACT duplicates are detected like this.")
 
             if amount > 7 or amount < -7:
                 raise ValueError("amount my only be in range [-7, 7]")
@@ -586,15 +586,16 @@ class FastDifPy:
 
             self.first_loop_in.put(arg.to_json())
 
+        v = self.verbose
         # start processes for cpu
         for i in range(cpu_proc):
-            p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, False))
+            p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, False, v))
             p.start()
             self.cpu_handles.append(p)
 
         # start processes for gpu
         for i in range(cpu_proc, gpu_proc + cpu_proc):
-            p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, True))
+            p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, True, v))
             p.start()
             self.gpu_handles.append(p)
 
@@ -626,7 +627,7 @@ class FastDifPy:
 
             # at this point we should have been idling for 60s
             if timeout > 60:
-                print("Timeout reached, stopping.")
+                self.logger.info("Timeout reached, stopping.")
                 run = False
 
         self.send_termination_signal(first_loop=True)
@@ -643,7 +644,7 @@ class FastDifPy:
         self.join_all_children()
         assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
                                             f"Remaining: {self.first_loop_out.qsize()}"
-        print("All Images have been preprocessed.")
+        self.logger.info("All Images have been preprocessed.")
 
     def __generate_first_loop_obj(self, amount: int, compute_hash: bool, compute_thumbnails: bool) \
             -> Union[PreprocessArguments, None]:
