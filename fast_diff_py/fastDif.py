@@ -729,23 +729,24 @@ class FastDifPy:
         :return:
         """
         if thumbs:
-            print("Deleting Thumbnails")
+            self.logger.info("Deleting Thumbnails")
             try:
                 shutil.rmtree(self.thumb_dir_a)
-                print(f"Deleted {self.thumb_dir_a}")
+                self.logger.info(f"Deleted {self.thumb_dir_a}")
             except FileNotFoundError:
                 pass
-            try:
-                shutil.rmtree(self.thumb_dir_b)
-                print(f"Deleted {self.thumb_dir_b}")
-            except FileNotFoundError:
-                pass
+            if self.has_dir_b:
+                try:
+                    shutil.rmtree(self.thumb_dir_b)
+                    self.logger.info(f"Deleted {self.thumb_dir_b}")
+                except FileNotFoundError:
+                    pass
 
         if db:
             self.db.disconnect()
             self.db.free()
             self.db = None
-            print("Deleted temporary database")
+            self.logger.info("Deleted temporary database")
 
     def create_plot_dir(self, diff_location: str, purge: bool = False):
         """
