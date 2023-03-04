@@ -33,7 +33,6 @@ Features:
 # ----------------------------------------------------------------------------------------------------------------------
 # FEATURES
 # ----------------------------------------------------------------------------------------------------------------------
-# TODO implement Cuda image diff.
 # TODO Implement process stop recovery.
 # TODO Range in which the aspects must lay for matching_aspect to trigger
 # TODO Harakiri method. More reckless method.
