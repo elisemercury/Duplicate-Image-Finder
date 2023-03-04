@@ -11,6 +11,16 @@ squared_diff_generic = cp.ElementwiseKernel(
     name='squared_diff_generic')
 
 
+squared_diff_generic_reduce = cp.ReductionKernel(
+    'T x, T y',
+    'T z',
+    '(x - y) * (x - y)',
+    'a + b',
+    'z = a',
+    '0',
+    'squared_diff_generic_reduce')
+
+
 class GPUImageProcessing(CPUImageProcessing):
     """
     This class Contains the functions to process a single image or a pari of images.
@@ -43,7 +53,8 @@ class GPUImageProcessing(CPUImageProcessing):
         """
         # difference = cp.array(image_a).astype("float") - cp.array(image_b).astype("float")
         # sq_diff = cp.square(difference)
-        sq_diff = squared_diff_generic(cp.array(image_a).astype("float"), cp.array(image_b).astype("float"))
-        sum_diff = cp.sum(sq_diff)
+        # sq_diff = squared_diff_generic(cp.array(image_a).astype("float"), cp.array(image_b).astype("float"))
+        # sum_diff = cp.sum(sq_diff)
+        sum_diff = squared_diff_generic_reduce(cp.array(image_a).astype("float"), cp.array(image_b).astype("float"))
         px_count = image_a.shape[0] * image_a.shape[1]
         return float(sum_diff / px_count)
