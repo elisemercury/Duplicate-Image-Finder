@@ -1989,11 +1989,24 @@ class FastDifPy:
         """
         self.logger = logging.getLogger("fast_diff_py")
 
+        # reconnecting handlers if previous handlers exist.
+        if self.logger.hasHandlers():
+            self.logger.debug("Logger has previous handlers, reconnecting them, assuming default config.")
+            for handler in self.logger.handlers:
+                if type(handler) is logging.StreamHandler:
+                    self.stream_handler = handler
+                if type(handler) is logging.FileHandler:
+                    if handler.level is logging.WARNING:
+                        self.file_handler = handler
+                    else:
+                        self.debug_logger = handler
+            return
+
         # get location for the logs
         fp = os.path.abspath(os.path.dirname(__file__))
 
         # create two File handlers one for logging directly to file one for logging to Console
-        self.stream_handler = logging.StreamHandler()
+        self.stream_handler = logging.StreamHandler(sys.stdout)
         self.file_handler = logging.FileHandler(os.path.join(fp, "execution.log"))
 
         # create Formatter t o format the logging messages in the console and in the file
