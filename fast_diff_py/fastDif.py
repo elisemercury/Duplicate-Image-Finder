@@ -483,7 +483,7 @@ class FastDifPy:
         dir_b_count = self.db.get_dir_count(False) if self.has_dir_b else 0
 
         if dir_b_count == 0:
-            comps = dir_a_count * dir_a_count / 2
+            comps = dir_a_count * (dir_a_count-1) / 2
         else:
             comps = dir_a_count * dir_b_count
 
