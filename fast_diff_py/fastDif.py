@@ -12,7 +12,7 @@ import multiprocessing as mp
 import threading as th
 import queue
 from fast_diff_py.datatransfer import *
-from fast_diff_py.image_processor import ImageProcessing
+from fast_diff_py.cpu_image_processor import CPUImageProcessing
 from concurrent.futures import ProcessPoolExecutor
 from fast_diff_py.sql_database import SQLiteDatabase
 import logging
@@ -41,7 +41,7 @@ Features:
 # TODO Arbitrary hash matching function
 # TODO Extract hashing_data
 
-def cpu_process_image(proc: ImageProcessing, args: PreprocessArguments) -> PreprocessResults:
+def cpu_process_image(proc: CPUImageProcessing, args: PreprocessArguments) -> PreprocessResults:
     """
     Function to execute preprocessing with the ImageProcessing Class
     # TODO WARNING in docs that an error in the course of processing if it was not fatal, will be treated as fatal.
@@ -106,7 +106,7 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
     if try_cupy:
         warnings.warn(f"{identifier:03}: Cupy version currently not implemented")
 
-    img_proc = ImageProcessing(identifier=identifier)
+    img_proc = CPUImageProcessing(identifier=identifier)
 
     # stay awake for 60s, otherwise kill
     while timeout < 60:
@@ -155,7 +155,7 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
     if try_cupy:
         warnings.warn(f"{identifier:03} Cupy version currently not implemented")
 
-    processor = ImageProcessing(identifier=identifier)
+    processor = CPUImageProcessing(identifier=identifier)
     # stay awake for 60s, otherwise kill
     while timeout < 60:
         try:
@@ -172,7 +172,7 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
         timeout = 0
 
         # short_circuiting
-        result = ImageProcessing.short_circuit(args=args, sc_size=sc_size, sc_hash=sc_hash)
+        result = CPUImageProcessing.short_circuit(args=args, sc_size=sc_size, sc_hash=sc_hash)
         if result is not None:
             assert type(result) is CompareImageResults, f"Unexpected Return Type of Short Circuiting function. \n" \
                                                         f"CompareImageResults expected, got {type(result).__name__}"
