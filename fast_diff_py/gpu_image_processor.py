@@ -12,13 +12,14 @@ squared_diff_generic = cp.ElementwiseKernel(
 
 
 squared_diff_generic_reduce = cp.ReductionKernel(
-    'T x, T y',
-    'T z',
-    '(x - y) * (x - y)',
-    'a + b',
-    'z = a',
-    '0',
-    'squared_diff_generic_reduce')
+    'T x, T y',                     # in_params
+    'T z',                          # out_params
+    '(x - y) * (x - y)',            # map_expr
+    'a + b',                        # reduce_expr
+    'z = a',                        # post_map_expr
+    '0',                            # identity
+    'squared_diff_generic_reduce'   # name
+)
 
 
 class GPUImageProcessing(CPUImageProcessing):
@@ -51,10 +52,16 @@ class GPUImageProcessing(CPUImageProcessing):
         """
         A GPU accelerated version of the mean squared error function.
         """
+        # V1
         # difference = cp.array(image_a).astype("float") - cp.array(image_b).astype("float")
         # sq_diff = cp.square(difference)
+        # sum_diff = cp.sum(sq_diff)
+
+        # V2
         # sq_diff = squared_diff_generic(cp.array(image_a).astype("float"), cp.array(image_b).astype("float"))
         # sum_diff = cp.sum(sq_diff)
+
+        # V3
         sum_diff = squared_diff_generic_reduce(cp.array(image_a).astype("float"), cp.array(image_b).astype("float"))
         px_count = image_a.shape[0] * image_a.shape[1]
         return float(sum_diff / px_count)
