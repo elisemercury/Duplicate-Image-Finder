@@ -38,4 +38,4 @@ class GPUImageProcessing(CPUImageProcessing):
         sq_diff = cp.square(difference)
         sum_diff = cp.sum(sq_diff)
         px_count = image_a.shape[0] * image_a.shape[1]
-        return sum_diff / px_count
+        return float(sum_diff / px_count)
