@@ -1007,7 +1007,8 @@ class FastDifPy:
         add_count = 0
 
         start_a = 0
-        start_b = 0
+        # set start_b to 1 bc we don't want to compare 0 with 0 in case both are from dir a.
+        start_b = 1
 
         # things that can happen independently of b
         rows_a = self.db.fetch_many_after_key(directory_a=True, count=max(procs, 100))
@@ -1022,6 +1023,9 @@ class FastDifPy:
 
         # We have a dir_b, replace rows_b with actual rows form that table
         if self.has_dir_b:
+            # we have a dir_b, so we set the start to 0 because we can compare the first two images.
+            start_b = 0
+
             # fetching rows from table b
             rows_b = self.db.fetch_many_after_key(directory_a=False, count=max(procs, 100))
 
