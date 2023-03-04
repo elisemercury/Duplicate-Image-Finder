@@ -4,6 +4,13 @@ import numpy as np
 from fast_diff_py.cpu_image_processor import CPUImageProcessing
 
 
+squared_diff_generic = cp.ElementwiseKernel(
+    in_params='T x, T y',
+    out_params='T z',
+    operation='z = (x - y) * (x - y)',
+    name='squared_diff_generic')
+
+
 class GPUImageProcessing(CPUImageProcessing):
     """
     This class Contains the functions to process a single image or a pari of images.
@@ -34,8 +41,9 @@ class GPUImageProcessing(CPUImageProcessing):
         """
         A GPU accelerated version of the mean squared error function.
         """
-        difference = cp.array(image_a).astype("float") - cp.array(image_b).astype("float")
-        sq_diff = cp.square(difference)
+        # difference = cp.array(image_a).astype("float") - cp.array(image_b).astype("float")
+        # sq_diff = cp.square(difference)
+        sq_diff = squared_diff_generic(cp.array(image_a).astype("float"), cp.array(image_b).astype("float"))
         sum_diff = cp.sum(sq_diff)
         px_count = image_a.shape[0] * image_a.shape[1]
         return float(sum_diff / px_count)
