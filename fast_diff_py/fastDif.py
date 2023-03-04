@@ -1177,6 +1177,11 @@ class FastDifPy:
         :param procs: number of processes that are running
         :return:
         """
+        # we are using less optimized, so we are going straight for the not optimized algorithm.
+        if self.less_optimized:
+            self.__refill_queues_non_optimized(init=True)
+            return
+
         # from a fetch the first set of images
         rows = self.db.fetch_many_after_key(directory_a=True, count=procs)
         self.second_loop_base_a = True
@@ -1189,18 +1194,13 @@ class FastDifPy:
                 # trying to use the directory b as a fixed directory
                 rows = self.db.fetch_many_after_key(directory_a=False, count=procs)
                 if len(rows) < procs:
-                    self.__refill_queues_small_non_optimized(init=True)
+                    self.__refill_queues_small_non_optimized(init=True, procs=procs)
                     return
                 else:
                     self.second_loop_base_a = False
             else:
-                self.__refill_queues_small_non_optimized(init=True)
+                self.__refill_queues_small_non_optimized(init=True, procs=procs)
                 return
-
-        # we are using less optimized, so we are going straight for the not optimized algorithm.
-        if self.less_optimized:
-            self.__refill_queues_non_optimized(init=True)
-            return
 
         # populating the files of the second loop.
         self.second_loop_queue_status = []
