@@ -983,11 +983,13 @@ class FastDifPy:
 
         return inserted if inserted > 0 else None
 
-    def __refill_queues_small_non_optimized(self, init: bool = False) -> Union[int, None]:
+    def __refill_queues_small_non_optimized(self, init: bool = False, procs: int = None) -> Union[int, None]:
         """
-        Refill the queues with the non optimized algorithm which just stupidly goes along.
+        Refill the queues with the non optimized algorithm which just stupidly goes along. The algorithm assumes though
+        a queue for each process!!!
 
         :param init: if init, start all loops from 0 and initialize the status to dict
+        :param procs: Number of processes.
         :return: number of images inserted into queues.
         """
         last_a = None
@@ -998,7 +1000,8 @@ class FastDifPy:
             last_b = self.second_loop_queue_status["last_b"]
 
         # initialize loop vars
-        procs = len(self.cpu_handles) + len(self.gpu_handles)
+        if procs is None:
+            procs = len(self.cpu_handles) + len(self.gpu_handles)
         queue_index = 0
 
         add_count = 0
