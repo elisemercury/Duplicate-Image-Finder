@@ -13,6 +13,7 @@ import threading as th
 import queue
 from fast_diff_py.datatransfer import *
 from fast_diff_py.cpu_image_processor import CPUImageProcessing
+from fast_diff_py.gpu_image_processor import GPUImageProcessing
 from concurrent.futures import ProcessPoolExecutor
 from fast_diff_py.sql_database import SQLiteDatabase
 import logging
@@ -41,7 +42,7 @@ Features:
 # TODO Arbitrary hash matching function
 # TODO Extract hashing_data
 
-def cpu_process_image(proc: CPUImageProcessing, args: PreprocessArguments) -> PreprocessResults:
+def process_image(proc: CPUImageProcessing, args: PreprocessArguments) -> PreprocessResults:
     """
     Function to execute preprocessing with the ImageProcessing Class
     # TODO WARNING in docs that an error in the course of processing if it was not fatal, will be treated as fatal.
@@ -104,9 +105,16 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
     # try to use cupy if it is indicated by arguments
     cupy_avail = False
     if try_cupy:
-        warnings.warn(f"{identifier:03}: Cupy version currently not implemented")
+        try:
+            import cupy as cp
+            cupy_avail = True
+        except ImportError:
+            warnings.warn(f"{identifier:03}: Cupy not available. Using CPU instead.")
 
-    img_proc = CPUImageProcessing(identifier=identifier)
+    if cupy_avail:
+        img_proc = GPUImageProcessing(identifier=identifier)
+    else:
+        img_proc = CPUImageProcessing(identifier=identifier)
 
     # stay awake for 60s, otherwise kill
     while timeout < 60:
@@ -124,7 +132,7 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
         args = PreprocessArguments.from_json(args_str)
         timeout = 0
 
-        result = cpu_process_image(img_proc, args)
+        result = process_image(img_proc, args)
         if verbose:
             print(f"{identifier:03}: Done with {os.path.basename(args.in_path)}")
 
@@ -153,9 +161,16 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
     # try to use cupy if it is indicated by arguments
     cupy_avail = False
     if try_cupy:
-        warnings.warn(f"{identifier:03} Cupy version currently not implemented")
+        try:
+            import cupy as cp
+            cupy_avail = True
+        except ImportError:
+            warnings.warn(f"{identifier:03}: Cupy not available. Using CPU instead.")
 
-    processor = CPUImageProcessing(identifier=identifier)
+    if cupy_avail:
+        processor = GPUImageProcessing(identifier=identifier)
+    else:
+        processor = CPUImageProcessing(identifier=identifier)
     # stay awake for 60s, otherwise kill
     while timeout < 60:
         try:
