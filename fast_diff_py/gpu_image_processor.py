@@ -1,41 +1,10 @@
 import cupy as cp
 from types import FunctionType
 import numpy as np
-from fast_diff_py.image_processor import ImageProcessing as CIP
+from fast_diff_py.cpu_image_processor import CPUImageProcessing
 
 
-# sample for the idiot I am.
-# import matplotlib.pyplot as plt
-# import numpy as np
-# import cv2
-#
-# # Some example data to display
-# x = np.linspace(0, 2 * np.pi, 400)
-# y = np.sin(x ** 2)
-#
-# fig, ax = plt.subplots()
-# ax.plot(x, y)
-# ax.set_title('A single plot')
-# plt.show()
-#
-# fig, axs = plt.subplots(2, 2)
-# fig.suptitle('Vertically stacked subplots')
-# axs[0][0].plot(x, y)
-# axs[1][0].plot(x, -y)
-#
-# im_a = "/home/alisot2000/Desktop/SAMPLE_MIRA/JOIN/20221206_014252.jpg"
-# im_b = "/home/alisot2000/Desktop/SAMPLE_MIRA/JOIN/0C2E9779-8E7C-4044-B2D3-07C8F8650527.jpeg"
-#
-# im_a_mat = cv2.imdecode(np.fromfile(im_a, dtype=np.uint8), cv2.IMREAD_COLOR)
-# im_b_mat = cv2.imdecode(np.fromfile(im_b, dtype=np.uint8), cv2.IMREAD_COLOR)
-#
-# axs[0][1].imshow(im_a_mat, cmap=plt.cm.gray)
-# axs[1][1].imshow(im_b_mat, cmap=plt.cm.gray)
-#
-# plt.show()
-
-
-class GPUImageProcessing(CIP):
+class GPUImageProcessing(CPUImageProcessing):
     """
     This class Contains the functions to process a single image or a pari of images.
 
