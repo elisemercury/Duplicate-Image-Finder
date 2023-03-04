@@ -856,7 +856,7 @@ class FastDifPy:
             self.cpu_handles.append(p)
 
         for i in range(cpu_proc, cpu_proc + gpu_proc):
-            p = mp.Process(target=parallel_resize, args=child_args[i])
+            p = mp.Process(target=parallel_compare, args=child_args[i])
             p.start()
             self.gpu_handles.append(p)
 
