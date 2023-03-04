@@ -271,6 +271,9 @@ class FastDifPy:
 
     __has_dir_b: bool = False
 
+    ignore_names: List[str]
+    ignore_paths: List[str]
+
     supported_file_types = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".gif", ".webp"}
 
     db: Union[Database, None]
@@ -355,6 +358,9 @@ class FastDifPy:
                 self.logger.info("No matching database found. Creating new one.")
                 self.db = SQLiteDatabase(os.path.join(self.p_root_dir_a, "diff.db"))
                 self.write_config()
+
+        self.ignore_paths = []
+        self.ignore_names = []
 
     def test_for_db(self):
         """
@@ -458,6 +464,14 @@ class FastDifPy:
 
         for file_name in os.listdir(path):
             full_path = os.path.join(path, file_name)
+
+            # ignore a path if given
+            if full_path in self.ignore_paths:
+                continue
+
+            # ignoring based only on name
+            if file_name in self.ignore_names:
+                continue
 
             # Thumbnail directory is called .temp_thumbnails
             if file_name.startswith(".temp_thumb") and ignore_thumbnail:
