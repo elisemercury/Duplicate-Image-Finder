@@ -862,6 +862,8 @@ class FastDifPy:
 
         done = False
         count = 0
+        timeout = 0
+
         # update everything
         while not done:
             # update the queues and store if there are more tasks to process
@@ -870,8 +872,14 @@ class FastDifPy:
             self.logger.info(f"Number of Processed Images: {count}")
 
             if current_count == 0:
+                timeout += 1
                 self.logger.debug("Dequeued 0 elements, stopping")
-                done = True
+                time.sleep(1)
+
+                if timeout > 5:
+                    done = True
+            else:
+                timeout = 0
 
             # exit the while loop if all children have exited.
             _, _, _, all_exited = self.check_children(cpu=cpu_proc > 0, gpu=gpu_proc > 0)
