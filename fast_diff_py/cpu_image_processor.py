@@ -40,7 +40,7 @@ from fast_diff_py.utils import *
 # plt.show()
 
 
-class ImageProcessing:
+class CPUImageProcessing:
     """
     This class Contains the functions to process a single image or a pari of images.
 
