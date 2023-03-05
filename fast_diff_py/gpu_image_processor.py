@@ -63,5 +63,6 @@ class GPUImageProcessing(CPUImageProcessing):
 
         # V3
         # sum_diff = squared_diff_generic_reduce(cp.array(image_a).astype("float"), cp.array(image_b).astype("float"))
+
         px_count = image_a.shape[0] * image_a.shape[1]
         return float(sum_diff / px_count)
