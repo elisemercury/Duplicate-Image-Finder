@@ -131,12 +131,12 @@ dif.py [-h] -D DIRECTORY [-Z OUTPUT_DIRECTORY] [-f {True,False}]
 
 | | Parameter | | Parameter |
 | :---: | ------ | :---: | ------ | 
-| `-D` | directory | `-px` | px_size |  
-| `-Z` | output_directory | `-p` | show_progress |
-| `-f`| fast_search | `-o` | show_output |
+| `-D` | directory | `-p` | show_progress |  
+| `-Z` | output_directory | `-o` | show_output |
+| `-f`| fast_search | `-mv` | move_to |
 | `-r`| recursive | `-d` | delete |
 | `-s` | similarity |  `-sd` | silent_del |
-
+| `-px` | px_size | `-l` | logs |
 
 When running from the CLI, the output of difPy is  written to files and saved in the working directory by default. To change the default output directory, specify the `-Z / -output_directory` parameter. The "xxx" in the output filenames is a unique timestamp:
 
