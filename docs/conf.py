@@ -6,7 +6,7 @@ project = 'difPy Guide'
 copyright = '2023, Elise Landman'
 author = 'Elise Landman'
 
-release = 'v3.0.5'
+release = 'v3.0.6'
 version = 'v3.0'
 
 # -- General configuration
