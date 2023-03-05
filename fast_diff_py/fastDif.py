@@ -502,7 +502,7 @@ class FastDifPy:
         :return: byte_count_a, byte_count_b
         """
         dir_a_count = self.db.get_dir_count(True)
-        dir_b_count = self.db.get_dir_count(False) if self.has_dir_b else 0
+        dir_b_count = self.db.get_dir_count(False)
 
         if dir_b_count == 0:
             comps = dir_a_count * (dir_a_count-1) / 2
