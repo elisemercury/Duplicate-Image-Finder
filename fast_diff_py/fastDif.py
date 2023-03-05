@@ -279,6 +279,9 @@ class FastDifPy:
 
     db: Union[Database, None]
 
+    # short circuiting variables
+    has_any_images: bool = False
+
     # relative to child processes
     first_loop_in: mp.Queue = None  # the tasks sent to the child processes
     first_loop_out: mp.Queue = None  # the results coming from the child processes
@@ -446,6 +449,10 @@ class FastDifPy:
         if self.has_dir_b:
             self.__recursive_index(False)
 
+        # get the number of images and create short circuit.
+        im_num = self.db.get_dir_count()
+        self.has_any_images = im_num > 0
+
     def __recursive_index(self, dir_a: bool = True, path: str = None, ignore_thumbnail: bool = True):
         """
         Recursively index the directories. This function is called by the index_the_dirs function.
@@ -583,6 +590,10 @@ class FastDifPy:
         :param purge: if the database should be purged before the loop runs.
         :return:
         """
+        # Short circuit if there are no images in the database.
+        if not self.has_any_images:
+            self.logger.debug("No images in database, aborting.")
+            return
 
         assert gpu_proc >= 0, "Number of GPU Processes needs to be greater than zero"
         if cpu_proc is None:
@@ -820,6 +831,11 @@ class FastDifPy:
         :param diff_location: Where the plots should be stored (needs to be provided if make_diff_plots is true)
         :return:
         """
+        # Short circuit if there are no images in the database.
+        if not self.has_any_images:
+            self.logger.debug("No images in database, aborting.")
+            return
+
         assert gpu_proc >= 0, "Number of GPU Processes needs to be greater than zero"
         if cpu_proc is None:
             cpu_proc = mp.cpu_count()
@@ -1591,6 +1607,9 @@ class FastDifPy:
         :param dif_based: if the relative difference should be used or hash based matching should be done.
         :return:
         """
+        if not self.has_any_images:
+            return {}, []
+
         if not dif_based:
             raise NotImplementedError("hash_based is in todos.")
         clusters = self.build_loose_duplicate_cluster(similarity)
