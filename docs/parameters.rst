@@ -129,7 +129,7 @@ The images are moved based on the ``lower_quality`` output as described under se
 
 ``None`` = (default) images are not moved
 
-``destination folder (type: str)`` = moves the lower quality image files to the destination folder
+``"C:/Path/to/Destination/"`` = moves the lower quality image files to the destination folder
 
 .. _delete:
 
