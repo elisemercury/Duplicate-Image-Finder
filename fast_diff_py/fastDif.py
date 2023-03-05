@@ -451,7 +451,7 @@ class FastDifPy:
 
         # get the number of images and create short circuit.
         im_num = self.db.get_dir_count()
-        self.has_any_images = im_num > 0
+        self.has_any_images = im_num > 1
 
     def __recursive_index(self, dir_a: bool = True, path: str = None, ignore_thumbnail: bool = True):
         """
