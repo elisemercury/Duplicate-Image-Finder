@@ -7,7 +7,7 @@ difPy supports the following parameters:
 
 .. code-block:: python
 
-   dif(directory*, fast_search=True, recursive=True, similarity="normal", px_size=50, 
+   dif(directory*, fast_search=True, recursive=True, similarity='normal', px_size=50, move_to=None
        show_progress=True, show_output=False, delete=False, silent_del=False, logs=False)
 
 .. csv-table::
@@ -18,10 +18,11 @@ difPy supports the following parameters:
    directory,"``str``, ``list``",,
    fast_search,``bool``,``True``,``False``
    recursive,``bool``,``True``,``False``
-   similarity,"``str``, ``int``",``'normal'``, "``'high'``, ``'low'``, any int"
+   similarity,"``str``, ``int``",``'normal'``, "``'high'``, ``'low'``, any ``int``"
    px_size,"``int``, ``float``",50,any ``int`` or ``float`` (not recommended to change default value)
    show_progress,``bool``,``True``,``False``
    show_output,``bool``,``False``,``True``
+   move_to,``str``,``None``,folder path as ``str``
    delete,``bool``,``False``,"``True`` (use with care, cannot be undone)"
    silent_del,``bool``,``False``,"``True`` (use with care, cannot be undone)"
    logs,``bool``,``False``,``True``
@@ -117,6 +118,19 @@ By default, difPy will output its search result data as described under section 
 
 ``True`` = displays the matched images and their filename in the console output
 
+.. _move_to:
+
+move_to
+------------
+
+difPy can automatically move the lower quality duplicate/similar images it found to another directory. Images can be moved by setting ``move_to`` to a desired destination folder.
+
+The images are moved based on the ``lower_quality`` output as described under section :ref:`output`.
+
+``None`` = (default) images are not moved
+
+``destination folder (type: str)`` = moves the lower quality image files to the destination folder
+
 .. _delete:
 
 delete
@@ -126,7 +140,7 @@ delete
 
    Please use with care, as this cannot be undone.
 
-When set to ``True``, the lower resolution duplicate image(s) that were found by difPy are deleted from the folder(s).
+When set to ``True``, the lower quality duplicate/similar image(s) that were found by difPy are deleted from the folder(s).
 
 The images are deleted based on the ``lower_quality`` output as described under section :ref:`output`. After auto-deleting the images, every match group will be left with one single image: the image with the highest quality among its match group.
 

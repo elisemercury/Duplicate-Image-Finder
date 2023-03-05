@@ -156,14 +156,14 @@ It supports the following arguments:
 
 .. code-block:: python
    
-   dif.py [-h] -D DIRECTORY [-Z [OUTPUT_DIRECTORY]] [-f [FAST_SEARCH]]
-          [-r [{True,False}]] [-s [{low,normal,high,int}]] [-px [PX_SIZE]] 
-          [-p [{True,False}]] [-o [{True,False}]]
-          [-d [{True,False}]] [-sd [{True,False}]] [-l [{True,False}]]
+   dif.py [-h] -D DIRECTORY [-Z OUTPUT_DIRECTORY] [-f {True,False}]
+          [-r {True,False}] [-s SIMILARITY] [-px PX_SIZE] 
+          [-p {True,False}] [-o {True,False}] [-mv MOVE_TO]
+          [-d {True,False}] [-sd {True,False}] [-l {True,False}]
 
 .. note::
 
-   🆕 difPy >= v3.0 has adjusted CLI parameters: ``directory`` changed to ``-D``, ``silend_del`` changed to ``-sd`` and ``logs`` has been added as ``-l``.
+   🆕 difPy >= v3.0 has adjusted CLI parameters: ``directory`` changed to ``-D`` and ``silend_del`` changed to ``-sd``.
 
 .. csv-table::
    :header: Cmd,Parameter,Cmd,Parameter
@@ -172,10 +172,10 @@ It supports the following arguments:
 
    ``-D``,directory,``-p``,show_progress
    ``-Z``,output_directory,``-o``,show_output
-   ``-f``,fast_search,``-d``,delete
-   ``-r``,recursive,``-sd``,silent_del
-   ``-s``,similarity,``-l``,logs
-   ``-px``,px_size
+   ``-f``,fast_search,``-mv``,move_to
+   ``-r``,recursive,``-d``,delete
+   ``-s``,similarity,``-sd``,silent_del
+   ``-px``,px_size,``-l``,logs
 
 When running from the CLI, the output of difPy is written to files and saved in the working directory by default. To change the default output directory, specify the ``-Z / -output_directory`` parameter. The "xxx" in the output filenames is a unique timestamp:
 
