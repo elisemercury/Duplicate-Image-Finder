@@ -968,7 +968,6 @@ class FastDifPy:
 
         :return:
         """
-        self.logger.debug("Refilling Queues fully optimized.")
         inserted = 0
         for p in range(len(self.second_loop_in)):
             # fetch possible candidates for the row.
@@ -1051,7 +1050,6 @@ class FastDifPy:
         :param procs: Number of processes.
         :return: number of images inserted into queues.
         """
-        self.logger.debug("Refilling Queues with non optimized algorithm for small sizes")
         last_a = None
         last_b = None
 
@@ -1133,7 +1131,6 @@ class FastDifPy:
         :param init: Create new status, and initialize the dict
         :return: number of images inserted into queues.
         """
-        self.logger.debug("Refilling queues with non optimized algorithm")
         assert self.less_optimized, "This functions needs to be called in the less_optimized mode since it assumes " \
                                     "that the attribute second_loop_in is of type mp.Queue and not List[mp.Queue]"
         # initialize loop vars
