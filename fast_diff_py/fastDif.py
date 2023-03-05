@@ -624,7 +624,7 @@ class FastDifPy:
         self.first_loop_out = mp.Queue()
 
         # prefill loop
-        for i in range(cpu_proc + gpu_proc):
+        for i in range(2*(cpu_proc + gpu_proc)):
             arg = self.__generate_first_loop_obj(amount=amount, compute_hash=compute_hash,
                                                  compute_thumbnails=compute_thumbnails)
 
@@ -633,6 +633,7 @@ class FastDifPy:
                 break
 
             self.first_loop_in.put(arg.to_json())
+            inserted_counter += 1
 
         v = self.verbose
         # start processes for cpu
@@ -654,6 +655,9 @@ class FastDifPy:
 
         # handle the running state of the loop
         while run:
+            if inserted_counter % 100 == 0:
+                self.logger.info(f"Inserted {inserted_counter} images.")
+
             if self.handle_result_of_first_loop(self.first_loop_out, compute_hash):
                 arg = self.__generate_first_loop_obj(amount, compute_hash, compute_thumbnails)
 
@@ -664,6 +668,7 @@ class FastDifPy:
 
                 else:
                     self.first_loop_in.put(arg.to_json())
+                    inserted_counter += 1
                     timeout = 0
             else:
                 time.sleep(1)
