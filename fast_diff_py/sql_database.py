@@ -661,7 +661,7 @@ class SQLiteDatabase(Database):
                            "key INTEGER PRIMARY KEY AUTOINCREMENT , "
                            "key_a INTEGER NOT NULL , "
                            "key_b INTEGER NOT NULL ,"
-                           "dif REAL CHECK (dif_table.dif > -1) DEFAULT -1,"
+                           "dif REAL CHECK (dif_table.dif >= -1) DEFAULT -1,"
                            "error TEXT,"
                            "success INT CHECK (dif_table.success >= 0 AND dif_table.success <= 1),"
                            "UNIQUE (key_a, key_b)) ")
@@ -955,7 +955,7 @@ class SQLiteDatabase(Database):
         """
         json_str = json.dumps(to_encode)
         bytes_string = json_str.encode("utf-8")
-        return base64.standard_b64encode(bytes_string)
+        return base64.standard_b64encode(bytes_string).decode("utf-8")
 
     @staticmethod
     def from_b64(b64_string: str):
@@ -965,7 +965,7 @@ class SQLiteDatabase(Database):
         :param b64_string: a b64 encoded python object
         :return: a python object
         """
-        bytes_string = base64.standard_b64decode(b64_string)
+        bytes_string = base64.standard_b64decode(b64_string.encode("utf-8"))
         json_string = bytes_string.decode("utf-8")
         return json.loads(json_string)
 
