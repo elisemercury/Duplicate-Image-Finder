@@ -1,12 +1,12 @@
 # Duplicate Image Finder (difPy)
 
-![PyPIv](https://img.shields.io/pypi/v/difPy)
-![PyPI status](https://img.shields.io/pypi/status/difPy)
+[![PyPIv](https://img.shields.io/pypi/v/difPy)](https://pypi.org/project/difPy/)
+[![PyPI status](https://img.shields.io/pypi/status/difPy)](https://pypi.org/project/difPy/)
 [![Documentation Status](https://readthedocs.org/projects/difpy/badge/?version=latest)](https://difpy.readthedocs.io/en/latest/?badge=latest)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/difPy)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/difPy)](https://pypi.org/project/difPy/)
 [![Downloads](https://static.pepy.tech/badge/difpy)](https://pepy.tech/project/difpy)
-![PyPI - License](https://img.shields.io/pypi/l/difPy)
-<img src="https://img.shields.io/badge/dif-Py-blue?style=flat&logo=python&labelColor=white&logoWidth=20.svg/"></a>
+[![PyPI - License](https://img.shields.io/pypi/l/difPy)](https://github.com/elisemercury/Duplicate-Image-Finder/blob/main/LICENSE.txt)
+[<img src="https://img.shields.io/badge/dif-Py-blue?style=flat&logo=python&labelColor=white&logoWidth=20.svg/"></a>](https://github.com/elisemercury/Duplicate-Image-Finder/)
 
 **Tired of going through all images in a folder and comparing them manually to check if they are duplicates?**
 
