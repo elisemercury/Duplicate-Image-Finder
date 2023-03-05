@@ -590,6 +590,7 @@ class FastDifPy:
         :param purge: if the database should be purged before the loop runs.
         :return:
         """
+        inserted_counter = 0
         # Short circuit if there are no images in the database.
         if not self.has_any_images:
             self.logger.debug("No images in database, aborting.")
