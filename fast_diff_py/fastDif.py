@@ -898,13 +898,18 @@ class FastDifPy:
         # update everything
         while not done:
             # update the queues and store if there are more tasks to process
-            current_count = self.update_queues()
+            current_inserted, current_count = self.update_queues()
             count += current_count
             self.logger.info(f"Number of Processed Images: {count}")
 
+            # We have no more images to enqueue
+            if current_inserted == 0 or current_inserted is None:
+                self.send_termination_signal(first_loop=False)
+                done = True
+
             if current_count == 0:
                 timeout += 1
-                self.logger.debug("Dequeued 0 elements, stopping")
+                self.logger.debug("Dequeued 0 elements")
                 time.sleep(1)
 
                 if timeout > 5:
