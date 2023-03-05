@@ -12,6 +12,7 @@ import time
 from pathlib import Path
 import argparse
 import json
+import csv
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -38,7 +39,7 @@ class dif:
         show_output : bool, optional
             Show the image matches in console (default is False)
         move_to : bool, optional
-            Move the unique highest quelity images to a target folder
+            Move the lower quality images to a target folder
         delete : bool, optional
             Delete lower quality matches images (default is False)
         silent_del : bool, optional
@@ -61,7 +62,7 @@ class dif:
         self.logs = _validate._logs(logs)
 
         start_time = time.time()
-        self.result, self.higher_quality, self.lower_quality, total_count, match_count, invalid_files = dif._run(self)
+        self.result, self.lower_quality, total_count, match_count, invalid_files = dif._run(self)
         end_time = time.time()
 
         time_elapsed = np.round(end_time - start_time, 4)
@@ -70,18 +71,17 @@ class dif:
 
         print(f'Found {match_count} pair(s) of duplicate/similar image(s) in {time_elapsed} seconds.')
 
-        if self.move_to != None:
-            _help._move_files(self.higher_quality, self.move_to)
+        if match_count != 0:
+            if self.move_to != None:
+                self.lower_quality = _help._move_imgs(self.lower_quality, self.move_to)
 
-        if self.delete:
-            # optional: delete lower_quality images
-            if len(self.lower_quality) != 0:
-                _help._delete_imgs(set(self.lower_quality), silent_del=self.silent_del)
+            elif self.delete:
+                if len(self.lower_quality) != 0:
+                    _help._delete_imgs(set(self.lower_quality), silent_del=self.silent_del)
     
     def _run(self):
         '''Runs the difPy algorithm.
         '''
-        # Function that runs the difPy algortihm
         for count, dir in enumerate(self.directory):
             if count == 0:
                 directory_files = _help._list_all_files(dir, self.recursive)
@@ -95,8 +95,8 @@ class dif:
                     break
         imgs_matrices, invalid_files = _compute._imgs_matrices(id_by_location, self.px_size, self.show_progress)
         result, exclude_from_search, total_count, match_count = _search._matches(imgs_matrices, id_by_location, self.similarity, self.show_output, self.show_progress, self.fast_search)
-        higher_quality, lower_quality = _search._lower_quality(result)
-        return result, higher_quality, lower_quality, total_count, match_count, invalid_files
+        lower_quality = _search._lower_quality(result)
+        return result, lower_quality, total_count, match_count, invalid_files
 
     def _generate_stats(self, start_time, end_time, time_elapsed, total_searched, total_matches, invalid_files):
         '''Generates stats of the difPy process.
@@ -208,7 +208,7 @@ class _validate:
             if not move_to == None:
                 raise Exception('Invalid value for "move_to" parameter: must be of type str or "None"')
         else:
-            _validate._directory_exist(move_to)
+            _validate._directory_exist([move_to])
         return move_to
 
     def _delete(delete, silent_del):
@@ -339,16 +339,15 @@ class _search:
 
     def _lower_quality(result):
         # Function that creates a list of all image matches that have the lowest quality within the match group
-        higher_quality, lower_quality = [], []
+        lower_quality = []
         for id, results in result.items():
             match_group = []
             match_group.append(result[id]['location'])
             for match_id in result[id]['matches']:
                 match_group.append(result[id]['matches'][match_id]['location'])
             sort_by_size = _help._check_img_quality(match_group)
-            higher_quality = higher_quality + sort_by_size[0]
             lower_quality = lower_quality + sort_by_size[1:]
-        return higher_quality, lower_quality
+        return lower_quality
 
 class _help:
     '''
@@ -402,11 +401,14 @@ class _help:
         else:
             print(f'difPy {task}: [{count}/{total_count}] [{count/total_count:.0%}]', end='\r')
 
-    def _move_files(higher_quality, move_to):
-        for file in higher_quality:
+    def _move_imgs(lower_quality, move_to):
+        new_lower_quality = []
+        for file in lower_quality:
             head, tail = os.path.split(file)
             os.replace(file, os.path.join(move_to, tail))
-        print(f'Moved {len(higher_quality)} unique higher quality file(s) to {Path(move_to)}')
+            new_lower_quality.append(str(Path(os.path.join(move_to, tail))))
+        print(f'Moved {len(lower_quality)} duplicate/similar image(s) to {str(Path(move_to))}')
+        return new_lower_quality
 
     def _delete_imgs(lower_quality_set, silent_del=False):
         # Function for deleting the lower quality images that were found after the search
@@ -457,7 +459,7 @@ if __name__ == '__main__':
     parser.add_argument('-px', '--px_size', type=int, help='Compression size of images in pixels.', required=False, default=50)
     parser.add_argument('-p', '--show_progress', type=bool, help='Show the real-time progress of difPy.', required=False, choices=[True, False], default=True)
     parser.add_argument('-o', '--show_output', type=bool, help='Show the compared images in real-time.', required=False, choices=[True, False], default=False)
-    parser.add_argument('-mv', '--move_to', type=str, help='Move the unique highest quelity images to a target folder.', required=False, default=None)
+    parser.add_argument('-mv', '--move_to', type=str, help='Move the lower quelity images to a target folder.', required=False, default=None)
     parser.add_argument('-d', '--delete', type=bool, help='Delete all duplicate images with lower quality.', required=False, choices=[True, False], default=False)
     parser.add_argument('-sd', '--silent_del', type=bool, help='Supress the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
     parser.add_argument('-l', '--logs', type=bool, help='Enable log collection for invalid files.', required=False, choices=[True, False], default=False)
@@ -472,7 +474,6 @@ if __name__ == '__main__':
     # create filenames for the output files
     timestamp =str(time.time()).replace('.', '_')
     result_file = f'difPy_results_{timestamp}.json'
-    hq_file = f'difPy_higher_quality_{timestamp}.csv'
     lq_file = f'difPy_lower_quality_{timestamp}.csv'
     stats_file = f'difPy_stats_{timestamp}.json'
 
@@ -487,15 +488,11 @@ if __name__ == '__main__':
     with open(os.path.join(dir, result_file), 'w') as file:
         json.dump(search.result, file)
 
-    with open(os.path.join(dir, hq_file), 'w') as file:
-        for element in search.higher_quality:
-            file.write(f'{element},')
-
-    with open(os.path.join(dir, lq_file), 'w') as file:
-        for element in search.lower_quality:
-            file.write(f'{element},')
+    with open(lq_file, 'w') as file:
+        wr = csv.writer(file, quoting=csv.QUOTE_ALL)
+        wr.writerow(search.lower_quality)
 
     with open(os.path.join(dir, stats_file), 'w') as file:
         json.dump(search.stats, file)
 
-    print(f'''\nSaved difPy results into folder '{dir}' and filenames:\n{result_file} \n{hq_file} \n{lq_file} \n{stats_file}''')
+    print(f'''\nSaved difPy results into folder '{dir}' and filenames:\n{result_file} \n{lq_file} \n{stats_file}''')
