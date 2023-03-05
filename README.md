@@ -23,8 +23,6 @@ Read more on how the algorithm of difPy works in my Medium article [Finding Dupl
 
 Check out the [difPy package on PyPI.org](https://pypi.org/project/difPy/)
 
-:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
-
 -------
 
 ## Description
