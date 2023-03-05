@@ -240,7 +240,7 @@ class SQLiteDatabase(Database):
         :param key: file identifier which is to be updated
         :param msg: error message created when attempting to process the file.
         """
-        msg_b64 = base64.b64encode(msg.encode("utf-8")).decode("ascii")
+        msg_b64 = SQLiteDatabase.to_b64(msg)
         self.debug_execute(f"UPDATE directory SET proc_suc = 0, error='{msg_b64}' WHERE key = {key}")
 
     def get_next_to_process(self):
