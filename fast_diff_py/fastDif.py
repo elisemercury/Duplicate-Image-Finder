@@ -13,7 +13,6 @@ import threading as th
 import queue
 from fast_diff_py.datatransfer import *
 from fast_diff_py.cpu_image_processor import CPUImageProcessing
-from fast_diff_py.gpu_image_processor import GPUImageProcessing
 from concurrent.futures import ProcessPoolExecutor
 from fast_diff_py.sql_database import SQLiteDatabase
 import logging
@@ -111,6 +110,7 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
             warnings.warn(f"{identifier:03}: Cupy not available. Using CPU instead.")
 
     if cupy_avail:
+        from fast_diff_py.gpu_image_processor import GPUImageProcessing
         img_proc = GPUImageProcessing(identifier=identifier)
     else:
         img_proc = CPUImageProcessing(identifier=identifier)
@@ -167,6 +167,7 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
             warnings.warn(f"{identifier:03}: Cupy not available. Using CPU instead.")
 
     if cupy_avail:
+        from fast_diff_py.gpu_image_processor import GPUImageProcessing
         processor = GPUImageProcessing(identifier=identifier)
     else:
         processor = CPUImageProcessing(identifier=identifier)
