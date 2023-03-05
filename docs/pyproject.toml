@@ -1,0 +1,7 @@
+[build-system]
+requires = ["numpy >=1.24.2", "matplotlib >= 3.7.0", "Pillow >= 9.4.0", "setuptools >= 40.8.0"]
+
+[project]
+name = "difPy"
+authors = [{name = "Elise Landman", email = "elisejlandman@hotmail.com"}]
+dynamic = ["version", "description"]

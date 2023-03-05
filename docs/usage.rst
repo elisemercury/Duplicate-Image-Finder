@@ -1,0 +1,224 @@
+Using difPy
+=====
+
+.. _using difPy:
+
+**difPy** is a Python package that automates the search for duplicate/similar images.
+
+It searches for images in one (or more) different folder(s), compares the images it found and checks whether these are duplicate or similar images.
+
+difPy compares the images based on their tensors i. e. the image content. This approach is different to classic image hash comparison and allows difPy to **not only search for duplicate images, but also for similar images**.
+
+.. _installation:
+
+Installation
+------------
+
+To use difPy, first install it using pip:
+
+.. code-block:: console
+
+   (.venv) $ pip install difPy
+
+.. _usage:
+
+Basic Usage
+----------------
+
+Single Folder Search
+^^^^^^^^^^
+
+Search for duplicate images in a single folder:
+
+.. code-block:: python
+
+   from difPy import dif
+   search = dif("C:/Path/to/Folder/")
+
+Multi-Folder Search
+^^^^^^^^^^
+
+.. note::
+
+   🆕 difPy >= v3.0 supports comparison of more than 2 folders simultaneously.
+
+Search for duplicate images in multiple folders:
+
+.. code-block:: python
+
+   from difPy import dif
+   search = dif("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder_C/", ...)
+
+or add a ``list`` of folders:
+
+.. code-block:: python
+
+   from difPy import dif
+   search = dif(["C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder_C/", ... ])
+
+
+Folder paths must be specified as either standalone Python strings, or within a Python `list`. difPy will compare the **union** of all files within the specified folders.
+
+By default, difPy leverages its :ref:`Fast Search Algorithm (FSA)`.
+
+*difPy supports most popular image formats, but since it makes use of the Pillow library for image decoding, the supported formats are restricted to the ones listed in the* `Pillow Documentation`_.
+
+.. _Pillow Documentation: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
+
+.. _output:
+
+Output
+----------------
+
+difPy returns various types of output that you may use depending on your use case:
+
+Matches Images
+^^^^^^^^^^
+A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found, where the keys are a **randomly generated unique id** for each image file:
+
+.. code-block:: python
+
+   search.result
+
+   > Output:
+   {20220819171549 : {"location" : "C:/Path/to/Image/image1.jpg",
+                      "matches" : {30270813251529 : "location": "C:/Path/to/Image/matched_image1.jpg",
+                                                   "mse": 0.0},
+                                  {72214282557852 : "location": "C:/Path/to/Image/matched_image2.jpg",
+                                                   "mse": 0.0},
+                      ... }
+    ...
+   }
+
+.. note::
+
+   🆕 difPy >= v3.0 has an improved ``search.result`` output structure and includes the MSE for each matched image.
+
+Lower Quality Images
+^^^^^^^^^^
+
+A **list** of duplicates/similar images that have the **lowest quality** among match groups:
+
+.. code-block:: python
+
+   search.lower_quality
+
+   > Output:
+   ["C:/Path/to/Image/duplicate_image1.jpg", 
+   "C:/Path/to/Image/duplicate_image2.jpg", ...]
+
+To find the lower quality images, difPy compares all image file sizes within a match group and selects all images that have lowest image file size among the group.
+
+Process Statistics
+^^^^^^^^^^
+
+A **JSON formatted collection** with statistics on the completed difPy process:
+
+.. code-block:: python
+
+   search.stats
+
+   > Output:
+   {"directory" : ("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", ... ),
+   "duration" : {"start_date": "2023-02-15",
+                  "start_time" : "18:44:19",
+                  "end_date" : "2023-02-15",
+                  "end_time" : "18:44:38",
+                  "seconds_elapsed" : 18.6113},
+   "fast_search": True,
+   "recursive" : True,
+   "match_mse" : 200,
+   "files_searched" : 1032,
+   "matches_found" : 852,
+   "invalid_files" : {"count": 4,
+                      "logs": {}}
+
+The ``invalid_files`` logs are only outputted if the ``logs`` parameter is set to ``True``. See the :ref:`logs` section for more details.
+
+.. note::
+
+   🆕 difPy >= v3.0 outputs the count and logs of **invalid files** in the target directory that could not be processed as images, as well as information on whether the ``fast_search`` algorithm was used.
+
+.. _cli_usage:
+
+CLI Usage
+----------------
+
+difPy can be invoked through a CLI interface by using the following commands:
+
+.. code-block:: python
+
+   python dif.py -D "C:/Path/to/Folder/"
+
+   python dif.py -D "C:/Path/to/Folder_A/" "C:/Path/to/Folder_B/" "C:/Path/to/Folder_C/"   
+
+It supports the following arguments:
+
+.. code-block:: python
+   
+   dif.py [-h] -D DIRECTORY [-Z [OUTPUT_DIRECTORY]] [-f [FAST_SEARCH]]
+          [-r [{True,False}]] [-s [{low,normal,high,int}]] [-px [PX_SIZE]] 
+          [-p [{True,False}]] [-o [{True,False}]]
+          [-d [{True,False}]] [-sd [{True,False}]] [-l [{True,False}]]
+
+.. note::
+
+   🆕 difPy >= v3.0 has adjusted CLI parameters: ``directory`` changed to ``-D``, ``silend_del`` changed to ``-sd`` and ``logs`` has been added as ``-l``.
+
+.. csv-table::
+   :header: Cmd,Parameter,Cmd,Parameter
+   :widths: 5, 10, 5, 10
+   :class: tight-table
+
+   ``-D``,directory,``-p``,show_progress
+   ``-Z``,output_directory,``-o``,show_output
+   ``-f``,fast_search,``-d``,delete
+   ``-r``,recursive,``-sd``,silent_del
+   ``-s``,similarity,``-l``,logs
+   ``-px``,px_size
+
+When running from the CLI, the output of difPy is written to files and saved in the working directory by default. To change the default output directory, specify the ``-Z / -output_directory`` parameter. The "xxx" in the output filenames is a unique timestamp:
+
+.. code-block:: python
+
+   difPy_results_xxx.json
+   difPy_lower_quality_xxx.csv
+   difPy_stats_xxx.json
+
+.. _Fast Search Algorithm (FSA):
+
+Fast Search Algorithm (FSA)
+--------
+
+.. note::
+
+   🆕 difPy >= v3.0 supports Fast Search Algorithm (FSA).
+
+difPy's Fast Search Algorithm (FSA) can provide significant performance increases and time complexity reduction when searching for duplicates.
+
+FSA can be enabled/disabled with the :ref:`fast_search` parameter.
+
+About FSA
+^^^^^^^^^^
+
+With the classic difPy algorithm, each image would be compared to every other successive image (by order of images found in the directories). Comparing every image is a very precise option, but leads to high time complexity. When searching for duplicates, this time complexity can be reduced by applying FSA. With FSA, difPy compares an image until it finds a duplicate. This duplicate is classified as duplicate and then excluded from the succeeding search, leading to a lower average number of comparisons.
+
+   *Example: in the first round, difPy searches for duplicates to imageA and finds imageB and imageC. In the next rounds, the search for duplicates of imageB and imageC will be skipped, since they are all duplicates and no further comparison is required.*
+
+Due to its nature, FSA is very efficient when run on duplicate searches, but it is **not advised to be used when searching for similar images**, as the result might be inaccurate. **When searching for similar images, difPy's classic algorithm should be used by setting** :ref:`fast_search` **to** ``False``.
+
+   *Example: imageA might be similar to imageB and imageC, but this does not imply that imageB is similar to imageC. Nevertheless, FSA would assume imageB and imageC to be equally similar and would therefore potentially return wrong results.*
+
+**When searching for similar images, difPy automatically disables FSA** to ensure accurate search results. This applies when :ref:`similarity` is set to ``'low'`` **or** if :ref:`similarity` is manually set to a value ``> 200``.
+
+FSA Best Practices
+^^^^^^^^^^
+
+Usually, FSA will be accurate enough to find duplicates with the default difPy settings (:ref:`similarity` = ``'normal'``). 
+
+In edge cases, FSA can lead to inaccurate results even when used on default settings. Such an edge case includes, but is not limited to: comparing a high number of images that need **high precision** to be compared, for example, when comparing images that contain **text**. When comparing images with text, it is advised to set :ref:`similarity` to ``'high'``, or to disable :ref:`fast_search`.
+
+To **increase difPy's precision**, the following settings are recommended:
+
+* Search for duplicates: :ref:`similarity` = ``'high'`` and :ref:`fast_search` = ``True``
+* Search for similar images: :ref:`fast_search` = ``False``
