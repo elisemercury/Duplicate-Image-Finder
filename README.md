@@ -104,7 +104,7 @@ search.stats
 DifPy supports the following parameters:
 
 ```python
-dif(*directory, fast_search=True, recursive=True, similarity="normal", px_size=50, 
+dif(*directory, fast_search=True, recursive=True, similarity='normal', px_size=50, move_to=None,
     show_progress=True, show_output=False, delete=False, silent_del=False, logs=False)
 ```
 :new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** now supports the use of its new **Fast Search Algorithm (FSA)**, capable of providing significant performance increases.
@@ -122,11 +122,10 @@ python dif.py -D"C:/Path/to/Folder_A/" "C:/Path/to/Folder_B/" "C:/Path/to/Folder
 It supports the following arguments:
 
 ```python
-dif.py [-h] -D DIRECTORY [-Z [OUTPUT_DIRECTORY]] [-f [FAST_SEARCH]]
-       [-r [{True,False}]] [-s [{low,normal,high,int}]] [-px [PX_SIZE]] 
-       [-p [{True,False}]] [-o [{True,False}]]
-       [-d [{True,False}]] [-sd [{True,False}]]
-       [-l [{True,False}]]
+dif.py [-h] -D DIRECTORY [-Z OUTPUT_DIRECTORY] [-f {True,False}]
+       [-r {True,False}] [-s SIMILARITY] [-px PX_SIZE] 
+       [-p {True,False}] [-o {True,False}] [-mv MOVE_TO]
+       [-d {True,False}] [-sd {True,False}] [-l {True,False}]
 ```
 
 | | Parameter | | Parameter |
