@@ -1,11 +1,12 @@
 # Duplicate Image Finder (difPy)
 
-![PyPIv](https://img.shields.io/pypi/v/difPy)
-![PyPI status](https://img.shields.io/pypi/status/difPy)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/difPy)
+[![PyPIv](https://img.shields.io/pypi/v/difPy)](https://pypi.org/project/difPy/)
+[![PyPI status](https://img.shields.io/pypi/status/difPy)](https://pypi.org/project/difPy/)
+[![Documentation Status](https://readthedocs.org/projects/difpy/badge/?version=latest)](https://difpy.readthedocs.io/en/latest/?badge=latest)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/difPy)](https://pypi.org/project/difPy/)
 [![Downloads](https://static.pepy.tech/badge/difpy)](https://pepy.tech/project/difpy)
-![PyPI - License](https://img.shields.io/pypi/l/difPy)
-<img src="https://img.shields.io/badge/dif-Py-blue?style=flat&logo=python&labelColor=white&logoWidth=20.svg/"></a>
+[![PyPI - License](https://img.shields.io/pypi/l/difPy)](https://github.com/elisemercury/Duplicate-Image-Finder/blob/main/LICENSE.txt)
+[<img src="https://img.shields.io/badge/dif-Py-blue?style=flat&logo=python&labelColor=white&logoWidth=20.svg/"></a>](https://github.com/elisemercury/Duplicate-Image-Finder/)
 
 **Tired of going through all images in a folder and comparing them manually to check if they are duplicates?**
 
@@ -48,7 +49,7 @@ search = dif(["C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder
 ``` 
 Folder paths must be specified as standalone Python strings, or within a Python list.
 
-:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
 ## Output
 DifPy returns various types of output that you may use depending on your use case: 
@@ -109,7 +110,7 @@ dif(*directory, fast_search=True, recursive=True, similarity='normal', px_size=5
 ```
 :new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** now supports the use of its new **Fast Search Algorithm (FSA)**, capable of providing significant performance increases.
 
-:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
 ## CLI Usage
 You can make use of difPy through a CLI interface by using the following commands:
@@ -145,7 +146,7 @@ difPy_lower_quality_xxx.csv
 difPy_stats_xxx.json
 ```
 
-:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
 ## Related Projects
 
