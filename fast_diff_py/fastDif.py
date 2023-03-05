@@ -1102,7 +1102,8 @@ class FastDifPy:
         # check if we have processed every entry. if so, return False, since we have not added anything to the
         # queues.
         if start_a == len(rows_a) - 2 and start_b == len(rows_b) - 1:
-            return 0
+            self.second_loop_queue_status = {"last_a": last_a, "last_b": last_b}
+            return add_count if add_count > 0 else None
 
         # since the number of entries is small, we can just perform a basic packaged for loop.
         for i in range(start_a, len(rows_a) - 1):
