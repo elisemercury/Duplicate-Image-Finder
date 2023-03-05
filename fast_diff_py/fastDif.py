@@ -674,7 +674,7 @@ class FastDifPy:
                 run = False
 
             # at this point we should have been idling for 60s
-            if timeout > 60:
+            if timeout > 5:
                 self.logger.info("Timeout reached, stopping.")
                 run = False
 
