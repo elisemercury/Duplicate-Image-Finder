@@ -51,6 +51,7 @@ class dif:
         self.directory = _validate._directory_type(directory)
         _validate._directory_exist(self.directory)
         _validate._directory_unique(self.directory)
+        self.directory = sorted(self.directory)
         self.recursive = _validate._recursive(recursive)
         self.similarity = _validate._similarity(similarity)
         self.fast_search = _validate._fast_search(fast_search, self.similarity)
@@ -88,9 +89,11 @@ class dif:
                 id_by_location = _compute._id_by_location(directory_files, id_by_location=None)
             else:
                 if len(self.directory) >= 2:
-                    if not dir in directory_files:
+                    if not os.path.normpath(dir) in directory_files:
                         directory_files = _help._list_all_files(dir, self.recursive)
                         id_by_location = _compute._id_by_location(directory_files, id_by_location=id_by_location)
+                    else:
+                        print(f"Skipped directory {dir} as it is part of another directory provided.")
                 else:
                     break
         imgs_matrices, invalid_files = _compute._imgs_matrices(id_by_location, self.px_size, self.show_progress)
@@ -255,7 +258,7 @@ class _compute:
                 if show_progress:
                     _help._show_progress(count, total_count, task='preparing files')
                 if os.path.isdir(file):
-                    count += 1
+                    total_count -= 1
                 else:
                     try:
                         img = Image.open(file)
@@ -356,6 +359,7 @@ class _help:
     def _list_all_files(directory, recursive):
         # Function that creates a list of all files in the directory
         directory_files = list(glob(str(directory) + '/**', recursive=recursive))
+        directory_files = [os.path.normpath(file) for file in directory_files]
         return directory_files
 
     def _show_img_figs(img_A, img_B, err):
