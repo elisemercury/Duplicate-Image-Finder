@@ -2,6 +2,7 @@
 
 ![PyPIv](https://img.shields.io/pypi/v/difPy)
 ![PyPI status](https://img.shields.io/pypi/status/difPy)
+[![Documentation Status](https://readthedocs.org/projects/difpy/badge/?version=latest)](https://difpy.readthedocs.io/en/latest/?badge=latest)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/difPy)
 [![Downloads](https://static.pepy.tech/badge/difpy)](https://pepy.tech/project/difpy)
 ![PyPI - License](https://img.shields.io/pypi/l/difPy)
@@ -21,6 +22,8 @@ pip install difPy
 Read more on how the algorithm of difPy works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051).
 
 Check out the [difPy package on PyPI.org](https://pypi.org/project/difPy/)
+
+:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
 -------
 
@@ -48,7 +51,7 @@ search = dif(["C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder
 ``` 
 Folder paths must be specified as standalone Python strings, or within a Python list.
 
-:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
 ## Output
 DifPy returns various types of output that you may use depending on your use case: 
@@ -109,7 +112,7 @@ dif(*directory, fast_search=True, recursive=True, similarity="normal", px_size=5
 ```
 :new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** now supports the use of its new **Fast Search Algorithm (FSA)**, capable of providing significant performance increases.
 
-:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
 ## CLI Usage
 You can make use of difPy through a CLI interface by using the following commands:
@@ -146,7 +149,7 @@ difPy_lower_quality_xxx.csv
 difPy_stats_xxx.json
 ```
 
-:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/difPy-Usage-Documentation)**.
+:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
 ## Related Projects
 
