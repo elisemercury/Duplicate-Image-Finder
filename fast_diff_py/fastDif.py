@@ -1095,17 +1095,17 @@ class FastDifPy:
                 if rows_b[i]["key"] == last_b:
                     start_b = i
 
-            # check if we have processed every entry. if so, return False, since we have not added anything to the
-            # queues.
-            if start_a == len(rows_a) - 1 and start_b == len(rows_b) - 1:
-                return 0
+        # check if we have processed every entry. if so, return False, since we have not added anything to the
+        # queues.
+        if start_a == len(rows_a) - 2 and start_b == len(rows_b) - 1:
+            return 0
 
         # since the number of entries is small, we can just perform a basic packaged for loop.
-        for i in range(start_a, len(rows_a)):
+        for i in range(start_a, len(rows_a) - 1):
             if i != start_a:
-                start_b = int(self.has_dir_b) * (i + 1)  # i + 1 if not dir b, else 0
+                start_b = int(not self.has_dir_b) * (i + 1)  # i + 1 if not dir b, else 0
 
-            for j in range(start_b, len(rows_a)):
+            for j in range(start_b, len(rows_b)):
                 # All queues full, no need to continue
                 if self.second_loop_in[queue_index].full():
                     break
