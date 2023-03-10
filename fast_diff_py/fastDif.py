@@ -634,6 +634,7 @@ class FastDifPy:
 
             # stop if there's nothing left to do.
             if arg is None:
+                self.logger.info("Less images than processes, no continuous euqneueing.")
                 run = False
                 break
 
