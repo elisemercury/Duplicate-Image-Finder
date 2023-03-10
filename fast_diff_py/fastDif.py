@@ -914,12 +914,14 @@ class FastDifPy:
             if comps < (cpu_proc + gpu_proc) * 90:
                 self.send_termination_signal(first_loop=False)
                 done = True
+                self.logger.info("Less comparisons than available space. Not performing continuous enqueue.")
 
         else:
             comps = a_count * (a_count - 1) / 2
             if comps < (cpu_proc + gpu_proc) * 90:
                 self.send_termination_signal(first_loop=False)
                 done = True
+                self.logger.info("Less comparisons than available space. Not performing continuous enqueue.")
 
         count = 0
         timeout = 0
@@ -1860,6 +1862,8 @@ class FastDifPy:
             # get the data from the rows
             key_a = row[1]
             key_b = row[2]
+
+            assert key_a != key_b, "Key A and Key B are the same, bug in scheduling."
 
             # get the cluster for the keys
             cluster_id_a = cluster_id.get(key_a)
