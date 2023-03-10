@@ -843,6 +843,8 @@ class FastDifPy:
         if cpu_proc is None:
             cpu_proc = mp.cpu_count()
 
+        assert cpu_proc >= 1, "Number of GPU Processes needs to be greater than zero"
+
         # storing arguments in attributes to reduce number of args of function
         self.matching_aspect = only_matching_aspect
         self.make_diff_plots = make_diff_plots
