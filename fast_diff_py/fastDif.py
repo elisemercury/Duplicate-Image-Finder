@@ -1159,6 +1159,7 @@ class FastDifPy:
         :param init: Create new status, and initialize the dict
         :return: number of images inserted into queues.
         """
+        # TODO Test this function seems like it has a bug.
         assert self.less_optimized, "This functions needs to be called in the less_optimized mode since it assumes " \
                                     "that the attribute second_loop_in is of type mp.Queue and not List[mp.Queue]"
         # initialize loop vars
@@ -1167,15 +1168,19 @@ class FastDifPy:
         add_count = 0
         current_count = 0
 
+        # fetching the point where we left off, if we call this function from the updater.
         last_a = None
         last_b = None
 
         if not init:
+            # Fetch the place where we left off
             last_a = self.second_loop_queue_status["last_a"]
             last_b = self.second_loop_queue_status["last_b"]
 
-        if not init:
+            # get the rows for a
             current_a = self.db.fetch_one_key(key=last_a)
+
+            # get the next key
             next_a = self.db.fetch_many_after_key(directory_a=True, starting=last_a, count=1)
             if len(next_a) == 0:
                 next_a = None
