@@ -623,6 +623,9 @@ class FastDifPy:
         self.first_loop_in = mp.Queue()
         self.first_loop_out = mp.Queue()
 
+        # var for following while loop:
+        run = True
+
         # prefill loop
         for i in range(cpu_proc + gpu_proc):
             arg = self.__generate_first_loop_obj(amount=amount, compute_hash=compute_hash,
@@ -630,6 +633,7 @@ class FastDifPy:
 
             # stop if there's nothing left to do.
             if arg is None:
+                run = False
                 break
 
             self.first_loop_in.put(arg.to_json())
@@ -648,7 +652,6 @@ class FastDifPy:
             self.gpu_handles.append(p)
 
         # turn main loop into handler and perform monitoring of the threads.
-        run = True
         none_counter = 0
         timeout = 0
 
