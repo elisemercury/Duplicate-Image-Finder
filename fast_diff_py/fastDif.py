@@ -624,6 +624,9 @@ class FastDifPy:
         self.first_loop_in = mp.Queue()
         self.first_loop_out = mp.Queue()
 
+        # var for following while loop:
+        run = True
+
         # prefill loop
         for i in range(2*(cpu_proc + gpu_proc)):
             arg = self.__generate_first_loop_obj(amount=amount, compute_hash=compute_hash,
@@ -631,6 +634,7 @@ class FastDifPy:
 
             # stop if there's nothing left to do.
             if arg is None:
+                run = False
                 break
 
             self.first_loop_in.put(arg.to_json())
@@ -650,7 +654,6 @@ class FastDifPy:
             self.gpu_handles.append(p)
 
         # turn main loop into handler and perform monitoring of the threads.
-        run = True
         none_counter = 0
         timeout = 0
 
@@ -846,6 +849,8 @@ class FastDifPy:
         if cpu_proc is None:
             cpu_proc = mp.cpu_count()
 
+        assert cpu_proc >= 1, "Number of GPU Processes needs to be greater than zero"
+
         # storing arguments in attributes to reduce number of args of function
         self.matching_aspect = only_matching_aspect
         self.make_diff_plots = make_diff_plots
@@ -897,7 +902,24 @@ class FastDifPy:
             p.start()
             self.gpu_handles.append(p)
 
+        # check if we need multiple iterations of the main loop.
         done = False
+        a_count = self.db.get_dir_count(dir_a=True)
+        b_count = self.db.get_dir_count(dir_a=False)
+
+        if self.has_dir_b:
+            comps = a_count * b_count
+
+            if comps < (cpu_proc + gpu_proc) * 90:
+                self.send_termination_signal(first_loop=False)
+                done = True
+
+        else:
+            comps = a_count * (a_count - 1) / 2
+            if comps < (cpu_proc + gpu_proc) * 90:
+                self.send_termination_signal(first_loop=False)
+                done = True
+
         count = 0
         timeout = 0
 
@@ -938,8 +960,14 @@ class FastDifPy:
         self.join_all_children()
         self.logger.debug("All child processes terminated")
 
-        # handle last results:
-        self.handle_results_second_queue()
+        while count < 5:
+            # handle last results:
+            if 0 == self.handle_results_second_queue():
+                count += 1
+                continue
+
+            count = 0
+
 
         # check if the tasks were empty.
         assert not self.handle_results_second_queue(), "Existed without having run out of tasks and without all " \
@@ -1138,6 +1166,7 @@ class FastDifPy:
         :param init: Create new status, and initialize the dict
         :return: number of images inserted into queues.
         """
+        # TODO Test this function seems like it has a bug.
         assert self.less_optimized, "This functions needs to be called in the less_optimized mode since it assumes " \
                                     "that the attribute second_loop_in is of type mp.Queue and not List[mp.Queue]"
         # initialize loop vars
@@ -1146,15 +1175,19 @@ class FastDifPy:
         add_count = 0
         current_count = 0
 
+        # fetching the point where we left off, if we call this function from the updater.
         last_a = None
         last_b = None
 
         if not init:
+            # Fetch the place where we left off
             last_a = self.second_loop_queue_status["last_a"]
             last_b = self.second_loop_queue_status["last_b"]
 
-        if not init:
+            # get the rows for a
             current_a = self.db.fetch_one_key(key=last_a)
+
+            # get the next key
             next_a = self.db.fetch_many_after_key(directory_a=True, starting=last_a, count=1)
             if len(next_a) == 0:
                 next_a = None
