@@ -906,7 +906,7 @@ class FastDifPy:
             # update the queues and store if there are more tasks to process
             current_inserted, current_count = self.update_queues()
             count += current_count
-            self.logger.info(f"Number of Processed Images: {count}")
+            self.logger.info(f"Number of Processed Images: {count:,}".replace(",", "'"))
 
             # We have no more images to enqueue
             if current_inserted == 0 or current_inserted is None:
