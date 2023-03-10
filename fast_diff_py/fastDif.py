@@ -896,7 +896,24 @@ class FastDifPy:
             p.start()
             self.gpu_handles.append(p)
 
+        # check if we need multiple iterations of the main loop.
         done = False
+        a_count = self.db.get_dir_count(dir_a=True)
+        b_count = self.db.get_dir_count(dir_a=False)
+
+        if self.has_dir_b:
+            comps = a_count * b_count
+
+            if comps < (cpu_proc + gpu_proc) * 90:
+                self.send_termination_signal(first_loop=False)
+                done = True
+
+        else:
+            comps = a_count * (a_count - 1) / 2
+            if comps < (cpu_proc + gpu_proc) * 90:
+                self.send_termination_signal(first_loop=False)
+                done = True
+
         count = 0
         timeout = 0
 
@@ -937,8 +954,14 @@ class FastDifPy:
         self.join_all_children()
         self.logger.debug("All child processes terminated")
 
-        # handle last results:
-        self.handle_results_second_queue()
+        while count < 5:
+            # handle last results:
+            if 0 == self.handle_results_second_queue():
+                count += 1
+                continue
+
+            count = 0
+
 
         # check if the tasks were empty.
         assert not self.handle_results_second_queue(), "Existed without having run out of tasks and without all " \
