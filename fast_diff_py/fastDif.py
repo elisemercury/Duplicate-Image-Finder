@@ -280,7 +280,7 @@ class FastDifPy:
     db: Union[Database, None]
 
     # short circuiting variables
-    has_any_images: bool = False
+    enough_images_to_compare: bool = False
 
     # relative to child processes
     first_loop_in: mp.Queue = None  # the tasks sent to the child processes
@@ -451,7 +451,7 @@ class FastDifPy:
 
         # get the number of images and create short circuit.
         im_num = self.db.get_dir_count()
-        self.has_any_images = im_num > 1
+        self.enough_images_to_compare = im_num > 1
 
     def __recursive_index(self, dir_a: bool = True, path: str = None, ignore_thumbnail: bool = True):
         """
@@ -592,7 +592,7 @@ class FastDifPy:
         """
         inserted_counter = 0
         # Short circuit if there are no images in the database.
-        if not self.has_any_images:
+        if not self.enough_images_to_compare:
             self.logger.debug("No images in database, aborting.")
             return
 
@@ -842,7 +842,7 @@ class FastDifPy:
         :return:
         """
         # Short circuit if there are no images in the database.
-        if not self.has_any_images:
+        if not self.enough_images_to_compare:
             self.logger.debug("No images in database, aborting.")
             return
 
@@ -1655,7 +1655,7 @@ class FastDifPy:
         :param dif_based: if the relative difference should be used or hash based matching should be done.
         :return:
         """
-        if not self.has_any_images:
+        if not self.enough_images_to_compare:
             return {}, []
 
         if not dif_based:
