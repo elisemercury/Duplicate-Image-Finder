@@ -139,7 +139,7 @@ The ``invalid_files`` logs are only outputted if the ``logs`` parameter is set t
 
 .. note::
 
-   🆕 difPy v3.1.0 outputs the ``match_count`` of **duplicates** and **similar** images it found.
+   🆕 difPy v3.0.8 outputs the ``match_count`` of **duplicates** and **similar** images it found.
 
    🆕 difPy >= v3.0 outputs the count and logs of **invalid files** in the target directory that could not be processed as images, as well as information on whether the ``fast_search`` algorithm was used.
 

@@ -29,7 +29,7 @@ difPy supports the following parameters:
 
 .. note::
 
-   🆕 Since difPy v3.1.0, the :ref:`similarity` parameter accepts `duplicates` and `similar` as input options.
+   🆕 Since difPy v3.0.8, the :ref:`similarity` parameter accepts `duplicates` and `similar` as input options.
 
 .. _directory:
 

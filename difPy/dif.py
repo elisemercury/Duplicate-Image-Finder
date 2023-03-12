@@ -47,7 +47,6 @@ class dif:
         logs : bool, optional
             Enable log collection for inavlid files in stats output    
         '''
-        print('difPy process initializing...', end='\r')
         self.directory = _validate._directory_type(directory)
         _validate._directory_exist(self.directory)
         _validate._directory_unique(self.directory)
