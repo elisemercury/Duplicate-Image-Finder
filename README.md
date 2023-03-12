@@ -114,7 +114,7 @@ dif(*directory, fast_search=True, recursive=True, similarity='duplicates', px_si
     show_progress=True, show_output=False, delete=False, silent_del=False, logs=False)
 ```
 
-:new: Since **[difPy v3.1.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)**, the `similarity` parameter accepts `duplicates` and `similar` as input options.
+:new: Since **[difPy v3.1.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)**, the `similarity` parameter accepts `'duplicates'` and `'similar'` as input options.
 
 :new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** now supports the use of its new **Fast Search Algorithm (FSA)**, capable of providing significant performance increases.
 
