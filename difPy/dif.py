@@ -170,7 +170,9 @@ class _validate:
 
     def _similarity(similarity):
         # Function that _validates the 'similarity' input parameter
-        if similarity not in ['duplicates', 'similar']: 
+        if similarity in ['low', 'normal', 'high']:
+            raise Exception('Since difPy v3.0.8, "similarity" parameter only accepts "duplicates" and "similar" as input options.')  
+        elif similarity not in ['duplicates', 'similar']: 
             try:
                 similarity = float(similarity)
                 if similarity < 0:
