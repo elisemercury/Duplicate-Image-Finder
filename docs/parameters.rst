@@ -27,7 +27,9 @@ difPy supports the following parameters:
    :ref:`silent_del`,``bool``,``False``,"``True`` (use with care, cannot be undone)"
    :ref:`logs`,``bool``,``False``,``True``
 
-🆕 Since difPy v3.0.8, the :ref:`similarity` parameter accepts only `duplicates` and `similar` as input values.
+.. note::
+
+   🆕 Since difPy v3.1.0, the :ref:`similarity` parameter accepts `duplicates` and `similar` as input options.
 
 .. _directory:
 
