@@ -394,7 +394,7 @@ class _help:
         # Function for printing filename info of plotted image files
         img_A = f'...{img_A[-45:]}'
         img_B = f'...{img_B[-45:]}'
-        print(f'''Duplicate files:\n{img_A} and \n{img_B}\n''')
+        print(f'''Files:\n{img_A} and \n{img_B}\n''')
 
     def _rotate_img(img):
         # Function for rotating an image matrix by a 90 degree angle
@@ -424,7 +424,7 @@ class _help:
             head, tail = os.path.split(file)
             os.replace(file, os.path.join(move_to, tail))
             new_lower_quality.append(str(Path(os.path.join(move_to, tail))))
-        print(f'Moved {len(lower_quality)} duplicate/similar image(s) to {str(Path(move_to))}')
+        print(f'Moved {len(lower_quality)} image(s) to {str(Path(move_to))}')
         return new_lower_quality
 
     def _delete_imgs(lower_quality_set, silent_del=False):
