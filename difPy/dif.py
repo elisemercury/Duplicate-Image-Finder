@@ -20,7 +20,7 @@ class dif:
     '''
     A class used to initialize and run difPy
     '''
-    def __init__(self, *directory, fast_search=True, recursive=True, similarity='normal', px_size=50, show_progress=True, show_output=False, move_to=None, delete=False, silent_del=False, logs=False):
+    def __init__(self, *directory, fast_search=True, recursive=True, similarity='duplicates', px_size=50, show_progress=True, show_output=False, move_to=None, delete=False, silent_del=False, logs=False):
         '''
         Parameters
         ----------
@@ -30,8 +30,8 @@ class dif:
             Use Fast Search Algortihm (default is True)
         recursive : bool, optional
             Search recursively within the directories (default is True)
-        similarity : 'high', 'normal', 'low', float, optional
-            Image similarity threshold (mse) (default is 'normal', 200)
+        similarity : 'duplicates', 'similar', float, optional
+            Image similarity threshold (mse) (default is 'duplicates', 0)
         px_size : int, optional
             Image compression size in pixels (default is 50)
         show_progress : bool, optional
@@ -63,16 +63,19 @@ class dif:
         self.logs = _validate._logs(logs)
 
         start_time = time.time()
-        self.result, self.lower_quality, total_count, match_count, invalid_files = dif._run(self)
+        self.result, self.lower_quality, total_count, duplicate_count, similar_count, invalid_files = dif._run(self)
         end_time = time.time()
 
         time_elapsed = np.round(end_time - start_time, 4)
         self.stats = dif._generate_stats(self, start_time=time.localtime(start_time), end_time=time.localtime(end_time), time_elapsed=time_elapsed, 
-                                         total_searched=total_count, total_matches=match_count, invalid_files=invalid_files)
+                                         total_searched=total_count, duplicate_count=duplicate_count, similar_count=similar_count, invalid_files=invalid_files)
 
-        print(f'Found {match_count} pair(s) of duplicate/similar image(s) in {time_elapsed} seconds.')
+        if self.similarity == 0:
+            print(f'Found {duplicate_count} pair(s) of duplicate image(s) in {time_elapsed} seconds.')
+        else:
+            print(f'Found {duplicate_count} pair(s) of duplicate and {similar_count} pair(s) of similar image(s) in {time_elapsed} seconds.')
 
-        if match_count != 0:
+        if duplicate_count + similar_count != 0:
             if self.move_to != None:
                 self.lower_quality = _help._move_imgs(self.lower_quality, self.move_to)
 
@@ -97,11 +100,11 @@ class dif:
                 else:
                     break
         imgs_matrices, invalid_files = _compute._imgs_matrices(id_by_location, self.px_size, self.show_progress)
-        result, exclude_from_search, total_count, match_count = _search._matches(imgs_matrices, id_by_location, self.similarity, self.show_output, self.show_progress, self.fast_search)
+        result, exclude_from_search, total_count, duplicate_count, similar_count = _search._matches(imgs_matrices, id_by_location, self.similarity, self.show_output, self.show_progress, self.fast_search)
         lower_quality = _search._lower_quality(result)
-        return result, lower_quality, total_count, match_count, invalid_files
+        return result, lower_quality, total_count, duplicate_count, similar_count, invalid_files
 
-    def _generate_stats(self, start_time, end_time, time_elapsed, total_searched, total_matches, invalid_files):
+    def _generate_stats(self, start_time, end_time, time_elapsed, total_searched, duplicate_count, similar_count, invalid_files):
         '''Generates stats of the difPy process.
         '''
         if self.logs:
@@ -119,8 +122,10 @@ class dif:
                  'fast_search': self.fast_search,
                  'recursive': self.recursive,
                  'match_mse': self.similarity,
+                 'px_size': self.px_size,
                  'files_searched': total_searched,
-                 'matches_found': total_matches,
+                 'matches_found': {'duplicates': duplicate_count,
+                                   'similar': similar_count},
                  'invalid_files': invalid_stats}
         return stats
 
@@ -129,6 +134,8 @@ class _validate:
     A class used to validate difPy input parameters.
     '''
     def _directory_type(directory):
+        if len(directory) == 0:
+            raise ValueError('Invalid directory parameter: no directory provided.')
         if all(isinstance(dir, list) for dir in directory):
             directory = [item for sublist in directory for item in sublist]
             return directory
@@ -152,7 +159,7 @@ class _validate:
         # Function that _validates the 'show_output' input parameter
         if not isinstance(fast_search, bool):
             raise Exception('Invalid value for "fast_search" parameter: must be of type bool.')
-        if similarity > 200:
+        if similarity > 0:
             fast_search = False
         return fast_search
 
@@ -164,7 +171,7 @@ class _validate:
 
     def _similarity(similarity):
         # Function that _validates the 'similarity' input parameter
-        if similarity not in ['low', 'normal', 'high']: 
+        if similarity not in ['duplicates', 'similar']: 
             try:
                 similarity = float(similarity)
                 if similarity < 0:
@@ -174,15 +181,12 @@ class _validate:
             except:
                 raise Exception('Invalid value for "similarity" parameter: must be of type float.')
         else: 
-            if similarity == 'low':
-                # low, search for duplicates, recommended, MSE <= 1000
+            if similarity == 'duplicates':
+                # search for duplicate images
+                similarity = 0
+            elif similarity == 'similar':
+                # search for similar images
                 similarity = 1000
-            elif similarity == 'high':
-                # high, search for exact duplicate images, extremly sensitive, MSE <= 0.1
-                similarity = 0.1
-            else:
-                # normal, search for duplicates, recommended, MSE <= 200
-                similarity = 200
             return similarity
 
     def _px_size(px_size):
@@ -293,7 +297,7 @@ class _search:
     def _matches(imgs_matrices, id_by_location, similarity, show_output, show_progress, fast_search):
         # Function that searches the images on duplicates/similarity matches
         progress_count = 0
-        match_count = 0
+        duplicate_count, similar_count = 0, 0
         total_count = len(imgs_matrices)
         exclude_from_search = []
         result = {}
@@ -336,9 +340,18 @@ class _search:
                                 rotations += 1
                 progress_count += 1
         
-        for id in result:
-            match_count += len(result[id]['matches'])
-        return result, exclude_from_search, total_count, match_count
+        if similarity > 0:
+            for id in result:
+                if similarity > 0:
+                    for matchid in result[id]['matches']:
+                        if result[id]['matches'][matchid]['mse'] > 0:
+                            similar_count += 1
+                        else:
+                            duplicate_count +=1        
+        else:
+            for id in result:
+                duplicate_count += len(result[id]['matches'])
+        return result, exclude_from_search, total_count, duplicate_count, similar_count
 
     def _lower_quality(result):
         # Function that creates a list of all image matches that have the lowest quality within the match group
@@ -459,7 +472,7 @@ if __name__ == '__main__':
     parser.add_argument('-Z', '--output_directory', type=str, help='Output directory for the difPy result files. Default is working dir.', required=False, default=None)
     parser.add_argument('-f', '--fast_search', type=str, help='Use difPys Fast Search Algorithm.', required=False, choices=[True, False], default=True)
     parser.add_argument('-r', '--recursive', type=bool, help='Scan subfolders for duplicate images', required=False, choices=[True, False], default=True)
-    parser.add_argument('-s', '--similarity', type=_help._type_str_int, help='Similarity grade.', required=False, default='normal')
+    parser.add_argument('-s', '--similarity', type=_help._type_str_int, help='Similarity grade.', required=False, default='duplicates')
     parser.add_argument('-px', '--px_size', type=int, help='Compression size of images in pixels.', required=False, default=50)
     parser.add_argument('-p', '--show_progress', type=bool, help='Show the real-time progress of difPy.', required=False, choices=[True, False], default=True)
     parser.add_argument('-o', '--show_output', type=bool, help='Show the compared images in real-time.', required=False, choices=[True, False], default=False)

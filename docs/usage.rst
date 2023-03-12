@@ -125,19 +125,23 @@ A **JSON formatted collection** with statistics on the completed difPy process:
                   "end_date" : "2023-02-15",
                   "end_time" : "18:44:38",
                   "seconds_elapsed" : 18.6113},
-   "fast_search": True,
+   "fast_search" : True,
    "recursive" : True,
    "match_mse" : 200,
+   "px_size" : 50,
    "files_searched" : 1032,
-   "matches_found" : 852,
-   "invalid_files" : {"count": 4,
-                      "logs": {}}
+   "matches_found" : {"duplicates" : 52,
+                      "similar" : 0},
+   "invalid_files" : {"count" : 4,
+                      "logs" : {}}
 
 The ``invalid_files`` logs are only outputted if the ``logs`` parameter is set to ``True``. See the :ref:`logs` section for more details.
 
 .. note::
 
    🆕 difPy >= v3.0 outputs the count and logs of **invalid files** in the target directory that could not be processed as images, as well as information on whether the ``fast_search`` algorithm was used.
+
+   🆕 difPy v3.0.8 outputs the ``match_count`` of **duplicates** and **similar** images it found.
 
 .. _cli_usage:
 
@@ -209,16 +213,4 @@ Due to its nature, FSA is very efficient when run on duplicate searches, but it 
 
    *Example: imageA might be similar to imageB and imageC, but this does not imply that imageB is similar to imageC. Nevertheless, FSA would assume imageB and imageC to be equally similar and would therefore potentially return wrong results.*
 
-**When searching for similar images, difPy automatically disables FSA** to ensure accurate search results. This applies when :ref:`similarity` is set to ``'low'`` **or** if :ref:`similarity` is manually set to a value ``> 200``.
-
-FSA Best Practices
-^^^^^^^^^^
-
-Usually, FSA will be accurate enough to find duplicates with the default difPy settings (:ref:`similarity` = ``'normal'``). 
-
-In edge cases, FSA can lead to inaccurate results even when used on default settings. Such an edge case includes, but is not limited to: comparing a high number of images that need **high precision** to be compared, for example, when comparing images that contain **text**. When comparing images with text, it is advised to set :ref:`similarity` to ``'high'``, or to disable :ref:`fast_search`.
-
-To **increase difPy's precision**, the following settings are recommended:
-
-* Search for duplicates: :ref:`similarity` = ``'high'`` and :ref:`fast_search` = ``True``
-* Search for similar images: :ref:`fast_search` = ``False``
+**When searching for similar images, difPy automatically disables FSA** to ensure accurate search results. This applies when :ref:`similarity` is set to ``'similar'`` **or** if :ref:`similarity` is manually set to a value ``> 0``.

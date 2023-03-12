@@ -7,7 +7,7 @@ difPy supports the following parameters:
 
 .. code-block:: python
 
-   dif(directory*, fast_search=True, recursive=True, similarity='normal', px_size=50, move_to=None
+   dif(directory*, fast_search=True, recursive=True, similarity='duplicates', px_size=50, move_to=None
        show_progress=True, show_output=False, delete=False, silent_del=False, logs=False)
 
 .. csv-table::
@@ -15,17 +15,19 @@ difPy supports the following parameters:
    :widths: 20, 10, 10, 10
    :class: tight-table
 
-   directory,"``str``, ``list``",,
-   fast_search,``bool``,``True``,``False``
-   recursive,``bool``,``True``,``False``
-   similarity,"``str``, ``int``",``'normal'``, "``'high'``, ``'low'``, any ``int``"
-   px_size,"``int``, ``float``",50,any ``int`` or ``float`` (not recommended to change default value)
-   show_progress,``bool``,``True``,``False``
-   show_output,``bool``,``False``,``True``
-   move_to,``str``,``None``,folder path as ``str``
-   delete,``bool``,``False``,"``True`` (use with care, cannot be undone)"
-   silent_del,``bool``,``False``,"``True`` (use with care, cannot be undone)"
-   logs,``bool``,``False``,``True``
+   :ref:`directory`,"``str``, ``list``",,
+   :ref:`fast_search`,``bool``,``True``,``False``
+   :ref:`recursive`,``bool``,``True``,``False``
+   :ref:`similarity`,"``str``, ``int``",``'duplicates'``, "``'similar'``, any ``int`` or ``float``"
+   :ref:`px_size`,"``int``, ``float``",50,any ``int`` (not recommended to change default value)
+   :ref:`show_progress`,``bool``,``True``,``False``
+   :ref:`show_output`,``bool``,``False``,``True``
+   :ref:`move_to`,``str``,``None``,folder path as ``str``
+   :ref:`delete`,``bool``,``False``,"``True`` (use with care, cannot be undone)"
+   :ref:`silent_del`,``bool``,``False``,"``True`` (use with care, cannot be undone)"
+   :ref:`logs`,``bool``,``False``,``True``
+
+🆕 Since difPy v3.0.8, the :ref:`similarity` parameter accepts only `duplicates` and `similar` as input values.
 
 .. _directory:
 
@@ -47,7 +49,7 @@ fast_search
 
 By default, when searching for duplicates, difPy will run the comparison process by using its :ref:`Fast Search Algorithm (FSA)`. This algorithm can provide significant performance increases and time complexity reduction. 
 
-FSA can only be leveraged when searching for duplicates, not for similar images. Therefore, it will only be enabled if the :ref:`similarity` parameter is set to ``"high"``, ``"normal"`` or if it is ``<= 200``. Even if ``fast_search`` is set to ``True``, as long as the :ref:`similarity` parameter does not comply with the above requirements, FSA will be disabled by difPy, as it might otherwise lead to inaccurate results. Please refer to FSA Best Practices for recommendations on how to best leverage FSA.
+FSA can only be leveraged when searching for duplicates, not for similar images. Therefore, it will only be enabled if the :ref:`similarity` parameter is set to ``"duplicates"`` or if it is manually set to ``0``. Even if ``fast_search`` is set to ``True``, as long as the :ref:`similarity` parameter does not comply with the above requirements, FSA will be disabled by difPy, as it might otherwise lead to inaccurate results.
 
 ``True`` = (default) uses difPy's Fast Search Algorithm (FSA)
 
@@ -71,15 +73,13 @@ similarity
 
 Depending on which use case you want to apply difPy for, the granularity for the classification of images can be adjusted.
 
-difPy can f. e. search for exact matching duplicate images or search for images that are similar, but not necessarily duplicates.
+difPy can f. e. search for exact matching duplicate images or search for images that are similar.
 
-``"normal"`` = (recommended, default) searches for duplicates (with a certain tolerance). MSE threshold is set to ``200``.
+``"duplicates"`` = (default) searches for duplicates. MSE threshold is set to ``0``.
 
-``"high"`` = searches for duplicate images with extreme precision, f. e. for use with images that contain a lot of details like f. e. text. MSE threshold is set to ``0.1``.
+``"similar"`` = searches for similar images. MSE threshold is set to ``1000``.
 
-``"low"`` = searches for similar images. MSE threshold is set to ``1000``.
-
-**Manual setting**: the match MSE threshold can be adjusted manually by setting ``similarity`` parmeter to any ``int`` or ``float``. difPy will then search for images that match an MSE threshold equal to or lower than the one specified.
+**Manual setting**: the match MSE threshold can be adjusted manually by setting ``similarity`` parmeter to any ``int`` or ``float``. difPy will then search for images that match an MSE threshold **equal to or lower than** the one specified.
 
 .. _px_size:
 
