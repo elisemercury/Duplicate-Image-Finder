@@ -1,13 +1,13 @@
 difPy App
 =====
 
-Not familiar with coding? **difPy** can now be accessed through its web app!
+Not familiar with coding? **difPy can now be accessed through its web app**!
 
-📱 **Try the `difPy App`_.**
+📱 **Try the `difPy Web App`_.**
 
 .. _difPy App: https://difpy.app
 
-The difPy web app is based on :doc:`difPy`, a Python-based package that automates the search for duplicate/similar images.
+The difPy web app is based on :ref:`difPy`, a Python-based package that automates the search for duplicate/similar images.
 
 .. _Use the difPy App:
 
