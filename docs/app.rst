@@ -3,7 +3,7 @@ difPy App
 
 Not familiar with coding? **difPy can now be accessed through its web app**!
 
-📱 **Try the `difPy Web App`_.**
+📱 Try the `difPy Web App`_.
 
 .. _difPy App: https://difpy.app
 
