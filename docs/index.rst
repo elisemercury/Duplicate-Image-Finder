@@ -1,6 +1,8 @@
 difPy Guide
 ===================================
 
+.. _difPy:
+
 .. image:: https://img.shields.io/badge/dif-Py-blue?style=flat&logo=python&labelColor=white&logoWidth=20.svg/"
    :target: https://github.com/elisemercury/Duplicate-Image-Finder
 
