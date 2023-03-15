@@ -16,7 +16,7 @@ Using the difPy Web App
 
 To search for duplicate images with the difPy web app, start by **uploading the images** you would like to compare. After the images have been uploaded, click "Run difPy!" to make difPy do its magic.
 
-Additional options
+Additional Options
 ------------
 
 The difPy search algortihm can be customized by adjusting the additional options.
@@ -33,7 +33,7 @@ difPy web can search for **duplicate or similar** images within the uploaded fil
 
 More information on similarity can be found in the :ref:`similarity` section.
 
-Pixel size
+Pixel Size
 ^^^^^^^^^^
 .. note::
 
