@@ -14,7 +14,7 @@ The difPy web app is based on :ref:`difPy`, a Python-based package that automate
 Using the difPy Web App
 ------------
 
-To search for duplicate images with the difPy web app, start by **uploading the images** you would like to compare. After the images have been uploaded, click "Run difPy!" to make difPy do its magic.
+To search for duplicate images with the difPy web app, start by **uploading the images** you would like to compare.
 
 .. image:: static/assets/app.png
    :width: 696px
@@ -22,6 +22,8 @@ To search for duplicate images with the difPy web app, start by **uploading the 
    :scale: 50 %
    :alt: difPy Web App
    :align: center
+
+After the images have been uploaded, click "Run difPy!" to make difPy do its magic.
 
 Additional options
 ------------
