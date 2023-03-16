@@ -42,7 +42,7 @@ The difPy search algorithm can be customized by adjusting the additional options
 
 Fast Search (FSA)
 ^^^^^^^^^^
-difPy Web can leverage difPy's **Fast Search Algortihm (FSA)** for increased performance when searching for  duplicate images. FSA can not be enabled when searching for similar images. 
+difPy Web can leverage difPy's **Fast Search Algorithm (FSA)** for increased performance when searching for  duplicate images. FSA can not be enabled when searching for similar images. 
 
 More information on FSA can be found in the :ref:`Fast Search Algorithm (FSA)` section.
 
