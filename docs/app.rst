@@ -1,7 +1,7 @@
-difPy App
+difPy Web App
 =====
 
-Not familiar with coding? **difPy can now be accessed through its web app**!
+Not familiar with coding? **You can now use difPy through its web app**!
 
 📱 **Try the** `difPy Web App`_.
 
@@ -15,6 +15,20 @@ Using the difPy Web App
 ------------
 
 To search for duplicate images with the difPy web app, start by **uploading the images** you would like to compare. After the images have been uploaded, click "Run difPy!" to make difPy do its magic.
+
+.. figure:: assets/app_transp.png
+   :scale: 50 %
+   :alt: difPy Web App - Interface
+
+   `difPy Web App`_
+
+difPy will output result metrics of the comparison process, and will let you download a ZIP file of the deduplicated images. 
+
+.. figure:: assets/result_transp.png
+   :scale: 50 %
+   :alt: difPy Web App - Result
+
+   `difPy Web App`_ Result
 
 Additional Options
 ------------
