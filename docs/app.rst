@@ -24,7 +24,7 @@ To search for duplicate images with the difPy web app, start by **uploading the 
    `difPy Web App`_ Interface
 
 
-difPy will output result metrics of the comparison process, and will let you download a ZIP file of the deduplicated images. 
+difPy Web will scan the uploaded images for duplicates (or similar images) and will let you download a ZIP file of all your deduplicated files! ✨
 
 .. figure:: static/assets/result_transp.png
    :scale: 60 %
