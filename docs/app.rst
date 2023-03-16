@@ -7,9 +7,9 @@ Not familiar with coding? **You can now use difPy through its web app**!
 
 .. _difPy Web App: https://difpy.app
 
-The difPy Web App is based on :ref:`difPy`, a `Python-based package`_ that automates the **search for duplicate/similar images**.
+The difPy Web App is based on `difPy`_, a Python-based package that automates the **search for duplicate/similar images**.
 
-.. _Python-based package: https://github.com/elisemercury/Duplicate-Image-Finder
+.. _difPy: https://github.com/elisemercury/Duplicate-Image-Finder
 
 .. _Use the difPy App:
 
