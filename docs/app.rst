@@ -17,7 +17,7 @@ Using the difPy Web App
 To search for duplicate images with the difPy web app, start by **uploading the images** you would like to compare. After the images have been uploaded, click "Run difPy!" to make difPy do its magic.
 
 .. figure:: static/assets/app_transp.png
-   :scale: 60 %
+   :scale: 70 %
    :alt: difPy Web App - Interface
    :align: center
 
