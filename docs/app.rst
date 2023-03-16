@@ -22,6 +22,11 @@ To search for duplicate images with the difPy web app, start by **uploading the 
 
    `difPy Web App`_
 
+.. image:: assets\\app_transp.png
+   :scale: 50 %
+   :alt: alternate text
+   :align: center
+
 difPy will output result metrics of the comparison process, and will let you download a ZIP file of the deduplicated images. 
 
 .. figure:: assets\\result_transp.png
