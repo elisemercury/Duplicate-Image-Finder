@@ -79,8 +79,8 @@ class CPUImageProcessing:
     hash_180: str = ""
     hash_270: str = ""
 
-    processing_args: CompareImageArguments = None
-    preprocessing_args: PreprocessArguments = None
+    processing_args: Union[CompareImageArguments, None] = None
+    preprocessing_args: Union[PreprocessArguments, None] = None
 
     error: str = None
 
@@ -102,6 +102,38 @@ class CPUImageProcessing:
             self.compare_func = comp
         else:
             self.compare_func = self.mse
+
+    def reset(self):
+        """
+        Resets the class to its initial state.
+        :return:
+        """
+        # reset matrix
+        self.image_a_matrix = None
+        self.image_b_matrix = None
+
+        # reset paths
+        self.image_a_path = ""
+        self.image_b_path = ""
+
+        # reset thumb paths
+        self.thumb_a_path = ""
+        self.thumb_b_path = ""
+
+        # reset size
+        self.original_size_x = 0
+        self.original_size_y = 0
+
+        # reset hashes
+        self.hash_0 = ""
+        self.hash_90 = ""
+        self.hash_180 = ""
+        self.hash_270 = ""
+
+        self.reset_diff()
+
+        self.processing_args = None
+        self.preprocessing_args = None
 
     def reset_diff(self):
         """
@@ -135,6 +167,9 @@ class CPUImageProcessing:
         """
         self.preprocessing_args = args
         self.error = ""
+
+        if self.processing_args is not None:
+            self.reset()
 
         if self.image_a_path != args.in_path:
             load = True
@@ -201,9 +236,12 @@ class CPUImageProcessing:
         Update the CompareImageArguments object and update the class variables so the computations can be performed.
         Also resets any previously occurred errors.
 
-        :param args: new CoompareImageArguments object to process
+        :param args: new CompareImageArguments object to process
         :return:
         """
+        if self.preprocessing_args is not None:
+            self.reset()
+
         self.processing_args = args
         self.error = ""
         load_a = False
