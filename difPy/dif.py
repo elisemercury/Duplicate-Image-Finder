@@ -27,7 +27,7 @@ class dif:
         directory : str, list
             The name(s) of the directories to be compared
         fast_search : bool, optional
-            Use Fast Search Algortihm (default is True)
+            Use Fast Search Algorithm (default is True)
         recursive : bool, optional
             Search recursively within the directories (default is True)
         similarity : 'duplicates', 'similar', float, optional
@@ -45,7 +45,7 @@ class dif:
         silent_del : bool, optional
             Skip user confirmation when delete=True (default is False)
         logs : bool, optional
-            Enable log collection for inavlid files in stats output    
+            Enable log collection for invalid files in stats output    
         '''
         self.directory = _validate._directory_type(directory)
         _validate._directory_exist(self.directory)
@@ -286,7 +286,7 @@ class _compute:
             raise KeyboardInterrupt
 
     def _mse(img_A, img_B):
-        # Function that calulates the mean squared error (mse) between two image matrices
+        # Function that calculates the mean squared error (mse) between two image matrices
         mse = np.sum((img_A.astype('float') - img_B.astype('float')) ** 2)
         mse /= float(img_A.shape[0] * img_A.shape[1])
         return mse
@@ -476,9 +476,9 @@ if __name__ == '__main__':
     parser.add_argument('-px', '--px_size', type=int, help='Compression size of images in pixels.', required=False, default=50)
     parser.add_argument('-p', '--show_progress', type=bool, help='Show the real-time progress of difPy.', required=False, choices=[True, False], default=True)
     parser.add_argument('-o', '--show_output', type=bool, help='Show the compared images in real-time.', required=False, choices=[True, False], default=False)
-    parser.add_argument('-mv', '--move_to', type=str, help='Move the lower quelity images to a target folder.', required=False, default=None)
+    parser.add_argument('-mv', '--move_to', type=str, help='Move the lower quality images to a target folder.', required=False, default=None)
     parser.add_argument('-d', '--delete', type=bool, help='Delete all duplicate images with lower quality.', required=False, choices=[True, False], default=False)
-    parser.add_argument('-sd', '--silent_del', type=bool, help='Supress the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
+    parser.add_argument('-sd', '--silent_del', type=bool, help='Suppress the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
     parser.add_argument('-l', '--logs', type=bool, help='Enable log collection for invalid files.', required=False, choices=[True, False], default=False)
     args = parser.parse_args()
 
