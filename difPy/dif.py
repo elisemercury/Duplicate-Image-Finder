@@ -447,7 +447,6 @@ class _help:
                 print('Image deletion canceled.')
                 return
         else:
-            delete_count += 1
             for file in lower_quality_set:
                 print('\nDeletion in progress...', end='\r')
                 try:
