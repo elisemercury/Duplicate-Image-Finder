@@ -1,9 +1,7 @@
 difPy Web App
 =====
 
-Not familiar with coding? **You can now use difPy through its web app**!
-
-📱 **Try the** `difPy Web App`_.
+📱 **Try the new** `difPy Web App`_.
 
 .. _difPy Web App: https://difpy.app
 
