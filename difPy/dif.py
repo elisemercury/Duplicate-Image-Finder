@@ -10,6 +10,7 @@ from PIL import Image
 import os
 import time
 from pathlib import Path
+from distutils.util import strtobool
 import argparse
 import json
 import csv
@@ -483,16 +484,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Find duplicate or similar images on your computer with difPy - https://github.com/elisemercury/Duplicate-Image-Finder')
     parser.add_argument('-D', '--directory', type=str, nargs='+', help='Directory to search for images.', required=True)
     parser.add_argument('-Z', '--output_directory', type=str, help='Output directory for the difPy result files. Default is working dir.', required=False, default=None)
-    parser.add_argument('-f', '--fast_search', type=str, help='Use difPys Fast Search Algorithm.', required=False, choices=[True, False], default=True)
-    parser.add_argument('-r', '--recursive', type=bool, help='Scan subfolders for duplicate images', required=False, choices=[True, False], default=True)
+    parser.add_argument('-f', '--fast_search', type=lambda x: bool(strtobool(x)), help='Use difPys Fast Search Algorithm.', required=False, choices=[True, False], default=True)
+    parser.add_argument('-r', '--recursive', type=lambda x: bool(strtobool(x)), help='Scan subfolders for duplicate images', required=False, choices=[True, False], default=True)
     parser.add_argument('-s', '--similarity', type=_help._type_str_int, help='Similarity grade.', required=False, default='duplicates')
     parser.add_argument('-px', '--px_size', type=int, help='Compression size of images in pixels.', required=False, default=50)
-    parser.add_argument('-p', '--show_progress', type=bool, help='Show the real-time progress of difPy.', required=False, choices=[True, False], default=True)
-    parser.add_argument('-o', '--show_output', type=bool, help='Show the compared images in real-time.', required=False, choices=[True, False], default=False)
+    parser.add_argument('-p', '--show_progress', type=lambda x: bool(strtobool(x)), help='Show the real-time progress of difPy.', required=False, choices=[True, False], default=True)
+    parser.add_argument('-o', '--show_output', type=lambda x: bool(strtobool(x)), help='Show the compared images in real-time.', required=False, choices=[True, False], default=False)
     parser.add_argument('-mv', '--move_to', type=str, help='Move the lower quality images to a target folder.', required=False, default=None)
-    parser.add_argument('-d', '--delete', type=bool, help='Delete all duplicate images with lower quality.', required=False, choices=[True, False], default=False)
-    parser.add_argument('-sd', '--silent_del', type=bool, help='Suppress the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
-    parser.add_argument('-l', '--logs', type=bool, help='Enable log collection for invalid files.', required=False, choices=[True, False], default=False)
+    parser.add_argument('-d', '--delete', type=lambda x: bool(strtobool(x)), help='Delete all duplicate images with lower quality.', required=False, choices=[True, False], default=False)
+    parser.add_argument('-sd', '--silent_del', type=lambda x: bool(strtobool(x)), help='Suppress the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
+    parser.add_argument('-l', '--logs', type=lambda x: bool(strtobool(x)), help='Enable log collection for invalid files.', required=False, choices=[True, False], default=False)
     args = parser.parse_args()
 
     # initialize difPy
