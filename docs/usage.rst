@@ -123,7 +123,7 @@ A **JSON formatted collection** with statistics on the completed difPy process:
     "invalid_files" : {"count" : 4,
                        "logs" : {},
     "deleted_files" : {"count" : 4,
-                       "logs" : {}}
+                       "logs" : []}
 
 The ``invalid_files`` logs are only outputted if the ``logs`` parameter is set to ``True``. See the :ref:`logs` section for more details.
 

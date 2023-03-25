@@ -160,7 +160,22 @@ When set to ``True``, the user confirmation for :ref:`delete` is skipped and the
 logs
 ------------
 
-difPy outputs ``search.stats`` statistics after each process, as described in :ref:`output`. These statistics include the count of ``invalid_files`` i. e. files that diPy could not be properly decode during the process. To troubleshoot why certain files were considered invalid, ``logs`` can be set to ``True`` and ``invalid_files`` will include the logs for each file as to why they could not be decoded.
+difPy outputs ``search.stats`` statistics after each process, as described in :ref:`output`. 
+
+For informative of troubleshooting purposes, the ``logs`` parameter can be set to ``True`` so that the ``.stats`` output contains more details around the ``invalid_files`` and the ``deleted_files`` during the process:
+
+.. code-block:: python
+
+   search.stats
+
+   > Output:
+   {... ,
+   "invalid_files" : {"count" : 4,
+                      "logs" : {"C:/Path/to/Images/inv_file.pdf" : "UnidentifiedImageError: file could not be identified as image.",
+                              ... },
+   "deleted_files" : {"count" : 25,
+                      "logs" : ["C:/Path/to/Images/duplicate_image1.jpg", "C:/Path/to/Images/duplicate_image2.jpg", ...]} }
+
 
 ``False`` = (default) logs output are disabled
 
