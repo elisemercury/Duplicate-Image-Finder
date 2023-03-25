@@ -70,7 +70,7 @@ class dif:
 
             elif self.delete:
                 if len(self.lower_quality) != 0:
-                    deleted_files, deleted_count = _help._delete_imgs(set(self.lower_quality), silent_del=self.silent_del)
+                    deleted_files = _help._delete_imgs(set(self.lower_quality), silent_del=self.silent_del)
 
         end_time = time.time()
         time_elapsed = np.round(end_time - start_time, 4)
@@ -89,8 +89,7 @@ class dif:
             duplicate_count=duplicate_count, 
             similar_count=similar_count, 
             invalid_files=invalid_files,
-            deleted_files=deleted_files,
-            deleted_count=deleted_count)  # generates the stats
+            deleted_files=deleted_files)
     
     def _run(self):
         '''Runs the difPy algorithm.
@@ -113,17 +112,17 @@ class dif:
         lower_quality = _search._lower_quality(result)
         return result, lower_quality, total_count, duplicate_count, similar_count, invalid_files
 
-    def _generate_stats(self, start_time, end_time, time_elapsed, total_searched, duplicate_count, similar_count, invalid_files, deleted_files, deleted_count):
+    def _generate_stats(self, start_time, end_time, time_elapsed, total_searched, duplicate_count, similar_count, invalid_files, deleted_files):
         '''Generates stats of the difPy process.
         '''
         if self.logs:
             invalid_stats = {'count': len(invalid_files),
                              'logs' : invalid_files}
-            deleted_stats = {'count': deleted_count, 
+            deleted_stats = {'count': len(deleted_files), 
                              'logs': deleted_files}
         else:
             invalid_stats = {'count': len(invalid_files)}
-            deleted_stats = {'count': deleted_count}
+            deleted_stats = {'count': len(deleted_files)}
              
         stats = {'directory': self.directory,
                  'duration': {'start_date': time.strftime('%Y-%m-%d', start_time),
@@ -444,19 +443,16 @@ class _help:
 
     def _delete_imgs(lower_quality_set, silent_del=False):
         # Function for deleting the lower quality images that were found after the search
-        delete_count = 0
         deleted_files = []
         if not silent_del:
             usr = input('Are you sure you want to delete all lower quality matched images? \n! This cannot be undone. (y/n)')
             if str(usr) == 'y':
-                delete_count += 1
                 for file in lower_quality_set:
                     print('\nDeletion in progress...', end='\r')
                     try:
                         os.remove(file)
                         deleted_files.append(file)
                         print(f'Deleted file: {file}', end='\r')
-                        delete_count += 1
                     except:
                         print(f'Could not delete file: {file}', end='\r')       
             else:
@@ -469,11 +465,10 @@ class _help:
                     os.remove(file)
                     deleted_files.append(file)
                     print(f'Deleted file: {file}', end='\r')
-                    delete_count += 1
                 except:
                     print(f'Could not delete file: {file}', end='\r')
-        print(f'\n***\nDeleted {delete_count} image file(s).')
-        return deleted_files, delete_count
+        print(f'\n***\nDeleted {len(deleted_files)} image file(s).')
+        return deleted_files
 
     def _type_str_int(x):
         # Helper function to make the CLI accept int and str type inputs for the similarity parameter
