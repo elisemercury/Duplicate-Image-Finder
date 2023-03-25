@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import uuid
 import numpy as np
 from PIL import Image
+from distutils.util import strtobool
+import re
 import os
 import time
 from pathlib import Path
@@ -20,7 +22,7 @@ class dif:
     '''
     A class used to initialize and run difPy
     '''
-    def __init__(self, *directory, fast_search=True, recursive=True, similarity='duplicates', px_size=50, show_progress=True, show_output=False, move_to=None, delete=False, silent_del=False, logs=False):
+    def __init__(self, *directory, fast_search=True, recursive=True, limit_extensions=False, similarity='duplicates', px_size=50, show_progress=True, show_output=False, move_to=None, delete=False, silent_del=False, logs=False):
         '''
         Parameters
         ----------
@@ -30,6 +32,8 @@ class dif:
             Use Fast Search Algorithm (default is True)
         recursive : bool, optional
             Search recursively within the directories (default is True)
+        limit_extensions : bool, optional
+            Limit search to known image file extensions (default is False)
         similarity : 'duplicates', 'similar', float, optional
             Image similarity threshold (mse) (default is 'duplicates', 0)
         px_size : int, optional
@@ -52,6 +56,7 @@ class dif:
         _validate._directory_unique(self.directory)
         self.directory = sorted(self.directory)
         self.recursive = _validate._recursive(recursive)
+        self.limit_extensions = _validate._limit_extensions(limit_extensions)
         self.similarity = _validate._similarity(similarity)
         self.fast_search = _validate._fast_search(fast_search, self.similarity)
         self.px_size = _validate._px_size(px_size)
@@ -62,7 +67,7 @@ class dif:
         self.logs = _validate._logs(logs)
         start_time = time.time()
 
-        self.result, self.lower_quality, total_count, duplicate_count, similar_count, invalid_files = dif._run(self)  # run algorithm
+        self.result, self.lower_quality, total_count, duplicate_count, similar_count, invalid_files, skipped_files = dif._run(self)  # run algorithm
 
         deleted_files = []
         if duplicate_count + similar_count != 0:
@@ -89,19 +94,20 @@ class dif:
             duplicate_count=duplicate_count, 
             similar_count=similar_count, 
             invalid_files=invalid_files,
-            deleted_files=deleted_files)
+            deleted_files=deleted_files,
+            skipped_files=skipped_files)
     
     def _run(self):
         '''Runs the difPy algorithm.
         '''
         for count, dir in enumerate(self.directory):
             if count == 0:
-                directory_files = _help._list_all_files(dir, self.recursive)
+                directory_files, skipped_files = _help._list_all_files(dir, self.recursive, self.limit_extensions)
                 id_by_location = _compute._id_by_location(directory_files, id_by_location=None)
             else:
                 if len(self.directory) >= 2:
                     if not os.path.normpath(dir) in directory_files:
-                        directory_files = _help._list_all_files(dir, self.recursive)
+                        directory_files, skipped_files = _help._list_all_files(dir, self.recursive, self.limit_extensions)
                         id_by_location = _compute._id_by_location(directory_files, id_by_location=id_by_location)
                     else:
                         print(f"Skipped directory {dir} as it is part of another directory provided.")
@@ -110,19 +116,23 @@ class dif:
         imgs_matrices, invalid_files = _compute._imgs_matrices(id_by_location, self.px_size, self.show_progress)
         result, exclude_from_search, total_count, duplicate_count, similar_count = _search._matches(imgs_matrices, id_by_location, self.similarity, self.show_output, self.show_progress, self.fast_search)
         lower_quality = _search._lower_quality(result)
-        return result, lower_quality, total_count, duplicate_count, similar_count, invalid_files
+        return result, lower_quality, total_count, duplicate_count, similar_count, invalid_files, skipped_files
 
-    def _generate_stats(self, start_time, end_time, time_elapsed, total_searched, duplicate_count, similar_count, invalid_files, deleted_files):
+    def _generate_stats(self, start_time, end_time, time_elapsed, total_searched, duplicate_count, similar_count, invalid_files, deleted_files, skipped_files):
         '''Generates stats of the difPy process.
         '''
         if self.logs:
+            print(self.logs)
             invalid_stats = {'count': len(invalid_files),
                              'logs' : invalid_files}
             deleted_stats = {'count': len(deleted_files), 
                              'logs': deleted_files}
+            skipped_stats = {'count': len(skipped_files), 
+                             'logs': skipped_files}
         else:
             invalid_stats = {'count': len(invalid_files)}
             deleted_stats = {'count': len(deleted_files)}
+            skipped_stats = {'count': len(skipped_files)}
              
         stats = {'directory': self.directory,
                  'duration': {'start_date': time.strftime('%Y-%m-%d', start_time),
@@ -138,7 +148,9 @@ class dif:
                  'matches_found': {'duplicates': duplicate_count,
                                    'similar': similar_count},
                  'invalid_files': invalid_stats,
-                 'deleted_files': deleted_stats}
+                 'deleted_files': deleted_stats,
+                 'skipped_files': skipped_stats
+                 }
         return stats
 
 class _validate:
@@ -180,6 +192,12 @@ class _validate:
         if not isinstance(recursive, bool):
             raise Exception('Invalid value for "recursive" parameter: must be of type bool.')
         return recursive
+    
+    def _limit_extensions(limit_extensions):
+        # Function that _validates the 'limit_extensions' input parameter
+        if not isinstance(limit_extensions, bool):
+            raise Exception('Invalid value for "limit_extensions" parameter: must be of type bool.')
+        return limit_extensions
 
     def _similarity(similarity):
         # Function that _validates the 'similarity' input parameter
@@ -383,11 +401,30 @@ class _help:
     '''
     A class used for difPy helper functions.
     '''
-    def _list_all_files(directory, recursive):
+
+    
+    def _list_all_files(directory, recursive, limit_extensions):
         # Function that creates a list of all files in the directory
+        skipped = []
         directory_files = list(glob(str(directory) + '/**', recursive=recursive))
+        if limit_extensions:
+            directory_files, skipped = _help._filter_extensions(directory_files)
         directory_files = [os.path.normpath(file) for file in directory_files]
-        return directory_files
+        return directory_files, skipped
+    
+    def _filter_extensions(directory_files):
+        # function that filters files into those with & without valid image extensions
+        valid_extensions = ('apng', 'bw', 'cdf', 'cur', 'dcx', 'dds', 'dib', 'emf', 'eps', 'fli', 'flc', 'fpx', 'ftex', 'fits', 'gd', 'gd2', 'gif', 'gbr', 'icb', 'icns', 'iim', 'ico', 'im', 'imt', 'j2k', 'jfif', 'jfi', 'jif', 'jp2', 'jpe', 'jpeg', 'jpg', 'jpm', 'jpf', 'jpx', 'jpeg', 'mic', 'mpo', 'msp', 'nc', 'pbm', 'pcd', 'pcx', 'pgm', 'png', 'ppm', 'psd', 'pixar', 'ras', 'rgb', 'rgba', 'sgi', 'spi', 'spider', 'sun', 'tga', 'tif', 'tiff', 'vda', 'vst', 'wal', 'webp', 'xbm', 'xpm')
+        filtered_list = []
+        skipped_list = []
+        for f in directory_files:
+            ext = re.search("\.([a-zA-Z0-9]+)$", f)
+            if ext:
+                if ext.group(1).lower() in valid_extensions:
+                    filtered_list.append(f)
+                else:
+                    skipped_list.append(f)
+        return filtered_list, skipped_list
 
     def _show_img_figs(img_A, img_B, err):
         # Function that plots two compared image files and their mse
@@ -483,23 +520,21 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Find duplicate or similar images on your computer with difPy - https://github.com/elisemercury/Duplicate-Image-Finder')
     parser.add_argument('-D', '--directory', type=str, nargs='+', help='Directory to search for images.', required=True)
     parser.add_argument('-Z', '--output_directory', type=str, help='Output directory for the difPy result files. Default is working dir.', required=False, default=None)
-    parser.add_argument('-f', '--fast_search', type=str, help='Use difPys Fast Search Algorithm.', required=False, choices=[True, False], default=True)
-    parser.add_argument('-r', '--recursive', type=bool, help='Scan subfolders for duplicate images', required=False, choices=[True, False], default=True)
+    parser.add_argument('-f', '--fast_search', type=lambda x: bool(strtobool(x)), help='Use difPys Fast Search Algorithm.', required=False, choices=[True, False], default=True)
+    parser.add_argument('-r', '--recursive', type=lambda x: bool(strtobool(x)), help='Scan subfolders for duplicate images', required=False, choices=[True, False], default=True)
+    parser.add_argument('-le', '--limit_extensions', type=lambda x: bool(strtobool(x)), help='Limit search to known image file extensions', required=False, choices=[True, False], default=False)
     parser.add_argument('-s', '--similarity', type=_help._type_str_int, help='Similarity grade.', required=False, default='duplicates')
     parser.add_argument('-px', '--px_size', type=int, help='Compression size of images in pixels.', required=False, default=50)
-    parser.add_argument('-p', '--show_progress', type=bool, help='Show the real-time progress of difPy.', required=False, choices=[True, False], default=True)
-    parser.add_argument('-o', '--show_output', type=bool, help='Show the compared images in real-time.', required=False, choices=[True, False], default=False)
+    parser.add_argument('-p', '--show_progress', type=lambda x: bool(strtobool(x)), help='Show the real-time progress of difPy.', required=False, choices=[True, False], default=True)
+    parser.add_argument('-o', '--show_output', type=lambda x: bool(strtobool(x)), help='Show the compared images in real-time.', required=False, choices=[True, False], default=False)
     parser.add_argument('-mv', '--move_to', type=str, help='Move the lower quality images to a target folder.', required=False, default=None)
-    parser.add_argument('-d', '--delete', type=bool, help='Delete all duplicate images with lower quality.', required=False, choices=[True, False], default=False)
-    parser.add_argument('-sd', '--silent_del', type=bool, help='Suppress the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
-    parser.add_argument('-l', '--logs', type=bool, help='Enable log collection for invalid files.', required=False, choices=[True, False], default=False)
+    parser.add_argument('-d', '--delete', type=lambda x: bool(strtobool(x)), help='Delete all duplicate images with lower quality.', required=False, choices=[True, False], default=False)
+    parser.add_argument('-sd', '--silent_del', type=lambda x: bool(strtobool(x)), help='Suppress the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
+    parser.add_argument('-l', '--logs', type=lambda x: bool(strtobool(x)), help='Enable log collection for invalid files.', required=False, choices=[True, False], default=False)
     args = parser.parse_args()
 
     # initialize difPy
-    search = dif(args.directory, fast_search=args.fast_search,
-                recursive=args.recursive, similarity=args.similarity, px_size=args.px_size, 
-                show_output=args.show_output, show_progress=args.show_progress,
-                move_to=args.move_to, delete=args.delete, silent_del=args.silent_del, logs=args.logs)
+    search = dif(args.directory, fast_search=args.fast_search, recursive=args.recursive, limit_extensions=args.limit_extensions, similarity=args.similarity,px_size=args.px_size, show_output=args.show_output, show_progress=args.show_progress, move_to=args.move_to, delete=args.delete, silent_del=args.silent_del, logs=args.logs)
 
     # create filenames for the output files
     timestamp =str(time.time()).replace('.', '_')
