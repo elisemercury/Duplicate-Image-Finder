@@ -18,7 +18,7 @@ Quick Start Guide
 
 To search for duplicate images with the difPy Web App, start by **uploading the images** you would like to compare. After the images have been uploaded, click "**Run difPy!**" to make difPy do its magic.
 
-.. figure:: static/assets/app_transp.png
+.. figure:: static/assets/difPyweb_demo.gif
    :scale: 70 %
    :alt: difPy Web App - Interface
    :align: center
@@ -67,7 +67,7 @@ Limitations
 
 Some limitations of difPy Web include:
 
-* A maximum of **100 images** can be uploaded and compared at once.
+* A maximum of **200 images** can be uploaded and compared at once.
 * Please ensure all uploaded files have a **unique filename**. If two files are uploaded that have the same filename, difPy web will overwrite them when uploaded. This applies even if the files are located in different folders in the source.
 
 ------------
