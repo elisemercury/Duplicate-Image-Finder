@@ -157,6 +157,10 @@ difPy can also be accessed via its new **web interface**. With difPy Web you com
 
 :iphone: **Try the new [difPy Web App](https://difpy.app/)**!
 
+<p align="center">
+  <a href="https://difpy.app/"><img src="docs/static/assets/difPyweb_demo.gif" width="700" title="Demo: difPy Web App"></a>
+</p>
+
 -------
 
 <p align="center"><b>
