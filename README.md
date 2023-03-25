@@ -15,11 +15,12 @@
 ```python
 pip install difPy
 ```
+
+> :iphone: **Try the new [difPy Web App](https://difpy.app/)**!
+
 > :point_right: :new: With **difPy v3.x** you can count on signifcant **performance increases**, **new features** and **bug fixes**. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for details. 
 
 > :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy) for more information.
-
-> :iphone: **Try the new [difPy Web App](https://difpy.app/)**!
 
 Read more on how the algorithm of difPy works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051).
 
