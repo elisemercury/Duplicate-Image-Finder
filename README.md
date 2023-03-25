@@ -159,9 +159,6 @@ difPy can also be accessed via its new **web interface**. With difPy Web you com
 
 -------
 
-❤️ difPy is an open source project with the aim of facilitating image deduplication - for everyone. Consider donating to support the project 🫶
-
-.. image:: https://img.shields.io/badge/Support-difPy-yellow?style=flat&logo=paypal&labelColor=white&logoWidth=20.svg/"
-   :target: https://paypal.me/eliselandman
-.. image:: https://img.shields.io/badge/Support-difPy-blueviolet?style=flat&logo=revolut&logoColor=black&labelColor=white&logoWidth=20.svg/"
-   :target: https://revolut.me/elisemercury
+<p align="center"><b>
+We :heart: Open Source
+</b></p>
