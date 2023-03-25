@@ -27,7 +27,7 @@ class dif:
         directory : str, list
             The name(s) of the directories to be compared
         fast_search : bool, optional
-            Use Fast Search Algortihm (default is True)
+            Use Fast Search Algorithm (default is True)
         recursive : bool, optional
             Search recursively within the directories (default is True)
         similarity : 'duplicates', 'similar', float, optional
@@ -45,7 +45,7 @@ class dif:
         silent_del : bool, optional
             Skip user confirmation when delete=True (default is False)
         logs : bool, optional
-            Enable log collection for inavlid files in stats output    
+            Enable log collection for invalid files in stats output    
         '''
         self.directory = _validate._directory_type(directory)
         _validate._directory_exist(self.directory)
@@ -60,19 +60,9 @@ class dif:
         self.move_to = _validate._move_to(move_to)
         self.delete, self.silent_del = _validate._delete(delete, silent_del)
         self.logs = _validate._logs(logs)
-
         start_time = time.time()
-        self.result, self.lower_quality, total_count, duplicate_count, similar_count, invalid_files = dif._run(self)
-        end_time = time.time()
 
-        time_elapsed = np.round(end_time - start_time, 4)
-        self.stats = dif._generate_stats(self, start_time=time.localtime(start_time), end_time=time.localtime(end_time), time_elapsed=time_elapsed, 
-                                         total_searched=total_count, duplicate_count=duplicate_count, similar_count=similar_count, invalid_files=invalid_files)
-
-        if self.similarity == 0:
-            print(f'Found {duplicate_count} pair(s) of duplicate image(s) in {time_elapsed} seconds.')
-        else:
-            print(f'Found {duplicate_count} pair(s) of duplicate and {similar_count} pair(s) of similar image(s) in {time_elapsed} seconds.')
+        self.result, self.lower_quality, total_count, duplicate_count, similar_count, invalid_files = dif._run(self)  # run algorithm
 
         if duplicate_count + similar_count != 0:
             if self.move_to != None:
@@ -80,7 +70,27 @@ class dif:
 
             elif self.delete:
                 if len(self.lower_quality) != 0:
-                    _help._delete_imgs(set(self.lower_quality), silent_del=self.silent_del)
+                    deleted_files, deleted_count = _help._delete_imgs(set(self.lower_quality), silent_del=self.silent_del)
+
+        end_time = time.time()
+        time_elapsed = np.round(end_time - start_time, 4)
+
+        if self.similarity == 0:
+            print(f'Found {duplicate_count} pair(s) of duplicate image(s) in {time_elapsed} seconds.')
+        else:
+            print(f'Found {duplicate_count} pair(s) of duplicate and {similar_count} pair(s) of similar image(s) in {time_elapsed} seconds.')
+
+        self.stats = dif._generate_stats(
+            self, 
+            start_time=time.localtime(start_time), 
+            end_time=time.localtime(end_time), 
+            time_elapsed=time_elapsed, 
+            total_searched=total_count,
+            duplicate_count=duplicate_count, 
+            similar_count=similar_count, 
+            invalid_files=invalid_files,
+            deleted_files=deleted_files,
+            deleted_count=deleted_count)  # generates the stats
     
     def _run(self):
         '''Runs the difPy algorithm.
@@ -103,14 +113,17 @@ class dif:
         lower_quality = _search._lower_quality(result)
         return result, lower_quality, total_count, duplicate_count, similar_count, invalid_files
 
-    def _generate_stats(self, start_time, end_time, time_elapsed, total_searched, duplicate_count, similar_count, invalid_files):
+    def _generate_stats(self, start_time, end_time, time_elapsed, total_searched, duplicate_count, similar_count, invalid_files, deleted_files, deleted_count):
         '''Generates stats of the difPy process.
         '''
         if self.logs:
             invalid_stats = {'count': len(invalid_files),
                              'logs' : invalid_files}
+            deleted_stats = {'count': deleted_count, 
+                             'logs': deleted_files}
         else:
             invalid_stats = {'count': len(invalid_files)}
+            deleted_stats = {'count': deleted_count}
              
         stats = {'directory': self.directory,
                  'duration': {'start_date': time.strftime('%Y-%m-%d', start_time),
@@ -125,7 +138,8 @@ class dif:
                  'files_searched': total_searched,
                  'matches_found': {'duplicates': duplicate_count,
                                    'similar': similar_count},
-                 'invalid_files': invalid_stats}
+                 'invalid_files': invalid_stats,
+                 'deleted_stats': deleted_stats}
         return stats
 
 class _validate:
@@ -286,7 +300,7 @@ class _compute:
             raise KeyboardInterrupt
 
     def _mse(img_A, img_B):
-        # Function that calulates the mean squared error (mse) between two image matrices
+        # Function that calculates the mean squared error (mse) between two image matrices
         mse = np.sum((img_A.astype('float') - img_B.astype('float')) ** 2)
         mse /= float(img_A.shape[0] * img_A.shape[1])
         return mse
@@ -431,6 +445,7 @@ class _help:
     def _delete_imgs(lower_quality_set, silent_del=False):
         # Function for deleting the lower quality images that were found after the search
         delete_count = 0
+        deleted_files = []
         if not silent_del:
             usr = input('Are you sure you want to delete all lower quality matched images? \n! This cannot be undone. (y/n)')
             if str(usr) == 'y':
@@ -439,6 +454,7 @@ class _help:
                     print('\nDeletion in progress...', end='\r')
                     try:
                         os.remove(file)
+                        deleted_files.append(file)
                         print(f'Deleted file: {file}', end='\r')
                         delete_count += 1
                     except:
@@ -447,16 +463,17 @@ class _help:
                 print('Image deletion canceled.')
                 return
         else:
-            delete_count += 1
             for file in lower_quality_set:
                 print('\nDeletion in progress...', end='\r')
                 try:
                     os.remove(file)
+                    deleted_files.append(file)
                     print(f'Deleted file: {file}', end='\r')
                     delete_count += 1
                 except:
                     print(f'Could not delete file: {file}', end='\r')
         print(f'\n***\nDeleted {delete_count} image file(s).')
+        return deleted_files, delete_count
 
     def _type_str_int(x):
         # Helper function to make the CLI accept int and str type inputs for the similarity parameter
@@ -477,9 +494,9 @@ if __name__ == '__main__':
     parser.add_argument('-px', '--px_size', type=int, help='Compression size of images in pixels.', required=False, default=50)
     parser.add_argument('-p', '--show_progress', type=bool, help='Show the real-time progress of difPy.', required=False, choices=[True, False], default=True)
     parser.add_argument('-o', '--show_output', type=bool, help='Show the compared images in real-time.', required=False, choices=[True, False], default=False)
-    parser.add_argument('-mv', '--move_to', type=str, help='Move the lower quelity images to a target folder.', required=False, default=None)
+    parser.add_argument('-mv', '--move_to', type=str, help='Move the lower quality images to a target folder.', required=False, default=None)
     parser.add_argument('-d', '--delete', type=bool, help='Delete all duplicate images with lower quality.', required=False, choices=[True, False], default=False)
-    parser.add_argument('-sd', '--silent_del', type=bool, help='Supress the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
+    parser.add_argument('-sd', '--silent_del', type=bool, help='Suppress the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
     parser.add_argument('-l', '--logs', type=bool, help='Enable log collection for invalid files.', required=False, choices=[True, False], default=False)
     args = parser.parse_args()
 
