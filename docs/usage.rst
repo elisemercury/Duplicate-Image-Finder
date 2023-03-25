@@ -57,10 +57,6 @@ Folder paths must be specified as either standalone Python strings, or within a 
 
 By default, difPy leverages its :ref:`Fast Search Algorithm (FSA)`.
 
-*difPy supports most popular image formats, but since it makes use of the Pillow library for image decoding, the supported formats are restricted to the ones listed in the* `Pillow Documentation`_.
-
-.. _Pillow Documentation: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
-
 .. _output:
 
 Output
@@ -172,6 +168,15 @@ When running from the CLI, the output of difPy is written to files and saved in 
    difPy_results_xxx.json
    difPy_lower_quality_xxx.csv
    difPy_stats_xxx.json
+
+.. _Supported File Types:
+
+Supported File Types
+----------------
+
+difPy supports most popular image formats. Nevertheless, since it relies on the Pillow library for image decoding, the supported formats are restricted to the ones listed in the* `Pillow Documentation`_. Unsupported file types will by marked as invalid and included in the :ref:`invalid_files` output.
+
+.. _Pillow Documentation: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
 
 .. _Fast Search Algorithm (FSA):
 
