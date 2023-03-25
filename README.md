@@ -35,19 +35,19 @@ DifPy searches for images in **one or more different folders**, compares the ima
 DifPy does not compare images based on their hashes. It compares them based on their tensors i. e. the image content - this allows difPy to **not only search for duplicate images, but also for similar images**.
 
 ## Basic Usage
-Use the following function to make difPy search for duplicates within one specific folder and its subfolders:
+To make difPy search for duplicates within one specific folder:
 
 ```python
 from difPy import dif
 search = dif("C:/Path/to/Folder/")
 ``` 
-:new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** now supports **multi-folder search**! To search for duplicates within mutliple folders and their subfolders:
+To search for duplicates within multiple folders:
 
 ```python
 from difPy import dif
 search = dif(["C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder_C/", ... ])
 ``` 
-Folder paths must be specified as standalone Python strings, or within a Python list.
+Folder paths can be specified as standalone Python strings, or within a list.
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
