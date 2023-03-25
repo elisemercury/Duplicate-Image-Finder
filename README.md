@@ -19,6 +19,8 @@ pip install difPy
 
 > :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy) for more information.
 
+> :iphone: **Try the new [difPy Web App](https://difpy.app/)**!
+
 Read more on how the algorithm of difPy works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051).
 
 Check out the [difPy package on PyPI.org](https://pypi.org/project/difPy/)
