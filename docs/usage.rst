@@ -185,7 +185,7 @@ Fast Search Algorithm (FSA)
 
 .. note::
 
-   🆕 difPy >= v3.0 supports Fast Search Algorithm (FSA).
+   🆕 difPy >= v3.x supports Fast Search Algorithm (FSA).
 
 difPy's Fast Search Algorithm (FSA) can provide significant performance increases and time complexity reduction when searching for duplicates.
 

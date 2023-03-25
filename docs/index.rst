@@ -16,6 +16,8 @@ Check out the :doc:`usage` section for a detailed usage guide.
 
    📱 **Try the new** `difPy Web App`_.
 
+.. _difPy Web App: https://difpy.app
+
 View difPy on `GitHub <https://github.com/elisemercury/Duplicate-Image-Finder>`_ and `PyPi <https://pypi.org/project/difPy/>`_.
 
 Contents
@@ -23,7 +25,7 @@ Contents
 
 .. toctree::
    :numbered:
-   :maxdepth: 3
+   :maxdepth: 2
 
    usage
    parameters

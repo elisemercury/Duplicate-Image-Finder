@@ -27,10 +27,6 @@ difPy supports the following parameters:
    :ref:`silent_del`,``bool``,``False``,"``True`` (use with care, cannot be undone)"
    :ref:`logs`,``bool``,``False``,``True``
 
-.. note::
-
-   🆕 Since difPy v3.0.8, the :ref:`similarity` parameter accepts `duplicates` and `similar` as input options.
-
 .. _directory:
 
 directory
@@ -47,7 +43,7 @@ fast_search
 
 .. note::
 
-   🆕 difPy >= v3.0 supports Fast Search Algorithm (FSA).
+   🆕 difPy >= v3.x supports Fast Search Algorithm (FSA).
 
 By default, when searching for duplicates, difPy will run the comparison process by using its :ref:`Fast Search Algorithm (FSA)`. This algorithm can provide significant performance increases and time complexity reduction. 
 
