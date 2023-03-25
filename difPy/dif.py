@@ -64,7 +64,7 @@ class dif:
 
         self.result, self.lower_quality, total_count, duplicate_count, similar_count, invalid_files = dif._run(self)  # run algorithm
 
-        deleted_files = {}
+        deleted_files = []
         if duplicate_count + similar_count != 0:
             if self.move_to != None:
                 self.lower_quality = _help._move_imgs(self.lower_quality, self.move_to)
