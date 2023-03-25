@@ -153,7 +153,7 @@ difPy_stats_xxx.json
 
 ## difPy Web App
 
-difPy can also be accessed via its new **web interface**. With difPy Web you compare **up to 200 images** and download a **deduplicated ZIP file** - all powered by difPy. [Read more](https://github.com/elisemercury/difPy-app). 
+difPy can also be accessed via its new **web interface**. With difPy Web, you can compare **up to 200 images** and download a **deduplicated ZIP file** - all powered by difPy. [Read more](https://github.com/elisemercury/difPy-app). 
 
 :iphone: **Try the new [difPy Web App](https://difpy.app/)**!
 
