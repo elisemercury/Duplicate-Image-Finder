@@ -41,15 +41,6 @@ Your pull request and implementation will be reviewed and approved if it passes 
 👉 follow the code style of the project, including indentation |br|
 👉 update the `README.md <https://github.com/elisemercury/Duplicate-Image-Finder/blob/main/README.md>`_ instructions
 
-Be Featured as difPy "Related Project"
-------------
-
-**Have you used difPy in one of your projects? Or have you been working on a project that is based 🧬 on, or inspired ✨ by difPy?**
-
-We would love to feature your project in the `Related Projects <https://github.com/elisemercury/Duplicate-Image-Finder#related-projects>`_ section of the difPy repository!
-
-Feel free to fork difPy, edit the `README.md <https://github.com/elisemercury/Duplicate-Image-Finder/blob/main/README.md>`_ file, add your project name and the repository link, and open a new pull request. After your project has been reviewed and passes the requirements, your pull request will be approved and you project will be listed.
-
 .. image:: https://img.shields.io/badge/Support-difPy-yellow?style=flat&logo=paypal&labelColor=white&logoWidth=20.svg/"
    :target: https://paypal.me/eliselandman
 .. image:: https://img.shields.io/badge/Support-difPy-blueviolet?style=flat&logo=revolut&logoColor=black&labelColor=white&logoWidth=20.svg/"

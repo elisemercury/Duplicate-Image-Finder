@@ -38,10 +38,6 @@ Search for duplicate images in a single folder:
 Multi-Folder Search
 ^^^^^^^^^^
 
-.. note::
-
-   🆕 difPy >= v3.0 supports comparison of more than 2 folders simultaneously.
-
 Search for duplicate images in multiple folders:
 
 .. code-block:: python
@@ -60,10 +56,6 @@ or add a ``list`` of folders:
 Folder paths must be specified as either standalone Python strings, or within a Python `list`. difPy will compare the **union** of all files within the specified folders.
 
 By default, difPy leverages its :ref:`Fast Search Algorithm (FSA)`.
-
-*difPy supports most popular image formats, but since it makes use of the Pillow library for image decoding, the supported formats are restricted to the ones listed in the* `Pillow Documentation`_.
-
-.. _Pillow Documentation: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
 
 .. _output:
 
@@ -90,10 +82,6 @@ A **JSON formatted collection** of duplicates/similar images (i. e. **match grou
     ...
    }
 
-.. note::
-
-   🆕 difPy >= v3.0 has an improved ``search.result`` output structure and includes the MSE for each matched image.
-
 Lower Quality Images
 ^^^^^^^^^^
 
@@ -105,7 +93,7 @@ A **list** of duplicates/similar images that have the **lowest quality** among m
 
    > Output:
    ["C:/Path/to/Image/duplicate_image1.jpg", 
-   "C:/Path/to/Image/duplicate_image2.jpg", ...]
+    "C:/Path/to/Image/duplicate_image2.jpg", ...]
 
 To find the lower quality images, difPy compares all image file sizes within a match group and selects all images that have lowest image file size among the group.
 
@@ -120,28 +108,24 @@ A **JSON formatted collection** with statistics on the completed difPy process:
 
    > Output:
    {"directory" : ("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", ... ),
-   "duration" : {"start_date": "2023-02-15",
+    "duration" : {"start_date" : "2023-02-15",
                   "start_time" : "18:44:19",
                   "end_date" : "2023-02-15",
                   "end_time" : "18:44:38",
                   "seconds_elapsed" : 18.6113},
-   "fast_search" : True,
-   "recursive" : True,
-   "match_mse" : 200,
-   "px_size" : 50,
-   "files_searched" : 1032,
-   "matches_found" : {"duplicates" : 52,
-                      "similar" : 0},
-   "invalid_files" : {"count" : 4,
-                      "logs" : {}}
+    "fast_search" : True,
+    "recursive" : True,
+    "match_mse" : 200,
+    "px_size" : 50,
+    "files_searched" : 1032,
+    "matches_found" : {"duplicates" : 52,
+                       "similar" : 0},
+    "invalid_files" : {"count" : 4,
+                       "logs" : {},
+    "deleted_files" : {"count" : 4,
+                       "logs" : {}}
 
 The ``invalid_files`` logs are only outputted if the ``logs`` parameter is set to ``True``. See the :ref:`logs` section for more details.
-
-.. note::
-
-   🆕 difPy v3.0.8 outputs the ``match_count`` of **duplicates** and **similar** images it found.
-
-   🆕 difPy >= v3.0 outputs the count and logs of **invalid files** in the target directory that could not be processed as images, as well as information on whether the ``fast_search`` algorithm was used.
 
 .. _cli_usage:
 
@@ -165,10 +149,6 @@ It supports the following arguments:
           [-p {True,False}] [-o {True,False}] [-mv MOVE_TO]
           [-d {True,False}] [-sd {True,False}] [-l {True,False}]
 
-.. note::
-
-   🆕 difPy >= v3.0 has adjusted CLI parameters: ``directory`` changed to ``-D`` and ``silend_del`` changed to ``-sd``.
-
 .. csv-table::
    :header: Cmd,Parameter,Cmd,Parameter
    :widths: 5, 10, 5, 10
@@ -188,6 +168,15 @@ When running from the CLI, the output of difPy is written to files and saved in 
    difPy_results_xxx.json
    difPy_lower_quality_xxx.csv
    difPy_stats_xxx.json
+
+.. _Supported File Types:
+
+Supported File Types
+----------------
+
+difPy supports most popular image formats. Nevertheless, since it relies on the Pillow library for image decoding, the supported formats are restricted to the ones listed in the* `Pillow Documentation`_. Unsupported file types will by marked as invalid and included in the :ref:`invalid_files` output.
+
+.. _Pillow Documentation: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
 
 .. _Fast Search Algorithm (FSA):
 

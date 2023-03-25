@@ -14,7 +14,7 @@ Check out the :doc:`usage` section for a detailed usage guide.
 
 .. note::
 
-   This project is under active development.
+   📱 **Try the new** `difPy Web App`_.
 
 View difPy on `GitHub <https://github.com/elisemercury/Duplicate-Image-Finder>`_ and `PyPi <https://pypi.org/project/difPy/>`_.
 
@@ -23,11 +23,12 @@ Contents
 
 .. toctree::
    :numbered:
-   :maxdepth: 2
+   :maxdepth: 3
 
    usage
    parameters
    contributing
+   app
 
 ❤️ difPy is an open source project with the aim of facilitating offline image deduplication - for everyone.
 
