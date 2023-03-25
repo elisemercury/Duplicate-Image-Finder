@@ -3,7 +3,14 @@ Contributing to difPy
 
 .. _Contributing:
 
-DifPy is constantly updated with code improvements, new features and requests from the community. Contributions are a good way to give feedback and to improve the functionalities and quality of the package.
+❤️ difPy is an open source project with the aim of facilitating offline image deduplication - for everyone. Consider donating to support the project 🫶
+
+.. image:: https://img.shields.io/badge/Support-difPy-yellow?style=flat&logo=paypal&labelColor=white&logoWidth=20.svg/"
+   :target: https://paypal.me/eliselandman
+.. image:: https://img.shields.io/badge/Support-difPy-blueviolet?style=flat&logo=revolut&logoColor=black&labelColor=white&logoWidth=20.svg/"
+   :target: https://revolut.me/elisemercury
+
+difPy is constantly updated with code improvements, new features and requests from the community. Contributions are a good way to give feedback and to improve the functionalities and quality of the package.
 
 **Do you feel like difPy is missing a certain feature? Or do you have an idea of how to improve difPy?**
 
@@ -13,11 +20,6 @@ Contributions to difPy are always welcomed and are highly appreciated! If you wa
 2. Contribute to difPy and fix/implement the missing feature yourself. Please follow the instructions and guidelines listed below 👇
 
 Thank you for your contribution! 💐
-
-.. image:: https://img.shields.io/badge/Support-difPy-yellow?style=flat&logo=paypal&labelColor=white&logoWidth=20.svg/"
-   :target: https://paypal.me/eliselandman
-.. image:: https://img.shields.io/badge/Support-difPy-blueviolet?style=flat&logo=revolut&logoColor=black&labelColor=white&logoWidth=20.svg/"
-   :target: https://revolut.me/elisemercury
 
 Guidelines - Become a difPy Contributor
 ------------

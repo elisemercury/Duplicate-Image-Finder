@@ -57,6 +57,48 @@ Folder paths must be specified as either standalone Python strings, or within a 
 
 By default, difPy leverages its :ref:`Fast Search Algorithm (FSA)`.
 
+.. _cli_usage:
+
+CLI Usage
+----------------
+
+difPy can be invoked through a CLI interface by using the following commands:
+
+.. code-block:: python
+
+   python dif.py -D "C:/Path/to/Folder/"
+
+   python dif.py -D "C:/Path/to/Folder_A/" "C:/Path/to/Folder_B/" "C:/Path/to/Folder_C/"   
+
+It supports the following arguments:
+
+.. code-block:: python
+   
+   dif.py [-h] -D DIRECTORY [-Z OUTPUT_DIRECTORY] [-f {True,False}]
+          [-r {True,False}] [-s SIMILARITY] [-px PX_SIZE] 
+          [-p {True,False}] [-o {True,False}] [-mv MOVE_TO]
+          [-d {True,False}] [-sd {True,False}] [-l {True,False}]
+
+.. csv-table::
+   :header: Cmd,Parameter,Cmd,Parameter
+   :widths: 5, 10, 5, 10
+   :class: tight-table
+
+   ``-D``,directory,``-p``,show_progress
+   ``-Z``,output_directory,``-o``,show_output
+   ``-f``,fast_search,``-mv``,move_to
+   ``-r``,recursive,``-d``,delete
+   ``-s``,similarity,``-sd``,silent_del
+   ``-px``,px_size,``-l``,logs
+
+When running from the CLI, the output of difPy is written to files and saved in the working directory by default. To change the default output directory, specify the ``-Z / -output_directory`` parameter. The "xxx" in the output filenames is a unique timestamp:
+
+.. code-block:: python
+
+   difPy_results_xxx.json
+   difPy_lower_quality_xxx.csv
+   difPy_stats_xxx.json
+
 .. _output:
 
 Output
@@ -64,7 +106,7 @@ Output
 
 difPy returns various types of output that you may use depending on your use case:
 
-Matches Images
+Matched Images
 ^^^^^^^^^^
 A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found, where the keys are a **randomly generated unique id** for each image file:
 
@@ -126,48 +168,6 @@ A **JSON formatted collection** with statistics on the completed difPy process:
                        "logs" : []}
 
 The ``invalid_files`` logs are only outputted if the ``logs`` parameter is set to ``True``. See the :ref:`logs` section for more details.
-
-.. _cli_usage:
-
-CLI Usage
-----------------
-
-difPy can be invoked through a CLI interface by using the following commands:
-
-.. code-block:: python
-
-   python dif.py -D "C:/Path/to/Folder/"
-
-   python dif.py -D "C:/Path/to/Folder_A/" "C:/Path/to/Folder_B/" "C:/Path/to/Folder_C/"   
-
-It supports the following arguments:
-
-.. code-block:: python
-   
-   dif.py [-h] -D DIRECTORY [-Z OUTPUT_DIRECTORY] [-f {True,False}]
-          [-r {True,False}] [-s SIMILARITY] [-px PX_SIZE] 
-          [-p {True,False}] [-o {True,False}] [-mv MOVE_TO]
-          [-d {True,False}] [-sd {True,False}] [-l {True,False}]
-
-.. csv-table::
-   :header: Cmd,Parameter,Cmd,Parameter
-   :widths: 5, 10, 5, 10
-   :class: tight-table
-
-   ``-D``,directory,``-p``,show_progress
-   ``-Z``,output_directory,``-o``,show_output
-   ``-f``,fast_search,``-mv``,move_to
-   ``-r``,recursive,``-d``,delete
-   ``-s``,similarity,``-sd``,silent_del
-   ``-px``,px_size,``-l``,logs
-
-When running from the CLI, the output of difPy is written to files and saved in the working directory by default. To change the default output directory, specify the ``-Z / -output_directory`` parameter. The "xxx" in the output filenames is a unique timestamp:
-
-.. code-block:: python
-
-   difPy_results_xxx.json
-   difPy_lower_quality_xxx.csv
-   difPy_stats_xxx.json
 
 .. _Supported File Types:
 
