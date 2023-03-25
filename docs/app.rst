@@ -67,12 +67,12 @@ Limitations
 
 Some limitations of difPy Web include:
 
-* A maximum of **100 images** can be uploaded and compared an once.
+* A maximum of **100 images** can be uploaded and compared at once.
 * Please ensure all uploaded files have a **unique filename**. If two files are uploaded that have the same filename, difPy web will overwrite them when uploaded. This applies even if the files are located in different folders in the source.
 
 ------------
 
-❤️ difPy is an open source project with the aim of facilitating offline image deduplication - for everyone. Consider donating to support the project 🫶
+❤️ difPy is an open source project with the aim of facilitating image deduplication - for everyone. Consider donating to support the project 🫶
 
 .. image:: https://img.shields.io/badge/Support-difPy-yellow?style=flat&logo=paypal&labelColor=white&logoWidth=20.svg/"
    :target: https://paypal.me/eliselandman

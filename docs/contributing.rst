@@ -3,8 +3,6 @@ Contributing to difPy
 
 .. _Contributing:
 
-❤️ difPy is an open source project with the aim of facilitating offline image deduplication - for everyone. Consider donating to support the project 🫶
-
 .. image:: https://img.shields.io/badge/Support-difPy-yellow?style=flat&logo=paypal&labelColor=white&logoWidth=20.svg/"
    :target: https://paypal.me/eliselandman
 .. image:: https://img.shields.io/badge/Support-difPy-blueviolet?style=flat&logo=revolut&logoColor=black&labelColor=white&logoWidth=20.svg/"
@@ -42,6 +40,10 @@ Your pull request and implementation will be reviewed and approved if it passes 
 👉 comment your code |br|
 👉 follow the code style of the project, including indentation |br|
 👉 update the `README.md <https://github.com/elisemercury/Duplicate-Image-Finder/blob/main/README.md>`_ instructions
+
+------------
+
+❤️ difPy is an open source project with the aim of facilitating image deduplication - for everyone. Consider donating to support the project 🫶
 
 .. image:: https://img.shields.io/badge/Support-difPy-yellow?style=flat&logo=paypal&labelColor=white&logoWidth=20.svg/"
    :target: https://paypal.me/eliselandman

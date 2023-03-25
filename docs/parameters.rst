@@ -169,12 +169,14 @@ For informative of troubleshooting purposes, the ``logs`` parameter can be set t
    search.stats
 
    > Output:
-   {... ,
+   {...,
    "invalid_files" : {"count" : 4,
                       "logs" : {"C:/Path/to/Images/inv_file.pdf" : "UnidentifiedImageError: file could not be identified as image.",
-                              ... },
+                                ... },
    "deleted_files" : {"count" : 25,
-                      "logs" : ["C:/Path/to/Images/duplicate_image1.jpg", "C:/Path/to/Images/duplicate_image2.jpg", ...]} }
+                      "logs" : ["C:/Path/to/Images/duplicate_image1.jpg", 
+                                "C:/Path/to/Images/duplicate_image2.jpg", 
+                                ... ]}}
 
 
 ``False`` = (default) logs output are disabled
