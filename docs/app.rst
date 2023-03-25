@@ -19,22 +19,15 @@ Quick Start Guide
 To search for duplicate images with the difPy Web App, start by **uploading the images** you would like to compare. After the images have been uploaded, click "**Run difPy!**" to make difPy do its magic.
 
 .. figure:: static/assets/difPyweb_demo.gif
-   :width: 390
-   :height: 232
+   :width: 520
+   :height: 309
    :alt: difPy Web App - Interface
    :align: center
 
-   `difPy Web App`_ Interface
+   `difPy Web App`_ interface
 
 
 difPy Web will scan the uploaded images for duplicates and will let you **download a ZIP file** of all your **deduplicated files**! ✨
-
-.. figure:: static/assets/result_transp.png
-   :scale: 60 %
-   :alt: difPy Web App - Result
-   :align: center
-
-   `difPy Web App`_ Result
 
 Additional Options
 ------------
