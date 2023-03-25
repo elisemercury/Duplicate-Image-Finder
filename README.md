@@ -15,7 +15,7 @@
 ```python
 pip install difPy
 ```
-> :point_right: :new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** has been released! Count on signifcant **performance increases**, **new features** and **bug fixes**. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for a detailed listing. 
+> :point_right: :new: With **difPy v3.x** you can count on signifcant **performance increases**, **new features** and **bug fixes**. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for details. 
 
 > :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy) for more information.
 
@@ -69,7 +69,6 @@ search.result
  ...
 }
 ``` 
-:new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** now outputs the **MSE** value for each matched image!
 
 A **list** of duplicates/similar images that have the **lowest quality** among match groups: 
 
@@ -99,12 +98,9 @@ search.stats
  "files_searched" : 1032,
  "matches_found" : {'duplicates': 52, 
                     'similar': 0},
- "invalid_files": {"count": 4}}
+ "invalid_files": {"count": 4},
+ "deleted_files": {'count': 0}}
 ```
-
-:new: **[difPy v3.0.8](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.8)** outputs the ``match_count`` of **duplicates** and **similar** images it found.
-
-:new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** now outputs the count of **invalid files** in the target directory that could not be processed as images, as well as information on whether difPy's **Fast Search Algorithm (FSA)** was used.
 
 ## Additional Parameters
 DifPy supports the following parameters:
@@ -113,10 +109,6 @@ DifPy supports the following parameters:
 dif(*directory, fast_search=True, recursive=True, similarity='duplicates', px_size=50, move_to=None, 
     show_progress=True, show_output=False, delete=False, silent_del=False, logs=False)
 ```
-
-:new: Since **[difPy v3.0.8](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.8)**, the `similarity` parameter accepts `'duplicates'` and `'similar'` as input options.
-
-:new: **[difPy v3.0](https://github.com/elisemercury/Duplicate-Image-Finder/releases/tag/v3.0.1)** now supports the use of its new **Fast Search Algorithm (FSA)**, capable of providing significant performance increases.
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
@@ -155,30 +147,6 @@ difPy_stats_xxx.json
 ```
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
-
-## Related Projects
-
-The below sections feature third-party work that has been **built with** or **inspired by** difPy. We would like to express a big thank you for any contributions made to difPy!
-
--------
-
-### I. DifPy as Webapp
-
-[A Streamlit based Webapp to find duplicate images from single/multiple directories](https://github.com/prateekralhan/Streamlit-based-Duplicate-Images-Finder) by @prateekralhan - :dna: **built with difPy**
-
-<p align="left">
-  <img src="https://user-images.githubusercontent.com/29462447/174408835-438234d9-5ff6-4159-a5e3-b908d885a8bc.gif" width="800" title="Single Directory Example">
-</p>
-
-### II. photosdup - Mac Photos Tool to Find Duplicates
-
-[Tool to scan a Mac Photos library for duplicates, thumbnails etc.](https://github.com/peter-sk/photosdup) by @peter-sk - :sparkles: **inspired by difPy**
-
--------
-
-<p align="center"><b>
-:thought_balloon: Also want to be featured in the "Related Projects" section? Check our <a href="https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy#be-featured-as-difpy-related-project">Contributor Guidelines</a> to find out how!
-</b></p>
 
 -------
 
