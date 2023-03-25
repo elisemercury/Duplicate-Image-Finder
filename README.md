@@ -151,8 +151,17 @@ difPy_stats_xxx.json
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
+## difPy Web App
+
+difPy can also be accessed via its new **web interface**. With difPy Web you compare **up to 200 images** and download a **deduplicated ZIP file** - all powered by difPy. [Read more](https://github.com/elisemercury/difPy-app). 
+
+:iphone: **Try the new [difPy Web App](https://difpy.app/)**!
+
 -------
 
-<p align="center"><b>
-We :heart: Open Source
-</b></p>
+❤️ difPy is an open source project with the aim of facilitating image deduplication - for everyone. Consider donating to support the project 🫶
+
+.. image:: https://img.shields.io/badge/Support-difPy-yellow?style=flat&logo=paypal&labelColor=white&logoWidth=20.svg/"
+   :target: https://paypal.me/eliselandman
+.. image:: https://img.shields.io/badge/Support-difPy-blueviolet?style=flat&logo=revolut&logoColor=black&labelColor=white&logoWidth=20.svg/"
+   :target: https://revolut.me/elisemercury
