@@ -401,8 +401,6 @@ class _help:
     '''
     A class used for difPy helper functions.
     '''
-
-    
     def _list_all_files(directory, recursive, limit_extensions):
         # Function that creates a list of all files in the directory
         skipped = []
