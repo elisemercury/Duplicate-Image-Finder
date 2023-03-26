@@ -110,7 +110,8 @@ difPy supports the following parameters:
 
 ```python
 dif(*directory, fast_search=True, recursive=True, similarity='duplicates', px_size=50, move_to=None, 
-    limit_extensions=False, show_progress=True, show_output=False, delete=False, silent_del=False, logs=False)
+    limit_extensions=False, show_progress=True, show_output=False, delete=False, silent_del=False, 
+    logs=False)
 ```
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.

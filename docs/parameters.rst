@@ -20,6 +20,7 @@ difPy supports the following parameters:
    :ref:`recursive`,``bool``,``True``,``False``
    :ref:`similarity`,"``str``, ``int``",``'duplicates'``, "``'similar'``, any ``int`` or ``float``"
    :ref:`px_size`,"``int``, ``float``",50,any ``int`` (not recommended to change default value)
+   :ref:`limit_extensions`,``bool``,``False``,``True``
    :ref:`show_progress`,``bool``,``True``,``False``
    :ref:`show_output`,``bool``,``False``,``True``
    :ref:`move_to`,``str``,``None``,folder path as ``str``
@@ -93,6 +94,21 @@ Absolute size in pixels (width x height) of the images before being compared. Th
 By default, ``px_size`` is set to ``50``.
 
 **Manual setting**: ``px_size`` can be manually adjusted by setting it to any ``int``.
+
+.. _limit_extensions:
+
+limit_extensions
+------------
+
+By default, difPy will try to decode all the files in the given directory to check if they are images. This is a very precise option, but consumes more time. To **speed up difPy** and limit difPy's decode only known image types, set ``limit_extensions`` to ``True``.
+
+.. note::
+
+   Predefined image types includes: 'apng', 'bw', 'cdf', 'cur', 'dcx', 'dds', 'dib', 'emf', 'eps', 'fli', 'flc', 'fpx', 'ftex', 'fits', 'gd', 'gd2', 'gif', 'gbr', 'icb', 'icns', 'iim', 'ico', 'im', 'imt', 'j2k', 'jfif', 'jfi', 'jif', 'jp2', 'jpe', 'jpeg', 'jpg', 'jpm', 'jpf', 'jpx', 'jpeg', 'mic', 'mpo', 'msp', 'nc', 'pbm', 'pcd', 'pcx', 'pgm', 'png', 'ppm', 'psd', 'pixar', 'ras', 'rgb', 'rgba', 'sgi', 'spi', 'spider', 'sun', 'tga', 'tif', 'tiff', 'vda', 'vst', 'wal', 'webp', 'xbm', 'xpm'.
+
+``False`` = (default) difPy searches through all the input files
+
+``True`` = difPy's search is limited to a set of predefined image types
 
 .. _show_progress:
 
