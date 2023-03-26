@@ -32,7 +32,9 @@ Due to its nature, FSA is very efficient when run on duplicate searches, but it 
 How to make difPy faster?
 ----------------
 
-difPy's processing speed can increase or decrease, depending on which parameter configurations are used. Speeding up the comparison process can be especially useful, when using difPy to compare a large number of images (>1'000 images). Below you will find some tips on which configurations can make difPy's processing faster:
+difPy's processing speed can increase or decrease, depending on which parameter configurations are used. Speeding up the comparison process can be especially useful when using difPy to compare a large number of images (>10'000 images). 
+
+Below you will find a list of configuration settings that can make difPy's processing faster:
 
 * Enable :ref:`fast_search` when searching for duplicates
 * Enable :ref:`limit_extensions`
