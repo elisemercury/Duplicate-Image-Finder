@@ -509,12 +509,12 @@ class _help:
 
 if __name__ == '__main__':
     # Parameters for when launching difPy via CLI
-    parser = argparse.ArgumentParser(description='Find duplicate or similar images on your computer with difPy - https://github.com/elisemercury/Duplicate-Image-Finder')
+    parser = argparse.ArgumentParser(description='Find duplicate or similar images with difPy - https://github.com/elisemercury/Duplicate-Image-Finder')
     parser.add_argument('-D', '--directory', type=str, nargs='+', help='Directory to search for images.', required=True)
     parser.add_argument('-Z', '--output_directory', type=str, help='Output directory for the difPy result files. Default is working dir.', required=False, default=None)
     parser.add_argument('-f', '--fast_search', type=lambda x: bool(strtobool(x)), help='Use difPys Fast Search Algorithm.', required=False, choices=[True, False], default=True)
-    parser.add_argument('-r', '--recursive', type=lambda x: bool(strtobool(x)), help='Scan subfolders for duplicate images', required=False, choices=[True, False], default=True)
-    parser.add_argument('-le', '--limit_extensions', type=lambda x: bool(strtobool(x)), help='Limit search to known image file extensions', required=False, choices=[True, False], default=False)
+    parser.add_argument('-r', '--recursive', type=lambda x: bool(strtobool(x)), help='Scan subfolders for duplicate images.', required=False, choices=[True, False], default=True)
+    parser.add_argument('-le', '--limit_extensions', type=lambda x: bool(strtobool(x)), help='Limit search to known image file extensions.', required=False, choices=[True, False], default=False)
     parser.add_argument('-s', '--similarity', type=_help._type_str_int, help='Similarity grade.', required=False, default='duplicates')
     parser.add_argument('-px', '--px_size', type=int, help='Compression size of images in pixels.', required=False, default=50)
     parser.add_argument('-p', '--show_progress', type=lambda x: bool(strtobool(x)), help='Show the real-time progress of difPy.', required=False, choices=[True, False], default=True)
