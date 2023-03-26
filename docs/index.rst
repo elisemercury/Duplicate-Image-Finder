@@ -28,6 +28,7 @@ Guide Content
    parameters
    contributing
    app
+   faq
 
 ------------
 
