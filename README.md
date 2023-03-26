@@ -110,7 +110,7 @@ difPy supports the following parameters:
 
 ```python
 dif(*directory, fast_search=True, recursive=True, similarity='duplicates', px_size=50, move_to=None, 
-    show_progress=True, show_output=False, delete=False, silent_del=False, logs=False)
+    limit_extensions=False, show_progress=True, show_output=False, delete=False, silent_del=False, logs=False)
 ```
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
@@ -126,9 +126,8 @@ python dif.py -D "C:/Path/to/Folder_A/" "C:/Path/to/Folder_B/" "C:/Path/to/Folde
 It supports the following arguments:
 
 ```python
-dif.py [-h] -D DIRECTORY [-Z OUTPUT_DIRECTORY] [-f {True,False}]
-       [-r {True,False}] [-s SIMILARITY] [-px PX_SIZE] 
-       [-p {True,False}] [-o {True,False}] [-mv MOVE_TO]
+dif.py [-h] -D DIRECTORY [-Z OUTPUT_DIRECTORY] [-f {True,False}] [-r {True,False}] [-s SIMILARITY] 
+       [-px PX_SIZE] [-mv MOVE_TO] [-le {True,False}] [-p {True,False}] [-o {True,False}]
        [-d {True,False}] [-sd {True,False}] [-l {True,False}]
 ```
 
@@ -140,6 +139,7 @@ dif.py [-h] -D DIRECTORY [-Z OUTPUT_DIRECTORY] [-f {True,False}]
 | `-r`| recursive | `-d` | delete |
 | `-s` | similarity |  `-sd` | silent_del |
 | `-px` | px_size | `-l` | logs |
+| `-le` | limit_extensions | | |
 
 When running from the CLI, the output of difPy is  written to files and saved in the working directory by default. To change the default output directory, specify the `-Z / -output_directory` parameter. The "xxx" in the output filenames is a unique timestamp:
 
