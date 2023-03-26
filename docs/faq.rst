@@ -3,6 +3,21 @@ FAQ
 
 .. _faq:
 
+.. _How to make difPy faster?:
+
+How to make difPy faster?
+----------------
+
+difPy's processing speed can increase or decrease, depending on which parameter configurations are used. Speeding up the comparison process can be especially relevant when using difPy to compare a large number of images. 
+
+Below is a list of **configuration settings** that can make **difPy's processing faster**:
+
+* Enable :ref:`fast_search` when searching for duplicates.
+* Enable :ref:`limit_extensions`.
+* Set :ref:`px_size` <= 50. Note: the lower the ``px_size``, the less precise the comparison will be. It is not recommended to go below a ``px_size`` of 20.
+
+Searching for similar images will always take more processing time, than searching for duplicates. This is due to the fact that difPy has to compare each image to each other image to check if these are similar. Duplicate image searching is more efficient thanks to difPy's Fast Search Algorithm.
+
 .. _Fast Search Algorithm (FSA):
 
 What is FSA (Fast Search Algorithm)?
@@ -28,14 +43,3 @@ Due to its nature, FSA is very efficient when run on duplicate searches, but it 
    *Example: imageA might be similar to imageB and imageC, but this does not imply that imageB is similar to imageC. Nevertheless, FSA would assume imageB and imageC to be equally similar and would therefore potentially return wrong results.*
 
 **When searching for similar images, difPy automatically disables FSA** to ensure accurate search results. This applies when :ref:`similarity` is set to ``'similar'`` **or** if :ref:`similarity` is manually set to a value ``> 0``.
-
-How to make difPy faster?
-----------------
-
-difPy's processing speed can increase or decrease, depending on which parameter configurations are used. Speeding up the comparison process can be especially useful when using difPy to compare a large number of images (>10'000 images). 
-
-Below you will find a list of configuration settings that can make difPy's processing faster:
-
-* Enable :ref:`fast_search` when searching for duplicates
-* Enable :ref:`limit_extensions`
-* Set :ref:`px_size` <= 50. Note: the lower the ``px_size``, the less precise the comparison will be. It is not recommended to go below a ``px_size`` of 20.

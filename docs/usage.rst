@@ -140,6 +140,8 @@ A **list** of duplicates/similar images that have the **lowest quality** among m
 
 To find the lower quality images, difPy compares all image file sizes within a match group and selects all images that have lowest image file size among the group.
 
+.. _Process Statistics:
+
 Process Statistics
 ^^^^^^^^^^
 
@@ -170,13 +172,14 @@ A **JSON formatted collection** with statistics on the completed difPy process:
     "skipped_files" : {"count" : 0,
                        "logs" : []} }
 
-The ``invalid_files`` logs are only outputted if the ``logs`` parameter is set to ``True``. See the :ref:`logs` section for more details.
+.. note::
+   The ``invalid_files``, ``deleted_files`` and ``skipped_files`` logs are only outputted if the ``logs`` parameter is set to ``True``. See the :ref:`logs` section for more details.
 
 .. _Supported File Types:
 
 Supported File Types
 ----------------
 
-difPy supports most popular image formats. Nevertheless, since it relies on the Pillow library for image decoding, the supported formats are restricted to the ones listed in the* `Pillow Documentation`_. Unsupported file types will by marked as invalid and included in the :ref:`invalid_files` output.
+difPy supports most popular image formats. Nevertheless, since it relies on the Pillow library for image decoding, the supported formats are restricted to the ones listed in the `Pillow Documentation`_. Unsupported file types will by marked as invalid and included in the :ref:`Process Statistics` output under ``invalid_files``.
 
 .. _Pillow Documentation: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
