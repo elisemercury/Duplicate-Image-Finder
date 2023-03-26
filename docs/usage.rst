@@ -164,9 +164,11 @@ A **JSON formatted collection** with statistics on the completed difPy process:
     "matches_found" : {"duplicates" : 52,
                        "similar" : 0},
     "invalid_files" : {"count" : 4,
-                       "logs" : {},
+                       "logs" : {}},
     "deleted_files" : {"count" : 4,
-                       "logs" : []}
+                       "logs" : []},
+    "skipped_files" : {"count" : 0,
+                       "logs" : []} }
 
 The ``invalid_files`` logs are only outputted if the ``logs`` parameter is set to ``True``. See the :ref:`logs` section for more details.
 
@@ -208,8 +210,8 @@ Due to its nature, FSA is very efficient when run on duplicate searches, but it 
 How to Speed Up difPy?
 ^^^^^^^^^^
 
-difPy's processing speed can increase or decrease, depending on which parameter configurations are used. Speeding up the comparison process can be especially useful, when using difPy to compare a large number of images (>1000 images). Below you will find some tips on which configurations can make difPy's processing faster:
+difPy's processing speed can increase or decrease, depending on which parameter configurations are used. Speeding up the comparison process can be especially useful, when using difPy to compare a large number of images (>1'000 images). Below you will find some tips on which configurations can make difPy's processing faster:
 
 * Enable :ref:`fast_search` when searching for duplicates
 * Enable :ref:`limit_extensions`
-* Set :ref:`px_size` <= 50. Note: the lower the ``px_size``, the less precise the comparison will be. 
+* Set :ref:`px_size` <= 50. Note: the lower the ``px_size``, the less precise the comparison will be. It is not recommended to go below a ``px_size`` of 20.

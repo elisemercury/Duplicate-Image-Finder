@@ -102,7 +102,8 @@ search.stats
  "matches_found" : {"duplicates" : 52, 
                     "similar" : 0},
  "invalid_files" : {"count" : 4},
- "deleted_files" : {"count" : 0}}
+ "deleted_files" : {"count" : 0},
+ "skipped_files" : {"count" : 0}}
 ```
 
 ## Additional Parameters
