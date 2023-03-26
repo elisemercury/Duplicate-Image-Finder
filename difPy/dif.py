@@ -8,7 +8,6 @@ import uuid
 import numpy as np
 from PIL import Image
 from distutils.util import strtobool
-import re
 import os
 import time
 from pathlib import Path
