@@ -204,3 +204,12 @@ Due to its nature, FSA is very efficient when run on duplicate searches, but it 
    *Example: imageA might be similar to imageB and imageC, but this does not imply that imageB is similar to imageC. Nevertheless, FSA would assume imageB and imageC to be equally similar and would therefore potentially return wrong results.*
 
 **When searching for similar images, difPy automatically disables FSA** to ensure accurate search results. This applies when :ref:`similarity` is set to ``'similar'`` **or** if :ref:`similarity` is manually set to a value ``> 0``.
+
+How to Speed Up difPy?
+^^^^^^^^^^
+
+difPy's processing speed can increase or decrease, depending on which parameter configurations are used. Speeding up the comparison process can be especially useful, when using difPy to compare a large number of images (>1000 images). Below you will find some tips on which configurations can make difPy's processing faster:
+
+* Enable :ref:`fast_search` when searching for duplicates
+* Enable :ref:`limit_extensions`
+* Set :ref:`px_size` <= 50. Note: the lower the ``px_size``, the less precise the comparison will be. 
