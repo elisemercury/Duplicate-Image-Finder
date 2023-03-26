@@ -122,9 +122,8 @@ class dif:
         '''Generates stats of the difPy process.
         '''
         if self.logs:
-            print(self.logs)
             invalid_stats = {'count': len(invalid_files),
-                             'logs' : invalid_files}
+                             'logs': invalid_files}
             deleted_stats = {'count': len(deleted_files), 
                              'logs': deleted_files}
             skipped_stats = {'count': len(skipped_files), 
@@ -293,23 +292,20 @@ class _compute:
             for id, file in id_by_location.items():
                 if show_progress:
                     _help._show_progress(count, total_count, task='preparing files')
-                if os.path.isdir(file):
-                    total_count -= 1
-                else:
-                    try:
-                        img = Image.open(file)
-                        if img.getbands() != ('R', 'G', 'B'):
-                            img = img.convert('RGB')
-                        img = img.resize((px_size, px_size), resample=Image.BICUBIC)
-                        img = np.asarray(img)
-                        imgs_matrices[id] = img
-                    except Exception as e:
-                        if e.__class__.__name__== 'UnidentifiedImageError':
-                            invalid_files[str(Path(file))] = f'UnidentifiedImageError: file could not be identified as image.'
-                        else:
-                            invalid_files[str(Path(file))] = str(e)
-                    finally:
-                        count += 1
+                try:
+                    img = Image.open(file)
+                    if img.getbands() != ('R', 'G', 'B'):
+                        img = img.convert('RGB')
+                    img = img.resize((px_size, px_size), resample=Image.BICUBIC)
+                    img = np.asarray(img)
+                    imgs_matrices[id] = img
+                except Exception as e:
+                    if e.__class__.__name__== 'UnidentifiedImageError':
+                        invalid_files[str(Path(file))] = f'UnidentifiedImageError: file could not be identified as image.'
+                    else:
+                        invalid_files[str(Path(file))] = str(e)
+                finally:
+                    count += 1
             for id in invalid_files:
                 id_by_location.pop(id, None)
             return imgs_matrices, invalid_files
@@ -405,23 +401,22 @@ class _help:
         # Function that creates a list of all files in the directory
         skipped = []
         directory_files = list(glob(str(directory) + '/**', recursive=recursive))
+        directory_files = [os.path.normpath(file) for file in directory_files if not os.path.isdir(file)]
         if limit_extensions:
             directory_files, skipped = _help._filter_extensions(directory_files)
-        directory_files = [os.path.normpath(file) for file in directory_files]
         return directory_files, skipped
     
     def _filter_extensions(directory_files):
         # function that filters files into those with & without valid image extensions
-        valid_extensions = ('apng', 'bw', 'cdf', 'cur', 'dcx', 'dds', 'dib', 'emf', 'eps', 'fli', 'flc', 'fpx', 'ftex', 'fits', 'gd', 'gd2', 'gif', 'gbr', 'icb', 'icns', 'iim', 'ico', 'im', 'imt', 'j2k', 'jfif', 'jfi', 'jif', 'jp2', 'jpe', 'jpeg', 'jpg', 'jpm', 'jpf', 'jpx', 'jpeg', 'mic', 'mpo', 'msp', 'nc', 'pbm', 'pcd', 'pcx', 'pgm', 'png', 'ppm', 'psd', 'pixar', 'ras', 'rgb', 'rgba', 'sgi', 'spi', 'spider', 'sun', 'tga', 'tif', 'tiff', 'vda', 'vst', 'wal', 'webp', 'xbm', 'xpm')
+        valid_extensions = ('.apng', '.bw', '.cdf', '.cur', '.dcx', '.dds', '.dib', '.emf', '.eps', '.fli', '.flc', '.fpx', '.ftex', '.fits', '.gd', '.gd2', '.gif', '.gbr', '.icb', '.icns', '.iim', '.ico', '.im', '.imt', '.j2k', '.jfif', '.jfi', '.jif', '.jp2', '.jpe', '.jpeg', '.jpg', '.jpm', '.jpf', '.jpx', '.jpeg', '.mic', '.mpo', '.msp', '.nc', '.pbm', '.pcd', '.pcx', '.pgm', '.png', '.ppm', '.psd', '.pixar', '.ras', '.rgb', '.rgba', '.sgi', '.spi', '.spider', '.sun', '.tga', '.tif', '.tiff', '.vda', '.vst', '.wal', '.webp', '.xbm', '.xpm')
         filtered_list = []
         skipped_list = []
         for f in directory_files:
-            ext = re.search("\.([a-zA-Z0-9]+)$", f)
-            if ext:
-                if ext.group(1).lower() in valid_extensions:
-                    filtered_list.append(f)
-                else:
-                    skipped_list.append(f)
+            file_extension = os.path.splitext(f)[1]
+            if file_extension.lower() in valid_extensions:
+                filtered_list.append(f)
+            else:
+                skipped_list.append(f)
         return filtered_list, skipped_list
 
     def _show_img_figs(img_A, img_B, err):
