@@ -8,11 +8,12 @@ difPy supports the following parameters:
 .. code-block:: python
 
    dif(directory*, fast_search=True, recursive=True, similarity='duplicates', px_size=50, move_to=None
-       show_progress=True, show_output=False, delete=False, silent_del=False, logs=False)
+       limit_extensions=False, show_progress=True, show_output=False, delete=False, silent_del=False, 
+       logs=False)
 
 .. csv-table::
    :header: Parameter,Input Type,Default Value,Other Values
-   :widths: 20, 10, 10, 10
+   :widths: 10, 10, 10, 20
    :class: tight-table
 
    :ref:`directory`,"``str``, ``list``",,
@@ -100,11 +101,11 @@ By default, ``px_size`` is set to ``50``.
 limit_extensions
 ------------
 
-By default, difPy will try to decode all the files in the given directory to check if they are images. This is a very precise option, but consumes more time. To **speed up difPy** and limit difPy's decode only known image types, set ``limit_extensions`` to ``True``.
+By default, difPy will try to decode all the files in the given directory to check if they are images. This is a very precise option, but consumes more time. To **speed up difPy** and limit it to decode only predefined image types, set ``limit_extensions`` to ``True``.
 
 .. note::
 
-   Predefined image types includes: 'apng', 'bw', 'cdf', 'cur', 'dcx', 'dds', 'dib', 'emf', 'eps', 'fli', 'flc', 'fpx', 'ftex', 'fits', 'gd', 'gd2', 'gif', 'gbr', 'icb', 'icns', 'iim', 'ico', 'im', 'imt', 'j2k', 'jfif', 'jfi', 'jif', 'jp2', 'jpe', 'jpeg', 'jpg', 'jpm', 'jpf', 'jpx', 'jpeg', 'mic', 'mpo', 'msp', 'nc', 'pbm', 'pcd', 'pcx', 'pgm', 'png', 'ppm', 'psd', 'pixar', 'ras', 'rgb', 'rgba', 'sgi', 'spi', 'spider', 'sun', 'tga', 'tif', 'tiff', 'vda', 'vst', 'wal', 'webp', 'xbm', 'xpm'.
+   Predefined image types includes: ``apng``, ``bw``, ``cdf``, ``cur``, ``dcx``, ``dds``, ``dib``, ``emf``, ``eps``, ``fli``, ``flc``, ``fpx``, ``ftex``, ``fits``, ``gd``, ``gd2``, ``gif``, ``gbr``, ``icb``, ``icns``, ``iim``, ``ico``, ``im``, ``imt``, ``j2k``, ``jfif``, ``jfi``, ``jif``, ``jp2``, ``jpe``, ``jpeg``, ``jpg``, ``jpm``, ``jpf``, ``jpx``, ``jpeg``, ``mic``, ``mpo``, ``msp``, ``nc``, ``pbm``, ``pcd``, ``pcx``, ``pgm``, ``png``, ``ppm``, ``psd``, ``pixar``, ``ras``, ``rgb``, ``rgba``, ``sgi``, ``spi``, ``spider``, ``sun``, ``tga``, ``tif``, ``tiff``, ``vda``, ``vst``, ``wal``, ``webp``, ``xbm``, ``xpm``.
 
 ``False`` = (default) difPy searches through all the input files
 
