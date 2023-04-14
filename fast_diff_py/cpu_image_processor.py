@@ -51,14 +51,13 @@ class CPUImageProcessing:
     The class needs to be aware of the availability of cuda / cupy and use it if indicated by the slave running the
     class.
     """
-    # TODO Make class Cupy compatible
     identifier: int
 
-    image_a_path: str = None
-    image_b_path: str = None
+    image_a_path: Union[str, None] = None
+    image_b_path: Union[str, None] = None
 
-    thumb_a_path: str = None
-    thumb_b_path: str = None
+    thumb_a_path: Union[str, None] = None
+    thumb_b_path: Union[str, None] = None
 
     image_a_matrix: Union[np.ndarray, None] = None
     image_b_matrix: Union[np.ndarray, None] = None
@@ -81,6 +80,7 @@ class CPUImageProcessing:
 
     processing_args: CompareImageArguments = None
     preprocessing_args: PreprocessArguments = None
+    last_args: Union[CompareImageArguments, PreprocessArguments] = None
 
     error: str = None
 
@@ -103,15 +103,37 @@ class CPUImageProcessing:
         else:
             self.compare_func = self.mse
 
-    def reset_diff(self):
+    def reset(self):
         """
-        Utility to reset the diff values.
+        Utility to reset the .
         :return:
         """
+
+        # Reset the class for further processing.
+        self.image_a_path = None
+        self.image_b_path = None
+
+        self.thumb_a_path = None
+        self.thumb_b_path = None
+
+        self.image_a_matrix = None
+        self.image_b_matrix = None
+
+        self.target_size_x = 64
+        self.target_size_y = 64
+
+        self.original_size_x = 0
+        self.original_size_y = 0
+
         self.diff_0 = 0
         self.diff_90 = 0
         self.diff_180 = 0
         self.diff_270 = 0
+
+        self.hash_0 = ""
+        self.hash_90 = ""
+        self.hash_180 = ""
+        self.hash_270 = ""
 
     @staticmethod
     def mse(image_a: np.ndarray, image_b: np.ndarray) -> float:
@@ -135,6 +157,9 @@ class CPUImageProcessing:
         """
         self.preprocessing_args = args
         self.error = ""
+
+        if self.last_args is CompareImageArguments:
+            self.reset()
 
         if self.image_a_path != args.in_path:
             load = True
@@ -208,6 +233,10 @@ class CPUImageProcessing:
         self.error = ""
         load_a = False
         load_b = False
+
+        # Reset the Class for further processing
+        if self.last_args is PreprocessArguments:
+            self.reset()
 
         # reload Image A if thumb or image has changed
         if self.image_a_path != args.img_a or self.thumb_a_path != args.thumb_a:
