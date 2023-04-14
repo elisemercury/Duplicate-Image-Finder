@@ -28,7 +28,6 @@ Features:
 
 
 # TODO single processing handler
-# TODO Reset Processing Class if the arguments are switched.
 # ----------------------------------------------------------------------------------------------------------------------
 # FEATURES
 # ----------------------------------------------------------------------------------------------------------------------
@@ -293,11 +292,11 @@ class FastDifPy:
     second_loop_base_a: bool = True
 
     # argument storage
-    matching_hash: bool = False
-    has_thumb: bool = False
-    matching_aspect: bool = False
-    make_diff_plots: bool = False
-    plot_output_dir: str = None
+    sl_matching_hash: bool = False
+    sl_has_thumb: bool = False
+    sl_matching_aspect: bool = False
+    sl_make_diff_plots: bool = False
+    sl_plot_output_dir: str = None
 
     # multiprocessing handles
     cpu_handles = None
@@ -816,7 +815,7 @@ class FastDifPy:
         if not os.path.exists(diff_location):
             os.makedirs(diff_location)
 
-        self.plot_output_dir = diff_location
+        self.sl_plot_output_dir = diff_location
         self.db.create_plot_table(purge=purge)
 
     def second_loop_iteration(self, only_matching_aspect: bool = False, only_matching_hash: bool = False,
@@ -846,11 +845,11 @@ class FastDifPy:
         assert cpu_proc >= 1, "Number of GPU Processes needs to be greater than zero"
 
         # storing arguments in attributes to reduce number of args of function
-        self.matching_aspect = only_matching_aspect
-        self.make_diff_plots = make_diff_plots
-        self.matching_hash = only_matching_hash
+        self.sl_matching_aspect = only_matching_aspect
+        self.sl_make_diff_plots = make_diff_plots
+        self.sl_matching_hash = only_matching_hash
 
-        self.has_thumb = self.db.test_thumb_table_existence()
+        self.sl_has_thumb = self.db.test_thumb_table_existence()
 
         if make_diff_plots:
             self.create_plot_dir(diff_location=diff_location)
@@ -1397,12 +1396,12 @@ class FastDifPy:
         thumb_a_path = None
         thumb_b_path = None
 
-        if self.has_thumb:
+        if self.sl_has_thumb:
             thumb_a_path = self.get_thumb_path_from_db(key=row_a["key"], dir_a=True)
             thumb_b_path = self.get_thumb_path_from_db(key=row_b["key"], dir_a=True)
 
         # performing match if desired
-        if self.matching_aspect:
+        if self.sl_matching_aspect:
             if not self.match_aspect(row_a=row_a, row_b=row_b):
                 return False
 
@@ -1415,7 +1414,7 @@ class FastDifPy:
             key_a=row_a["key"],
             key_b=row_b["key"],
             store_path=self.create_plt_name(key_a=row_a["key"], key_b=row_b["key"]),
-            store_compare=self.make_diff_plots,
+            store_compare=self.sl_make_diff_plots,
             compare_threshold=self.similarity_threshold,
             size_x=self.thumbnail_size_x,
             size_y=self.thumbnail_size_y,
@@ -1436,11 +1435,11 @@ class FastDifPy:
         :param key_b: key of the second image
         :return: path to the plot or None
         """
-        if not self.make_diff_plots:
+        if not self.sl_make_diff_plots:
             return None
 
         nm = self.db.make_plot_name(key_a=key_a, key_b=key_b)
-        return os.path.join(self.plot_output_dir, nm)
+        return os.path.join(self.sl_plot_output_dir, nm)
 
     @staticmethod
     def match_aspect(row_a: dict, row_b: dict):
