@@ -2093,8 +2093,14 @@ class FastDifPy:
             self.logger.debug("Logger has previous handlers, reconnecting them, assuming default config.")
             for handler in self.logger.handlers:
                 if type(handler) is logging.StreamHandler:
+
+                    # Follows from type checking
+                    handler: logging.StreamHandler
                     self.stream_handler = handler
                 if type(handler) is logging.FileHandler:
+
+                    # Follows from Type checking
+                    handler: logging.FileHandler
                     if handler.level is logging.WARNING:
                         self.file_handler = handler
                     else:
