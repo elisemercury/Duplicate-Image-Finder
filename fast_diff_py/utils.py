@@ -56,6 +56,7 @@ def walking_hash(mat: np.ndarray) -> str:
     walk(sha256_hash, mat)
     return sha256_hash.hexdigest()
 
+
 def fill(base: str, length: int, fill_char: str = " ", left: bool = True) -> str:
     """
     Fill a string with a character to a certain length.
