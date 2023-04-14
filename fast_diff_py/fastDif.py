@@ -1790,7 +1790,6 @@ class FastDifPy:
 
         print("-"*120)
 
-
     def spawn_duplicate_error_worker(self):
         """
         TODO Docstring
