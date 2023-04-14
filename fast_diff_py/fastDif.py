@@ -1639,6 +1639,10 @@ class FastDifPy:
         thumb_dir = self.thumb_dir_a if dir_a else self.thumb_dir_b
         return os.path.join(thumb_dir, thumb_name[1])
 
+    # ==================================================================================================================
+    # DATA RETRIEVAL FUNCTIONS
+    # ==================================================================================================================
+
     def get_duplicates(self, similarity: float = None, dif_based: bool = True):
         """
         Builds the duplicates clusters. The function returns the
