@@ -844,6 +844,10 @@ class FastDifPy:
         self.db.commit()
         return True
 
+    # ==================================================================================================================
+    # SECOND LOOP ITERATION / DIFFERENCE RATING
+    # ==================================================================================================================
+
     def second_loop_iteration(self, only_matching_aspect: bool = False, only_matching_hash: bool = False,
                               make_diff_plots: bool = False, similarity_threshold: float = 200.0, gpu_proc: int = 0,
                               cpu_proc: int = None, diff_location: str = None):
