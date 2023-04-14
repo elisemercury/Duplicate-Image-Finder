@@ -530,6 +530,38 @@ class FastDifPy:
 
         return byte_count_a, byte_count_b
 
+    def clean_up(self, thumbs: bool = True, db: bool = True):
+        """
+        Remove thumbnails and db.
+
+        :param thumbs: Delete Thumbnail directories
+        :param db: Delete Database
+        :return:
+        """
+        if thumbs:
+            self.logger.info("Deleting Thumbnails")
+            try:
+                shutil.rmtree(self.thumb_dir_a)
+                self.logger.info(f"Deleted {self.thumb_dir_a}")
+            except FileNotFoundError:
+                pass
+            if self.has_dir_b:
+                try:
+                    shutil.rmtree(self.thumb_dir_b)
+                    self.logger.info(f"Deleted {self.thumb_dir_b}")
+                except FileNotFoundError:
+                    pass
+
+        if db:
+            self.db.disconnect()
+            self.db.free()
+            self.db = None
+            self.logger.info("Deleted temporary database")
+
+    # ==================================================================================================================
+    # COMMON LOOP FUNCTIONS
+    # ==================================================================================================================
+
     def check_create_thumbnail_dir(self):
         """
         Create the thumbnail directories if they don't exist already.
@@ -542,25 +574,54 @@ class FastDifPy:
         if self.has_dir_b and not os.path.exists(self.thumb_dir_b):
             os.makedirs(self.thumb_dir_b)
 
-    def generate_thumbnail_path(self, key: int, filename: str, dir_a: bool):
+    def send_termination_signal(self, first_loop: bool = False):
         """
-        Generate the thumbnail_path first tries to fetch the thumbnail name from the db if it exists already,
-        otherwise generate a new name.
+        Sends None in the queues to the child processes, which is the termination signal for them.
 
-        :param key: key in the directory_x table
-        :param filename: the name of the file with extension
-        :param dir_a: if the file is located in directory a or b
-        :return: the thumbnail path.
+        :param first_loop: if the termination signal needs to be sent to the children of the first or the second loop
+        :return:
         """
-        name = self.db.get_thumb_name(key)
-        directory = self.thumb_dir_a if dir_a else self.thumb_dir_b
+        if first_loop:
+            for i in range((len(self.cpu_handles) + len(self.gpu_handles)) * 4):
+                self.first_loop_in.put(None)
 
-        # return the name if it existed already
-        if name is not None:
-            return os.path.join(directory, name[1])
+            return
+        for q in self.second_loop_in:
+            [q.put(None) for _ in range(4)]
 
-        name = self.db.generate_new_thumb_name(key, filename, dir_a=dir_a, retry_limit=self.retry_limit)
-        return os.path.join(directory, name)
+    def join_all_children(self):
+        """
+        Check the results of all spawned processes and verify they produced a True as a result ergo, they computed
+        successfully.
+
+        :return:
+        """
+        cpu_proc = len(self.cpu_handles)
+
+        # all processes should be done now, iterating through and killing them if they're still alive.
+        for i in range(len(self.cpu_handles)):
+            p = self.cpu_handles[i]
+            try:
+                self.logger.info(f"Trying to join process {i} Process Alive State is {p.is_alive()}")
+                p.join(1)
+                if p.is_alive():
+                    self.logger.info(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
+                    p.kill()
+            except TimeoutError:
+                self.logger.warning(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
+                p.kill()
+
+        for i in range(len(self.gpu_handles)):
+            p = self.gpu_handles[i]
+            try:
+                self.logger.info(f"Trying to join process {i + cpu_proc} Process State is {p.is_alive()}")
+                p.join(1)
+                if p.is_alive():
+                    self.logger.info(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
+                    p.kill()
+            except TimeoutError:
+                self.logger.warning(f"Process {i + cpu_proc} timed out. Alive state: {p.is_alive()}; killing it.")
+                p.kill()
 
     # ------------------------------------------------------------------------------------------------------------------
     # FIRST LOOP ITERATION; PREPROCESSING / ABSOLUTE MATCHING
@@ -689,6 +750,26 @@ class FastDifPy:
                                             f"Remaining: {self.first_loop_out.qsize()}"
         self.logger.info("All Images have been preprocessed.")
 
+    def generate_thumbnail_path(self, key: int, filename: str, dir_a: bool):
+        """
+        Generate the thumbnail_path first tries to fetch the thumbnail name from the db if it exists already,
+        otherwise generate a new name.
+
+        :param key: key in the directory_x table
+        :param filename: the name of the file with extension
+        :param dir_a: if the file is located in directory a or b
+        :return: the thumbnail path.
+        """
+        name = self.db.get_thumb_name(key)
+        directory = self.thumb_dir_a if dir_a else self.thumb_dir_b
+
+        # return the name if it existed already
+        if name is not None:
+            return os.path.join(directory, name[1])
+
+        name = self.db.generate_new_thumb_name(key, filename, dir_a=dir_a, retry_limit=self.retry_limit)
+        return os.path.join(directory, name)
+
     def __generate_first_loop_obj(self, amount: int, compute_hash: bool, compute_thumbnails: bool) \
             -> Union[PreprocessArguments, None]:
         """
@@ -762,54 +843,6 @@ class FastDifPy:
         # to be sure commit here.
         self.db.commit()
         return True
-
-    def clean_up(self, thumbs: bool = True, db: bool = True):
-        """
-        Remove thumbnails and db.
-
-        :param thumbs: Delete Thumbnail directories
-        :param db: Delete Database
-        :return:
-        """
-        if thumbs:
-            self.logger.info("Deleting Thumbnails")
-            try:
-                shutil.rmtree(self.thumb_dir_a)
-                self.logger.info(f"Deleted {self.thumb_dir_a}")
-            except FileNotFoundError:
-                pass
-            if self.has_dir_b:
-                try:
-                    shutil.rmtree(self.thumb_dir_b)
-                    self.logger.info(f"Deleted {self.thumb_dir_b}")
-                except FileNotFoundError:
-                    pass
-
-        if db:
-            self.db.disconnect()
-            self.db.free()
-            self.db = None
-            self.logger.info("Deleted temporary database")
-
-    def create_plot_dir(self, diff_location: str, purge: bool = False):
-        """
-        Verifies the provided directory, creates if it doesn't exist.
-        Initializes the Database for plot names as well.
-
-        :param diff_location: path to plot where the plots are to be saved
-        :param purge: purge the plot database before running.
-        :return:
-        """
-        if diff_location is None:
-            raise ValueError("If plots are to be generated, an output folder needs to be specified.")
-        if not os.path.isdir(diff_location):
-            raise ValueError("Plot location doesn't specify a valid directory path")
-
-        if not os.path.exists(diff_location):
-            os.makedirs(diff_location)
-
-        self.sl_plot_output_dir = diff_location
-        self.db.create_plot_table(purge=purge)
 
     def second_loop_iteration(self, only_matching_aspect: bool = False, only_matching_hash: bool = False,
                               make_diff_plots: bool = False, similarity_threshold: float = 200.0, gpu_proc: int = 0,
@@ -960,6 +993,27 @@ class FastDifPy:
 
         self.db.commit()
         self.logger.debug("Data should be committed")
+
+    def create_plot_dir(self, diff_location: str, purge: bool = False):
+        """
+        Verifies the provided directory, creates if it doesn't exist.
+        Initializes the Database for plot names as well.
+
+        :param diff_location: path to plot where the plots are to be saved
+        :param purge: purge the plot database before running.
+        :return:
+        """
+        if diff_location is None:
+            raise ValueError("If plots are to be generated, an output folder needs to be specified.")
+        if not os.path.isdir(diff_location):
+            raise ValueError("Plot location doesn't specify a valid directory path")
+
+        if not os.path.exists(diff_location):
+            os.makedirs(diff_location)
+
+        self.sl_plot_output_dir = diff_location
+        self.db.create_plot_table(purge=purge)
+
 
     def update_queues(self):
         results = self.__refill_queues()
@@ -1495,55 +1549,6 @@ class FastDifPy:
         else:
             self.db.insert_dif_error(key_a=res_obj.key_a, key_b=res_obj.key_b, error=res_obj.error)
         return True
-
-    def send_termination_signal(self, first_loop: bool = False):
-        """
-        Sends None in the queues to the child processes, which is the termination signal for them.
-
-        :param first_loop: if the termination signal needs to be sent to the children of the first or the second loop
-        :return:
-        """
-        if first_loop:
-            for i in range((len(self.cpu_handles) + len(self.gpu_handles)) * 4):
-                self.first_loop_in.put(None)
-
-            return
-        for q in self.second_loop_in:
-            [q.put(None) for _ in range(4)]
-
-    def join_all_children(self):
-        """
-        Check the results of all spawned processes and verify they produced a True as a result ergo, they computed
-        successfully.
-
-        :return:
-        """
-        cpu_proc = len(self.cpu_handles)
-
-        # all processes should be done now, iterating through and killing them if they're still alive.
-        for i in range(len(self.cpu_handles)):
-            p = self.cpu_handles[i]
-            try:
-                self.logger.info(f"Trying to join process {i} Process Alive State is {p.is_alive()}")
-                p.join(1)
-                if p.is_alive():
-                    self.logger.info(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
-                    p.kill()
-            except TimeoutError:
-                self.logger.warning(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
-                p.kill()
-
-        for i in range(len(self.gpu_handles)):
-            p = self.gpu_handles[i]
-            try:
-                self.logger.info(f"Trying to join process {i + cpu_proc} Process State is {p.is_alive()}")
-                p.join(1)
-                if p.is_alive():
-                    self.logger.info(f"Process {i} timed out. Alive state: {p.is_alive()}; killing it.")
-                    p.kill()
-            except TimeoutError:
-                self.logger.warning(f"Process {i + cpu_proc} timed out. Alive state: {p.is_alive()}; killing it.")
-                p.kill()
 
     def check_children(self, gpu: bool = False, cpu: bool = False):
         """
