@@ -1348,7 +1348,7 @@ class FastDifPy:
         if self.second_loop_base_a:
             for row in rows:
                 # The last_key can be set if we have second_loop_base_a and no dir_b because we're looking only at an
-                # upper triangular matrix of the Kartesian product of the elements of the image itself.
+                # upper triangular matrix of the Cartesian product of the elements of the image itself.
                 temp = {"row_a": row, "last_key": None if self.has_dir_b else row["key"]}
 
                 self.second_loop_queue_status.append(temp)
