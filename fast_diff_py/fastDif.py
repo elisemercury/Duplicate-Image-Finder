@@ -912,7 +912,7 @@ class FastDifPy:
         self.db.create_dif_table()
 
         # prefill
-        self.__init_queues(procs=gpu_proc + cpu_proc)
+        self.__init_queues(processes=gpu_proc + cpu_proc)
 
         # starting all processes
         for i in range(cpu_proc):
@@ -1017,7 +1017,6 @@ class FastDifPy:
 
         self.sl_plot_output_dir = diff_location
         self.db.create_plot_table(purge=purge)
-
 
     def update_queues(self):
         results = self.__refill_queues()
@@ -1310,11 +1309,11 @@ class FastDifPy:
         self.second_loop_queue_status = {"last_a": last_a, "last_b": last_b}
         return add_count if add_count > 0 else None
 
-    def __init_queues(self, procs: int):
+    def __init_queues(self, processes: int):
         """
         Initialize the state describing variables as well as the queues for the second loop.
 
-        :param procs: number of processes that are running
+        :param processes: number of processes that are running
         :return:
         """
         # we are using less optimized, so we are going straight for the not optimized algorithm.
@@ -1323,23 +1322,24 @@ class FastDifPy:
             return
 
         # from a fetch the first set of images
-        rows = self.db.fetch_many_after_key(directory_a=True, count=procs)
+        rows = self.db.fetch_many_after_key(directory_a=True, count=processes)
         self.second_loop_base_a = True
 
         # check if folder a has enough, so we can iterate using the files as fixed during an iteration and then switch
         # the file.
-        if len(rows) < procs:
+        if len(rows) < processes:
             if self.has_dir_b:
 
                 # trying to use the directory b as a fixed directory
-                rows = self.db.fetch_many_after_key(directory_a=False, count=procs)
-                if len(rows) < procs:
-                    self.__refill_queues_small_non_optimized(init=True, procs=procs)
+                rows = self.db.fetch_many_after_key(directory_a=False, count=processes)
+                if len(rows) < processes:
+                    self.__refill_queues_small_non_optimized(init=True, procs=processes)
                     return
                 else:
                     self.second_loop_base_a = False
+            # No directory b and less than number of processes images.
             else:
-                self.__refill_queues_small_non_optimized(init=True, procs=procs)
+                self.__refill_queues_small_non_optimized(init=True, procs=processes)
                 return
 
         # populating the files of the second loop.
@@ -1347,6 +1347,8 @@ class FastDifPy:
 
         if self.second_loop_base_a:
             for row in rows:
+                # The last_key can be set if we have second_loop_base_a and no dir_b because we're looking only at an
+                # upper triangular matrix of the Kartesian product of the elements of the image itself.
                 temp = {"row_a": row, "last_key": None if self.has_dir_b else row["key"]}
 
                 self.second_loop_queue_status.append(temp)
