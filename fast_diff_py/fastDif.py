@@ -954,7 +954,6 @@ class FastDifPy:
 
             count = 0
 
-
         # check if the tasks were empty.
         assert not self.handle_results_second_queue(), "Existed without having run out of tasks and without all " \
                                                        "processes having stopped."
