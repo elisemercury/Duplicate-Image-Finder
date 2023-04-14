@@ -278,7 +278,7 @@ class FastDifPy:
 
     db: Union[Database, None]
 
-    # short circuiting variables
+    # short-circuiting variables
     has_any_images: bool = False
 
     # relative to child processes
@@ -562,8 +562,12 @@ class FastDifPy:
         name = self.db.generate_new_thumb_name(key, filename, dir_a=dir_a, retry_limit=self.retry_limit)
         return os.path.join(directory, name)
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # FIRST LOOP ITERATION; PREPROCESSING / ABSOLUTE MATCHING
+    # ------------------------------------------------------------------------------------------------------------------
+
     def first_loop_iteration(self, compute_thumbnails: bool = True, compute_hash: bool = False, amount: int = 4,
-                             gpu_proc: int = 0, cpu_proc: int = None, purge: bool = True):
+                             cpu_proc: int = None, purge: bool = True):
         """
         Perform the preprocessing step. I.e. compute hashes, get image sizes, resize the images and store the
         thumbnails.
@@ -584,7 +588,6 @@ class FastDifPy:
         :param compute_thumbnails: Resize images and store them temporarily
         :param compute_hash: Compute hashes of the image
         :param amount: shift amount before hash
-        :param gpu_proc: number of processes using gpu [not implemented]
         :param cpu_proc: number of cpu processes. Default number of system cores.
         :param purge: if the database should be purged before the loop runs.
         :return:
@@ -594,12 +597,8 @@ class FastDifPy:
             self.logger.debug("No images in database, aborting.")
             return
 
-        assert gpu_proc >= 0, "Number of GPU Processes needs to be greater than zero"
         if cpu_proc is None:
             cpu_proc = mp.cpu_count()
-
-        if gpu_proc > 0:
-            self.logger.warning("Currently not implemented, adding to cpu procs.")
 
         # store thumbnails if possible.
         if compute_hash:
@@ -626,7 +625,7 @@ class FastDifPy:
         run = True
 
         # prefill loop
-        for i in range(cpu_proc + gpu_proc):
+        for i in range(cpu_proc):
             arg = self.__generate_first_loop_obj(amount=amount, compute_hash=compute_hash,
                                                  compute_thumbnails=compute_thumbnails)
 
@@ -643,12 +642,6 @@ class FastDifPy:
             p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, False, v))
             p.start()
             self.cpu_handles.append(p)
-
-        # start processes for gpu
-        for i in range(cpu_proc, gpu_proc + cpu_proc):
-            p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, True, v))
-            p.start()
-            self.gpu_handles.append(p)
 
         # turn main loop into handler and perform monitoring of the threads.
         none_counter = 0
@@ -672,7 +665,7 @@ class FastDifPy:
                 timeout += 1
 
             # if this point is reached, all processes should be done and the queues empty.
-            if none_counter >= cpu_proc + gpu_proc:
+            if none_counter >= cpu_proc:
                 run = False
 
             # at this point we should have been idling for 60s
