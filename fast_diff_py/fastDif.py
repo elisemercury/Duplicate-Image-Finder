@@ -1063,6 +1063,7 @@ class FastDifPy:
                 self.second_loop_in[p].put(None)
                 continue
 
+            # TODO Test performance if this is not in there.
             try:
                 inserted_count = 100 - self.second_loop_in[p].qsize()
 
@@ -1073,6 +1074,8 @@ class FastDifPy:
 
             not_full = True
             iterations = 0
+            slqs = self.second_loop_queue_status
+
             while not_full:
                 # break if the queue is full
                 if self.second_loop_in[p].full():
@@ -1080,29 +1083,35 @@ class FastDifPy:
 
                 if self.second_loop_base_a:
                     for i in range(len(row_b)):
-                        insertion_success = self.schedule_pair(row_a=self.second_loop_queue_status[p]["row_a"],
-                                                               row_b=row_b[i], queue_index=p)
+                        # Fetch the row from self or the parent.
+                        row_a_tmp = slqs[slqs[p]["parent"]]["row_a"] if "parent" in slqs[p].keys() else slqs[p]["row_a"]
+
+                        insertion_success = self.schedule_pair(row_a=row_a_tmp, row_b=row_b[i], queue_index=p)
                         inserted_count -= int(insertion_success)
                         inserted += int(insertion_success)
 
                 else:
                     for i in range(len(row_a)):
-                        insertion_success = self.schedule_pair(row_a=row_a[i],
-                                                               row_b=self.second_loop_queue_status[p]["row_b"],
-                                                               queue_index=p)
+                        # Fetch the row from self or the parent.
+                        row_b_tmp = slqs[slqs[p]["parent"]]["row_b"] if "parent" in slqs[p].keys() else slqs[p]["row_b"]
+
+                        insertion_success = self.schedule_pair(row_a=row_a[i], row_b=row_b_tmp, queue_index=p)
                         inserted_count -= int(insertion_success)
                         inserted += int(insertion_success)
 
                 iterations += 1
 
+                # get the correct slqs
+                target = slqs[slqs[p]["parent"]] if "parent" in slqs[p].keys() else slqs[p]
+
                 # update last key
                 if self.has_dir_b:
                     if not self.second_loop_base_a:
-                        self.second_loop_queue_status[p]["last_key"] = row_a[-1]["key"]
+                        target["last_key"] = row_a[-1]["key"]
                     else:
-                        self.second_loop_queue_status[p]["last_key"] = row_b[-1]["key"]
+                        target["last_key"] = row_b[-1]["key"]
                 else:
-                    self.second_loop_queue_status[p]["last_key"] = row_b[-1]["key"]
+                    target["last_key"] = row_b[-1]["key"]
 
                 row_a, row_b = self.__fetch_rows(p=p)
 
