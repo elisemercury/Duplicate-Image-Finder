@@ -1444,6 +1444,31 @@ class FastDifPy:
         self.second_loop_queue_status[p] = {"row_a": rows[0], "last_key": rows[0]["key"]}
         return True
 
+    def __check_indirection(self, p: int) -> bool:
+        """
+        Go through all processes and check if a new parent is available (so we coprocess a row in the matrix.)
+        If this is not the case, we return False and proceed to put None's into the queue to tell the process to stop.
+
+        :param p: index in the process status list, i.e. the current process id.
+        :return: weather a new parent was found or not.
+        """
+        success = False
+        for i in range(len(self.second_loop_queue_status)):
+            if "parent" in self.second_loop_queue_status[i].keys():
+                continue
+
+            # Find a new parent.
+            self.second_loop_queue_status[p]["parent"] = i
+            success = True
+            break
+
+        # increment the children of the process when it is the time that its row runs out of elements to process too
+        for status in self.second_loop_queue_status:
+            if "parent" in status.keys() and status["parent"] == p:
+                status["parent"] = self.second_loop_queue_status[p]["parent"]
+
+        return success
+
     def __fetch_rows(self, p: int, count: int = 100) -> Tuple[list, list]:
         """
         Fetch the next up to 100 rows for the ingest process into the children.
