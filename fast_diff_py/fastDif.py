@@ -1390,6 +1390,14 @@ class FastDifPy:
         # TODO implement smart algorithm to find next image for the process that is now done.
         next_key = 0
 
+        if "parent" in self.second_loop_queue_status[p].keys():
+            if self.__check_indirection(p=p):
+                return True
+
+            if not self.second_loop_in[p].full():
+                self.second_loop_in[p].put(None)
+            return False
+
         # get the limit for the next key
         for i in range(len(self.second_loop_queue_status)):
             if self.has_dir_b:
@@ -1418,6 +1426,16 @@ class FastDifPy:
 
         # no completely unprocessed key found
         if len(rows) == 0:
+            if self.__check_indirection(p=p):
+                # Delete the unnecessary dict entries.
+                del self.second_loop_queue_status[p]["last_key"]
+                if "row_b" in self.second_loop_queue_status[p].keys():
+                    del self.second_loop_queue_status[p]["row_b"]
+                if "row_a" in self.second_loop_queue_status[p].keys():
+                    del self.second_loop_queue_status[p]["row_a"]
+
+                return True
+
             if not self.second_loop_in[p].full():
                 self.second_loop_in[p].put(None)
             return False
