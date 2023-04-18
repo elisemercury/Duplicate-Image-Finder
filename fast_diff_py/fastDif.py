@@ -1745,15 +1745,14 @@ class FastDifPy:
 
         :return:
         """
-        errors = True
         last_key = None
 
         # get the errors as long as there are any
-        while errors:
+        while True:
             results = self.db.get_many_preprocessing_errors(start_key=last_key, count=1000)
 
             if len(results) == 0:
-                errors = False
+                break
 
             for r in results:
                 path = r['path']
