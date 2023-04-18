@@ -51,6 +51,7 @@ class CPUImageProcessing:
     The class needs to be aware of the availability of cuda / cupy and use it if indicated by the slave running the
     class.
     """
+    # TODO Make class Cupy compatible
     identifier: int
 
     image_a_path: Union[str, None] = None
@@ -78,8 +79,8 @@ class CPUImageProcessing:
     hash_180: str = ""
     hash_270: str = ""
 
-    processing_args: CompareImageArguments = None
-    preprocessing_args: PreprocessArguments = None
+    processing_args: Union[CompareImageArguments, None] = None
+    preprocessing_args: Union[PreprocessArguments, None] = None
     last_args: Union[CompareImageArguments, PreprocessArguments] = None
 
     error: str = None
@@ -105,7 +106,7 @@ class CPUImageProcessing:
 
     def reset(self):
         """
-        Utility to reset the .
+        Utility to reset the diff values.
         :return:
         """
 
@@ -226,7 +227,7 @@ class CPUImageProcessing:
         Update the CompareImageArguments object and update the class variables so the computations can be performed.
         Also resets any previously occurred errors.
 
-        :param args: new CoompareImageArguments object to process
+        :param args: new CompareImageArguments object to process
         :return:
         """
         self.processing_args = args

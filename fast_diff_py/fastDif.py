@@ -279,7 +279,7 @@ class FastDifPy:
     db: Union[Database, None]
 
     # short-circuiting variables
-    has_any_images: bool = False
+    enough_images_to_compare: bool = False
 
     # relative to child processes
     first_loop_in: mp.Queue = None  # the tasks sent to the child processes
@@ -450,7 +450,7 @@ class FastDifPy:
 
         # get the number of images and create short circuit.
         im_num = self.db.get_dir_count()
-        self.has_any_images = im_num > 1
+        self.enough_images_to_compare = im_num > 1
 
     def __recursive_index(self, dir_a: bool = True, path: str = None, ignore_thumbnail: bool = True):
         """
@@ -653,8 +653,9 @@ class FastDifPy:
         :param purge: if the database should be purged before the loop runs.
         :return:
         """
+        inserted_counter = 0
         # Short circuit if there are no images in the database.
-        if not self.has_any_images:
+        if not self.enough_images_to_compare:
             self.logger.debug("No images in database, aborting.")
             return
 
@@ -692,10 +693,12 @@ class FastDifPy:
 
             # stop if there's nothing left to do.
             if arg is None:
+                self.logger.info("Less images than processes, no continuous euqneueing.")
                 run = False
                 break
 
             self.first_loop_in.put(arg.to_json())
+            inserted_counter += 1
 
         v = self.verbose
         # start processes for cpu
@@ -710,6 +713,9 @@ class FastDifPy:
 
         # handle the running state of the loop
         while run:
+            if inserted_counter % 100 == 0:
+                self.logger.info(f"Inserted {inserted_counter} images.")
+
             if self.handle_result_of_first_loop(self.first_loop_out, compute_hash):
                 arg = self.__generate_first_loop_obj(amount, compute_hash, compute_thumbnails)
 
@@ -720,6 +726,7 @@ class FastDifPy:
 
                 else:
                     self.first_loop_in.put(arg.to_json())
+                    inserted_counter += 1
                     timeout = 0
             else:
                 time.sleep(1)
@@ -864,7 +871,7 @@ class FastDifPy:
         :return:
         """
         # Short circuit if there are no images in the database.
-        if not self.has_any_images:
+        if not self.enough_images_to_compare:
             self.logger.debug("No images in database, aborting.")
             return
 
@@ -936,12 +943,14 @@ class FastDifPy:
             if comps < (cpu_proc + gpu_proc) * 90:
                 self.send_termination_signal(first_loop=False)
                 done = True
+                self.logger.info("Less comparisons than available space. Not performing continuous enqueue.")
 
         else:
             comps = a_count * (a_count - 1) / 2
             if comps < (cpu_proc + gpu_proc) * 90:
                 self.send_termination_signal(first_loop=False)
                 done = True
+                self.logger.info("Less comparisons than available space. Not performing continuous enqueue.")
 
         count = 0
         timeout = 0
@@ -951,7 +960,7 @@ class FastDifPy:
             # update the queues and store if there are more tasks to process
             current_inserted, current_count = self.update_queues()
             count += current_count
-            self.logger.info(f"Number of Processed Images: {count}")
+            self.logger.info(f"Number of Processed Images: {count:,}".replace(",", "'"))
 
             # We have no more images to enqueue
             if current_inserted == 0 or current_inserted is None:
@@ -1172,7 +1181,8 @@ class FastDifPy:
         # check if we have processed every entry. if so, return False, since we have not added anything to the
         # queues.
         if start_a == len(rows_a) - 2 and start_b == len(rows_b) - 1:
-            return 0
+            self.second_loop_queue_status = {"last_a": last_a, "last_b": last_b}
+            return add_count if add_count > 0 else None
 
         # since the number of entries is small, we can just perform a basic packaged for loop.
         for i in range(start_a, len(rows_a) - 1):
@@ -1651,7 +1661,7 @@ class FastDifPy:
         :param dif_based: if the relative difference should be used or hash based matching should be done.
         :return:
         """
-        if not self.has_any_images:
+        if not self.enough_images_to_compare:
             return {}, []
 
         if not dif_based:
@@ -1857,6 +1867,8 @@ class FastDifPy:
             key_a = row[1]
             key_b = row[2]
 
+            assert key_a != key_b, "Key A and Key B are the same, bug in scheduling."
+
             # get the cluster for the keys
             cluster_id_a = cluster_id.get(key_a)
             cluster_id_b = cluster_id.get(key_b)
@@ -1905,7 +1917,6 @@ class FastDifPy:
         # We have two clusters that need to be merged. or a duplicate row
         else:
             if cluster_id_a == cluster_id_b:
-                self.logger.error("Duplicate row found!!!")
                 return next_id
 
             # We merge the two clusters into one.
