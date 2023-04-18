@@ -1037,7 +1037,11 @@ class FastDifPy:
 
         :return:
         """
-        # testing if the
+        # Handling less optimized
+        if self.less_optimized:
+            return self.__refill_queues_non_optimized()
+
+        # testing if the status is dict.
         if type(self.second_loop_queue_status) is dict:
             return self.__refill_queues_small_non_optimized()
 
