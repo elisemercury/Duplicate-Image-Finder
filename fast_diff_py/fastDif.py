@@ -1546,13 +1546,9 @@ class FastDifPy:
         )
 
         target_queue = self.second_loop_in if self.less_optimized else self.second_loop_in[queue_index]
-        # send task to process
-        try:
-            target_queue.put(arg.to_json(), timeout=0.5)
-        except queue.Full:
-            self.logger.debug("Timeout Exception while scheduling pair")
-            return False
 
+        # Emptiness of queue needs to be established before calling this function
+        target_queue.put(arg.to_json())
         return True
 
     def create_plt_name(self, key_a: int, key_b: int) -> Union[None, str]:
