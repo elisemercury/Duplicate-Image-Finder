@@ -1075,16 +1075,14 @@ class FastDifPy:
             slqs = self.second_loop_queue_status
 
             while not_full:
-                # break if the queue is full
-                if self.second_loop_in[p].full():
-                    break
-
                 if self.second_loop_base_a:
                     for i in range(len(row_b)):
                         # Fetch the row from self or the parent.
                         row_a_tmp = slqs[slqs[p]["parent"]]["row_a"] if "parent" in slqs[p].keys() else slqs[p]["row_a"]
 
-                        insertion_success = self.schedule_pair(row_a=row_a_tmp, row_b=row_b[i], queue_index=p)
+                        insertion_success, full = self.schedule_pair(row_a=row_a_tmp, row_b=row_b[i], queue_index=p)
+                        if full:
+                            break
                         inserted_count -= int(insertion_success)
                         inserted += int(insertion_success)
 
@@ -1093,7 +1091,9 @@ class FastDifPy:
                         # Fetch the row from self or the parent.
                         row_b_tmp = slqs[slqs[p]["parent"]]["row_b"] if "parent" in slqs[p].keys() else slqs[p]["row_b"]
 
-                        insertion_success = self.schedule_pair(row_a=row_a[i], row_b=row_b_tmp, queue_index=p)
+                        insertion_success, full = self.schedule_pair(row_a=row_a[i], row_b=row_b_tmp, queue_index=p)
+                        if full:
+                            break
                         inserted_count -= int(insertion_success)
                         inserted += int(insertion_success)
 
