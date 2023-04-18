@@ -1400,12 +1400,18 @@ class FastDifPy:
 
         # get the limit for the next key
         for i in range(len(self.second_loop_queue_status)):
+            # select proper status
+            if "parent" in self.second_loop_queue_status[i].keys():
+                target_status = self.second_loop_queue_status[self.second_loop_queue_status[i]["parent"]]
+            else:
+                target_status = self.second_loop_queue_status[i]
+
             if self.has_dir_b:
                 if not self.second_loop_base_a:
-                    next_key = max(self.second_loop_queue_status[i]["row_b"]["key"], next_key)
+                    next_key = max(target_status["row_b"]["key"], next_key)
                     continue
 
-            next_key = max(self.second_loop_queue_status[i]["row_a"]["key"], next_key)
+            next_key = max(target_status["row_a"]["key"], next_key)
 
         # process case, when we're looking to move the dir_b
         if self.has_dir_b:
