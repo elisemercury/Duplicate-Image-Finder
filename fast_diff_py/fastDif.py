@@ -490,7 +490,7 @@ class FastDifPy:
 
             if os.path.isfile(full_path):
                 # check if the file is supported, then add it to the database
-                if os.path.splitext(full_path)[1] in self.supported_file_types:
+                if os.path.splitext(full_path)[1].lower() in self.supported_file_types:
                     self.db.add_file(full_path, file_name, dir_a)
 
     def estimate_disk_usage(self, print_results: bool = True) -> Tuple[int, int]:
