@@ -1063,14 +1063,7 @@ class FastDifPy:
                 self.second_loop_in[p].put(None)
                 continue
 
-            # TODO Test performance if this is not in there.
-            try:
-                inserted_count = 100 - self.second_loop_in[p].qsize()
-
-            # exception can occur on Unix Systems like MacOS because they don't implement sem_getvalue()
-            # docs: https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue
-            except NotImplementedError:
-                inserted_count = 100
+            inserted_count = 100
 
             not_full = True
             iterations = 0
