@@ -1204,7 +1204,10 @@ class FastDifPy:
                 row_a = rows_a[i]
                 row_b = rows_b[j]
 
-                if self.schedule_pair(row_a=row_a, row_b=row_b, queue_index=queue_index):
+                insertion_success, full = self.schedule_pair(row_a=row_a, row_b=row_b, queue_index=queue_index)
+                if full:
+                    break
+                if insertion_success:
                     # update the remaining loop variables
                     queue_index = (queue_index + 1) % procs
                     add_count += 1
