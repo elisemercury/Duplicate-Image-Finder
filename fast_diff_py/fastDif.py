@@ -1457,6 +1457,10 @@ class FastDifPy:
             if "parent" in self.second_loop_queue_status[i].keys():
                 continue
 
+            # Cannot be the parent of yourself.
+            if i == p:
+                continue
+
             # Find a new parent.
             self.second_loop_queue_status[p]["parent"] = i
             success = True
