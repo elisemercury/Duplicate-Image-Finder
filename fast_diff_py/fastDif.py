@@ -1071,7 +1071,8 @@ class FastDifPy:
             while not_full:
                 if self.second_loop_base_a:
                     for i in range(len(row_b)):
-                        insertion_success, full = self.schedule_pair(row_a=row_a, row_b=row_b[i], queue_index=p)
+                        insertion_success, full = self.schedule_pair(row_a=self.second_loop_queue_status[p]["row_a"],
+                                                                     row_b=row_b[i], queue_index=p)
                         if full:
                             break
                         inserted_count -= int(insertion_success)
@@ -1079,7 +1080,9 @@ class FastDifPy:
 
                 else:
                     for i in range(len(row_a)):
-                        insertion_success, full = self.schedule_pair(row_a=row_a[i], row_b=row_b, queue_index=p)
+                        insertion_success, full = self.schedule_pair(row_a=row_a[i],
+                                                                     row_b=self.second_loop_queue_status[p]["row_b"],
+                                                                     queue_index=p)
                         if full:
                             break
                         inserted_count -= int(insertion_success)
