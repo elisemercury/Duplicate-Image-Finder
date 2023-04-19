@@ -1028,8 +1028,9 @@ class FastDifPy:
         self.db.create_plot_table(purge=purge)
 
     def update_queues(self):
-        results = self.__refill_queues()
-        return results, self.handle_results_second_queue(results)
+        enqueued = self.__refill_queues()
+        dequeued = self.handle_results_second_queue(enqueued)
+        return enqueued, dequeued
 
     def __refill_queues(self) -> Union[int, None]:
         """
