@@ -1442,7 +1442,7 @@ class FastDifPy:
                                                  starting=self.second_loop_queue_status[p]["last_key"])
         return row_a, row_b
 
-    def schedule_pair(self, row_a: dict, row_b: dict, queue_index: Union[None, int]):
+    def schedule_pair(self, row_a: dict, row_b: dict, queue_index: Union[None, int]) -> Tuple[bool, bool]:
         """
         Given two rows from the database, performs the checks necessary to schedule them. If they pass, send them to the
         respective queue.
@@ -1450,7 +1450,7 @@ class FastDifPy:
         :param row_a: first row (from dir_a)
         :param row_b: second row (form dir_a or dir_b)
         :param queue_index: index of the queue to insert into.
-        :return:
+        :return: success: element was inserted in queue, full: queue is full
         """
         thumb_a_path = None
         thumb_b_path = None
@@ -1462,7 +1462,7 @@ class FastDifPy:
         # performing match if desired
         if self.sl_matching_aspect:
             if not self.match_aspect(row_a=row_a, row_b=row_b):
-                return False
+                return False, False
 
         # Aspect matches => Create Task object and send to process
         arg = CompareImageArguments(
@@ -1479,12 +1479,14 @@ class FastDifPy:
             size_y=self.thumbnail_size_y,
         )
 
-        # send task to process
-        if not self.less_optimized:
-            self.second_loop_in[queue_index].put(arg.to_json())
-        else:
-            self.second_loop_in.put(arg.to_json())
-        return True
+        target_queue = self.second_loop_in if self.less_optimized else self.second_loop_in[queue_index]
+
+        # Emptiness of queue needs to be established before calling this function
+        try:
+            target_queue.put(arg.to_json(), block=False)
+        except queue.Full:
+            return False, True
+        return True, False
 
     def create_plt_name(self, key_a: int, key_b: int) -> Union[None, str]:
         """
