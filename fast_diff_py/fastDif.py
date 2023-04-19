@@ -1296,7 +1296,9 @@ class FastDifPy:
                     current_count = 0
                     continue
 
-                success = self.schedule_pair(row_a=current_a, row_b=row, queue_index=None)
+                success, full = self.schedule_pair(row_a=current_a, row_b=row, queue_index=None)
+                if full:
+                    break
                 current_count += int(success)
                 add_count += int(success)
 
