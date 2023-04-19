@@ -1064,33 +1064,24 @@ class FastDifPy:
                 self.second_loop_in[p].put(None)
                 continue
 
-            try:
-                inserted_count = 100 - self.second_loop_in[p].qsize()
-
-            # exception can occur on Unix Systems like MacOS because they don't implement sem_getvalue()
-            # docs: https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue
-            except NotImplementedError:
-                inserted_count = 100
+            inserted_count = 100
 
             not_full = True
             iterations = 0
             while not_full:
-                # break if the queue is full
-                if self.second_loop_in[p].full():
-                    break
-
                 if self.second_loop_base_a:
                     for i in range(len(row_b)):
-                        insertion_success = self.schedule_pair(row_a=self.second_loop_queue_status[p]["row_a"],
-                                                               row_b=row_b[i], queue_index=p)
+                        insertion_success, full = self.schedule_pair(row_a=row_a, row_b=row_b[i], queue_index=p)
+                        if full:
+                            break
                         inserted_count -= int(insertion_success)
                         inserted += int(insertion_success)
 
                 else:
                     for i in range(len(row_a)):
-                        insertion_success = self.schedule_pair(row_a=row_a[i],
-                                                               row_b=self.second_loop_queue_status[p]["row_b"],
-                                                               queue_index=p)
+                        insertion_success, full = self.schedule_pair(row_a=row_a[i], row_b=row_b, queue_index=p)
+                        if full:
+                            break
                         inserted_count -= int(insertion_success)
                         inserted += int(insertion_success)
 
