@@ -29,10 +29,10 @@ Features:
 
 
 # TODO single processing handler
+# TODO Implement process stop recovery.
 # ----------------------------------------------------------------------------------------------------------------------
 # FEATURES
 # ----------------------------------------------------------------------------------------------------------------------
-# TODO Implement process stop recovery.
 # TODO Range in which the aspects must lay for matching_aspect to trigger
 # TODO Harakiri method. More reckless method.
 # TODO keyboard shortcuts pyinput
