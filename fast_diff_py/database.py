@@ -390,3 +390,10 @@ class Database:
         :return:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
+
+    def create_config_dump(self):
+        """
+        Creates a dump of all the relevant information for the database as well as the type of database used.
+        :return:
+        """
+        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
