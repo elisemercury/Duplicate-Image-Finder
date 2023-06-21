@@ -258,7 +258,6 @@ def find_best_image(args: Tuple[list, FunctionType]) -> Tuple[dict, list]:
 
 
 class FastDifPy:
-    p_db: str
     __p_root_dir_a: str
     __p_root_dir_b: Union[str, None]
 
