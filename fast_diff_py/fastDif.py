@@ -337,7 +337,7 @@ class FastDifPy:
         directory_a = os.path.abspath(directory_a)
         directory_b = os.path.abspath(directory_b) if directory_b is not None else None
 
-        # make sure the paths aren't subdirs of each other.
+        # make sure the paths aren't sub-dirs of each other.
         if directory_b is not None:
             temp_a = directory_a + os.sep
             temp_b = directory_b + os.sep
