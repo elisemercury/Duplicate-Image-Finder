@@ -92,6 +92,14 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
+    def reset_first_loop_mark(self):
+        """
+        Reset the mark from mark_processing on all files that are currently in processing. Intended for resume of
+        processing.
+        :return:
+        """
+        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
+
     def fetch_many_after_key(self, directory_a: bool = True, starting: int = None, count=100) -> List[dict]:
         """
         Fetch count number of rows from a table a or table b starting at a specific key (WHERE key > starting)
