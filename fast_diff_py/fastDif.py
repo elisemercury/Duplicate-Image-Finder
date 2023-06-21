@@ -514,12 +514,13 @@ class FastDifPy:
 
         return byte_count_a, byte_count_b
 
-    def clean_up(self, thumbs: bool = True, db: bool = True):
+    def clean_up(self, thumbs: bool = True, db: bool = True, config: bool = True):
         """
         Remove thumbnails and db.
 
         :param thumbs: Delete Thumbnail directories
         :param db: Delete Database
+        :param config: Delete the Config file.
         :return:
         """
         if thumbs:
@@ -541,6 +542,14 @@ class FastDifPy:
             self.db.free()
             self.db = None
             self.logger.info("Deleted temporary database")
+
+        if config:
+            cfg_path = self.config.cfg_path
+            self.config = None
+
+            if os.path.exists(cfg_path):
+                os.remove(cfg_path)
+                self.logger.info("Deleted Config")
 
     # ==================================================================================================================
     # COMMON LOOP FUNCTIONS
