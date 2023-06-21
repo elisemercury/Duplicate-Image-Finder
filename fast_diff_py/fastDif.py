@@ -890,6 +890,19 @@ class FastDifPy:
         :param diff_location: Where the plots should be stored (needs to be provided if make_diff_plots is true)
         :return:
         """
+        # Writing to config.
+        self.config.cfg_dict["state"] = "second_loop_in_progress"
+        self.config.cfg_dict["second_loop"] = {}
+        self.config.cfg_dict["second_loop"]["only_matching_aspect"] = only_matching_aspect
+        self.config.cfg_dict["second_loop"]["only_matching_hash"] = only_matching_hash
+        self.config.cfg_dict["second_loop"]["make_diff_plots"] = make_diff_plots
+        self.config.cfg_dict["second_loop"]["similarity_threshold"] = similarity_threshold
+        self.config.cfg_dict["second_loop"]["gpu_proc"] = gpu_proc
+        self.config.cfg_dict["second_loop"]["cpu_proc"] = cpu_proc
+        self.config.cfg_dict["second_loop"]["cpu_proc"] = cpu_proc
+        self.config.cfg_dict["second_loop"]["diff_location"] = diff_location
+        self.config.write_to_file()
+
         # Short circuit if there are no images in the database.
         if not self.enough_images_to_compare:
             self.logger.debug("No images in database, aborting.")
