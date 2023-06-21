@@ -15,55 +15,6 @@ class Database:
         Init function for your implementation of the database
         """
         pass
-    # ------------------------------------------------------------------------------------------------------------------
-    # CONFIG TABLE
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def create_config(self, config: dict, type_name: str) -> bool:
-        """
-        Create the config table and insert a config dictionary.
-
-        :param config: config dict
-        :param type_name: name under which config is stored
-        :return: bool -> insert successful or not (key already exists)
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def get_config(self, type_name: str) -> Union[dict, None]:
-        """
-        Get the config dictionary from the database.
-
-        :param type_name: name under which config is stored
-        :return: config dict or None if not found
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def delete_config(self, type_name: str):
-        """
-        Delete the config from the database.
-
-        :param type_name: name under which config is stored
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def update_config(self, config: dict, type_name: str):
-        """
-        Update the config to the database.
-
-        :param config: config dict
-        :param type_name: name under which config is stored
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def config_table_exists(self):
-        """
-        Check the master table if the config table exists. DOES NOT VERIFY THE TABLE DEFINITION!
-
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
     # ------------------------------------------------------------------------------------------------------------------
     # DIRECTORY TABLES
