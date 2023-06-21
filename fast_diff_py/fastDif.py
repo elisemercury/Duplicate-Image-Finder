@@ -277,7 +277,7 @@ class FastDifPy:
 
     supported_file_types = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".gif", ".webp"}
 
-    db: Union[Database, None]
+    __db: Union[Database, None]
 
     # short-circuiting variables
     enough_images_to_compare: bool = False
@@ -2055,6 +2055,15 @@ class FastDifPy:
             self.stream_handler.setLevel(logging.INFO)
         else:
             self.stream_handler.setLevel(logging.WARNING)
+
+    @property
+    def db(self):
+        return self.__db
+
+    @db.setter
+    def db(self, value):
+        self.__db = value
+        self.config.cfg_dict["database"] = self.__db.create_config_dump()
 
     def prepare_logging(self, console_level: int = logging.DEBUG, debug: bool = False):
         """
