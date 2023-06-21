@@ -372,74 +372,20 @@ class FastDifPy:
         self.ignore_paths = []
         self.ignore_names = []
 
-    def test_for_db(self):
+    def continue_from_config(self, full_depth: bool = False):
         """
-        Test if the database is present in the current directory/ies. Directory A has priority.
-        If a Database is found, the config is checked to make sure the paths match the current ones.
+        Load the config and start the process from where the config remained.
 
-        :return: True -> Database connected and ready to use. False -> Database not found.
+        :param full_depth: Check that every file in the database exists.
+
+        :return:
         """
-        db_a = os.path.join(self.p_root_dir_a, "diff.db")
-        dir_b = self.p_root_dir_b  # can be none
-        db_b = os.path.join(dir_b, "diff.db") if self.has_dir_b else None
-        matching_config = False
+        # TODO Perform verify
 
-        if os.path.exists(db_a):
-            temp_db = SQLiteDatabase(db_a)
-            cfg = temp_db.get_config('main_config')
+        # TODO if verify fail raise error
 
-            # verify the config matches the call arguments (in case the computation was stopped during the
-            # execution before)
-            if cfg is not None:
-                matching_config = cfg["directory_a"] == self.p_root_dir_a and cfg["directory_b"] == self.p_root_dir_b
-
-                # return straight away in case the other directory is not set
-                if matching_config and dir_b is None:
-                    self.db = temp_db
-                    return True
-
-        if dir_b is not None and os.path.exists(db_b):
-            temp_db = SQLiteDatabase(db_b)
-            cfg = temp_db.get_config('main_config')
-
-            # verify the config matches the call arguments (in case the computation was stopped during the
-            # execution before)
-            if cfg is not None:
-                temp_match = cfg["directory_a"] == self.p_root_dir_a and cfg["directory_b"] == self.p_root_dir_b
-
-                if matching_config and temp_match:
-                    raise Exception("Two matching configs found. Please remove one of the databases in one of the "
-                                    "selected directories so the program can continue.")
-
-                if temp_match:
-                    self.db = temp_db
-                    return True
-
+        # TODO if verify returns empty, create database
         return False
-
-    def get_progress_from_db(self):
-        """
-        Loads the progress state from the database.
-        WARNING: The program WILL NOT reindex the files. If you added files in the meantime, the files are NOT going
-        compared against!
-
-        :return:
-        """
-
-        # TODO get the progress from the database
-        raise NotImplementedError("Progress Recovery is currently not implemented yet.")
-
-    def write_config(self):
-        """
-        Write the initial config to the database.
-
-        :return:
-        """
-        temp_config = {
-            "directory_a": self.p_root_dir_a,
-            "directory_b": self.p_root_dir_b
-        }
-        self.db.create_config(type_name="main_config", config=temp_config)
 
     def index_the_dirs(self):
         """
