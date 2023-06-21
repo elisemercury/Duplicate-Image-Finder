@@ -922,3 +922,6 @@ class SQLiteDatabase(Database):
         self.logger = logging.getLogger("fast_diff_py.sql_database")
         self.logger.propagate = True
         self.logger.level = logging.DEBUG
+
+    def create_config_dump(self):
+        return {"type": "sqlite", "path": self.path}
