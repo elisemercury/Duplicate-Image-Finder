@@ -192,6 +192,14 @@ class SQLiteDatabase(Database):
         """
         self.debug_execute(f"UPDATE directory SET proc_suc = -2 WHERE key = {task['key']}")
 
+    def reset_first_loop_mark(self):
+        """
+        Reset the mark from mark_processing on all files that are currently in processing. Intended for resume of
+        processing.
+        :return:
+        """
+        self.debug_execute("UPDATE directory SET proc_suc = -1 WHERE directory.proc_suc = -2")
+
     def fetch_many_after_key(self, directory_a: bool = True, starting: int = None, count=100) -> List[dict]:
         """
         Fetch count number of rows from a table a or table b starting at a specific key (WHERE key > starting)
