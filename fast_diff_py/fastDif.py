@@ -2064,6 +2064,7 @@ class FastDifPy:
     def db(self, value):
         self.__db = value
         self.config.cfg_dict["database"] = self.__db.create_config_dump()
+        self.config.write_to_file()
 
     def prepare_logging(self, console_level: int = logging.DEBUG, debug: bool = False):
         """
