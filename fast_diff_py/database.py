@@ -439,3 +439,11 @@ class Database:
         :return:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
+
+    @staticmethod
+    def thread_safe():
+        """
+        Returns weather the implementation of the database is thread safe (for improved performance)
+        :return:
+        """
+        return False
