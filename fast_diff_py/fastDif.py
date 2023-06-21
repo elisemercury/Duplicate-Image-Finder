@@ -646,7 +646,30 @@ class FastDifPy:
         :param purge: if the database should be purged before the loop runs.
         :return:
         """
+        # Writing the arguments to config
+        self.config.cfg_dict["state"] = "first_loop_in_progress"
+        self.config.cfg_dict["first_loop"] = {}
+        self.config.cfg_dict["first_loop"]["compute_thumbnails"] = compute_thumbnails
+        self.config.cfg_dict["first_loop"]["compute_hash"] = compute_hash
+        self.config.cfg_dict["first_loop"]["amount"] = amount
+        self.config.cfg_dict["first_loop"]["cpu_proc"] = cpu_proc
+        self.config.cfg_dict["first_loop"]["purge"] = purge
+
+        # Fetching previous counter.
+        prev_insert_count = self.config.cfg_dict["first_loop"].get("inserted_counter")
+
         inserted_counter = 0
+        if prev_insert_count is not None:
+            inserted_counter = prev_insert_count
+            self.logger.info("Retrieving inserted_counter from config - might be to low.")
+
+        # Reset the marked files in any case.
+        self.logger.debug("Reset as in progress marked files")
+        self.db.reset_first_loop_mark()
+
+        self.config.write_to_file()
+        # INFO: Since the database marks files that are
+
         # Short circuit if there are no images in the database.
         if not self.enough_images_to_compare:
             self.logger.debug("No images in database, aborting.")
@@ -692,6 +715,7 @@ class FastDifPy:
 
             self.first_loop_in.put(arg.to_json())
             inserted_counter += 1
+            self.config.cfg_dict["first_loop"]["inserted_counter"] = inserted_counter
 
         v = self.verbose
         # start processes for cpu
@@ -748,6 +772,9 @@ class FastDifPy:
         self.join_all_children()
         assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
                                             f"Remaining: {self.first_loop_out.qsize()}"
+        del self.config.cfg_dict["first_loop"]
+        self.config.cfg_dict["state"] = "first_loop_done"
+        self.config.write_to_file()
         self.logger.info("All Images have been preprocessed.")
 
     def generate_thumbnail_path(self, key: int, filename: str, dir_a: bool):
