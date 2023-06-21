@@ -931,5 +931,13 @@ class SQLiteDatabase(Database):
         self.logger.propagate = True
         self.logger.level = logging.DEBUG
 
+    @staticmethod
+    def thread_safe():
+        """
+        Returns weather the implementation of the database is thread safe (for improved performance)
+        :return:
+        """
+        return False
+
     def create_config_dump(self):
         return {"type": "sqlite", "path": self.path}
