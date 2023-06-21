@@ -327,9 +327,12 @@ class FastDifPy:
         :param directory_b: second directory to compare against. Otherwise, comparison will be done against directory
         :param default_db: create a sqlite database in the a_directory.
         itself.
-        *** kwarg:
-        debug: bool - Enable Debug File in the logs.
-        config_path: str - Path to the config that stores the progress of the program (for progress recovery on stop)
+
+        kwarg:
+        ------
+        - debug: bool - Enable Debug File in the logs.
+        - config_path: str - Path to the config that stores the progress of the program (for progress recovery on stop)
+        - config_purge: str - Ignore preexisting config and overwrite it.
         """
 
         if not os.path.isdir(directory_a):
@@ -361,7 +364,11 @@ class FastDifPy:
         if "config_path" in kwargs.keys():
             config_path = kwargs.get("config_path")
 
-        self.config = FastDiffPyConfig(path=config_path)
+        config_purge = False
+        if "config_purge" in kwargs.keys():
+            config_purge = kwargs.get("config_purge")
+
+        self.config = FastDiffPyConfig(path=config_path, purge=config_purge)
 
         # Loading config and creating default database if desired
         if self.continue_from_config() and default_db:
