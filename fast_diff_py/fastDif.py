@@ -15,6 +15,7 @@ from fast_diff_py.datatransfer import *
 from fast_diff_py.cpu_image_processor import CPUImageProcessing
 from concurrent.futures import ProcessPoolExecutor
 from fast_diff_py.sql_database import SQLiteDatabase
+from fast_diff_py.config import FastDiffPyConfig
 import logging
 
 """
@@ -314,18 +315,21 @@ class FastDifPy:
 
     __verbose: bool = False
 
-    def __init__(self, directory_a: str, directory_b: str = None, test_db: bool = True, **kwargs):
+    # config
+    config: FastDiffPyConfig
+
+    def __init__(self, directory_a: str, directory_b: str = None, default_db: bool = True, **kwargs):
         """
         Provide the directories to be searched. If a different implementation of the database is used,
         set the test_db to false.
 
         :param directory_a: first directory to search for differentiation.
         :param directory_b: second directory to compare against. Otherwise, comparison will be done against directory
+        :param default_db: create a sqlite database in the a_directory.
         itself.
-        :param test_db: Test and create a sqlite db for the processing. Should be set to off, if a different
-        implementation is used
         *** kwarg:
-        debug: Enable Debug File in the logs.
+        debug: bool - Enable Debug File in the logs.
+        config_path: str - Path to the config that stores the progress of the program (for progress recovery on stop)
         """
 
         if not os.path.isdir(directory_a):
@@ -353,14 +357,17 @@ class FastDifPy:
         if "debug" in kwargs.keys():
             debug = kwargs.get("debug")
 
-        self.prepare_logging(debug=debug)
+        config_path = None
+        if "config_path" in kwargs.keys():
+            config_path = kwargs.get("config_path")
 
-        # proceed with the database if the default is used.
-        if test_db:
-            if not self.test_for_db():
-                self.logger.info("No matching database found. Creating new one.")
-                self.db = SQLiteDatabase(os.path.join(self.p_root_dir_a, "diff.db"))
-                self.write_config()
+        self.config = FastDiffPyConfig(path=config_path)
+
+        # Loading config and creating default database if desired
+        if self.continue_from_config() and default_db:
+            self.db = SQLiteDatabase(path=os.path.join(self.p_root_dir_a, "diff.db"))
+
+        self.prepare_logging(debug=debug)
 
         self.ignore_paths = []
         self.ignore_names = []
