@@ -379,6 +379,12 @@ class FastDifPy:
         self.ignore_paths = []
         self.ignore_names = []
 
+        # Setting the first stuff in the config
+        self.config.cfg_dict["state"] = "init"
+        self.config.cfg_dict["root_dir_a"] = self.p_root_dir_a
+        self.config.cfg_dict["root_dir_b"] = self.p_root_dir_b
+        self.config.write_to_file()
+
     def continue_from_config(self, full_depth: bool = False):
         """
         Load the config and start the process from where the config remained.
