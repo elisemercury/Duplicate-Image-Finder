@@ -371,7 +371,7 @@ class FastDifPy:
         self.config = FastDiffPyConfig(path=config_path, purge=config_purge)
 
         # Loading config and creating default database if desired
-        if self.continue_from_config() and default_db:
+        if not self.verify_config() and default_db:
             self.db = SQLiteDatabase(path=os.path.join(self.p_root_dir_a, "diff.db"))
 
         self.prepare_logging(debug=debug)
@@ -385,20 +385,35 @@ class FastDifPy:
         self.config.cfg_dict["root_dir_b"] = self.p_root_dir_b
         self.config.write_to_file()
 
-    def continue_from_config(self, full_depth: bool = False):
+    def verify_config(self, full_depth: bool = False):
         """
-        Load the config and start the process from where the config remained.
+        Load the config and verify that the folders match and the content if the directories too.
 
         :param full_depth: Check that every file in the database exists.
 
+        :return: returns False if no Config is found. otherwise returns true.
+        """
+        # Empty dict, we have nothing.
+        if len(self.config.cfg_dict) == 0:
+            return False
+
+        # Sanity check
+        if self.config.cfg_dict.get("root_dir_a") != self.p_root_dir_a:
+            raise ValueError("root_dir_a doesn't match config")
+
+        if self.config.cfg_dict.get("root_dir_b") != self.p_root_dir_b:
+            raise ValueError("root_dir_b doesn't match config")
+
+        if full_depth:
+            self.verify_dir_content()
+        return True
+
+    def verify_dir_content(self):
+        """
+        Function should go through dir table and make sure every file exists. If a file doesn't exist, raises ValueError.
         :return:
         """
-        # TODO Perform verify
-
-        # TODO if verify fail raise error
-
-        # TODO if verify returns empty, create database
-        return False
+        pass
 
     def index_the_dirs(self):
         """
