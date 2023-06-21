@@ -8,7 +8,7 @@ class FastDiffPyConfig:
     update_timeout: int = 30
     __cfg_dict: dict
     __last_update: datetime.datetime
-    def __init__(self, path: str = None):
+    def __init__(self, path: str = None, purge: bool = False):
         # set the config_path
         if path is None:
             self.cfg_path = os.path.join(os.path.dirname(__file__), "config.json")
@@ -16,7 +16,10 @@ class FastDiffPyConfig:
         self.__cfg_dict = {}
 
         if os.path.exists(self.cfg_path):
-            self.load_config()
+            if purge:
+                os.remove(self.cfg_path)
+            else:
+                self.load_config()
 
     def load_config(self):
         """
