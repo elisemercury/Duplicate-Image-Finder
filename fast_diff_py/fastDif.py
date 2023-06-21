@@ -258,28 +258,28 @@ def find_best_image(args: Tuple[list, FunctionType]) -> Tuple[dict, list]:
 
 
 class FastDifPy:
-    __p_root_dir_a: str
-    __p_root_dir_b: Union[str, None]
+    __p_root_dir_a: str                 # TODO make property store on set
+    __p_root_dir_b: Union[str, None]    # TODO make property store on set
 
     __thumb_dir_a: str
     __thumb_dir_b: Union[str, None]
 
-    __thumbnail_size_x = 64
-    __thumbnail_size_y = 64
+    __thumbnail_size_x = 64             # TODO make property store on set
+    __thumbnail_size_y = 64             # TODO make property store on set
 
-    __similarity_threshold = 200
+    __similarity_threshold = 200        # TODO make property store on set
 
     __has_dir_b: bool = False
 
-    ignore_names: List[str]
-    ignore_paths: List[str]
+    ignore_names: List[str]             # TODO make property store on set
+    ignore_paths: List[str]             # TODO make property store on set.
 
-    supported_file_types = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".gif", ".webp"}
+    supported_file_types = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".gif", ".webp"}  # TODO make property store on set.
 
     __db: Union[Database, None]
 
     # short-circuiting variables
-    enough_images_to_compare: bool = False
+    enough_images_to_compare: bool = False   # TODO make property store on set
 
     # relative to child processes
     first_loop_in: mp.Queue = None  # the tasks sent to the child processes
@@ -303,8 +303,8 @@ class FastDifPy:
     gpu_handles = None
 
     # default config
-    less_optimized: bool = False
-    retry_limit: int = 1000
+    less_optimized: bool = False    # TODO make property store on set.
+    retry_limit: int = 1000         # TODO make property store on set.
 
     # logger / CLI Output
     logger: logging.Logger = None
@@ -312,7 +312,7 @@ class FastDifPy:
     stream_handler: logging.StreamHandler = None
     debug_logger: logging.FileHandler = None
 
-    __verbose: bool = False
+    __verbose: bool = False         # TODO make property store on set.
 
     # config
     config: FastDiffPyConfig
