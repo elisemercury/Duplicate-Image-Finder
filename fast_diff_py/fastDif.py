@@ -386,11 +386,11 @@ class FastDifPy:
             self.__recursive_index(False)
 
         self.config.state = "indexed_dirs"
-        self.config.write_to_file()
 
         # get the number of images and create short circuit.
         im_num = self.db.get_dir_count()
         self.config.enough_images_to_compare = im_num > 1
+        self.config.write_to_file()
 
     def __recursive_index(self, dir_a: bool = True, path: str = None, ignore_thumbnail: bool = True):
         """
