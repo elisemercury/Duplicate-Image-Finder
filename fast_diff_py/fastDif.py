@@ -258,14 +258,11 @@ def find_best_image(args: Tuple[list, FunctionType]) -> Tuple[dict, list]:
 
 
 class FastDifPy:
-    __p_root_dir_a: str                 # TODO make property store on set
     __p_root_dir_b: Union[str, None]    # TODO make property store on set
 
     __thumb_dir_a: str
     __thumb_dir_b: Union[str, None]
 
-    __thumbnail_size_x = 64             # TODO make property store on set
-    __thumbnail_size_y = 64             # TODO make property store on set
 
     __similarity_threshold = 200        # TODO make property store on set
 
@@ -353,7 +350,7 @@ class FastDifPy:
                 raise ValueError(f"{directory_b} is a subdirectory of {directory_a}")
 
         self.p_root_dir_b = directory_b
-        self.p_root_dir_a = directory_a
+        self.config.p_root_dir_a = directory_a
 
         debug = False
         if "debug" in kwargs.keys():
@@ -371,7 +368,7 @@ class FastDifPy:
 
         # Loading config and creating default database if desired
         if not self.verify_config() and default_db:
-            self.db = SQLiteDatabase(path=os.path.join(self.p_root_dir_a, "diff.db"))
+            self.db = SQLiteDatabase(path=os.path.join(self.config.p_root_dir_a, "diff.db"))
 
         self.prepare_logging(debug=debug)
 
@@ -379,9 +376,7 @@ class FastDifPy:
         self.ignore_names = []
 
         # Setting the first stuff in the config
-        self.config.cfg_dict["state"] = "init"
-        self.config.cfg_dict["root_dir_a"] = self.p_root_dir_a
-        self.config.cfg_dict["root_dir_b"] = self.p_root_dir_b
+        self.config.state = "init"
         self.config.write_to_file()
 
     def verify_config(self, full_depth: bool = False):
@@ -393,15 +388,8 @@ class FastDifPy:
         :return: returns False if no Config is found. otherwise returns true.
         """
         # Empty dict, we have nothing.
-        if len(self.config.cfg_dict) == 0:
+        if not os.path.exists(self.config.cfg_path):
             return False
-
-        # Sanity check
-        if self.config.cfg_dict.get("root_dir_a") != self.p_root_dir_a:
-            raise ValueError("root_dir_a doesn't match config")
-
-        if self.config.cfg_dict.get("root_dir_b") != self.p_root_dir_b:
-            raise ValueError("root_dir_b doesn't match config")
 
         if full_depth:
             self.verify_dir_content()
@@ -448,7 +436,7 @@ class FastDifPy:
         # load the path to index from
         if path is None:
             if dir_a:
-                path = self.p_root_dir_a
+                path = self.config.p_root_dir_a
             else:
                 path = self.p_root_dir_b
 
@@ -491,16 +479,16 @@ class FastDifPy:
         else:
             comps = dir_a_count * dir_b_count
 
-        byte_count_a = dir_a_count * self.__thumbnail_size_x * self.__thumbnail_size_y * 3
-        byte_count_b = dir_b_count * self.__thumbnail_size_x * self.__thumbnail_size_y * 3
+        byte_count_a = dir_a_count * self.config.thumbnail_size_x * self.config.thumbnail_size_y * 3
+        byte_count_b = dir_b_count * self.config.thumbnail_size_x * self.config.thumbnail_size_y * 3
 
         dir_b = self.p_root_dir_b if self.has_dir_b else ""
 
-        target = max(len(self.p_root_dir_a), len(dir_b), len('the two dirs '))
+        target = max(len(self.config.p_root_dir_a), len(dir_b), len('the two dirs '))
 
         if print_results:
             print(
-                f"Estimated disk usage by {fill(self.p_root_dir_a, target)}: " + h(byte_count_a, "B") +
+                f"Estimated disk usage by {fill(self.config.p_root_dir_a, target)}: " + h(byte_count_a, "B") +
                 " bytes")
             if self.has_dir_b:
                 print(
@@ -821,8 +809,8 @@ class FastDifPy:
                                                   key=task["key"]),
             compute_hash=compute_hash,
             store_thumb=compute_thumbnails,
-            size_x=self.thumbnail_size_x,
-            size_y=self.thumbnail_size_y,
+            size_x=self.config.thumbnail_size_x,
+            size_y=self.config.thumbnail_size_y,
         )
         self.db.mark_processing(task)
 
@@ -1510,8 +1498,8 @@ class FastDifPy:
             store_path=self.create_plt_name(key_a=row_a["key"], key_b=row_b["key"]),
             store_compare=self.sl_make_diff_plots,
             compare_threshold=self.similarity_threshold,
-            size_x=self.thumbnail_size_x,
-            size_y=self.thumbnail_size_y,
+            size_x=self.config.thumbnail_size_x,
+            size_y=self.config.thumbnail_size_y,
         )
 
         target_queue = self.second_loop_in if self.less_optimized else self.second_loop_in[queue_index]
@@ -2027,43 +2015,7 @@ class FastDifPy:
     # PROPERTIES
     # ------------------------------------------------------------------------------------------------------------------
 
-    @property
-    def thumbnail_size_x(self):
-        return self.__thumbnail_size_x
 
-    @thumbnail_size_x.setter
-    def thumbnail_size_x(self, value):
-        if value < 0:
-            raise ValueError("Thumbnail size must be positive")
-
-        if value > 1000:
-            warnings.warn("Thumbnail size is very large. Higher Accuracy will slow down the process and "
-                          "increase storage usage.")
-        self.__thumbnail_size_x = value
-
-    @property
-    def thumbnail_size_y(self):
-        return self.__thumbnail_size_y
-
-    @thumbnail_size_y.setter
-    def thumbnail_size_y(self, value):
-        if value < 0:
-            raise ValueError("Thumbnail size must be positive")
-
-        if value > 1000:
-            warnings.warn("Thumbnail size is very large. Higher Accuracy will slow down the process and "
-                          "increase storage usage.")
-        self.__thumbnail_size_y = value
-
-    @property
-    def p_root_dir_a(self):
-        return self.__p_root_dir_a
-
-    @p_root_dir_a.setter
-    def p_root_dir_a(self, value):
-        if os.path.exists(value):
-            self.__p_root_dir_a = value
-            self.__thumb_dir_a = os.path.join(self.__p_root_dir_a, ".temp_thumbnails")
 
     @property
     def p_root_dir_b(self):
