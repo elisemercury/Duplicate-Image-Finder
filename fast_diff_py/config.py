@@ -44,6 +44,8 @@ class FastDiffPyConfig:
                 "matching_aspect": False,
                 "make_diff_plots": False,
                 "plot_output_dir": None,
+                "cpu_proc": None,
+                "gpu_proc": 0,
             },
             "supported_file_types" : [".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".gif", ".webp"],
             "less_optimized": False,
@@ -227,6 +229,22 @@ class FastDiffPyConfig:
     @sl_plot_output_dir.setter
     def sl_plot_output_dir(self, value):
         self._cfg_dict["second_loop"]["plot_output_dir"] = value
+
+    @property
+    def sl_gpu_proc(self):
+        return self._cfg_dict["second_loop"]["gpu_proc"]
+
+    @sl_gpu_proc.setter
+    def sl_gpu_proc(self, value):
+        self._cfg_dict["second_loop"]["gpu_proc"] = value
+
+    @property
+    def sl_cpu_proc(self):
+        return self._cfg_dict["second_loop"]["cpu_proc"]
+
+    @sl_cpu_proc.setter
+    def sl_cpu_proc(self, value):
+        self._cfg_dict["second_loop"]["cpu_proc"] = value
 
     @property
     def supported_file_types(self):
