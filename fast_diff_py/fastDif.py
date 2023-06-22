@@ -92,7 +92,7 @@ class FastDifPy:
         if "config_purge" in kwargs.keys():
             config_purge = kwargs.get("config_purge")
 
-        self.config = FastDiffPyConfig(path=config_path, purge=config_purge)
+        self.config = FastDiffPyConfig(task_path=config_path, task_purge=config_purge)
 
         if not self.verify_config():
             # Only set the directory_a and directory_b when the config is not set.
