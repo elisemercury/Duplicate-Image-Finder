@@ -47,6 +47,10 @@ class FastDiffPyConfig:
                 "cpu_proc": None,
                 "gpu_proc": 0,
             },
+            "database":{
+                "type": "sqlite",
+                "path": ""
+            },
             "supported_file_types" : [".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".gif", ".webp"],
             "less_optimized": False,
             "retry_limit": 1000,
@@ -334,3 +338,11 @@ class FastDiffPyConfig:
     @fl_inserted_counter.setter
     def fl_inserted_counter(self, value):
         self._task_dict["first_loop"]["inserted_counter"] = value
+
+    @property
+    def database(self):
+        return self._task_dict["database"]
+
+    @database.setter
+    def database(self, value):
+        self._task_dict["database"] = value
