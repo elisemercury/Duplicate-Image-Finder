@@ -611,14 +611,6 @@ class FastDifPy:
         self.config.fl_purge = purge
         self.config.write_to_file()
 
-        # Fetching previous counter.
-        prev_insert_count = self.config.fl_inserted_counter
-
-        inserted_counter = 0
-        if prev_insert_count is not None:
-            inserted_counter = prev_insert_count
-            self.logger.info("Retrieving inserted_counter from config - might be to low.")
-
         # Reset the marked files in any case.
         self.logger.debug("Reset as in progress marked files")
         self.db.reset_first_loop_mark()
@@ -670,8 +662,7 @@ class FastDifPy:
                 break
 
             self.first_loop_in.put(arg.to_json())
-            inserted_counter += 1
-            self.config.fl_inserted_counter = inserted_counter
+            self.config.fl_inserted_counter += 1
 
         v = self.verbose
         # start processes for cpu
