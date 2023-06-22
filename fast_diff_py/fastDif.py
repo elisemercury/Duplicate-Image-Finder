@@ -258,15 +258,7 @@ def find_best_image(args: Tuple[list, FunctionType]) -> Tuple[dict, list]:
 
 
 class FastDifPy:
-    __p_root_dir_b: Union[str, None]    # TODO make property store on set
-
-    __thumb_dir_a: str
-    __thumb_dir_b: Union[str, None]
-
-
     __similarity_threshold = 200        # TODO make property store on set
-
-    __has_dir_b: bool = False
 
     ignore_names: List[str]             # TODO make property store on set
     ignore_paths: List[str]             # TODO make property store on set.
@@ -349,7 +341,7 @@ class FastDifPy:
             elif temp_b.startswith(temp_a):
                 raise ValueError(f"{directory_b} is a subdirectory of {directory_a}")
 
-        self.p_root_dir_b = directory_b
+        self.config.p_root_dir_b = directory_b
         self.config.p_root_dir_a = directory_a
 
         debug = False
@@ -413,7 +405,7 @@ class FastDifPy:
         self.db.create_directory_tables()
 
         self.__recursive_index(True)
-        if self.has_dir_b:
+        if self.config.has_dir_b:
             self.__recursive_index(False)
 
         self.config.cfg_dict["state"] = "indexed_dirs"
@@ -438,7 +430,7 @@ class FastDifPy:
             if dir_a:
                 path = self.config.p_root_dir_a
             else:
-                path = self.p_root_dir_b
+                path = self.config.p_root_dir_b
 
         for file_name in os.listdir(path):
             full_path = os.path.join(path, file_name)
@@ -482,7 +474,7 @@ class FastDifPy:
         byte_count_a = dir_a_count * self.config.thumbnail_size_x * self.config.thumbnail_size_y * 3
         byte_count_b = dir_b_count * self.config.thumbnail_size_x * self.config.thumbnail_size_y * 3
 
-        dir_b = self.p_root_dir_b if self.has_dir_b else ""
+        dir_b = self.config.p_root_dir_b if self.config.has_dir_b else ""
 
         target = max(len(self.config.p_root_dir_a), len(dir_b), len('the two dirs '))
 
@@ -490,9 +482,9 @@ class FastDifPy:
             print(
                 f"Estimated disk usage by {fill(self.config.p_root_dir_a, target)}: " + h(byte_count_a, "B") +
                 " bytes")
-            if self.has_dir_b:
+            if self.config.has_dir_b:
                 print(
-                    f"Estimated disk usage by {fill(self.p_root_dir_b, target)}: " + h(byte_count_b, "B") +
+                    f"Estimated disk usage by {fill(self.config.p_root_dir_b, target)}: " + h(byte_count_b, "B") +
                     " bytes")
                 print(f"Estimated disk usage by {fill('the two dirs ', target)}: " +
                       h(byte_count_b + byte_count_a, "B") + "bytes")
@@ -513,14 +505,14 @@ class FastDifPy:
         if thumbs:
             self.logger.info("Deleting Thumbnails")
             try:
-                shutil.rmtree(self.thumb_dir_a)
-                self.logger.info(f"Deleted {self.thumb_dir_a}")
+                shutil.rmtree(self.config.thumb_dir_a)
+                self.logger.info(f"Deleted {self.config.thumb_dir_a}")
             except FileNotFoundError:
                 pass
-            if self.has_dir_b:
+            if self.config.has_dir_b:
                 try:
-                    shutil.rmtree(self.thumb_dir_b)
-                    self.logger.info(f"Deleted {self.thumb_dir_b}")
+                    shutil.rmtree(self.config.thumb_dir_b)
+                    self.logger.info(f"Deleted {self.config.thumb_dir_b}")
                 except FileNotFoundError:
                     pass
 
@@ -548,11 +540,11 @@ class FastDifPy:
 
         :return:
         """
-        if not os.path.exists(self.thumb_dir_a):
-            os.makedirs(self.thumb_dir_a)
+        if not os.path.exists(self.config.thumb_dir_a):
+            os.makedirs(self.config.thumb_dir_a)
 
-        if self.has_dir_b and not os.path.exists(self.thumb_dir_b):
-            os.makedirs(self.thumb_dir_b)
+        if self.config.has_dir_b and not os.path.exists(self.config.thumb_dir_b):
+            os.makedirs(self.config.thumb_dir_b)
 
     def send_termination_signal(self, first_loop: bool = False):
         """
@@ -775,7 +767,7 @@ class FastDifPy:
         :return: the thumbnail path.
         """
         name = self.db.get_thumb_name(key)
-        directory = self.thumb_dir_a if dir_a else self.thumb_dir_b
+        directory = self.config.thumb_dir_a if dir_a else self.config.thumb_dir_b
 
         # return the name if it existed already
         if name is not None:
@@ -957,7 +949,7 @@ class FastDifPy:
         a_count = self.db.get_dir_count(dir_a=True)
         b_count = self.db.get_dir_count(dir_a=False)
 
-        if self.has_dir_b:
+        if self.config.has_dir_b:
             comps = a_count * b_count
 
             if comps < (cpu_proc + gpu_proc) * 90:
@@ -1111,7 +1103,7 @@ class FastDifPy:
                 iterations += 1
 
                 # update last key
-                if self.has_dir_b:
+                if self.config.has_dir_b:
                     if not self.second_loop_base_a:
                         self.second_loop_queue_status[p]["last_key"] = row_a[-1]["key"]
                     else:
@@ -1180,7 +1172,7 @@ class FastDifPy:
                     start_a = i
 
         # We have a dir_b, replace rows_b with actual rows form that table
-        if self.has_dir_b:
+        if self.config.has_dir_b:
             # we have a dir_b, so we set the start to 0 because we can compare the first two images.
             start_b = 0
 
@@ -1202,7 +1194,7 @@ class FastDifPy:
         # since the number of entries is small, we can just perform a basic packaged for loop.
         for i in range(start_a, len(rows_a) - 1):
             if i != start_a:
-                start_b = int(not self.has_dir_b) * (i + 1)  # i + 1 if not dir b, else 0
+                start_b = int(not self.config.has_dir_b) * (i + 1)  # i + 1 if not dir b, else 0
 
             for j in range(start_b, len(rows_b)):
                 # All queues full, no need to continue
@@ -1301,7 +1293,7 @@ class FastDifPy:
 
                 # updating the last_b bc we can save us some effort if we don't compute the all to all but the triangle
                 # matrix.
-                if not self.has_dir_b:
+                if not self.config.has_dir_b:
                     last_b = last_a
 
                 # We go back to the beginning just for good measure.
@@ -1358,7 +1350,7 @@ class FastDifPy:
         # check if folder a has enough, so we can iterate using the files as fixed during an iteration and then switch
         # the file.
         if len(rows) < processes:
-            if self.has_dir_b:
+            if self.config.has_dir_b:
 
                 # trying to use the directory b as a fixed directory
                 rows = self.db.fetch_many_after_key(directory_a=False, count=processes)
@@ -1379,7 +1371,7 @@ class FastDifPy:
             for row in rows:
                 # The last_key can be set if we have second_loop_base_a and no dir_b because we're looking only at an
                 # upper triangular matrix of the Cartesian product of the elements of the image itself.
-                temp = {"row_a": row, "last_key": None if self.has_dir_b else row["key"]}
+                temp = {"row_a": row, "last_key": None if self.config.has_dir_b else row["key"]}
 
                 self.second_loop_queue_status.append(temp)
         else:
@@ -1403,7 +1395,7 @@ class FastDifPy:
 
         # get the limit for the next key
         for i in range(len(self.second_loop_queue_status)):
-            if self.has_dir_b:
+            if self.config.has_dir_b:
                 if not self.second_loop_base_a:
                     next_key = max(self.second_loop_queue_status[i]["row_b"]["key"], next_key)
                     continue
@@ -1411,7 +1403,7 @@ class FastDifPy:
             next_key = max(self.second_loop_queue_status[i]["row_a"]["key"], next_key)
 
         # process case, when we're looking to move the dir_b
-        if self.has_dir_b:
+        if self.config.has_dir_b:
             if not self.second_loop_base_a:
                 rows = self.db.fetch_many_after_key(directory_a=False, starting=next_key, count=1)
 
@@ -1449,7 +1441,7 @@ class FastDifPy:
         assert type(self.second_loop_queue_status) is list, "__fetch_rows called with not_optimized process"
 
         # we have a directory b
-        if self.has_dir_b:
+        if self.config.has_dir_b:
 
             # we don't keep the images of dir_a fixed but the ones of dir_b
             if not self.second_loop_base_a:
@@ -1668,7 +1660,7 @@ class FastDifPy:
         if thumb_name is None:
             return None
 
-        thumb_dir = self.thumb_dir_a if dir_a else self.thumb_dir_b
+        thumb_dir = self.config.thumb_dir_a if dir_a else self.config.thumb_dir_b
         return os.path.join(thumb_dir, thumb_name[1])
 
     # ==================================================================================================================
@@ -2014,38 +2006,6 @@ class FastDifPy:
     # ------------------------------------------------------------------------------------------------------------------
     # PROPERTIES
     # ------------------------------------------------------------------------------------------------------------------
-
-
-
-    @property
-    def p_root_dir_b(self):
-        return self.__p_root_dir_b
-
-    @p_root_dir_b.setter
-    def p_root_dir_b(self, value):
-        if value is None:
-            self.__p_root_dir_b = None
-            self.__thumb_dir_b = None
-            self.__has_dir_b = False
-
-        elif os.path.exists(value):
-            self.__p_root_dir_b = value
-            self.__thumb_dir_b = os.path.join(self.__p_root_dir_b, ".temp_thumbnails")
-            self.__has_dir_b = True
-        else:
-            raise ValueError("The root dir b is not None yet it doesn't exist")
-
-    @property
-    def thumb_dir_a(self):
-        return self.__thumb_dir_a
-
-    @property
-    def thumb_dir_b(self):
-        return self.__thumb_dir_b
-
-    @property
-    def has_dir_b(self):
-        return self.__has_dir_b
 
     @property
     def similarity_threshold(self):
