@@ -299,32 +299,6 @@ class FastDifPy:
         - config_path: str - Path to the config that stores the progress of the program (for progress recovery on stop)
         - config_purge: str - Ignore preexisting config and overwrite it.
         """
-
-        if not os.path.isdir(directory_a):
-            raise NotADirectoryError(f"{directory_a} is not a directory")
-
-        if directory_b is not None and not os.path.isdir(directory_b):
-            raise NotADirectoryError(f"{directory_b} is not a directory")
-
-        directory_a = os.path.abspath(directory_a)
-        directory_b = os.path.abspath(directory_b) if directory_b is not None else None
-
-        # make sure the paths aren't subdirs of each other.
-        if directory_b is not None:
-            temp_a = directory_a + os.sep
-            temp_b = directory_b + os.sep
-            if temp_a.startswith(temp_b):
-                raise ValueError(f"{directory_a} is a subdirectory of {directory_b}")
-            elif temp_b.startswith(temp_a):
-                raise ValueError(f"{directory_b} is a subdirectory of {directory_a}")
-
-        self.config.p_root_dir_b = directory_b
-        self.config.p_root_dir_a = directory_a
-
-        debug = False
-        if "debug" in kwargs.keys():
-            debug = kwargs.get("debug")
-
         config_path = None
         if "config_path" in kwargs.keys():
             config_path = kwargs.get("config_path")
@@ -335,14 +309,42 @@ class FastDifPy:
 
         self.config = FastDiffPyConfig(path=config_path, purge=config_purge)
 
-        # Loading config and creating default database if desired
-        if not self.verify_config() and default_db:
-            self.db = SQLiteDatabase(path=os.path.join(self.config.p_root_dir_a, "diff.db"))
+        if not self.verify_config():
+            # Only set the directory_a and directory_b when the config is not set.
+            if not os.path.isdir(directory_a):
+                raise NotADirectoryError(f"{directory_a} is not a directory")
+
+            if directory_b is not None and not os.path.isdir(directory_b):
+                raise NotADirectoryError(f"{directory_b} is not a directory")
+
+            directory_a = os.path.abspath(directory_a)
+            directory_b = os.path.abspath(directory_b) if directory_b is not None else None
+
+            # make sure the paths aren't subdirs of each other.
+            if directory_b is not None:
+                temp_a = directory_a + os.sep
+                temp_b = directory_b + os.sep
+                if temp_a.startswith(temp_b):
+                    raise ValueError(f"{directory_a} is a subdirectory of {directory_b}")
+                elif temp_b.startswith(temp_a):
+                    raise ValueError(f"{directory_b} is a subdirectory of {directory_a}")
+
+            self.config.p_root_dir_b = directory_b
+            self.config.p_root_dir_a = directory_a
+
+            # Creating default database if desired.
+            if default_db:
+                self.db = SQLiteDatabase(path=os.path.join(self.config.p_root_dir_a, "diff.db"))
+
+            self.config.ignore_paths = []
+            self.config.ignore_names = []
+
+
+        debug = False
+        if "debug" in kwargs.keys():
+            debug = kwargs.get("debug")
 
         self.prepare_logging(debug=debug)
-
-        self.config.ignore_paths = []
-        self.config.ignore_names = []
 
         # Setting the first stuff in the config
         self.config.state = "init"
