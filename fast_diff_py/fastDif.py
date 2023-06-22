@@ -258,17 +258,7 @@ def find_best_image(args: Tuple[list, FunctionType]) -> Tuple[dict, list]:
 
 
 class FastDifPy:
-    __similarity_threshold = 200        # TODO make property store on set
-
-    ignore_names: List[str]             # TODO make property store on set
-    ignore_paths: List[str]             # TODO make property store on set.
-
-    supported_file_types = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".gif", ".webp"}  # TODO make property store on set.
-
     __db: Union[Database, None]
-
-    # short-circuiting variables
-    enough_images_to_compare: bool = False   # TODO make property store on set
 
     # relative to child processes
     first_loop_in: mp.Queue = None  # the tasks sent to the child processes
@@ -300,8 +290,6 @@ class FastDifPy:
     file_handler: logging.FileHandler = None
     stream_handler: logging.StreamHandler = None
     debug_logger: logging.FileHandler = None
-
-    __verbose: bool = False         # TODO make property store on set.
 
     # config
     config: FastDiffPyConfig
@@ -364,8 +352,8 @@ class FastDifPy:
 
         self.prepare_logging(debug=debug)
 
-        self.ignore_paths = []
-        self.ignore_names = []
+        self.config.ignore_paths = []
+        self.config.ignore_names = []
 
         # Setting the first stuff in the config
         self.config.state = "init"
@@ -413,7 +401,7 @@ class FastDifPy:
 
         # get the number of images and create short circuit.
         im_num = self.db.get_dir_count()
-        self.enough_images_to_compare = im_num > 1
+        self.config.enough_images_to_compare = im_num > 1
 
     def __recursive_index(self, dir_a: bool = True, path: str = None, ignore_thumbnail: bool = True):
         """
@@ -436,11 +424,11 @@ class FastDifPy:
             full_path = os.path.join(path, file_name)
 
             # ignore a path if given
-            if full_path in self.ignore_paths:
+            if full_path in self.config.ignore_paths:
                 continue
 
             # ignoring based only on name
-            if file_name in self.ignore_names:
+            if file_name in self.config.ignore_names:
                 continue
 
             # Thumbnail directory is called .temp_thumbnails
@@ -453,7 +441,7 @@ class FastDifPy:
 
             if os.path.isfile(full_path):
                 # check if the file is supported, then add it to the database
-                if os.path.splitext(full_path)[1].lower() in self.supported_file_types:
+                if os.path.splitext(full_path)[1].lower() in self.config.supported_file_types:
                     self.db.add_file(full_path, file_name, dir_a)
 
     def estimate_disk_usage(self, print_results: bool = True) -> Tuple[int, int]:
@@ -650,7 +638,7 @@ class FastDifPy:
         # INFO: Since the database marks files that are
 
         # Short circuit if there are no images in the database.
-        if not self.enough_images_to_compare:
+        if not self.config.enough_images_to_compare:
             self.logger.debug("No images in database, aborting.")
             return
 
@@ -883,7 +871,7 @@ class FastDifPy:
         self.config.write_to_file()
 
         # Short circuit if there are no images in the database.
-        if not self.enough_images_to_compare:
+        if not self.config.enough_images_to_compare:
             self.logger.debug("No images in database, aborting.")
             return
 
@@ -909,7 +897,7 @@ class FastDifPy:
             if similarity_threshold < 0:
                 raise ValueError("Similarity needs to be greater than 0")
 
-        self.similarity_threshold = similarity_threshold
+        self.config.similarity_threshold = similarity_threshold
 
         self.cpu_handles = []
         self.gpu_handles = []
@@ -1489,7 +1477,7 @@ class FastDifPy:
             key_b=row_b["key"],
             store_path=self.create_plt_name(key_a=row_a["key"], key_b=row_b["key"]),
             store_compare=self.sl_make_diff_plots,
-            compare_threshold=self.similarity_threshold,
+            compare_threshold=self.config.similarity_threshold,
             size_x=self.config.thumbnail_size_x,
             size_y=self.config.thumbnail_size_y,
         )
@@ -1675,7 +1663,7 @@ class FastDifPy:
         :param dif_based: if the relative difference should be used or hash based matching should be done.
         :return:
         """
-        if not self.enough_images_to_compare:
+        if not self.config.enough_images_to_compare:
             return {}, []
 
         if not dif_based:
@@ -1859,7 +1847,7 @@ class FastDifPy:
         :return:
         """
         if similarity is None:
-            similarity = self.similarity_threshold
+            similarity = self.config.similarity_threshold
 
         if similarity <= 0:
             raise ValueError("No Similarity provided and / or similarity_threshold from second loop not usable.")
@@ -2008,28 +1996,18 @@ class FastDifPy:
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def similarity_threshold(self):
-        return self.__similarity_threshold
-
-    @similarity_threshold.setter
-    def similarity_threshold(self, value):
-        if type(value) is not float or value < 0:
-            raise ValueError("similarity threshold needs to be float and greater than 0.")
-        self.__similarity_threshold = value
-
-    @property
     def verbose(self):
-        return self.__verbose
+        return self.config.verbose
 
     @verbose.setter
     def verbose(self, value):
         if type(value) is not bool:
             raise TypeError("Verbose is a boolean")
 
-        self.__verbose = value
+        self.config.verbose = value
 
         # update the logging level.
-        if self.__verbose:
+        if self.config.verbose:
             self.stream_handler.setLevel(logging.INFO)
         else:
             self.stream_handler.setLevel(logging.WARNING)
