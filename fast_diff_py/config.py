@@ -36,7 +36,7 @@ class FastDiffPyConfig:
                 "shift_amount": 4,
                 "cpu_proc": None,
                 "purge": True,
-                "inserted_counter": None,
+                "inserted_counter": 0,
             },
             "second_loop": {
                 "matching_hash": False,
@@ -74,7 +74,7 @@ class FastDiffPyConfig:
         :return:
         """
         with open(self.cfg_path, "w") as file:
-            json.dump(self._task_dict, file)
+            json.dump(self.__task_dict, file)
 
     @property
     def _task_dict(self):
