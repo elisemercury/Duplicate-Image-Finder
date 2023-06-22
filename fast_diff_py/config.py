@@ -26,7 +26,7 @@ class FastDiffPyConfig:
             "thumbnail_size_y": 64,
             "p_root_dir_a": None,
             "p_root_dir_b": None,
-            "similarity_threshold": 200,
+            "similarity_threshold": 200.0,
             "ignore_names": [],
             "ignore_paths": [],
             "enough_images_to_compare": [],
