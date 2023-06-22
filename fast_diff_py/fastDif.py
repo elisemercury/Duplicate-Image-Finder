@@ -88,7 +88,7 @@ class FastDifPy:
         if "config_path" in kwargs.keys():
             config_path = kwargs.get("config_path")
 
-        config_purge = False
+        config_purge = True
         if "config_purge" in kwargs.keys():
             config_purge = kwargs.get("config_purge")
 
