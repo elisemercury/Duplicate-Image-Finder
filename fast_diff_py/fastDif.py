@@ -385,7 +385,7 @@ class FastDifPy:
         if self.config.has_dir_b:
             self.__recursive_index(False)
 
-        self.config.cfg_dict["state"] = "indexed_dirs"
+        self.config.state = "indexed_dirs"
         self.config.write_to_file()
 
         # get the number of images and create short circuit.
