@@ -8,9 +8,10 @@ import warnings
 class FastDiffPyConfig:
     cfg_path: str
     update_timeout: int = 30
+    retain_config: bool = True
 
     __cfg_dict: dict
-    __last_update: datetime.datetime
+    __last_update: datetime.datetime = datetime.datetime.now()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Class Config Storage
@@ -78,7 +79,7 @@ class FastDiffPyConfig:
 
     @property
     def _cfg_dict(self):
-        if (datetime.datetime.now() - self.__last_update).total_seconds() > self.update_timeout:
+        if (datetime.datetime.now() - self.__last_update).total_seconds() > self.update_timeout and self.retain_config:
             self.write_to_file()
             self.__last_update = datetime.datetime.now()
 
@@ -87,7 +88,7 @@ class FastDiffPyConfig:
     @_cfg_dict.setter
     def _cfg_dict(self, value):
         self.__cfg_dict = value
-        if (datetime.datetime.now() - self.__last_update).total_seconds() > self.update_timeout:
+        if (datetime.datetime.now() - self.__last_update).total_seconds() > self.update_timeout and self.retain_config:
             self.write_to_file()
             self.__last_update = datetime.datetime.now()
 
