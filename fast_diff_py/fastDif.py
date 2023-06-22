@@ -877,12 +877,10 @@ class FastDifPy:
 
         if not self.config.less_optimized:
             self.second_loop_in = [mp.Queue() for _ in range(cpu_proc + gpu_proc)]
-            child_args = [(self.second_loop_in[i], self.second_loop_out, i, False if i < cpu_proc else True, False,
-                           False, self.verbose)
+            child_args = [(self.second_loop_in[i], self.second_loop_out, i, i >= cpu_proc, False, False, self.verbose)
                           for i in range(gpu_proc + cpu_proc)]
         else:
-            child_args = [(self.second_loop_in, self.second_loop_out, i, False if i < cpu_proc else True, False,
-                           False, self.verbose)
+            child_args = [(self.second_loop_in, self.second_loop_out, i, i >= cpu_proc , False, False, self.verbose)
                           for i in range(gpu_proc + cpu_proc)]
 
         self.db.create_dif_table()
