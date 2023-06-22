@@ -45,6 +45,7 @@ class FastDiffPyConfig:
     __retry_limit: int = 1000
 
     __verbose: bool = False
+    __state: str = None
 
     def __init__(self, path: str = None, purge: bool = False):
         # set the config_path
@@ -298,5 +299,15 @@ class FastDiffPyConfig:
     def verbose(self, value):
         self.__verbose = value
         self.__cfg_dict["verbose"] = value
+        self.write_to_file()
+
+    @property
+    def state(self):
+        return self.__state
+
+    @state.setter
+    def state(self, value):
+        self.__state = value
+        self.__cfg_dict["state"] = value
         self.write_to_file()
 
