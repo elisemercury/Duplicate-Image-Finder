@@ -677,8 +677,8 @@ class FastDifPy:
 
         # handle the running state of the loop
         while run:
-            if inserted_counter % 100 == 0:
-                self.logger.info(f"Inserted {inserted_counter} images.")
+            if self.config.fl_inserted_counter % 100 == 0:
+                self.logger.info(f"Inserted {self.config.fl_inserted_counter} images.")
 
             if self.handle_result_of_first_loop(self.first_loop_out, compute_hash):
                 arg = self.__generate_first_loop_obj(amount, compute_hash, compute_thumbnails)
@@ -690,7 +690,7 @@ class FastDifPy:
 
                 else:
                     self.first_loop_in.put(arg.to_json())
-                    inserted_counter += 1
+                    self.config.fl_inserted_counter += 1
                     timeout = 0
             else:
                 time.sleep(1)
@@ -719,8 +719,8 @@ class FastDifPy:
         self.join_all_children()
         assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
                                             f"Remaining: {self.first_loop_out.qsize()}"
-        del self.config.cfg_dict["first_loop"]
-        self.config.cfg_dict["state"] = "first_loop_done"
+
+        self.config.state = "first_loop_done"
         self.config.write_to_file()
         self.logger.info("All Images have been preprocessed.")
 
