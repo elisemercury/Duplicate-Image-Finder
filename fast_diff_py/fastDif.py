@@ -270,20 +270,9 @@ class FastDifPy:
     second_loop_queue_status: Union[List[dict], dict] = None
     second_loop_base_a: bool = True
 
-    # argument storage
-    sl_matching_hash: bool = False
-    sl_has_thumb: bool = False
-    sl_matching_aspect: bool = False
-    sl_make_diff_plots: bool = False
-    sl_plot_output_dir: str = None
-
     # multiprocessing handles
     cpu_handles = None
     gpu_handles = None
-
-    # default config
-    less_optimized: bool = False    # TODO make property store on set.
-    retry_limit: int = 1000         # TODO make property store on set.
 
     # logger / CLI Output
     logger: logging.Logger = None
@@ -614,16 +603,16 @@ class FastDifPy:
         :return:
         """
         # Writing the arguments to config
-        self.config.cfg_dict["state"] = "first_loop_in_progress"
-        self.config.cfg_dict["first_loop"] = {}
-        self.config.cfg_dict["first_loop"]["compute_thumbnails"] = compute_thumbnails
-        self.config.cfg_dict["first_loop"]["compute_hash"] = compute_hash
-        self.config.cfg_dict["first_loop"]["amount"] = amount
-        self.config.cfg_dict["first_loop"]["cpu_proc"] = cpu_proc
-        self.config.cfg_dict["first_loop"]["purge"] = purge
+        self.config.state = "first_loop_in_progress"
+        self.config.fl_compute_thumbnails = compute_thumbnails
+        self.config.fl_compute_hash = compute_hash
+        self.config.fl_shift_amount = amount
+        self.config.fl_cpu_proc = cpu_proc
+        self.config.fl_purge = purge
+        self.config.write_to_file()
 
         # Fetching previous counter.
-        prev_insert_count = self.config.cfg_dict["first_loop"].get("inserted_counter")
+        prev_insert_count = self.config.fl_inserted_counter
 
         inserted_counter = 0
         if prev_insert_count is not None:
@@ -682,7 +671,7 @@ class FastDifPy:
 
             self.first_loop_in.put(arg.to_json())
             inserted_counter += 1
-            self.config.cfg_dict["first_loop"]["inserted_counter"] = inserted_counter
+            self.config.fl_inserted_counter = inserted_counter
 
         v = self.verbose
         # start processes for cpu
@@ -761,7 +750,7 @@ class FastDifPy:
         if name is not None:
             return os.path.join(directory, name[1])
 
-        name = self.db.generate_new_thumb_name(key, filename, dir_a=dir_a, retry_limit=self.retry_limit)
+        name = self.db.generate_new_thumb_name(key, filename, dir_a=dir_a, retry_limit=self.config.retry_limit)
         return os.path.join(directory, name)
 
     def __generate_first_loop_obj(self, amount: int, compute_hash: bool, compute_thumbnails: bool) \
@@ -858,12 +847,7 @@ class FastDifPy:
         :return:
         """
         # Writing to config.
-        self.config.cfg_dict["state"] = "second_loop_in_progress"
-        self.config.cfg_dict["second_loop"] = {}
-        self.config.cfg_dict["second_loop"]["only_matching_aspect"] = only_matching_aspect
-        self.config.cfg_dict["second_loop"]["only_matching_hash"] = only_matching_hash
-        self.config.cfg_dict["second_loop"]["make_diff_plots"] = make_diff_plots
-        self.config.cfg_dict["second_loop"]["similarity_threshold"] = similarity_threshold
+        self.config.state = "second_loop_in_progress"
         self.config.cfg_dict["second_loop"]["gpu_proc"] = gpu_proc
         self.config.cfg_dict["second_loop"]["cpu_proc"] = cpu_proc
         self.config.cfg_dict["second_loop"]["cpu_proc"] = cpu_proc
@@ -906,7 +890,7 @@ class FastDifPy:
         self.second_loop_out = mp.Queue()
         self.second_loop_in = mp.Queue()
 
-        if not self.less_optimized:
+        if not self.config.less_optimized:
             self.second_loop_in = [mp.Queue() for _ in range(cpu_proc + gpu_proc)]
             child_args = [(self.second_loop_in[i], self.second_loop_out, i, False if i < cpu_proc else True, False,
                            False, self.verbose)
@@ -1024,7 +1008,7 @@ class FastDifPy:
         if not os.path.exists(diff_location):
             os.makedirs(diff_location)
 
-        self.sl_plot_output_dir = diff_location
+        self.config.sl_plot_output_dir = diff_location
         self.db.create_plot_table(purge=purge)
 
     def update_queues(self):
@@ -1216,8 +1200,9 @@ class FastDifPy:
         :return: number of images inserted into queues.
         """
         # TODO Test this function seems like it has a bug.
-        assert self.less_optimized, "This functions needs to be called in the less_optimized mode since it assumes " \
-                                    "that the attribute second_loop_in is of type mp.Queue and not List[mp.Queue]"
+        assert self.config.less_optimized, "This functions needs to be called in the less_optimized mode since it " \
+                                           "assumes that the attribute second_loop_in is of type mp.Queue and " \
+                                           "not List[mp.Queue]"
         # initialize loop vars
         procs = len(self.cpu_handles) + len(self.gpu_handles)
 
@@ -1327,7 +1312,7 @@ class FastDifPy:
         :return:
         """
         # we are using less optimized, so we are going straight for the not optimized algorithm.
-        if self.less_optimized:
+        if self.config.less_optimized:
             self.__refill_queues_non_optimized(init=True)
             return
 
@@ -1458,12 +1443,12 @@ class FastDifPy:
         thumb_a_path = None
         thumb_b_path = None
 
-        if self.sl_has_thumb:
+        if self.config.sl_has_thumb:
             thumb_a_path = self.get_thumb_path_from_db(key=row_a["key"], dir_a=True)
             thumb_b_path = self.get_thumb_path_from_db(key=row_b["key"], dir_a=True)
 
         # performing match if desired
-        if self.sl_matching_aspect:
+        if self.config.sl_matching_aspect:
             if not self.match_aspect(row_a=row_a, row_b=row_b):
                 return False, False
 
@@ -1476,13 +1461,13 @@ class FastDifPy:
             key_a=row_a["key"],
             key_b=row_b["key"],
             store_path=self.create_plt_name(key_a=row_a["key"], key_b=row_b["key"]),
-            store_compare=self.sl_make_diff_plots,
+            store_compare=self.config.sl_make_diff_plots,
             compare_threshold=self.config.similarity_threshold,
             size_x=self.config.thumbnail_size_x,
             size_y=self.config.thumbnail_size_y,
         )
 
-        target_queue = self.second_loop_in if self.less_optimized else self.second_loop_in[queue_index]
+        target_queue = self.second_loop_in if self.config.less_optimized else self.second_loop_in[queue_index]
 
         # Emptiness of queue needs to be established before calling this function
         try:
@@ -1499,11 +1484,11 @@ class FastDifPy:
         :param key_b: key of the second image
         :return: path to the plot or None
         """
-        if not self.sl_make_diff_plots:
+        if not self.config.sl_make_diff_plots:
             return None
 
         nm = self.db.make_plot_name(key_a=key_a, key_b=key_b)
-        return os.path.join(self.sl_plot_output_dir, nm)
+        return os.path.join(self.config.sl_plot_output_dir, nm)
 
     @staticmethod
     def match_aspect(row_a: dict, row_b: dict):
