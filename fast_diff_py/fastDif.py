@@ -832,7 +832,7 @@ class FastDifPy:
     # ==================================================================================================================
 
     def second_loop_iteration(self, only_matching_aspect: bool = False, only_matching_hash: bool = False,
-                              make_diff_plots: bool = False, similarity_threshold: float = 200.0, gpu_proc: int = 0,
+                              make_diff_plots: bool = False, similarity_threshold: Union[int, float] = 200.0, gpu_proc: int = 0,
                               cpu_proc: int = None, diff_location: str = None):
         """
         Similarity old values: high - 0.15, medium 200, low 1000
@@ -848,11 +848,8 @@ class FastDifPy:
         """
         # Writing to config.
         self.config.state = "second_loop_in_progress"
-        self.config.cfg_dict["second_loop"]["gpu_proc"] = gpu_proc
-        self.config.cfg_dict["second_loop"]["cpu_proc"] = cpu_proc
-        self.config.cfg_dict["second_loop"]["cpu_proc"] = cpu_proc
-        self.config.cfg_dict["second_loop"]["diff_location"] = diff_location
-        self.config.write_to_file()
+        self.config.sl_gpu_proc = gpu_proc
+        self.config.sl_cpu_proc = cpu_proc
 
         # Short circuit if there are no images in the database.
         if not self.config.enough_images_to_compare:
@@ -862,20 +859,23 @@ class FastDifPy:
         assert gpu_proc >= 0, "Number of GPU Processes needs to be greater than zero"
         if cpu_proc is None:
             cpu_proc = mp.cpu_count()
+            self.config.sl_cpu_proc = cpu_proc
 
         assert cpu_proc >= 1, "Number of GPU Processes needs to be greater than zero"
 
         # storing arguments in attributes to reduce number of args of function
-        self.sl_matching_aspect = only_matching_aspect
-        self.sl_make_diff_plots = make_diff_plots
-        self.sl_matching_hash = only_matching_hash
+        self.config.sl_matching_aspect = only_matching_aspect
+        self.config.sl_make_diff_plots = make_diff_plots
+        self.config.sl_matching_hash = only_matching_hash
 
-        self.sl_has_thumb = self.db.test_thumb_table_existence()
+        self.config.sl_has_thumb = self.db.test_thumb_table_existence()
 
         if make_diff_plots:
+            # diff_location is stored in config in this function.
             self.create_plot_dir(diff_location=diff_location)
 
         self.config.similarity_threshold = float(similarity_threshold)
+        self.config.write_to_file()
 
         self.cpu_handles = []
         self.gpu_handles = []
