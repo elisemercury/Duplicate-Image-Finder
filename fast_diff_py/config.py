@@ -282,7 +282,6 @@ class FastDiffPyConfig:
 
     @less_optimized.setter
     def less_optimized(self, value):
-        self.__less_optimized = value
         self._task_dict["less_optimized"] = value
 
     @property
