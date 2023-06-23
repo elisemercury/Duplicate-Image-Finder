@@ -1113,25 +1113,10 @@ class FastDifPy:
             return
 
         # from a fetch the first set of images
-        rows = self.db.fetch_many_after_key(directory_a=True, count=processes)
-        self.config.sl_base_a = True
-
-        # check if folder a has enough, so we can iterate using the files as fixed during an iteration and then switch
-        # the file.
-        if len(rows) < processes:
-            if self.config.has_dir_b:
-
-                # trying to use the directory b as a fixed directory
-                rows = self.db.fetch_many_after_key(directory_a=False, count=processes)
-                if len(rows) < processes:
-                    self.__refill_queues_small_non_optimized(init=True, procs=processes)
-                    return
-                else:
-                    self.config.sl_base_a = False
-            # No directory b and less than number of processes images.
-            else:
-                self.__refill_queues_small_non_optimized(init=True, procs=processes)
-                return
+        if self.config.sl_base_a:
+            rows = self.db.fetch_many_after_key(directory_a=True, count=processes)
+        else:
+            rows = self.db.fetch_many_after_key(directory_a=False, count=processes)
 
         # populating the files of the second loop.
         self.config.sl_queue_status = []
