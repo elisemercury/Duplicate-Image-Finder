@@ -621,6 +621,8 @@ class FastDifPy:
         :param diff_location: Where the plots should be stored (needs to be provided if make_diff_plots is true)
         :return:
         """
+        # TODO check the number of images with self.db.get_dir_count() -> set the less optimized flag there and then
+        #   make the adjustment fro there.
         # Writing to config.
         self.config.state = "second_loop_in_progress"
         self.config.sl_gpu_proc = gpu_proc
