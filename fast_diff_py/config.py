@@ -2,7 +2,7 @@ import json
 import os
 import datetime
 import warnings
-
+from typing import Union, List
 
 class FastDiffPyConfig:
     cfg_path: str
@@ -46,6 +46,8 @@ class FastDiffPyConfig:
                 "plot_output_dir": None,
                 "cpu_proc": None,
                 "gpu_proc": 0,
+                "queue_status": [] ,
+                "loop_base_a": True ,
             },
             "database":{
                 "type": "sqlite",
@@ -249,6 +251,22 @@ class FastDiffPyConfig:
     @sl_cpu_proc.setter
     def sl_cpu_proc(self, value):
         self._task_dict["second_loop"]["cpu_proc"] = value
+
+    @property
+    def sl_queue_status(self) -> Union[List[dict], dict]:
+        return self._task_dict["second_loop"]["queue_status"]
+
+    @sl_queue_status.setter
+    def sl_queue_status(self, value):
+        self._task_dict["second_loop"]["queue_status"] = value
+
+    @property
+    def sl_base_a(self):
+        return self._task_dict["second_loop"]["loop_base_a"]
+
+    @sl_base_a.setter
+    def sl_base_a(self, value):
+        self._task_dict["second_loop"]["loop_base_a"] = value
 
     @property
     def supported_file_types(self):

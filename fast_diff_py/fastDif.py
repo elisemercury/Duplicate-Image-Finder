@@ -52,9 +52,6 @@ class FastDifPy:
     second_loop_in: Union[List[mp.Queue], mp.Queue] = None
     second_loop_out: mp.Queue = None
 
-    second_loop_queue_status: Union[List[dict], dict] = None
-    second_loop_base_a: bool = True
-
     # multiprocessing handles
     cpu_handles = None
     gpu_handles = None
@@ -793,11 +790,11 @@ class FastDifPy:
         :return:
         """
         # testing if the
-        if type(self.second_loop_queue_status) is dict:
+        if type(self.config.sl_queue_status) is dict:
             return self.__refill_queues_small_non_optimized()
 
-        assert type(self.second_loop_queue_status) is list, f"Unexpected type of second_loop_queue_status: " \
-                                                            f"{type(self.second_loop_queue_status).__name__}, " \
+        assert type(self.config.sl_queue_status) is list, f"Unexpected type of config.sl_queue_status: " \
+                                                            f"{type(self.config.sl_queue_status).__name__}, " \
                                                             f"valid are list and dict"
 
         return self.__refill_queues_optimized()
@@ -823,9 +820,9 @@ class FastDifPy:
             not_full = True
             iterations = 0
             while not_full:
-                if self.second_loop_base_a:
+                if self.config.sl_base_a:
                     for i in range(len(row_b)):
-                        insertion_success, full = self.schedule_pair(row_a=self.second_loop_queue_status[p]["row_a"],
+                        insertion_success, full = self.schedule_pair(row_a=self.config.sl_queue_status[p]["row_a"],
                                                                      row_b=row_b[i], queue_index=p)
                         if full:
                             break
@@ -835,7 +832,7 @@ class FastDifPy:
                 else:
                     for i in range(len(row_a)):
                         insertion_success, full = self.schedule_pair(row_a=row_a[i],
-                                                                     row_b=self.second_loop_queue_status[p]["row_b"],
+                                                                     row_b=self.config.sl_queue_status[p]["row_b"],
                                                                      queue_index=p)
                         if full:
                             break
@@ -846,12 +843,12 @@ class FastDifPy:
 
                 # update last key
                 if self.config.has_dir_b:
-                    if not self.second_loop_base_a:
-                        self.second_loop_queue_status[p]["last_key"] = row_a[-1]["key"]
+                    if not self.config.sl_base_a:
+                        self.config.sl_queue_status[p]["last_key"] = row_a[-1]["key"]
                     else:
-                        self.second_loop_queue_status[p]["last_key"] = row_b[-1]["key"]
+                        self.config.sl_queue_status[p]["last_key"] = row_b[-1]["key"]
                 else:
-                    self.second_loop_queue_status[p]["last_key"] = row_b[-1]["key"]
+                    self.config.sl_queue_status[p]["last_key"] = row_b[-1]["key"]
 
                 row_a, row_b = self.__fetch_rows(p=p)
 
@@ -888,8 +885,8 @@ class FastDifPy:
         last_b = None
 
         if not init:
-            last_a = self.second_loop_queue_status["last_a"]
-            last_b = self.second_loop_queue_status["last_b"]
+            last_a = self.config.sl_queue_status["last_a"]
+            last_b = self.config.sl_queue_status["last_b"]
 
         # initialize loop vars
         if procs is None:
@@ -930,7 +927,7 @@ class FastDifPy:
         # check if we have processed every entry. if so, return False, since we have not added anything to the
         # queues.
         if start_a == len(rows_a) - 2 and start_b == len(rows_b) - 1:
-            self.second_loop_queue_status = {"last_a": last_a, "last_b": last_b}
+            self.config.sl_queue_status = {"last_a": last_a, "last_b": last_b}
             return add_count if add_count > 0 else None
 
         # since the number of entries is small, we can just perform a basic packaged for loop.
@@ -959,7 +956,7 @@ class FastDifPy:
 
         # store the current indices to be sure. The update loop function would trigger and throw the remaining
         # stuff out.
-        self.second_loop_queue_status = {"last_a": last_a, "last_b": last_b}
+        self.config.sl_queue_status = {"last_a": last_a, "last_b": last_b}
         return add_count if add_count > 0 else None
 
     def __refill_queues_non_optimized(self, init: bool = False) -> Union[int, None]:
@@ -985,8 +982,8 @@ class FastDifPy:
 
         if not init:
             # Fetch the place where we left off
-            last_a = self.second_loop_queue_status["last_a"]
-            last_b = self.second_loop_queue_status["last_b"]
+            last_a = self.config.sl_queue_status["last_a"]
+            last_b = self.config.sl_queue_status["last_b"]
 
             # get the rows for a
             current_a = self.db.fetch_one_key(key=last_a)
@@ -1012,13 +1009,13 @@ class FastDifPy:
         while add_count < procs * 100:
 
             # fetch the rows for the next queue
-            rows_b = self.db.fetch_many_after_key(directory_a=not self.__has_dir_b, starting=last_b, count=100 * procs)
+            rows_b = self.db.fetch_many_after_key(directory_a=not self.config.has_dir_b, starting=last_b, count=100 * procs)
 
             # end reached. increment the indexes
             if len(rows_b) == 0:
                 # We have reached the end.
                 if next_a is None:
-                    self.second_loop_queue_status = {"last_a": last_a, "last_b": last_b}
+                    self.config.sl_queue_status = {"last_a": last_a, "last_b": last_b}
                     return add_count if add_count > 0 else None
 
                 # increment the variables.
@@ -1071,7 +1068,7 @@ class FastDifPy:
 
             last_b = rows_b[-1]["key"]
 
-        self.second_loop_queue_status = {"last_a": last_a, "last_b": last_b}
+        self.config.sl_queue_status = {"last_a": last_a, "last_b": last_b}
         return add_count if add_count > 0 else None
 
     def __init_queues(self, processes: int):
@@ -1088,7 +1085,7 @@ class FastDifPy:
 
         # from a fetch the first set of images
         rows = self.db.fetch_many_after_key(directory_a=True, count=processes)
-        self.second_loop_base_a = True
+        self.config.sl_base_a = True
 
         # check if folder a has enough, so we can iterate using the files as fixed during an iteration and then switch
         # the file.
@@ -1101,27 +1098,27 @@ class FastDifPy:
                     self.__refill_queues_small_non_optimized(init=True, procs=processes)
                     return
                 else:
-                    self.second_loop_base_a = False
+                    self.config.sl_base_a = False
             # No directory b and less than number of processes images.
             else:
                 self.__refill_queues_small_non_optimized(init=True, procs=processes)
                 return
 
         # populating the files of the second loop.
-        self.second_loop_queue_status = []
+        self.config.sl_queue_status = []
 
-        if self.second_loop_base_a:
+        if self.config.sl_base_a:
             for row in rows:
                 # The last_key can be set if we have second_loop_base_a and no dir_b because we're looking only at an
                 # upper triangular matrix of the Cartesian product of the elements of the image itself.
                 temp = {"row_a": row, "last_key": None if self.config.has_dir_b else row["key"]}
 
-                self.second_loop_queue_status.append(temp)
+                self.config.sl_queue_status.append(temp)
         else:
             for row in rows:
                 temp = {"row_b": row, "last_key": None}
 
-                self.second_loop_queue_status.append(temp)
+                self.config.sl_queue_status.append(temp)
 
         self.__refill_queues_optimized()
 
@@ -1130,24 +1127,24 @@ class FastDifPy:
         Given a process p, it searches for the next 'row' in the matching matrix to find the next key to keep constant
         for the process p
 
-        :param p: index of process spec in self.second_loop_queue_status
+        :param p: index of process spec in self.config.sl_queue_status
         :return: True -> free image found, False, -> no new image found.
         """
         # TODO implement smart algorithm to find next image for the process that is now done.
         next_key = 0
 
         # get the limit for the next key
-        for i in range(len(self.second_loop_queue_status)):
+        for i in range(len(self.config.sl_queue_status)):
             if self.config.has_dir_b:
-                if not self.second_loop_base_a:
-                    next_key = max(self.second_loop_queue_status[i]["row_b"]["key"], next_key)
+                if not self.config.sl_base_a:
+                    next_key = max(self.config.sl_queue_status[i]["row_b"]["key"], next_key)
                     continue
 
-            next_key = max(self.second_loop_queue_status[i]["row_a"]["key"], next_key)
+            next_key = max(self.config.sl_queue_status[i]["row_a"]["key"], next_key)
 
         # process case, when we're looking to move the dir_b
         if self.config.has_dir_b:
-            if not self.second_loop_base_a:
+            if not self.config.sl_base_a:
                 rows = self.db.fetch_many_after_key(directory_a=False, starting=next_key, count=1)
 
                 # no completely unprocessed key found
@@ -1157,7 +1154,7 @@ class FastDifPy:
                     return False
 
                 # update the dict
-                self.second_loop_queue_status[p] = {"row_b": rows[0], "last_key": None}
+                self.config.sl_queue_status[p] = {"row_b": rows[0], "last_key": None}
                 return True
 
         rows = self.db.fetch_many_after_key(directory_a=True, starting=next_key, count=1)
@@ -1169,7 +1166,7 @@ class FastDifPy:
             return False
 
         # update the dict
-        self.second_loop_queue_status[p] = {"row_a": rows[0], "last_key": rows[0]["key"]}
+        self.config.sl_queue_status[p] = {"row_a": rows[0], "last_key": rows[0]["key"]}
         return True
 
     def __fetch_rows(self, p: int, count: int = 100) -> Tuple[list, list]:
@@ -1181,23 +1178,23 @@ class FastDifPy:
         """
         row_a = []
         row_b = []
-        assert type(self.second_loop_queue_status) is list, "__fetch_rows called with not_optimized process"
+        assert type(self.config.sl_queue_status) is list, "__fetch_rows called with not_optimized process"
 
         # we have a directory b
         if self.config.has_dir_b:
 
             # we don't keep the images of dir_a fixed but the ones of dir_b
-            if not self.second_loop_base_a:
+            if not self.config.sl_base_a:
                 row_a = self.db.fetch_many_after_key(directory_a=True, count=count,
-                                                     starting=self.second_loop_queue_status[p]["last_key"])
+                                                     starting=self.config.sl_queue_status[p]["last_key"])
             # we keep the images of dir a fixed
             else:
                 row_b = self.db.fetch_many_after_key(directory_a=False, count=count,
-                                                     starting=self.second_loop_queue_status[p]["last_key"])
+                                                     starting=self.config.sl_queue_status[p]["last_key"])
         # we don't have a directory b
         else:
             row_b = self.db.fetch_many_after_key(directory_a=True, count=count,
-                                                 starting=self.second_loop_queue_status[p]["last_key"])
+                                                 starting=self.config.sl_queue_status[p]["last_key"])
         return row_a, row_b
 
     def schedule_pair(self, row_a: dict, row_b: dict, queue_index: Union[None, int]) -> Tuple[bool, bool]:
