@@ -1049,7 +1049,7 @@ class FastDifPy:
                         last_b = rows_b[i - 1]["key"]
 
                     current_count = 0
-                    continue
+                    continue # TODO is this correct? Rethink this
 
                 success, full = self.schedule_pair(row_a=current_a, row_b=row, queue_index=None)
                 if full:
@@ -1064,7 +1064,7 @@ class FastDifPy:
                         last_b = rows_b[i - 1]["key"]
 
                     current_count = 0
-                    continue
+                    continue # TODO is this correct?
 
             last_b = rows_b[-1]["key"]
 
