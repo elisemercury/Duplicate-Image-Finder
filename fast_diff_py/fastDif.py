@@ -820,7 +820,7 @@ class FastDifPy:
         """
         # testing if the
         if type(self.config.sl_queue_status) is dict:
-            return self.__refill_queues_small_non_optimized()
+            return self.__refill_queues_non_optimized()
 
         assert type(self.config.sl_queue_status) is list, f"Unexpected type of config.sl_queue_status: " \
                                                             f"{type(self.config.sl_queue_status).__name__}, " \
@@ -900,93 +900,6 @@ class FastDifPy:
                     not_full = False
 
         return inserted if inserted > 0 else None
-
-    def __refill_queues_small_non_optimized(self, init: bool = False, procs: int = None) -> Union[int, None]:
-        """
-        Refill the queues with the non optimized algorithm which just stupidly goes along. The algorithm assumes though
-        a queue for each process!!!
-
-        :param init: if init, start all loops from 0 and initialize the status to dict
-        :param procs: Number of processes.
-        :return: number of images inserted into queues.
-        """
-        last_a = None
-        last_b = None
-
-        if not init:
-            last_a = self.config.sl_queue_status["last_a"]
-            last_b = self.config.sl_queue_status["last_b"]
-
-        # initialize loop vars
-        if procs is None:
-            procs = len(self.cpu_handles) + len(self.gpu_handles)
-        queue_index = 0
-
-        add_count = 0
-
-        start_a = 0
-        # set start_b to 1 bc we don't want to compare 0 with 0 in case both are from dir a.
-        start_b = 1
-
-        # things that can happen independently of b
-        rows_a = self.db.fetch_many_after_key(directory_a=True, count=max(procs, 100))
-        rows_b = rows_a
-
-        # get start index of constant rows_a
-        if not init:
-            # cannot be issue with last_a being None since for that init should be true which it cannot here.
-            for i in range(len(rows_a)):
-                if rows_a[i]["key"] == last_a:
-                    start_a = i
-
-        # We have a dir_b, replace rows_b with actual rows form that table
-        if self.config.has_dir_b:
-            # we have a dir_b, so we set the start to 0 because we can compare the first two images.
-            start_b = 0
-
-            # fetching rows from table b
-            rows_b = self.db.fetch_many_after_key(directory_a=False, count=max(procs, 100))
-
-        # get start index
-        if not init:
-            for i in range(len(rows_b)):
-                if rows_b[i]["key"] == last_b:
-                    start_b = i
-
-        # check if we have processed every entry. if so, return False, since we have not added anything to the
-        # queues.
-        if start_a == len(rows_a) - 2 and start_b == len(rows_b) - 1:
-            self.config.sl_queue_status = {"last_a": last_a, "last_b": last_b}
-            return add_count if add_count > 0 else None
-
-        # since the number of entries is small, we can just perform a basic packaged for loop.
-        for i in range(start_a, len(rows_a) - 1):
-            if i != start_a:
-                start_b = int(not self.config.has_dir_b) * (i + 1)  # i + 1 if not dir b, else 0
-
-            for j in range(start_b, len(rows_b)):
-                # All queues full, no need to continue
-                if self.second_loop_in[queue_index].full():
-                    break
-
-                row_a = rows_a[i]
-                row_b = rows_b[j]
-
-                insertion_success, full = self.schedule_pair(row_a=row_a, row_b=row_b, queue_index=queue_index)
-                if full:
-                    break
-                if insertion_success:
-                    # update the remaining loop variables
-                    queue_index = (queue_index + 1) % procs
-                    add_count += 1
-
-                last_a = row_a["key"]
-                last_b = row_b["key"]
-
-        # store the current indices to be sure. The update loop function would trigger and throw the remaining
-        # stuff out.
-        self.config.sl_queue_status = {"last_a": last_a, "last_b": last_b}
-        return add_count if add_count > 0 else None
 
     def __refill_queues_non_optimized(self, init: bool = False) -> Union[int, None]:
         """
