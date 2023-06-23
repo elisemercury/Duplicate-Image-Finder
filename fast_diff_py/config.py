@@ -98,11 +98,11 @@ class FastDiffPyConfig:
             self.__last_update = datetime.datetime.now()
 
     @property
-    def thumbnail_size_x(self):
+    def thumbnail_size_x(self) -> int:
         return self._task_dict["thumbnail_size_x"]
 
     @thumbnail_size_x.setter
-    def thumbnail_size_x(self, value):
+    def thumbnail_size_x(self, value: int):
         if value < 0:
             raise ValueError("Thumbnail size must be positive")
 
@@ -112,11 +112,11 @@ class FastDiffPyConfig:
         self._task_dict["thumbnail_size_x"] = value
 
     @property
-    def thumbnail_size_y(self):
+    def thumbnail_size_y(self) -> int:
         return self._task_dict["thumbnail_size_y"]
 
     @thumbnail_size_y.setter
-    def thumbnail_size_y(self, value):
+    def thumbnail_size_y(self, value: int):
         if value < 0:
             raise ValueError("Thumbnail size must be positive")
 
@@ -126,22 +126,22 @@ class FastDiffPyConfig:
         self._task_dict["thumbnail_size_y"] = value
 
     @property
-    def p_root_dir_a(self):
+    def p_root_dir_a(self) -> str:
         return self._task_dict["p_root_dir_a"]
 
     @p_root_dir_a.setter
-    def p_root_dir_a(self, value):
+    def p_root_dir_a(self, value: str):
         if os.path.exists(value):
             self._task_dict["p_root_dir_a"] = value
         else:
             raise FileNotFoundError("Directory A not found.")
 
     @property
-    def p_root_dir_b(self):
+    def p_root_dir_b(self) -> str:
         return self._task_dict["p_root_dir_b"]
 
     @p_root_dir_b.setter
-    def p_root_dir_b(self, value):
+    def p_root_dir_b(self, value: str):
         if value is None:
             self._task_dict["p_root_dir_b"] = value
 
@@ -151,105 +151,105 @@ class FastDiffPyConfig:
             raise FileNotFoundError("The root dir b is not None yet it doesn't exist")
 
     @property
-    def thumb_dir_a(self):
+    def thumb_dir_a(self) -> str:
         return os.path.join(self._task_dict["p_root_dir_a"], ".temp_thumbnails")
 
     @property
-    def thumb_dir_b(self):
+    def thumb_dir_b(self) -> str:
         return os.path.join(self._task_dict["p_root_dir_b"], ".temp_thumbnails")
 
     @property
-    def has_dir_b(self):
+    def has_dir_b(self) -> bool:
         return self._task_dict["p_root_dir_b"] is not None
 
     @property
-    def similarity_threshold(self):
+    def similarity_threshold(self) -> float:
         return self._task_dict["similarity_threshold"]
 
     @similarity_threshold.setter
-    def similarity_threshold(self, value):
+    def similarity_threshold(self, value: float):
         if type(value) is not float or value < 0:
             raise ValueError("similarity threshold needs to be float and greater than 0.")
         self._task_dict["similarity_threshold"] = value
 
     @property
-    def ignore_names(self):
+    def ignore_names(self) -> List[str]:
         return self._task_dict["ignore_names"]
 
     @ignore_names.setter
-    def ignore_names(self, value):
+    def ignore_names(self, value: List[str]):
         self._task_dict["ignore_names"] = value
 
     @property
-    def ignore_paths(self):
+    def ignore_paths(self) -> List[str]:
         return self._task_dict["ignore_paths"]
 
     @ignore_paths.setter
-    def ignore_paths(self, value):
+    def ignore_paths(self, value: List[str]):
         self._task_dict["ignore_paths"] = value
 
     @property
-    def enough_images_to_compare(self):
+    def enough_images_to_compare(self) -> bool:
         return self._task_dict["enough_images_to_compare"]
 
     @enough_images_to_compare.setter
-    def enough_images_to_compare(self, value):
+    def enough_images_to_compare(self, value: bool):
         self._task_dict["enough_images_to_compare"] = value
 
     @property
-    def sl_matching_hash(self):
+    def sl_matching_hash(self) -> bool:
         return self._task_dict["second_loop"]["matching_hash"]
 
     @sl_matching_hash.setter
-    def sl_matching_hash(self, value):
+    def sl_matching_hash(self, value: bool):
         self._task_dict["second_loop"]["matching_hash"] = value
 
     @property
-    def sl_has_thumb(self):
+    def sl_has_thumb(self) -> bool:
         return self._task_dict["second_loop"]["has_thumb"]
 
     @sl_has_thumb.setter
-    def sl_has_thumb(self, value):
+    def sl_has_thumb(self, value: bool):
         self._task_dict["second_loop"]["has_thumb"] = value
 
     @property
-    def sl_matching_aspect(self):
+    def sl_matching_aspect(self) -> bool:
         return self._task_dict["second_loop"]["matching_aspect"]
 
     @sl_matching_aspect.setter
-    def sl_matching_aspect(self, value):
+    def sl_matching_aspect(self, value: bool):
         self._task_dict["second_loop"]["matching_aspect"] = value
 
     @property
-    def sl_make_diff_plots(self):
+    def sl_make_diff_plots(self) -> bool:
         return self._task_dict["second_loop"]["make_diff_plots"]
 
     @sl_make_diff_plots.setter
-    def sl_make_diff_plots(self, value):
+    def sl_make_diff_plots(self, value: bool):
         self._task_dict["second_loop"]["make_diff_plots"] = value
 
     @property
-    def sl_plot_output_dir(self):
+    def sl_plot_output_dir(self) -> str:
         return self._task_dict["second_loop"]["plot_output_dir"]
 
     @sl_plot_output_dir.setter
-    def sl_plot_output_dir(self, value):
+    def sl_plot_output_dir(self, value: str):
         self._task_dict["second_loop"]["plot_output_dir"] = value
 
     @property
-    def sl_gpu_proc(self):
+    def sl_gpu_proc(self) -> int:
         return self._task_dict["second_loop"]["gpu_proc"]
 
     @sl_gpu_proc.setter
-    def sl_gpu_proc(self, value):
+    def sl_gpu_proc(self, value: int):
         self._task_dict["second_loop"]["gpu_proc"] = value
 
     @property
-    def sl_cpu_proc(self):
+    def sl_cpu_proc(self) -> Union[int, None]:
         return self._task_dict["second_loop"]["cpu_proc"]
 
     @sl_cpu_proc.setter
-    def sl_cpu_proc(self, value):
+    def sl_cpu_proc(self, value: Union[int, None]):
         self._task_dict["second_loop"]["cpu_proc"] = value
 
     @property
@@ -257,109 +257,109 @@ class FastDiffPyConfig:
         return self._task_dict["second_loop"]["queue_status"]
 
     @sl_queue_status.setter
-    def sl_queue_status(self, value):
+    def sl_queue_status(self, value: Union[List[dict], dict]):
         self._task_dict["second_loop"]["queue_status"] = value
 
     @property
-    def sl_base_a(self):
+    def sl_base_a(self) -> bool:
         return self._task_dict["second_loop"]["loop_base_a"]
 
     @sl_base_a.setter
-    def sl_base_a(self, value):
+    def sl_base_a(self, value: bool):
         self._task_dict["second_loop"]["loop_base_a"] = value
 
     @property
-    def supported_file_types(self):
+    def supported_file_types(self) -> List[str]:
         return self._task_dict["supported_file_types"]
 
     @supported_file_types.setter
-    def supported_file_types(self, value):
+    def supported_file_types(self, value: List[str]):
         self._task_dict["supported_file_types"] = value
 
     @property
-    def less_optimized(self):
+    def less_optimized(self) -> bool:
         return self._task_dict["less_optimized"]
 
     @less_optimized.setter
-    def less_optimized(self, value):
+    def less_optimized(self, value: bool):
         self._task_dict["less_optimized"] = value
 
     @property
-    def retry_limit(self):
+    def retry_limit(self) -> int:
         return self._task_dict["retry_limit"]
 
     @retry_limit.setter
-    def retry_limit(self, value):
+    def retry_limit(self, value: int):
         self._task_dict["retry_limit"] = value
 
     @property
-    def verbose(self):
+    def verbose(self) -> bool:
         return self._task_dict["verbose"]
 
     @verbose.setter
-    def verbose(self, value):
+    def verbose(self, value: bool):
         self._task_dict["verbose"] = value
 
     @property
-    def state(self):
+    def state(self) -> str:
         return self._task_dict["state"]
 
     @state.setter
-    def state(self, value):
+    def state(self, value: str):
         self._task_dict["state"] = value
 
     @property
-    def fl_compute_thumbnails(self):
+    def fl_compute_thumbnails(self) -> bool:
         return self._task_dict["first_loop"]["compute_thumbnails"]
 
     @fl_compute_thumbnails.setter
-    def fl_compute_thumbnails(self, value):
+    def fl_compute_thumbnails(self, value: bool):
         self._task_dict["first_loop"]["compute_thumbnails"] = value
 
     @property
-    def fl_compute_hash(self):
+    def fl_compute_hash(self) -> bool:
         return self._task_dict["first_loop"]["compute_hash"]
 
     @fl_compute_hash.setter
-    def fl_compute_hash(self, value):
+    def fl_compute_hash(self, value: bool):
         self._task_dict["first_loop"]["compute_hash"] = value
 
     @property
-    def fl_shift_amount(self):
+    def fl_shift_amount(self) -> int:
         return self._task_dict["first_loop"]["shift_amount"]
 
     @fl_shift_amount.setter
-    def fl_shift_amount(self, value):
+    def fl_shift_amount(self, value: int):
         self._task_dict["first_loop"]["shift_amount"] = value
 
     @property
-    def fl_cpu_proc(self):
+    def fl_cpu_proc(self) -> int:
         return self._task_dict["first_loop"]["cpu_proc"]
 
     @fl_cpu_proc.setter
-    def fl_cpu_proc(self, value):
+    def fl_cpu_proc(self, value: int):
         self._task_dict["first_loop"]["cpu_proc"] = value
 
     @property
-    def fl_purge(self):
+    def fl_purge(self) -> bool:
         return self._task_dict["first_loop"]["purge"]
 
     @fl_purge.setter
-    def fl_purge(self, value):
+    def fl_purge(self, value: bool):
         self._task_dict["first_loop"]["purge"] = value
 
     @property
-    def fl_inserted_counter(self):
+    def fl_inserted_counter(self) -> int:
         return self._task_dict["first_loop"]["inserted_counter"]
 
     @fl_inserted_counter.setter
-    def fl_inserted_counter(self, value):
+    def fl_inserted_counter(self, value: int):
         self._task_dict["first_loop"]["inserted_counter"] = value
 
     @property
-    def database(self):
+    def database(self) -> dict:
         return self._task_dict["database"]
 
     @database.setter
-    def database(self, value):
+    def database(self, value: dict):
         self._task_dict["database"] = value
