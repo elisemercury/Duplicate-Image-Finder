@@ -661,6 +661,8 @@ class FastDifPy:
         self.second_loop_out = mp.Queue()
         self.second_loop_in = mp.Queue()
 
+        self.__sl_determine_algo()
+
         if not self.config.less_optimized:
             self.second_loop_in = [mp.Queue() for _ in range(cpu_proc + gpu_proc)]
             child_args = [(self.second_loop_in[i], self.second_loop_out, i, i >= cpu_proc, False, False, self.verbose)
@@ -759,6 +761,31 @@ class FastDifPy:
 
         self.db.commit()
         self.logger.debug("Data should be committed")
+
+    def __sl_determine_algo(self):
+        """
+        Determine if we use the optimized or non-optimized algorithm. => Important for layout of queues etc.
+        :return:
+        """
+        proc_count = self.config.sl_cpu_proc + self.config.sl_gpu_proc
+
+        dir_a_count = self.db.get_dir_count(dir_a=True)
+        dir_b_count = dir_a_count
+
+        if self.config.has_dir_b:
+            dir_b_count = self.db.get_dir_count(dir_a=False)
+
+        if dir_a_count >= proc_count:
+            self.config.sl_base_a = True
+            return
+
+        # dir_a has less than processes images
+        if self.config.has_dir_b and dir_b_count >= proc_count:
+            self.config.sl_base_a = False
+            return
+
+        # We have fewer images than processes in both folders. => Using less optimized approach
+        self.config.less_optimized = True
 
     def create_plot_dir(self, diff_location: str, purge: bool = False):
         """
