@@ -219,7 +219,7 @@ class SQLiteDatabase(Database):
         self.debug_execute(f"SELECT * FROM directory WHERE key > {starting} AND dir_b = {dir_b} ORDER BY key ASC")
         return self.wrap_many_dict_dir(rows=self.cur.fetchmany(count))
 
-    def fetch_one_key(self, key: int):
+    def fetch_row_of_key(self, key: int):
         """
         Fetch exactly the row matching the key and directory.
 

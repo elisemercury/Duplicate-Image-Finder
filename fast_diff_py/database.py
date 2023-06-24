@@ -111,7 +111,7 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    def fetch_one_key(self, key: int):
+    def fetch_row_of_key(self, key: int):
         """
         Fetch exactly the row matching the key and directory.
 
