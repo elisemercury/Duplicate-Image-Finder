@@ -812,6 +812,42 @@ class FastDifPy:
         dequeued = self.handle_results_second_queue(enqueued)
         return enqueued, dequeued
 
+    def __init_queues(self, processes: int):
+        """
+        Initialize the state describing variables as well as the queues for the second loop.
+
+        :param processes: number of processes that are running
+        :return:
+        """
+        # we are using less optimized, so we are going straight for the not optimized algorithm.
+        if self.config.less_optimized:
+            self.__refill_queues_non_optimized(init=True)
+            return
+
+        # from a fetch the first set of images
+        if self.config.sl_base_a:
+            rows = self.db.fetch_many_after_key(directory_a=True, count=processes)
+        else:
+            rows = self.db.fetch_many_after_key(directory_a=False, count=processes)
+
+        # populating the files of the second loop.
+        self.config.sl_queue_status = []
+
+        if self.config.sl_base_a:
+            for row in rows:
+                # The last_key can be set if we have second_loop_base_a and no dir_b because we're looking only at an
+                # upper triangular matrix of the Cartesian product of the elements of the image itself.
+                temp = {"row_a": row, "last_key": None if self.config.has_dir_b else row["key"]}
+
+                self.config.sl_queue_status.append(temp)
+        else:
+            for row in rows:
+                temp = {"row_b": row, "last_key": None}
+
+                self.config.sl_queue_status.append(temp)
+
+        self.__refill_queues_optimized()
+
     def __refill_queues(self) -> Union[int, None]:
         """
         Call to either the optimized or non optimized filler.
@@ -827,6 +863,108 @@ class FastDifPy:
                                                             f"valid are list and dict"
 
         return self.__refill_queues_optimized()
+
+    def __refill_queues_non_optimized(self, init: bool = False) -> Union[int, None]:
+        """
+        Refilling queues without the load optimized algorithm.
+
+        :param init: Create new status, and initialize the dict
+        :return: number of images inserted into queues.
+        """
+        # TODO Test this function seems like it has a bug.
+        assert self.config.less_optimized, "This functions needs to be called in the less_optimized mode since it " \
+                                           "assumes that the attribute second_loop_in is of type mp.Queue and " \
+                                           "not List[mp.Queue]"
+        # initialize loop vars
+        procs = len(self.cpu_handles) + len(self.gpu_handles)
+
+        add_count = 0
+        current_count = 0
+
+        # fetching the point where we left off, if we call this function from the updater.
+        last_a = None
+        last_b = None
+
+        if init:
+
+        else:
+            # Fetch the place where we left off
+            last_a = self.config.sl_queue_status["last_a"]
+            last_b = self.config.sl_queue_status["last_b"]
+
+            # get the rows for a
+            current_a = self.db.fetch_row_of_key(key=last_a)
+
+            # get the next key
+            next_a = self.db.fetch_many_after_key(directory_a=True, starting=last_a, count=1)
+            if len(next_a) == 0:
+                next_a = None
+
+
+        while add_count < procs * 100:
+
+            # fetch the rows for the next queue
+            rows_b = self.db.fetch_many_after_key(directory_a=not self.config.has_dir_b, starting=last_b, count=100 * procs)
+
+            # end reached. increment the indexes
+            if len(rows_b) == 0:
+                # We have reached the end.
+                if next_a is None:
+                    self.config.sl_queue_status = {"last_a": last_a, "last_b": last_b}
+                    return add_count if add_count > 0 else None
+
+                # increment the variables.
+                current_a = next_a
+                last_a = current_a["key"]
+                rows = self.db.fetch_many_after_key(directory_a=True, starting=last_a, count=1)
+
+                # resetting the next rows
+                if len(rows) == 0:
+                    next_a = None
+                else:
+                    next_a = rows[0]
+
+                last_b = None
+
+                # updating the last_b bc we can save us some effort if we don't compute the all to all but the triangle
+                # matrix.
+                if not self.config.has_dir_b:
+                    last_b = last_a
+
+                # We go back to the beginning just for good measure.
+                continue
+
+            # scheduling the rows
+            for i in range(len(rows_b)):
+                row = rows_b[i]
+
+                if self.second_loop_in.full():
+                    if i != 0:
+                        # updating the last_b entry
+                        last_b = rows_b[i - 1]["key"]
+
+                    current_count = 0
+                    continue # TODO is this correct? Rethink this
+
+                success, full = self.schedule_pair(row_a=current_a, row_b=row, queue_index=None)
+                if full:
+                    break
+                current_count += int(success)
+                add_count += int(success)
+
+                # limit reached
+                if current_count >= 100:
+                    if i != 0:
+                        # updating the last_b entry
+                        last_b = rows_b[i - 1]["key"]
+
+                    current_count = 0
+                    continue # TODO is this correct?
+
+            last_b = rows_b[-1]["key"]
+
+        self.config.sl_queue_status = {"last_a": last_a, "last_b": last_b}
+        return add_count if add_count > 0 else None
 
     def __refill_queues_optimized(self):
         """
@@ -900,154 +1038,6 @@ class FastDifPy:
                     not_full = False
 
         return inserted if inserted > 0 else None
-
-    def __refill_queues_non_optimized(self, init: bool = False) -> Union[int, None]:
-        """
-        Refilling queues without the load optimized algorithm.
-
-        :param init: Create new status, and initialize the dict
-        :return: number of images inserted into queues.
-        """
-        # TODO Test this function seems like it has a bug.
-        assert self.config.less_optimized, "This functions needs to be called in the less_optimized mode since it " \
-                                           "assumes that the attribute second_loop_in is of type mp.Queue and " \
-                                           "not List[mp.Queue]"
-        # initialize loop vars
-        procs = len(self.cpu_handles) + len(self.gpu_handles)
-
-        add_count = 0
-        current_count = 0
-
-        # fetching the point where we left off, if we call this function from the updater.
-        last_a = None
-        last_b = None
-
-        if not init:
-            # Fetch the place where we left off
-            last_a = self.config.sl_queue_status["last_a"]
-            last_b = self.config.sl_queue_status["last_b"]
-
-            # get the rows for a
-            current_a = self.db.fetch_one_key(key=last_a)
-
-            # get the next key
-            next_a = self.db.fetch_many_after_key(directory_a=True, starting=last_a, count=1)
-            if len(next_a) == 0:
-                next_a = None
-        else:
-            # Case of init
-            rows = self.db.fetch_many_after_key(directory_a=True, starting=last_a, count=2)
-            if len(rows) == 0:
-                raise ValueError("No Rows in Directory A Table")
-
-            elif len(rows) == 1:
-                current_a = rows[0]
-                next_a = None
-
-            else:
-                current_a = rows[0]
-                next_a = rows[1]
-
-        while add_count < procs * 100:
-
-            # fetch the rows for the next queue
-            rows_b = self.db.fetch_many_after_key(directory_a=not self.config.has_dir_b, starting=last_b, count=100 * procs)
-
-            # end reached. increment the indexes
-            if len(rows_b) == 0:
-                # We have reached the end.
-                if next_a is None:
-                    self.config.sl_queue_status = {"last_a": last_a, "last_b": last_b}
-                    return add_count if add_count > 0 else None
-
-                # increment the variables.
-                current_a = next_a
-                last_a = current_a["key"]
-                rows = self.db.fetch_many_after_key(directory_a=True, starting=last_a, count=1)
-
-                # resetting the next rows
-                if len(rows) == 0:
-                    next_a = None
-                else:
-                    next_a = rows[0]
-
-                last_b = None
-
-                # updating the last_b bc we can save us some effort if we don't compute the all to all but the triangle
-                # matrix.
-                if not self.config.has_dir_b:
-                    last_b = last_a
-
-                # We go back to the beginning just for good measure.
-                continue
-
-            # scheduling the rows
-            for i in range(len(rows_b)):
-                row = rows_b[i]
-
-                if self.second_loop_in.full():
-                    if i != 0:
-                        # updating the last_b entry
-                        last_b = rows_b[i - 1]["key"]
-
-                    current_count = 0
-                    continue # TODO is this correct? Rethink this
-
-                success, full = self.schedule_pair(row_a=current_a, row_b=row, queue_index=None)
-                if full:
-                    break
-                current_count += int(success)
-                add_count += int(success)
-
-                # limit reached
-                if current_count >= 100:
-                    if i != 0:
-                        # updating the last_b entry
-                        last_b = rows_b[i - 1]["key"]
-
-                    current_count = 0
-                    continue # TODO is this correct?
-
-            last_b = rows_b[-1]["key"]
-
-        self.config.sl_queue_status = {"last_a": last_a, "last_b": last_b}
-        return add_count if add_count > 0 else None
-
-    def __init_queues(self, processes: int):
-        """
-        Initialize the state describing variables as well as the queues for the second loop.
-
-        :param processes: number of processes that are running
-        :return:
-        """
-        # we are using less optimized, so we are going straight for the not optimized algorithm.
-        if self.config.less_optimized:
-            self.__refill_queues_non_optimized(init=True)
-            return
-
-        # from a fetch the first set of images
-        if self.config.sl_base_a:
-            rows = self.db.fetch_many_after_key(directory_a=True, count=processes)
-        else:
-            rows = self.db.fetch_many_after_key(directory_a=False, count=processes)
-
-        # populating the files of the second loop.
-        self.config.sl_queue_status = []
-
-        if self.config.sl_base_a:
-            for row in rows:
-                # The last_key can be set if we have second_loop_base_a and no dir_b because we're looking only at an
-                # upper triangular matrix of the Cartesian product of the elements of the image itself.
-                temp = {"row_a": row, "last_key": None if self.config.has_dir_b else row["key"]}
-
-                self.config.sl_queue_status.append(temp)
-        else:
-            for row in rows:
-                temp = {"row_b": row, "last_key": None}
-
-                self.config.sl_queue_status.append(temp)
-
-        self.__refill_queues_optimized()
 
     def __increment_fixed_image(self, p: int):
         """
