@@ -407,8 +407,8 @@ class FastDifPy:
             self.logger.debug("No images in database, aborting.")
             return
 
-        if cpu_proc is None:
-            cpu_proc = mp.cpu_count()
+        if self.config.fl_cpu_proc is None:
+            self.config.fl_cpu_proc = mp.cpu_count()
 
         # store thumbnails if possible.
         if compute_hash:
@@ -435,7 +435,7 @@ class FastDifPy:
         run = True
 
         # prefill loop
-        for i in range(cpu_proc):
+        for i in range(self.config.fl_cpu_proc):
             arg = self.__generate_first_loop_obj(amount=amount, compute_hash=compute_hash,
                                                  compute_thumbnails=compute_thumbnails)
 
@@ -450,7 +450,7 @@ class FastDifPy:
 
         v = self.verbose
         # start processes for cpu
-        for i in range(cpu_proc):
+        for i in range(self.config.fl_cpu_proc):
             p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, False, v))
             p.start()
             self.cpu_handles.append(p)
@@ -481,7 +481,7 @@ class FastDifPy:
                 timeout += 1
 
             # if this point is reached, all processes should be done and the queues empty.
-            if none_counter >= cpu_proc:
+            if none_counter >= self.config.fl_cpu_proc:
                 run = False
 
             # at this point we should have been idling for 60s
