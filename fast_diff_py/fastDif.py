@@ -627,6 +627,10 @@ class FastDifPy:
         self.config.state = "second_loop_in_progress"
         self.config.sl_gpu_proc = gpu_proc
         self.config.sl_cpu_proc = cpu_proc
+        self.config.sl_matching_aspect = only_matching_aspect
+        self.config.sl_make_diff_plots = make_diff_plots
+        self.config.sl_matching_hash = only_matching_hash
+        self.config.similarity_threshold = float(similarity_threshold)
 
         # Short circuit if there are no images in the database.
         if not self.config.enough_images_to_compare:
@@ -634,16 +638,10 @@ class FastDifPy:
             return
 
         assert gpu_proc >= 0, "Number of GPU Processes needs to be greater than zero"
-        if cpu_proc is None:
-            cpu_proc = mp.cpu_count()
-            self.config.sl_cpu_proc = cpu_proc
+        if self.config.sl_cpu_proc is None:
+            self.config.sl_cpu_proc = mp.cpu_count()
 
-        assert cpu_proc >= 1, "Number of GPU Processes needs to be greater than zero"
-
-        # storing arguments in attributes to reduce number of args of function
-        self.config.sl_matching_aspect = only_matching_aspect
-        self.config.sl_make_diff_plots = make_diff_plots
-        self.config.sl_matching_hash = only_matching_hash
+        assert self.config.sl_cpu_proc >= 1, "Number of GPU Processes needs to be greater than zero"
 
         self.config.sl_has_thumb = self.db.test_thumb_table_existence()
 
@@ -651,8 +649,9 @@ class FastDifPy:
             # diff_location is stored in config in this function.
             self.create_plot_dir(diff_location=diff_location)
 
-        self.config.similarity_threshold = float(similarity_threshold)
         self.config.write_to_file()
+
+        self.__sl_determine_algo()
 
         self.cpu_handles = []
         self.gpu_handles = []
@@ -661,15 +660,15 @@ class FastDifPy:
         self.second_loop_out = mp.Queue()
         self.second_loop_in = mp.Queue()
 
-        self.__sl_determine_algo()
-
+        if not self.config.less_optimized:
+            self.second_loop_in = [mp.Queue() for _ in range(self.config.sl_gpu_proc + self.config.sl_cpu_proc)]
 
         child_args = [(self.second_loop_in if self.config.less_optimized else self.second_loop_in[i],
-                       self.second_loop_out, i, i >= cpu_proc ,
+                       self.second_loop_out, i, i >= self.config.sl_cpu_proc ,
                        False,
                        False,
                        self.verbose)
-                          for i in range(gpu_proc + cpu_proc)]
+                          for i in range(self.config.sl_gpu_proc + self.config.sl_cpu_proc)]
 
         self.db.create_dif_table()
 
@@ -677,36 +676,18 @@ class FastDifPy:
         self.__init_queues(processes=gpu_proc + cpu_proc)
 
         # starting all processes
-        for i in range(cpu_proc):
+        for i in range(self.config.sl_cpu_proc):
             p = mp.Process(target=parallel_compare, args=child_args[i])
             p.start()
             self.cpu_handles.append(p)
 
-        for i in range(cpu_proc, cpu_proc + gpu_proc):
+        for i in range(self.config.sl_cpu_proc, self.config.sl_cpu_proc + self.config.sl_gpu_proc):
             p = mp.Process(target=parallel_compare, args=child_args[i])
             p.start()
             self.gpu_handles.append(p)
 
         # check if we need multiple iterations of the main loop.
-        done = False
-        a_count = self.db.get_dir_count(dir_a=True)
-        b_count = self.db.get_dir_count(dir_a=False)
-
-        if self.config.has_dir_b:
-            comps = a_count * b_count
-
-            if comps < (cpu_proc + gpu_proc) * 90:
-                self.send_termination_signal(first_loop=False)
-                done = True
-                self.logger.info("Less comparisons than available space. Not performing continuous enqueue.")
-
-        else:
-            comps = a_count * (a_count - 1) / 2
-            if comps < (cpu_proc + gpu_proc) * 90:
-                self.send_termination_signal(first_loop=False)
-                done = True
-                self.logger.info("Less comparisons than available space. Not performing continuous enqueue.")
-
+        done = self.__require_queue_refill()
         count = 0
         timeout = 0
 
@@ -733,13 +714,13 @@ class FastDifPy:
                 timeout = 0
 
             # exit the while loop if all children have exited.
-            _, _, _, all_exited = self.check_children(cpu=cpu_proc > 0, gpu=gpu_proc > 0)
+            _, _, _, all_exited = self.check_children(cpu=self.config.sl_cpu_proc > 0, gpu=self.config.sl_gpu_proc > 0)
             if all_exited:
                 self.logger.debug("All Exited")
                 done = True
 
         # check if it was the children's fault
-        _, all_errored, _, _ = self.check_children(cpu=cpu_proc > 0, gpu=gpu_proc > 0)
+        _, all_errored, _, _ = self.check_children(cpu=self.config.sl_cpu_proc > 0, gpu=self.config.sl_gpu_proc > 0)
 
         if all_errored:
             raise RuntimeError("All child processes exited with an Error")
@@ -786,6 +767,27 @@ class FastDifPy:
 
         # We have fewer images than processes in both folders. => Using less optimized approach
         self.config.less_optimized = True
+
+    def __require_queue_refill(self):
+        done = False
+        a_count = self.db.get_dir_count(dir_a=True)
+        b_count = self.db.get_dir_count(dir_a=False)
+
+        if self.config.has_dir_b:
+            comps = a_count * b_count
+
+            if comps < (self.config.sl_cpu_proc + self.config.sl_gpu_proc) * 100:
+                self.send_termination_signal(first_loop=False)
+                done = True
+                self.logger.info("Less comparisons than available space. Not performing continuous enqueue.")
+
+        else:
+            comps = a_count * (a_count - 1) / 2
+            if comps < (self.config.sl_cpu_proc + self.config.sl_gpu_proc) * 100:
+                self.send_termination_signal(first_loop=False)
+                done = True
+                self.logger.info("Less comparisons than available space. Not performing continuous enqueue.")
+        return done
 
     def create_plot_dir(self, diff_location: str, purge: bool = False):
         """
