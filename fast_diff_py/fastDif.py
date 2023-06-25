@@ -817,16 +817,22 @@ class FastDifPy:
         dequeued = self.handle_results_second_queue(enqueued)
         return enqueued, dequeued
 
-    def __init_queues(self, processes: int):
+    def __init_queues(self):
         """
         Initialize the state describing variables as well as the queues for the second loop.
-
-        :param processes: number of processes that are running
         :return:
         """
+        processes = self.config.sl_cpu_proc + self.config.sl_gpu_proc
         # we are using less optimized, so we are going straight for the not optimized algorithm.
         if self.config.less_optimized:
-            self.__refill_queues_non_optimized(init=True)
+            first_key = self.db.fetch_many_after_key(directory_a=True, starting=None, count=1)
+            self.config.sl_queue_status = {"fix_key": first_key[0]["key"], "shift_key": None, "done": False}
+
+
+            # Only on dir to itself - only upper matrix to be computed.
+            if not self.config.has_dir_b:
+                self.config.sl_queue_status["shift_key"] = first_key[0]["key"]
+
             return
 
         # from a fetch the first set of images
