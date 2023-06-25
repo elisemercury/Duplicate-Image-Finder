@@ -426,6 +426,7 @@ class FastDifPy:
             self.db.create_thumb_table()
             self.check_create_thumbnail_dir()
 
+        # reset handles and create queues.
         self.cpu_handles = []
         self.gpu_handles = []
 
