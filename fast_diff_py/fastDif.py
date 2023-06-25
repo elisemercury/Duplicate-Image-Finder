@@ -39,8 +39,8 @@ Features:
 # TODO different shift amounts for different colors.
 # TODO Arbitrary hash matching function
 # TODO Extract hashing_data
-
-
+# TODO Smart child processes that fetch their info from the db and that have a queue for the next key that needs ot be
+#  processed. => Wont allow for smart algo for increment => for very large datasets. (Maybe with check?)
 
 class FastDifPy:
     __db: Union[Database, None]
