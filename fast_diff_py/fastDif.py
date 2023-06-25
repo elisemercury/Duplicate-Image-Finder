@@ -675,7 +675,7 @@ class FastDifPy:
         self.db.create_dif_table()
 
         # prefill
-        self.__init_queues(processes=gpu_proc + cpu_proc)
+        self.__init_queues()
 
         # starting all processes
         for i in range(self.config.sl_cpu_proc):
