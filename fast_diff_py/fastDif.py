@@ -875,107 +875,80 @@ class FastDifPy:
 
         return self.__refill_queues_optimized()
 
-    def __refill_queues_non_optimized(self, init: bool = False) -> Union[int, None]:
+    def __refill_queues_non_optimized(self) -> Union[int, None]:
         """
         Refilling queues without the load optimized algorithm.
 
-        :param init: Create new status, and initialize the dict
         :return: number of images inserted into queues.
         """
-        # TODO Test this function seems like it has a bug.
+        # ThIS FUNCTION IS CALLED WHEN WE HAVE ENOUGH IMAGES TO PROCESS.
+        # Sanity checks:
         assert self.config.less_optimized, "This functions needs to be called in the less_optimized mode since it " \
                                            "assumes that the attribute second_loop_in is of type mp.Queue and " \
                                            "not List[mp.Queue]"
+        assert type(self.config.sl_queue_status) is dict, "less optimized not with dict in sl_queue_status"
+        assert ["fix_key", "shift_key", "done"] == list(
+            self.config.sl_queue_status.keys()), "Verify keys of sl_queue_status"
+
+        if self.config.sl_queue_status["done"]:
+            return 0
+
         # initialize loop vars
         procs = len(self.cpu_handles) + len(self.gpu_handles)
 
         add_count = 0
-        current_count = 0
 
-        # fetching the point where we left off, if we call this function from the updater.
-        last_a = None
-        last_b = None
+        # Fetch the place where we left off
+        fix_key = self.config.sl_queue_status["fix_key"] # Last submitted a key
+        shift_key = self.config.sl_queue_status["shift_key"] # Last submitted b key
 
-        if init:
-
-        else:
-            # Fetch the place where we left off
-            last_a = self.config.sl_queue_status["last_a"]
-            last_b = self.config.sl_queue_status["last_b"]
-
-            # get the rows for a
-            current_a = self.db.fetch_row_of_key(key=last_a)
-
-            # get the next key
-            next_a = self.db.fetch_many_after_key(directory_a=True, starting=last_a, count=1)
-            if len(next_a) == 0:
-                next_a = None
-
+        # Fetch the fixed row and the next key
+        cur_f_row = self.db.fetch_row_of_key(key=fix_key)
 
         while add_count < procs * 100:
+            shifting_rows = self.db.fetch_many_after_key(directory_a=not self.config.has_dir_b, starting=shift_key,
+                                                         count=procs*100 - add_count)
 
-            # fetch the rows for the next queue
-            rows_b = self.db.fetch_many_after_key(directory_a=not self.config.has_dir_b, starting=last_b, count=100 * procs)
+            # We have reached the end of the current cycle and need to increment the fixed row.
+            if len(shifting_rows) == 0:
+                next_row = self.db.fetch_many_after_key(directory_a=True, starting=fix_key, count=2)
 
-            # end reached. increment the indexes
-            if len(rows_b) == 0:
-                # We have reached the end.
-                if next_a is None:
-                    self.config.sl_queue_status = {"last_a": last_a, "last_b": last_b}
-                    return add_count if add_count > 0 else None
+                # We have a directory_b, and we've exhausted every picture in directory_a. => Stop
+                if self.config.has_dir_b and len(next_row) == 0:
+                    self.config.sl_queue_status["done"] = True
+                    return add_count
 
-                # increment the variables.
-                current_a = next_a
-                last_a = current_a["key"]
-                rows = self.db.fetch_many_after_key(directory_a=True, starting=last_a, count=1)
+                # verify that we have at least another image to compare if we don't have dir_b, so the fixed picture
+                # is the second to last image in directory_a.
+                elif not self.config.has_dir_b and len(next_row) == 1:
+                    self.config.sl_queue_status["done"] = True
+                    return add_count
 
-                # resetting the next rows
-                if len(rows) == 0:
-                    next_a = None
-                else:
-                    next_a = rows[0]
+                # We have at least one more row to go:
+                self.config.sl_queue_status["fix_key"] = fix_key =next_row[0]["key"]
+                cur_f_row = next_row[0]
 
-                last_b = None
-
-                # updating the last_b bc we can save us some effort if we don't compute the all to all but the triangle
-                # matrix.
-                if not self.config.has_dir_b:
-                    last_b = last_a
-
-                # We go back to the beginning just for good measure.
+                # The shift key needs to be none since we start from the beginning if we have a directory_b or
+                # it needs to be the fixed key since we want to compare everything upwards.
+                self.config.sl_queue_status["shift_key"] = shift_key = None if self.config.has_dir_b else fix_key
+                # We need to continue since we need to refetch the shifting_rows
                 continue
 
-            # scheduling the rows
-            for i in range(len(rows_b)):
-                row = rows_b[i]
+            # go through the shifting rows and schedule them.
+            for row in shifting_rows:
+                insert_success, queue_full = self.schedule_pair(row_a=cur_f_row, row_b=row, queue_index=None)
 
-                if self.second_loop_in.full():
-                    if i != 0:
-                        # updating the last_b entry
-                        last_b = rows_b[i - 1]["key"]
+                # Queue is full
+                if queue_full:
+                    return add_count
 
-                    current_count = 0
-                    continue # TODO is this correct? Rethink this
+                # regardless weather the insert was successful or aborted because of match aspect, set the config.
+                self.config.sl_queue_status["shift_key"] = shift_key = row["key"]
+                add_count += int(insert_success)
 
-                success, full = self.schedule_pair(row_a=current_a, row_b=row, queue_index=None)
-                if full:
-                    break
-                current_count += int(success)
-                add_count += int(success)
+        # We added successfully the full number of images to the queue, return the add count.
+        return add_count
 
-                # limit reached
-                if current_count >= 100:
-                    if i != 0:
-                        # updating the last_b entry
-                        last_b = rows_b[i - 1]["key"]
-
-                    current_count = 0
-                    continue # TODO is this correct?
-
-            last_b = rows_b[-1]["key"]
-
-        self.config.sl_queue_status = {"last_a": last_a, "last_b": last_b}
-        return add_count if add_count > 0 else None
 
     def __refill_queues_optimized(self):
         """
