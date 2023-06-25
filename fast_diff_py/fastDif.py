@@ -748,6 +748,7 @@ class FastDifPy:
     def __sl_determine_algo(self):
         """
         Determine if we use the optimized or non-optimized algorithm. => Important for layout of queues etc.
+        Sets *config.sl_base_a* and *config.less_optimized*
         :return:
         """
         proc_count = self.config.sl_cpu_proc + self.config.sl_gpu_proc
