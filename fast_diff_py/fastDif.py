@@ -1126,6 +1126,7 @@ class FastDifPy:
                 return False, False
 
         # Aspect matches => Create Task object and send to process
+        # self.logger.debug(f"Key A: {row_a['key']}, Key B: {row_b['key']}")
         arg = CompareImageArguments(
             img_a=row_a["path"],
             img_b=row_b["path"],
