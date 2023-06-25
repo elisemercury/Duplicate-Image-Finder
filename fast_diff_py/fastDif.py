@@ -318,8 +318,12 @@ class FastDifPy:
         if first_loop:
             for i in range((len(self.cpu_handles) + len(self.gpu_handles)) * 4):
                 self.first_loop_in.put(None)
-
             return
+
+        if self.config.less_optimized:
+            for i in range((len(self.cpu_handles) + len(self.gpu_handles)) * 4):
+                self.second_loop_in.put(None)
+
         for q in self.second_loop_in:
             [q.put(None) for _ in range(4)]
 
