@@ -638,6 +638,7 @@ class FastDifPy:
         self.config.sl_make_diff_plots = make_diff_plots
         self.config.sl_matching_hash = only_matching_hash
         self.config.similarity_threshold = float(similarity_threshold)
+        self.config.state = "second_loop_in_progress"
 
         # Short circuit if there are no images in the database.
         if not self.config.enough_images_to_compare:
@@ -748,6 +749,8 @@ class FastDifPy:
                                                        "processes having stopped."
 
         self.db.commit()
+        self.config.state = "second_loop_done"
+        self.config.write_to_file()
         self.logger.debug("Data should be committed")
 
     def __sl_determine_algo(self):
