@@ -22,10 +22,17 @@ import logging
 Fast implementation of the DifPy Library.
 Features:
 - Use GPU to accelerate the comparison
-- Use Parallelization to use multicore CPUs
+- Use Parallelization on multicore CPUs
 - Use of aspect ration to ignore images with non-matching aspect ratio
 - Use hash based deduplication to find duplicates with color grading
 """
+
+# from contextlib import redirect_stdout
+#
+# with open('out.txt', 'w') as f:
+#     with redirect_stdout(f):
+#         print('data')
+
 
 
 # TODO single processing handler
