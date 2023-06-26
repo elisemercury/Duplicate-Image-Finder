@@ -15,7 +15,134 @@ to interface with another database.
 """
 
 
-class SQLiteDatabase(Database):
+class SQLBase(Database):
+    @staticmethod
+    def all_to_dict_dir(row: Union[tuple, None]):
+        """
+        Takes the result of a 'SELECT *' from a directory table and turns the tuple into a dict
+
+        :param row: tuple to turn into dict
+        :return:
+        """
+        if row is None:
+            return None
+
+        return {"key": row[0],
+                "path": row[1],
+                "filename": row[2],
+                "error": SQLiteDatabase.from_b64(row[3]) if row[3] is not None else None,
+                "proc_suc": row[4],
+                "px": row[5],
+                "py": row[6],
+                "dir_a": row[7] == 0,
+                "hash_0": row[8],
+                "hash_90": row[9],
+                "hash_180": row[10],
+                "hash_270": row[11],
+                }
+
+
+    @staticmethod
+    def wrap_many_dict_dir(rows: List[tuple]):
+        """
+        Wraps a list of rows in dictionaries.
+
+        :param rows: rows to wrap
+        :return:
+        """
+        result = []
+        for row in rows:
+            result.append(SQLiteDatabase.all_to_dict_dir(row))
+        return result
+
+    @staticmethod
+    def all_to_dict_dif(row: tuple):
+        if row is None:
+            return None
+
+        return {
+            "key": row[0],
+            "key_a": row[1],
+            "key_b": row[2],
+            "dif": row[3],
+            "error": row[4],
+            "success": row[5]
+        }
+
+    @staticmethod
+    def wrap_many_dict_dif(rows: List[tuple]):
+        """
+        Wraps a list of rows in dictionaries.
+
+        :param rows: rows to wrap
+        :return:
+        """
+        result = []
+        for row in rows:
+            result.append(SQLiteDatabase.all_to_dict_dif(row))
+        return result
+
+    @staticmethod
+    def error_to_dict(row: tuple = None) -> Union[dict, None]:
+        """
+        Wrapp the result of an error row which was previously created by using two joins on the keys.
+        It only contains the paths, keys in the dir table, key in the dif_table and the error string
+
+        :param row: row as tuple to wrap
+        :return: the row tuple wrapped with a dict for better readability
+        """
+        if row is None:
+            return None
+
+        return {
+            "dif_key": row[0],
+            "dir_key_a": row[1],
+            "dir_key_b": row[2],
+            "a_path": row[3],
+            "b_path": row[4],
+            "error": SQLiteDatabase.from_b64(row[5]),
+        }
+
+    @staticmethod
+    def wrap_many_errors_dif(rows: List[tuple]) -> List[dict]:
+        """
+        Wrap error rows in a dict.
+
+        :param rows: list of tuples that should be wrapped.
+        :return: list of wrapped rows in dict.
+        """
+        results = []
+
+        for row in rows:
+            results.append(SQLiteDatabase.error_to_dict(row))
+
+        return results
+
+    @staticmethod
+    def to_b64(to_encode: Any):
+        """
+        Convert an object to a b64 string
+
+        :param to_encode: object to encode
+        :return: base64 string
+        """
+        json_str = json.dumps(to_encode)
+        bytes_string = json_str.encode("utf-8")
+        return base64.standard_b64encode(bytes_string).decode("utf-8")
+
+    @staticmethod
+    def from_b64(b64_string: str):
+        """
+        Convert a b64 string to a python object
+
+        :param b64_string: a b64 encoded python object
+        :return: a python object
+        """
+        bytes_string = base64.standard_b64decode(b64_string.encode("utf-8"))
+        json_string = bytes_string.decode("utf-8")
+        return json.loads(json_string)
+
+class SQLiteDatabase(SQLBase):
     path: str = None
     con: sqlite3.Connection = None
     cur: sqlite3.Cursor = None
@@ -67,44 +194,6 @@ class SQLiteDatabase(Database):
             "hash_270 INTEGER ,  "
             "UNIQUE (path, dir_b))"
         )
-
-    @staticmethod
-    def all_to_dict_dir(row: Union[tuple, None]):
-        """
-        Takes the result of a 'SELECT *' from a directory table and turns the tuple into a dict
-
-        :param row: tuple to turn into dict
-        :return:
-        """
-        if row is None:
-            return None
-
-        return {"key": row[0],
-                "path": row[1],
-                "filename": row[2],
-                "error": SQLiteDatabase.from_b64(row[3]) if row[3] is not None else None,
-                "proc_suc": row[4],
-                "px": row[5],
-                "py": row[6],
-                "dir_a": row[7] == 0,
-                "hash_0": row[8],
-                "hash_90": row[9],
-                "hash_180": row[10],
-                "hash_270": row[11],
-                }
-
-    @staticmethod
-    def wrap_many_dict_dir(rows: List[tuple]):
-        """
-        Wraps a list of rows in dictionaries.
-
-        :param rows: rows to wrap
-        :return:
-        """
-        result = []
-        for row in rows:
-            result.append(SQLiteDatabase.all_to_dict_dir(row))
-        return result
 
     def test_dir_table_existence(self):
         """
@@ -669,33 +758,6 @@ class SQLiteDatabase(Database):
 
         return self.all_to_dict_dif(res)
 
-    @staticmethod
-    def all_to_dict_dif(row: tuple):
-        if row is None:
-            return None
-
-        return {
-            "key": row[0],
-            "key_a": row[1],
-            "key_b": row[2],
-            "dif": row[3],
-            "error": row[4],
-            "success": row[5]
-        }
-
-    @staticmethod
-    def wrap_many_dict_dif(rows: List[tuple]):
-        """
-        Wraps a list of rows in dictionaries.
-
-        :param rows: rows to wrap
-        :return:
-        """
-        result = []
-        for row in rows:
-            result.append(SQLiteDatabase.all_to_dict_dif(row))
-        return result
-
     def get_by_table_key(self, key: int):
         """
         Get a row by the table key. Return the row wrapped in a dict tor None if it doesn't exist.
@@ -796,42 +858,6 @@ class SQLiteDatabase(Database):
 
         return self.wrap_many_errors_dif(self.cur.fetchmany(count))
 
-    @staticmethod
-    def error_to_dict(row: tuple = None) -> Union[dict, None]:
-        """
-        Wrapp the result of an error row which was previously created by using two joins on the keys.
-        It only contains the paths, keys in the dir table, key in the dif_table and the error string
-
-        :param row: row as tuple to wrap
-        :return: the row tuple wrapped with a dict for better readability
-        """
-        if row is None:
-            return None
-
-        return {
-            "dif_key": row[0],
-            "dir_key_a": row[1],
-            "dir_key_b": row[2],
-            "a_path": row[3],
-            "b_path": row[4],
-            "error": SQLiteDatabase.from_b64(row[5]),
-        }
-
-    @staticmethod
-    def wrap_many_errors_dif(rows: List[tuple]) -> List[dict]:
-        """
-        Wrap error rows in a dict.
-
-        :param rows: list of tuples that should be wrapped.
-        :return: list of wrapped rows in dict.
-        """
-        results = []
-
-        for row in rows:
-            results.append(SQLiteDatabase.error_to_dict(row))
-
-        return results
-
     # ------------------------------------------------------------------------------------------------------------------
     # COMMON FUNCTIONS
     # ------------------------------------------------------------------------------------------------------------------
@@ -873,40 +899,6 @@ class SQLiteDatabase(Database):
         self.con.commit()
         self.con.close()
 
-    @property
-    def has_b(self):
-        """
-        Executes an SQL statement to detect if there are any entries in directory b.
-
-        :return: bool
-        """
-        self.debug_execute("SELECT * FROM directory WHERE dir_b > 0")
-        return self.cur.fetchone() is not None
-
-    @staticmethod
-    def to_b64(to_encode: Any):
-        """
-        Convert an object to a b64 string
-
-        :param to_encode: object to encode
-        :return: base64 string
-        """
-        json_str = json.dumps(to_encode)
-        bytes_string = json_str.encode("utf-8")
-        return base64.standard_b64encode(bytes_string).decode("utf-8")
-
-    @staticmethod
-    def from_b64(b64_string: str):
-        """
-        Convert a b64 string to a python object
-
-        :param b64_string: a b64 encoded python object
-        :return: a python object
-        """
-        bytes_string = base64.standard_b64decode(b64_string.encode("utf-8"))
-        json_string = bytes_string.decode("utf-8")
-        return json.loads(json_string)
-
     def commit(self):
         """
         Commit any not stored changes now to the filesystem.
@@ -931,8 +923,8 @@ class SQLiteDatabase(Database):
         self.logger.propagate = True
         self.logger.level = logging.DEBUG
 
-    @staticmethod
-    def thread_safe():
+    @property
+    def thread_safe(self):
         """
         Returns weather the implementation of the database is thread safe (for improved performance)
         :return:
