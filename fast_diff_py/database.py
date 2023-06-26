@@ -406,8 +406,8 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    @staticmethod
-    def thread_safe():
+    @property
+    def thread_safe(self):
         """
         Returns weather the implementation of the database is thread safe (for improved performance)
         :return:
