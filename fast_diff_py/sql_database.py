@@ -30,7 +30,7 @@ class SQLBase(Database):
         return {"key": row[0],
                 "path": row[1],
                 "filename": row[2],
-                "error": SQLiteDatabase.from_b64(row[3]) if row[3] is not None else None,
+                "error": SQLBase.from_b64(row[3]) if row[3] is not None else None,
                 "proc_suc": row[4],
                 "px": row[5],
                 "py": row[6],
@@ -52,7 +52,7 @@ class SQLBase(Database):
         """
         result = []
         for row in rows:
-            result.append(SQLiteDatabase.all_to_dict_dir(row))
+            result.append(SQLBase.all_to_dict_dir(row))
         return result
 
     @staticmethod
@@ -79,7 +79,7 @@ class SQLBase(Database):
         """
         result = []
         for row in rows:
-            result.append(SQLiteDatabase.all_to_dict_dif(row))
+            result.append(SQLBase.all_to_dict_dif(row))
         return result
 
     @staticmethod
@@ -100,7 +100,7 @@ class SQLBase(Database):
             "dir_key_b": row[2],
             "a_path": row[3],
             "b_path": row[4],
-            "error": SQLiteDatabase.from_b64(row[5]),
+            "error": SQLBase.from_b64(row[5]),
         }
 
     @staticmethod
@@ -114,7 +114,7 @@ class SQLBase(Database):
         results = []
 
         for row in rows:
-            results.append(SQLiteDatabase.error_to_dict(row))
+            results.append(SQLBase.error_to_dict(row))
 
         return results
 
