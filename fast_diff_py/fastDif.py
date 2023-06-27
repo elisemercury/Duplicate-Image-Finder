@@ -286,6 +286,7 @@ class FastDifPy:
                     pass
 
         if db:
+            self.db.free()
             self.db.disconnect()
             self.db.free()
             self.db = None
