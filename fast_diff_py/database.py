@@ -23,17 +23,6 @@ class Database:
     # DIRECTORY TABLES
     # ------------------------------------------------------------------------------------------------------------------
 
-    def create_directory_tables(self, purge: bool = True):
-        """
-        Create the directory tables. Default for purge is true, to recompute it in case the program is stopped during 
-        indexing. ASSUMPTION: Indexing is a very fast operation. TODO Handle Stop mid Indexing.
-
-        :param purge: if True, purge the tables before creating them.
-        :return:
-        """
-
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
     def add_file(self, path: str, filename: str, dir_a: bool = True):
         """
         Add a file to the database.
@@ -184,16 +173,6 @@ class Database:
     # THUMBNAIL FILENAME TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
-    def create_thumb_table(self, purge: bool = False):
-        """
-        Create tables which contain the names of the thumbnails (to make sure there's no collisions ahead of time)
-
-        :param purge: if True, purge the tables before creating them.
-        :return:
-        """
-
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
     def test_thumb_table_existence(self):
         """
         Check the table for thumbnails of directory table, exists. DOES NOT VERIFY THE TABLE DEFINITION!
@@ -228,15 +207,6 @@ class Database:
     # ------------------------------------------------------------------------------------------------------------------
     # PLOT TABLE
     # ------------------------------------------------------------------------------------------------------------------
-
-    def create_plot_table(self, purge: bool = False):
-        """
-        Create tables which contain the filenames of the plots (to make sure there's no collisions ahead of time)
-
-        :param purge: if True, purge the tables before creating them.
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
     def get_plot_name(self, key_a: int, key_b: int):
         """
@@ -284,16 +254,6 @@ class Database:
     # ------------------------------------------------------------------------------------------------------------------
     # ERROR TABLE
     # ------------------------------------------------------------------------------------------------------------------
-
-    def create_dif_table(self, purge: bool = False):
-        """
-        Create the dif table. If purge is true, drop a preexisting dif table.
-
-        :param purge: if True, purge the table before creating it.
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
 
     def insert_dif_success(self, key_a: int, key_b: int, dif: float) -> bool:
         """
