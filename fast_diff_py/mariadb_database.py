@@ -778,12 +778,11 @@ class MariaDBDatabase(SQLBase):
     # COMMON FUNCTIONS
     # ------------------------------------------------------------------------------------------------------------------
 
-    def debug_execute(self, statement: str, commit_now: bool = False):
+    def debug_execute(self, statement: str):
         """
         Wrapper to print the infringing statement in case of an error.
 
         :param statement: statement to execute
-        :param commit_now: If after execution a commit should be executed.
         :return:
         """
         try:
@@ -791,12 +790,6 @@ class MariaDBDatabase(SQLBase):
         except Exception as e:
             self.logger.exception(f"Exception {e} with statement:\n{statement}")
             raise e
-
-        # automatically commit.
-        if (
-                datetime.datetime.now() - self.last_update).total_seconds() > 60 or commit_now or self.last_update is None:
-            self.con.commit()
-            self.last_update = datetime.datetime.now()
 
     def connect(self):
         """
