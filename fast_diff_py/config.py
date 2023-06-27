@@ -58,6 +58,7 @@ class FastDiffPyConfig:
             "retry_limit": 1000,
             "verbose": False,
             "state": None,
+            "retain_db": True,
         }
 
         if os.path.exists(self.cfg_path):
@@ -363,3 +364,11 @@ class FastDiffPyConfig:
     @database.setter
     def database(self, value: dict):
         self._task_dict["database"] = value
+
+    @property
+    def retain_db(self) -> bool:
+        return self._task_dict["retain_db"]
+
+    @retain_db.setter
+    def retain_db(self, value: bool):
+        self._task_dict["retain_db"] = value
