@@ -70,7 +70,7 @@ class FastDifPy:
     debug_logger: logging.FileHandler = None
 
     # config
-    config: FastDiffPyConfig
+    config: Union[FastDiffPyConfig, None] = None
 
     def __init__(self, directory_a: str, directory_b: str = None, default_db: bool = True, **kwargs):
         """
