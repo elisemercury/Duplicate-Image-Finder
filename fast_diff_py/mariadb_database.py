@@ -17,8 +17,8 @@ class MariaDBDatabase(SQLBase):
 
     kw: dict = None
 
-    con: Union[mariadb.Connection] = None
-    cur: Union[mariadb.Cursor] = None
+    con: Union[mariadb.Connection, None] = None
+    cur: Union[mariadb.Cursor, None] = None
     logger: logging.Logger
 
     def __init__(self, user: str, host: str, port: int, database: str, password: str = None, table_suffix: str = None,
