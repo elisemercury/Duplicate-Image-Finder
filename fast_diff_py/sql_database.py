@@ -151,7 +151,7 @@ class SQLiteDatabase(SQLBase):
     last_update: datetime.datetime = datetime.datetime.now()
     logger: logging.Logger = None
 
-    def __init__(self, path, purge: bool = False):
+    def __init__(self, path: str, purge: bool = False):
         """
         Instantiate SQLite database.
 
