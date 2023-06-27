@@ -169,9 +169,6 @@ class FastDifPy:
 
         :return:
         """
-        # create the tables in the database
-        self.db.create_directory_tables()
-
         self.__recursive_index(True)
         if self.config.has_dir_b:
             self.__recursive_index(False)
@@ -375,7 +372,7 @@ class FastDifPy:
     # ------------------------------------------------------------------------------------------------------------------
 
     def first_loop_iteration(self, compute_thumbnails: bool = True, compute_hash: bool = False, amount: int = 4,
-                             cpu_proc: int = None, purge: bool = True):
+                             cpu_proc: int = None):
         """
         Perform the preprocessing step. I.e. compute hashes, get image sizes, resize the images and store the
         thumbnails.
@@ -397,7 +394,6 @@ class FastDifPy:
         :param compute_hash: Compute hashes of the image
         :param amount: shift amount before hash
         :param cpu_proc: number of cpu processes. Default number of system cores.
-        :param purge: if the database should be purged before the loop runs.
         :return:
         """
         # Writing the arguments to config
@@ -406,7 +402,6 @@ class FastDifPy:
         self.config.fl_compute_hash = compute_hash
         self.config.fl_shift_amount = amount
         self.config.fl_cpu_proc = cpu_proc
-        self.config.fl_purge = purge
         self.config.write_to_file()
 
         # Reset the marked files in any case.
@@ -432,11 +427,8 @@ class FastDifPy:
             if amount > 7 or amount < -7:
                 raise ValueError("amount my only be in range [-7, 7]")
 
-            self.db.create_hash_table(purge=purge)
-
         # thumbnail are required to exist for both.
         if compute_thumbnails or compute_hash:
-            self.db.create_thumb_table()
             self.check_create_thumbnail_dir()
 
         # reset handles and create queues.
@@ -686,8 +678,6 @@ class FastDifPy:
                        self.verbose)
                           for i in range(self.config.sl_gpu_proc + self.config.sl_cpu_proc)]
 
-        self.db.create_dif_table()
-
         # prefill
         self.__init_queues()
 
@@ -808,13 +798,11 @@ class FastDifPy:
                 self.logger.info("Less comparisons than available space. Not performing continuous enqueue.")
         return done
 
-    def create_plot_dir(self, diff_location: str, purge: bool = False):
+    def create_plot_dir(self, diff_location: str):
         """
         Verifies the provided directory, creates if it doesn't exist.
-        Initializes the Database for plot names as well.
 
         :param diff_location: path to plot where the plots are to be saved
-        :param purge: purge the plot database before running.
         :return:
         """
         if diff_location is None:
@@ -826,7 +814,6 @@ class FastDifPy:
             os.makedirs(diff_location)
 
         self.config.sl_plot_output_dir = diff_location
-        self.db.create_plot_table(purge=purge)
 
     def update_queues(self):
         enqueued = self.__refill_queues()
