@@ -524,11 +524,11 @@ class MariaDBDatabase(SQLBase):
                            f"key_a INT UNSIGNED, "
                            f"key_b INT UNSIGNED,"
                            f"PRIMARY KEY (`key`),"
-                           f"CONSTRAINT key_a FOREIGN KEY (key_a)"
+                           f"CONSTRAINT id_a FOREIGN KEY (key_a)"
                            f"   REFERENCES {self.directory_table} (`key`)"
                            f"   ON DELETE RESTRICT "
                            f"   ON UPDATE RESTRICT,"
-                           f"CONSTRAINT key_b FOREIGN KEY (key_b)"
+                           f"CONSTRAINT id_b FOREIGN KEY (key_b)"
                            f"   REFERENCES {self.directory_table} (`key`) "
                            f"   ON DELETE RESTRICT "
                            f"   ON UPDATE RESTRICT )")
