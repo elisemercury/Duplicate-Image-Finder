@@ -488,6 +488,7 @@ class SQLiteDatabase(SQLBase):
 
         :return:
         """
+        # TODO fetch count from thumb table and assert it is greater than zero.
         self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'thumb'")
         return self.cur.fetchone() is not None
 
@@ -697,7 +698,7 @@ class SQLiteDatabase(SQLBase):
                            "success INT CHECK (dif_table.success >= 0 AND dif_table.success <= 1),"
                            "UNIQUE (key_a, key_b)) ")
 
-    def test_dif_table_existence(self) -> bool:
+    def test_diff_table_existence(self) -> bool:
         """
         Check if the dif table exists. DOES NOT VERIFY THE TABLE DEFINITION!
 
