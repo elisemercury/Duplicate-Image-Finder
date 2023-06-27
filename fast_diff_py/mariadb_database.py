@@ -107,8 +107,8 @@ class MariaDBDatabase(SQLBase):
         # prod_suc:
         # * -1 not processed
         # * -2 currently processing
-        # *  0 processing success
-        # *  1 error occurred while processing.
+        # *  0 error occurred while processing
+        # *  1 processing success
         self.debug_execute(
             f"CREATE TABLE {self.directory_table} ("
             f"`key` INT UNSIGNED AUTO_INCREMENT,"
