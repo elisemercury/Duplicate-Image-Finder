@@ -193,15 +193,21 @@ class SQLiteDatabase(SQLBase):
 
         # creating the tables.
         if not self.test_hash_table_existence():
+            self.logger.info("Creating hash table.")
             self.__create_hash_table()
         if not self.test_dir_table_existence():
+            self.logger.info("Creating directory table.")
             self.__create_directory_tables()
-        if not self.test_thumb_table_existence():
-            self.__create_thumb_table()
         if not self.test_diff_table_existence():
+            self.logger.info("Creating error table.")
             self.__create_diff_table()
         if not self.test_plot_table_existence():
+            self.logger.info("Creating plot table.")
             self.__create_plot_table()
+        if not self.test_thumb_table_existence():
+            self.logger.info("Creating thumbnail table.")
+            self.__create_thumb_table()
+
     # ------------------------------------------------------------------------------------------------------------------
     # DIRECTORY TABLES
     # ------------------------------------------------------------------------------------------------------------------
