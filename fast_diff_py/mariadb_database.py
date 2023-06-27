@@ -640,7 +640,7 @@ class MariaDBDatabase(SQLBase):
                            f"success INT CHECK (success >= 0 AND success <= 1),"
                            f"UNIQUE (key_a, key_b)) ")
 
-    def test_dif_table_existence(self) -> bool:
+    def test_diff_table_existence(self) -> bool:
         """
         Check if the dif table exists. DOES NOT VERIFY THE TABLE DEFINITION!
 
