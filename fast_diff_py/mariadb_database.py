@@ -257,7 +257,7 @@ class MariaDBDatabase(SQLBase):
             return self.wrap_many_dict_dir(rows=self.cur.fetchmany(count))
 
         # start from specific point
-        self.debug_execute(f"SELECT * FROM {self.directory_table} WHERE key > {starting} AND dir_b = {dir_b} "
+        self.debug_execute(f"SELECT * FROM {self.directory_table} WHERE `key` > {starting} AND dir_b = {dir_b} "
                            f"ORDER BY `key` ASC")
         return self.wrap_many_dict_dir(rows=self.cur.fetchmany(count))
 
@@ -420,7 +420,7 @@ class MariaDBDatabase(SQLBase):
         :return:
         """
         self.debug_execute(f"CREATE TABLE {self.thumbnail_table} ( "
-                           f"key INT UNSIGNED, "
+                           f"`key` INT UNSIGNED, "
                            f"filename TEXT , "
                            f"dir_b TINYINT DEFAULT 0 CHECK (dir_b >= 0 AND dir_b <= 1),"
                            f"UNIQUE (filename, dir_b),"
@@ -443,7 +443,7 @@ class MariaDBDatabase(SQLBase):
 
         :return:
         """
-        self.debug_execute(f"SELECT COUNT(key) FROM thumb")
+        self.debug_execute(f"SELECT COUNT(`key`) FROM {self.thumbnail_table}")
         row = self.cur.fetchone()
         return row[0] > 0
 
@@ -506,7 +506,7 @@ class MariaDBDatabase(SQLBase):
         :return:
         """
         self.debug_execute(f"SELECT * FROM {self.thumbnail_table} "
-                           f"WHERE filename IS '{thumb_name}' "
+                           f"WHERE filename = '{thumb_name}' "
                            f"AND dir_b = {0 if dir_a else 1}")
         return self.cur.fetchone() is not None
 
