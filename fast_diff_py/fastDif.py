@@ -651,7 +651,7 @@ class FastDifPy:
 
         assert self.config.sl_cpu_proc >= 1, "Number of GPU Processes needs to be greater than zero"
 
-        self.config.sl_has_thumb = self.db.test_thumb_table_existence()
+        self.config.sl_has_thumb = self.db.test_thumb_existence()
 
         if make_diff_plots:
             # diff_location is stored in config in this function.

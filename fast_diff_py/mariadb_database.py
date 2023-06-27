@@ -435,6 +435,16 @@ class MariaDBDatabase(SQLBase):
         self.cur.execute(f"SHOW TABLES LIKE '{self.thumbnail_table}';")
         return self.cur.fetchone() is not None
 
+    def test_thumb_existence(self):
+        """
+        Check the table for thumbnails of directory table, exists. DOES NOT VERIFY THE TABLE DEFINITION!
+
+        :return:
+        """
+        self.cur.execute(f"SELECT COUNT(key) FROM thumb")
+        row = self.cur.fetchone()
+        return row[0] > 0
+
     def drop_thumb(self):
         """
         Drop a table related to the thumbnails of the directories.

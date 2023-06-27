@@ -513,9 +513,18 @@ class SQLiteDatabase(SQLBase):
 
         :return:
         """
-        # TODO fetch count from thumb table and assert it is greater than zero.
         self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'thumb'")
         return self.cur.fetchone() is not None
+
+    def test_thumb_existence(self):
+        """
+        Check the table for thumbnails of directory table, exists. DOES NOT VERIFY THE TABLE DEFINITION!
+
+        :return:
+        """
+        self.cur.execute(f"SELECT COUNT(key) FROM thumb")
+        row = self.cur.fetchone()
+        return row[0] > 0
 
     def drop_thumb(self):
         """

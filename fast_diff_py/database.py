@@ -173,7 +173,7 @@ class Database:
     # THUMBNAIL FILENAME TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
-    def test_thumb_table_existence(self):
+    def test_thumb_existence(self):
         """
         Check the table for thumbnails of directory table, exists. DOES NOT VERIFY THE TABLE DEFINITION!
 
