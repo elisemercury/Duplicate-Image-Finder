@@ -35,7 +35,6 @@ class FastDiffPyConfig:
                 "compute_hash": False,
                 "shift_amount": 4,
                 "cpu_proc": None,
-                "purge": True,
                 "inserted_counter": 0,
             },
             "second_loop": {
@@ -340,14 +339,6 @@ class FastDiffPyConfig:
     @fl_cpu_proc.setter
     def fl_cpu_proc(self, value: int):
         self._task_dict["first_loop"]["cpu_proc"] = value
-
-    @property
-    def fl_purge(self) -> bool:
-        return self._task_dict["first_loop"]["purge"]
-
-    @fl_purge.setter
-    def fl_purge(self, value: bool):
-        self._task_dict["first_loop"]["purge"] = value
 
     @property
     def fl_inserted_counter(self) -> int:
