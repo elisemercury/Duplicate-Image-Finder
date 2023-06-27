@@ -975,3 +975,32 @@ class SQLiteDatabase(SQLBase):
 
     def create_config_dump(self):
         return {"type": "sqlite", "path": self.path}
+
+
+class BenchmarkSQLiteDatabase(SQLiteDatabase):
+    query_time = 0
+    def debug_execute(self, statement: str, commit_now: bool = False):
+        """
+        Wrapper to print the infringing statement in case of an error.
+
+        :param statement: statement to execute
+        :param commit_now: If after execution a commit should be executed.
+        :return:
+        """
+        try:
+            start = datetime.datetime.now()
+            self.cur.execute(statement)
+            stop = datetime.datetime.now()
+            self.query_time += (stop - start).total_seconds()
+        except Exception as e:
+            self.logger.exception(f"Exception {e} with statement:\n{statement}")
+            raise e
+
+        # automatically commit.
+        if (datetime.datetime.now() - self.last_update).total_seconds() > 60 or \
+                commit_now or self.last_update is None:
+            start = datetime.datetime.now()
+            self.con.commit()
+            stop = datetime.datetime.now()
+            self.query_time += (stop - start).total_seconds()
+            self.last_update = datetime.datetime.now()
