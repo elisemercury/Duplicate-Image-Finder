@@ -144,8 +144,8 @@ class SQLBase(Database):
 
 class SQLiteDatabase(SQLBase):
     path: str = None
-    con: sqlite3.Connection = None
-    cur: sqlite3.Cursor = None
+    con: Union[sqlite3.Connection, None] = None
+    cur: Union[sqlite3.Cursor, None] = None
     path: str
 
     last_update: datetime.datetime = datetime.datetime.now()
