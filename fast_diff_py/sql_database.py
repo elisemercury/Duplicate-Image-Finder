@@ -898,6 +898,8 @@ class SQLiteDatabase(SQLBase):
         """
         self.con.commit()
         self.con.close()
+        self.con = None
+        self.cur = None
 
     def commit(self):
         """
@@ -913,7 +915,8 @@ class SQLiteDatabase(SQLBase):
 
         :return:
         """
-        os.remove(self.path)
+        if self.cur is None and self.con is None:
+            os.remove(self.path)
 
     def prepare_logging(self):
         """
