@@ -955,14 +955,14 @@ class MariaDBDatabase(SQLBase):
 
 
 class BenchmarkMariaDBDatabase(MariaDBDatabase):
-    qtime = 0
+    query_time = 0
 
     def debug_execute(self, statement: str):
         try:
             start = datetime.datetime.now()
             self.cur.execute(statement)
             stop = datetime.datetime.now()
-            self.qtime += (stop - start).total_seconds()
+            self.query_time += (stop - start).total_seconds()
         except Exception as e:
             self.logger.exception(f"Exception {e} with statement:\n{statement}")
             raise e
