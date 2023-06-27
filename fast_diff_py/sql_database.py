@@ -151,12 +151,57 @@ class SQLiteDatabase(SQLBase):
     last_update: datetime.datetime = datetime.datetime.now()
     logger: logging.Logger = None
 
-    def __init__(self, path):
+    def __init__(self, path, purge: bool = False):
+        """
+        Instantiate SQLite database.
+
+        :param path: path to the sqlite file
+        :param purge: if the tables that are crated should be removed first.
+        """
         super().__init__()
         self.connect(path)
         self.path = path
         self.prepare_logging()
 
+        self.create_tables(purge=purge)
+
+    def create_tables(self, purge: bool = False):
+        """
+        First tests if the tables exist and then creates them.
+        :param purge:
+        :return:
+        """
+        # Removing all tables
+        if purge:
+            self.logger.info("Purging preexisting tables.")
+
+            if self.test_thumb_table_existence():
+                self.logger.info("Dropping preexisting thumbnail table.")
+                self.drop_thumb()
+            if self.test_plot_table_existence():
+                self.logger.info("Dropping preexisting plot table.")
+                self.drop_plot()
+            if self.test_diff_table_existence():
+                self.logger.info("Dropping preexisting error table.")
+                self.drop_dif_table()
+            if self.test_dir_table_existence():
+                self.logger.info("Dropping preexisting directory table.")
+                self.drop_dir()
+            if self.test_hash_table_existence():
+                self.logger.info("Dropping preexisting hash table.")
+                self.drop_hash_table()
+
+        # creating the tables.
+        if not self.test_hash_table_existence():
+            self.__create_hash_table()
+        if not self.test_dir_table_existence():
+            self.__create_directory_tables()
+        if not self.test_thumb_table_existence():
+            self.__create_thumb_table()
+        if not self.test_diff_table_existence():
+            self.__create_diff_table()
+        if not self.test_plot_table_existence():
+            self.__create_plot_table()
     # ------------------------------------------------------------------------------------------------------------------
     # DIRECTORY TABLES
     # ------------------------------------------------------------------------------------------------------------------
