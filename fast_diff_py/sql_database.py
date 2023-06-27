@@ -206,23 +206,12 @@ class SQLiteDatabase(SQLBase):
     # DIRECTORY TABLES
     # ------------------------------------------------------------------------------------------------------------------
 
-    def create_directory_tables(self, purge: bool = True):
+    def __create_directory_tables(self):
         """
-        Create the directory tables. Default for purge is true, to recompute it in case the program is stopped during
-        indexing. ASSUMPTION: Indexing is a very fast operation. TODO Handle Stop mid Indexing.
+        Simply create the directory table.
 
-        :param purge: if True, purge the tables before creating them.
         :return:
         """
-
-        # Drop the tables if purge is set
-        if purge:
-            self.logger.info("Purging preexisting indexes of directories.")
-
-            if self.test_dir_table_existence():
-                self.logger.info("Dropping directory table.")
-                self.drop_dir()
-
         self.debug_execute(
             "CREATE TABLE directory ("
             "key INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -481,21 +470,11 @@ class SQLiteDatabase(SQLBase):
     # THUMBNAIL FILENAME TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
-    def create_thumb_table(self, purge: bool = False):
+    def __create_thumb_table(self):
         """
-        Create tables which contain the names of the thumbnails (to make sure there's no collisions ahead of time)
-
-        :param purge: if True, purge the tables before creating them.
+        Simply create the thumbnail table.
         :return:
         """
-
-        # Drop the tables if purge is set
-        if purge:
-            self.logger.info("Purging preexisting indexes of directories.")
-
-            if self.test_thumb_table_existence():
-                self.logger.info("Dropping directory A table.")
-                self.drop_thumb()
 
         self.debug_execute("CREATE TABLE thumb ( "
                            "key INTEGER PRIMARY KEY, "
@@ -577,21 +556,12 @@ class SQLiteDatabase(SQLBase):
     # PLOT TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
-    def create_plot_table(self, purge: bool = False):
+    def __create_plot_table(self):
         """
-        Create tables which contain the filenames of the plots (to make sure there's no collisions ahead of time)
+        Simply create the plot table.
 
-        :param purge: if True, purge the tables before creating them.
         :return:
         """
-
-        # Drop the tables if purge is set
-        if purge:
-            self.logger.info("Purging preexisting indexes of directories.")
-
-            if self.test_plot_table_existence():
-                self.logger.info("Dropping directory A table.")
-                self.drop_plot()
 
         self.debug_execute("CREATE TABLE plots ( key INTEGER PRIMARY KEY, key_a INTEGER, key_b INTEGER )")
 
@@ -659,17 +629,12 @@ class SQLiteDatabase(SQLBase):
     # HASH TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
-    def create_hash_table(self, purge: bool = False):
+    def __create_hash_table(self):
         """
-        Create the hash table and purge preexisting table if desirerd.
+        Simply create the hash table.
 
-        :param purge: if True, purge the table before creating it.
         :return:
         """
-        if purge:
-            if self.test_hash_table_existence():
-                self.drop_hash_table()
-
         self.debug_execute("CREATE TABLE hash_table ("
                            "key INTEGER PRIMARY KEY AUTOINCREMENT , "
                            "hash TEXT UNIQUE , "
@@ -718,17 +683,11 @@ class SQLiteDatabase(SQLBase):
     # ERROR TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
-    def create_dif_table(self, purge: bool = False):
+    def __create_diff_table(self):
         """
-        Create the dif table. If purge is true, drop a preexisting dif table.
-
-        :param purge: if True, purge the table before creating it.
+        Simply create the diff table.
         :return:
         """
-        if purge:
-            if self.test_dif_table_existence():
-                self.drop_dif_table()
-
         self.debug_execute("CREATE TABLE dif_table ("
                            "key INTEGER PRIMARY KEY AUTOINCREMENT , "
                            "key_a INTEGER NOT NULL , "
