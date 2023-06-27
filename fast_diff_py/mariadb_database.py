@@ -152,7 +152,7 @@ class MariaDBDatabase(SQLBase):
 
         :return:
         """
-        self.cur.execute(f"SHOW TABLES LIKE '{self.directory_table}';")
+        self.debug_execute(f"SHOW TABLES LIKE '{self.directory_table}';")
         return self.cur.fetchone() is not None
 
     def drop_dir(self):
@@ -434,7 +434,7 @@ class MariaDBDatabase(SQLBase):
 
         :return:
         """
-        self.cur.execute(f"SHOW TABLES LIKE '{self.thumbnail_table}';")
+        self.debug_execute(f"SHOW TABLES LIKE '{self.thumbnail_table}';")
         return self.cur.fetchone() is not None
 
     def test_thumb_existence(self):
@@ -443,7 +443,7 @@ class MariaDBDatabase(SQLBase):
 
         :return:
         """
-        self.cur.execute(f"SELECT COUNT(key) FROM thumb")
+        self.debug_execute(f"SELECT COUNT(key) FROM thumb")
         row = self.cur.fetchone()
         return row[0] > 0
 
@@ -539,7 +539,7 @@ class MariaDBDatabase(SQLBase):
 
         :return:
         """
-        self.cur.execute(f"SHOW TABLES LIKE '{self.plot_table}';")
+        self.debug_execute(f"SHOW TABLES LIKE '{self.plot_table}';")
         return self.cur.fetchone() is not None
 
     def drop_plot(self):
@@ -615,7 +615,7 @@ class MariaDBDatabase(SQLBase):
 
         :return:
         """
-        self.cur.execute(f"SHOW TABLES LIKE '{self.hash_table}';")
+        self.debug_execute(f"SHOW TABLES LIKE '{self.hash_table}';")
         return self.cur.fetchone() is not None
 
     def drop_hash_table(self):
@@ -638,8 +638,8 @@ class MariaDBDatabase(SQLBase):
         # no entry in database, add it.
         row = self.cur.fetchone()
         if row is None:
-            self.cur.execute(f"INSERT INTO {self.hash_table} (hash, count) VALUES ('{file_hash}', 1)")
-            self.cur.execute(f"SELECT `key` FROM {self.hash_table} WHERE hash = '{file_hash}'")
+            self.debug_execute(f"INSERT INTO {self.hash_table} (hash, count) VALUES ('{file_hash}', 1)")
+            self.debug_execute(f"SELECT `key` FROM {self.hash_table} WHERE hash = '{file_hash}'")
             return self.cur.fetchone()[0]
 
         # increment the key
@@ -681,7 +681,7 @@ class MariaDBDatabase(SQLBase):
 
         :return: bool, True if the table exists
         """
-        self.cur.execute(f"SHOW TABLES LIKE '{self.diff_table}';")
+        self.debug_execute(f"SHOW TABLES LIKE '{self.diff_table}';")
         return self.cur.fetchone() is not None
 
     def drop_dif_table(self):
@@ -854,7 +854,7 @@ class MariaDBDatabase(SQLBase):
         :return:
         """
         try:
-            self.con.execute(statement)
+            self.cur.execute(statement)
         except Exception as e:
             self.logger.exception(f"Exception {e} with statement:\n{statement}")
             raise e
