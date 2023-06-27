@@ -142,7 +142,7 @@ class MariaDBDatabase(SQLBase):
             f"CONSTRAINT hash270 FOREIGN KEY (hash_270) "
             f"                 REFERENCES {self.hash_table} (`key`) "
             f"                 ON DELETE RESTRICT "
-            f"                 ON UPDATE RESTRICT, "
+            f"                 ON UPDATE RESTRICT "
             f");"
         )
 
