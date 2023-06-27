@@ -10,9 +10,12 @@ Inherit from this class and implement all its functions to fully use your own db
 
 
 class Database:
-    def __init__(self):
+    def __init__(self, purge=False):
         """
         Init function for your implementation of the database
+        Create all tables needed here.
+
+        :param purge: If the tables should be deleted if they exist and recreated.
         """
         pass
 
