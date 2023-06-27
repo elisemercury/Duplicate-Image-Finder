@@ -517,7 +517,19 @@ class MariaDBDatabase(SQLBase):
         Create tables which contain the filenames of the plots (to make sure there's no collisions ahead of time)
         :return:
         """
-        self.debug_execute(f"CREATE TABLE {self.plot_table} ( key INTEGER PRIMARY KEY, key_a INTEGER, key_b INTEGER )")
+        self.debug_execute(f"CREATE TABLE {self.plot_table} ( "
+                           f"key INT UNSIGNED , "
+                           f"key_a INT UNSIGNED, "
+                           f"key_b INT UNSIGNED,"
+                           f"PRIMARY KEY (`key`),"
+                           f"CONSTRAINT key_a FOREIGN KEY (key_a)"
+                           f"   REFERENCES {self.directory_table} (`key`)"
+                           f"   ON DELETE RESTRICT "
+                           f"   ON UPDATE RESTRICT,"
+                           f"CONSTRAINT key_b FOREIGN KEY (key_b)"
+                           f"   REFERENCES {self.directory_table} (`key`) "
+                           f"   ON DELETE RESTRICT "
+                           f"   ON UPDATE RESTRICT )")
 
     def test_plot_table_existence(self):
         """
@@ -525,7 +537,7 @@ class MariaDBDatabase(SQLBase):
 
         :return:
         """
-        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'plots'")
+        self.cur.execute(f"SHOW TABLES LIKE '{self.plot_table}';")
         return self.cur.fetchone() is not None
 
     def drop_plot(self):
@@ -576,7 +588,7 @@ class MariaDBDatabase(SQLBase):
         except ValueError:
             return None
 
-        self.debug_execute(f"SELECT * FROM {self.plot_table} WHERE key = {db_key}")
+        self.debug_execute(f"SELECT * FROM {self.plot_table} WHERE `key` = {db_key}")
         return self.cur.fetchone()
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -589,9 +601,10 @@ class MariaDBDatabase(SQLBase):
         :return:
         """
         self.debug_execute(f"CREATE TABLE {self.hash_table} ("
-                           f"`key` INTEGER PRIMARY KEY AUTOINCREMENT , "
+                           f"`key` INT UNSIGNED, "
                            f"hash TEXT UNIQUE , "
-                           f"count INTEGER CHECK (count >=0 ))"
+                           f"count INT CHECK (count >=0 ),"
+                           f"PRIMARY KEY (`key`))"
                            )
 
     def test_hash_table_existence(self):
@@ -600,7 +613,7 @@ class MariaDBDatabase(SQLBase):
 
         :return:
         """
-        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'hash_table'")
+        self.cur.execute(f"SHOW TABLES LIKE '{self.hash_table}';")
         return self.cur.fetchone() is not None
 
     def drop_hash_table(self):
@@ -611,7 +624,7 @@ class MariaDBDatabase(SQLBase):
         """
         self.debug_execute(f"DROP TABLE {self.hash_table}")
 
-    def add_increment_hash(self, file_hash: str):
+    def add_increment_hash(self, file_hash: str) -> int:
         """
         Add the hash to database if it doesn't exist otherwise increment it.
 
@@ -629,7 +642,7 @@ class MariaDBDatabase(SQLBase):
 
         # increment the key
         key = row[0]
-        self.debug_execute(f"UPDATE hash_table SET count = {row[2] + 1} WHERE key = {key}")
+        self.debug_execute(f"UPDATE hash_table SET count = {row[2] + 1} WHERE `key` = {key}")
         return key
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -642,13 +655,23 @@ class MariaDBDatabase(SQLBase):
         :return:
         """
         self.debug_execute(f"CREATE TABLE {self.diff_table} ("
-                           f"key INTEGER PRIMARY KEY AUTOINCREMENT , "
-                           f"key_a INTEGER NOT NULL , "
-                           f"key_b INTEGER NOT NULL ,"
+                           f"`key` INT UNSIGNED , "
+                           f"key_a INT UNSIGNED NOT NULL , "
+                           f"key_b INT UNSIGNED NOT NULL ,"
                            f"dif REAL CHECK (dif >= -1) DEFAULT -1,"
                            f"error TEXT,"
-                           f"success INT CHECK (success >= 0 AND success <= 1),"
-                           f"UNIQUE (key_a, key_b)) ")
+                           f"success TINYINT CHECK (success >= 0 AND success <= 1),"
+                           f"UNIQUE (key_a, key_b),"
+                           f"PRIMARY KEY (`key`),"
+                           f"CONSTRAINT key_a FOREIGN KEY (key_a)"
+                           f"   REFERENCES {self.directory_table} (`key`)"
+                           f"   ON UPDATE RESTRICT "
+                           f"   ON DELETE RESTRICT, "
+                           f"CONSTRAINT key_b FOREIGN KEY (key_b)"
+                           f"   REFERENCES {self.directory_table} (`key`)"
+                           f"   ON DELETE RESTRICT "
+                           f"   ON UPDATE RESTRICT "
+                           f") ")
 
     def test_diff_table_existence(self) -> bool:
         """
@@ -656,7 +679,7 @@ class MariaDBDatabase(SQLBase):
 
         :return: bool, True if the table exists
         """
-        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'dif_table'")
+        self.cur.execute(f"SHOW TABLES LIKE '{self.diff_table}';")
         return self.cur.fetchone() is not None
 
     def drop_dif_table(self):
@@ -722,7 +745,7 @@ class MariaDBDatabase(SQLBase):
         :param key: unique key in the dif table.
         :return: None, nothing exists, dict of matching row.
         """
-        self.debug_execute(f"SELECT * FROM {self.diff_table} WHERE key = {key}")
+        self.debug_execute(f"SELECT * FROM {self.diff_table} WHERE `key` = {key}")
         res = self.cur.fetchone()
 
         if res is None:
@@ -776,12 +799,14 @@ class MariaDBDatabase(SQLBase):
         """
         # fetching from the beginning
         if start_key is None:
-            self.debug_execute(f"SELECT * FROM {self.diff_table} WHERE dif >= 0 AND dif < {threshold} ORDER BY key ASC")
+            self.debug_execute(f"SELECT * FROM {self.diff_table} WHERE dif >= 0 AND dif < {threshold} "
+                               f"ORDER BY `key` ASC")
             return self.wrap_many_dict_dif(self.cur.fetchmany(count))
 
         # fetching from starting key.
-        self.debug_execute(f"SELECT * FROM {self.diff_table} WHERE dif >= 0 AND dif < {threshold} AND key > {start_key} "
-                           f"ORDER BY key ASC")
+        self.debug_execute(f"SELECT * FROM {self.diff_table} WHERE dif >= 0 AND dif < {threshold} "
+                           f"AND `key` > {start_key} "
+                           f"ORDER BY `key` ASC")
         return self.wrap_many_dict_dif(self.cur.fetchmany(count))
 
     def get_many_comparison_errors(self, start_key: int = None, count: int = 1000) -> List[dict]:
@@ -796,22 +821,22 @@ class MariaDBDatabase(SQLBase):
 
         # fetch from the beginning
         if start_key is None:
-            self.debug_execute(f"SELECT dif_table.key, dif_table.key_a, dif_table.key_b,  a.path, b.path, "
-                               f"dif_table.error "
+            self.debug_execute(f"SELECT {self.diff_table}.key, {self.diff_table}.key_a, {self.diff_table}.key_b,  "
+                               f"a.path, b.path, {self.diff_table}.error "
                                f"FROM {self.diff_table} "
-                               f"JOIN directory a on dif_table.key_a = a.key "
-                               f"JOIN directory b on dif_table.key_b = b.key "
-                               f"WHERE dif_table.error IS NOT NULL ORDER BY dif_table.key ASC")
+                               f"JOIN directory a on {self.diff_table}.key_a = a.`key` "
+                               f"JOIN directory b on {self.diff_table}.key_b = b.`key` "
+                               f"WHERE {self.diff_table}.error IS NOT NULL ORDER BY {self.diff_table}.`key` ASC")
 
             return self.wrap_many_errors_dif(self.cur.fetchmany(count))
 
         # fetching from starting key.
-        self.debug_execute(f"SELECT dif_table.key, dif_table.key_a, dif_table.key_b,  a.path, b.path, "
-                           f"dif_table.error "
+        self.debug_execute(f"SELECT {self.diff_table}.key, {self.diff_table}.key_a, {self.diff_table}.key_b,  "
+                           f"a.path, b.path, {self.diff_table}.error "
                            f"FROM {self.diff_table} "
-                           f"JOIN directory a on dif_table.key_a = a.key "
-                           f"JOIN directory b on dif_table.key_b = b.key "
-                           f"WHERE dif_table.error IS NOT NULL ORDER BY dif_table.key ASC")
+                           f"JOIN directory a on {self.diff_table}.key_a = a.`key` "
+                           f"JOIN directory b on {self.diff_table}.key_b = b.`key` "
+                           f"WHERE {self.diff_table}.error IS NOT NULL ORDER BY {self.diff_table}.`key` ASC")
 
         return self.wrap_many_errors_dif(self.cur.fetchmany(count))
 
