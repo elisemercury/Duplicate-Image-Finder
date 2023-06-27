@@ -334,13 +334,33 @@ class MariaDBDatabase(SQLBase):
         :param key: key in the directory table
         :return:
         """
-        # TODO implement call with transactions to make sure coherancy between hash table count and directory table is
-        #  assured
+        hashes = self.get_hash_of_key(key=key)
+        for hs in hashes:
+            if hs is None:
+                continue
 
-        self.logger.warning("Deleting hashes, this is not matched with the hash table at the moment.")
+            self.__decrement_hash(hs)
+
         self.debug_execute(f"UPDATE {self.directory_table} "
                            f"SET hash_0 = NULL, hash_90 = NULL, hash_180 = NULL, hash_270 = NULL "
                            f"WHERE `key` = {key}")
+
+    def __decrement_hash(self, key: int):
+        """
+        Decrement the count of a hash in the hash table.
+
+        :param key: key of hash to decrement.
+        :return:
+        """
+        self.debug_execute(f"SELECT count FROM {self.hash_table} WHERE `key` = {key}")
+        row = self.cur.fetchone()
+
+        if row is None:
+            raise ValueError(f"No hash found. key {key}")
+
+        count = row[0]
+        self.debug_execute(f"UPDATE {self.hash_table} SET count = {count - 1} WHERE `key` = {key}")
+
 
     def get_hash_of_key(self, key: int) -> list:
         """
