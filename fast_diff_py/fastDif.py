@@ -1220,9 +1220,9 @@ class FastDifPy:
 
         # store in database
         if res_obj.success:
-            self.db.insert_dif_success(key_a=res_obj.key_a, key_b=res_obj.key_b, dif=res_obj.min_avg_diff)
+            self.db.insert_diff_success(key_a=res_obj.key_a, key_b=res_obj.key_b, dif=res_obj.min_avg_diff)
         else:
-            self.db.insert_dif_error(key_a=res_obj.key_a, key_b=res_obj.key_b, error=res_obj.error)
+            self.db.insert_diff_error(key_a=res_obj.key_a, key_b=res_obj.key_b, error=res_obj.error)
         return True
 
     def check_children(self, gpu: bool = False, cpu: bool = False):

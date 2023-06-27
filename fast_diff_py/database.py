@@ -242,7 +242,7 @@ class Database:
     # ERROR TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
-    def insert_dif_success(self, key_a: int, key_b: int, dif: float) -> bool:
+    def insert_diff_success(self, key_a: int, key_b: int, dif: float) -> bool:
         """
         Insert a new row into the database. If the value exists already, return False, else return True
 
@@ -253,7 +253,7 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    def insert_dif_error(self, key_a: int, key_b: int, error: str) -> bool:
+    def insert_diff_error(self, key_a: int, key_b: int, error: str) -> bool:
         """
         Insert a new row into the database. If the value exists already, return False, else return True
 
@@ -283,14 +283,14 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    def update_pair_row(self, key_a: int, key_b: int, dif: float = None) -> bool:
+    def update_pair_row(self, key_a: int, key_b: int, diff: float = None) -> bool:
         """
         Updates a pair with the new data. if the data is not specified, the preexisting data is used.
         Return true if the update was successful. Return False if the row didn't exist.
 
         :param key_a: key of first image in directory_X table
         :param key_b: key of second image in directory_X table
-        :param dif: difference measurement
+        :param diff: difference measurement
         :return: if update was successful
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
