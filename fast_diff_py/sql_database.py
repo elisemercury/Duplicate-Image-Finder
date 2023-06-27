@@ -241,7 +241,7 @@ class SQLiteDatabase(SQLBase):
 
         :return:
         """
-        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'directory'")
+        self.debug_execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'directory'")
         return self.cur.fetchone() is not None
 
     def drop_dir(self):
@@ -513,7 +513,7 @@ class SQLiteDatabase(SQLBase):
 
         :return:
         """
-        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'thumb'")
+        self.debug_execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'thumb'")
         return self.cur.fetchone() is not None
 
     def test_thumb_existence(self):
@@ -522,7 +522,7 @@ class SQLiteDatabase(SQLBase):
 
         :return:
         """
-        self.cur.execute(f"SELECT COUNT(key) FROM thumb")
+        self.debug_execute(f"SELECT COUNT(key) FROM thumb")
         row = self.cur.fetchone()
         return row[0] > 0
 
@@ -606,7 +606,7 @@ class SQLiteDatabase(SQLBase):
 
         :return:
         """
-        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'plots'")
+        self.debug_execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'plots'")
         return self.cur.fetchone() is not None
 
     def drop_plot(self):
@@ -682,7 +682,7 @@ class SQLiteDatabase(SQLBase):
 
         :return:
         """
-        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'hash_table'")
+        self.debug_execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'hash_table'")
         return self.cur.fetchone() is not None
 
     def drop_hash_table(self):
@@ -705,8 +705,8 @@ class SQLiteDatabase(SQLBase):
         # no entry in database, add it.
         row = self.cur.fetchone()
         if row is None:
-            self.cur.execute(f"INSERT INTO hash_table (hash, count) VALUES ('{file_hash}', 1)")
-            self.cur.execute(f"SELECT key FROM hash_table WHERE hash = '{file_hash}'")
+            self.debug_execute(f"INSERT INTO hash_table (hash, count) VALUES ('{file_hash}', 1)")
+            self.debug_execute(f"SELECT key FROM hash_table WHERE hash = '{file_hash}'")
             return self.cur.fetchone()[0]
 
         # increment the key
@@ -738,7 +738,7 @@ class SQLiteDatabase(SQLBase):
 
         :return: bool, True if the table exists
         """
-        self.cur.execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'dif_table'")
+        self.debug_execute(f"SELECT * FROM sqlite_master WHERE tbl_name IS 'dif_table'")
         return self.cur.fetchone() is not None
 
     def drop_dif_table(self):
