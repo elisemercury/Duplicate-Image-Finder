@@ -603,7 +603,7 @@ class MariaDBDatabase(SQLBase):
         :return:
         """
         self.debug_execute(f"CREATE TABLE {self.hash_table} ("
-                           f"`key` INT UNSIGNED, "
+                           f"`key` INT UNSIGNED AUTO_INCREMENT, "
                            f"hash TEXT UNIQUE , "
                            f"count INT CHECK (count >=0 ),"
                            f"PRIMARY KEY (`key`))"
@@ -644,7 +644,7 @@ class MariaDBDatabase(SQLBase):
 
         # increment the key
         key = row[0]
-        self.debug_execute(f"UPDATE hash_table SET count = {row[2] + 1} WHERE `key` = {key}")
+        self.debug_execute(f"UPDATE {self.hash_table} SET count = {row[2] + 1} WHERE `key` = {key}")
         return key
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -657,7 +657,7 @@ class MariaDBDatabase(SQLBase):
         :return:
         """
         self.debug_execute(f"CREATE TABLE {self.diff_table} ("
-                           f"`key` INT UNSIGNED , "
+                           f"`key` INT UNSIGNED AUTO_INCREMENT, "
                            f"key_a INT UNSIGNED NOT NULL , "
                            f"key_b INT UNSIGNED NOT NULL ,"
                            f"dif DOUBLE DEFAULT -1.0 CHECK (dif >= -1.0) ,"
