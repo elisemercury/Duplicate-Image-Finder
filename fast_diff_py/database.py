@@ -239,19 +239,6 @@ class Database:
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
     # ------------------------------------------------------------------------------------------------------------------
-    # HASH TABLE
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def create_hash_table(self, purge: bool = False):
-        """
-        Create the hash table and purge preexisting table if desirerd.
-
-        :param purge: if True, purge the table before creating it.
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    # ------------------------------------------------------------------------------------------------------------------
     # ERROR TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
