@@ -1689,8 +1689,9 @@ class FastDifPy:
     @db.setter
     def db(self, value):
         self.__db = value
-        self.config.database = self.__db.create_config_dump()
-        self.config.write_to_file()
+        if self.config.retain_db:
+            self.config.database = self.__db.create_config_dump()
+            self.config.write_to_file()
 
     def prepare_logging(self, console_level: int = logging.DEBUG, debug: bool = False):
         """
