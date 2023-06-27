@@ -520,7 +520,7 @@ class MariaDBDatabase(SQLBase):
         :return:
         """
         self.debug_execute(f"CREATE TABLE {self.plot_table} ( "
-                           f"key INT UNSIGNED , "
+                           f"`key` INT UNSIGNED , "
                            f"key_a INT UNSIGNED, "
                            f"key_b INT UNSIGNED,"
                            f"PRIMARY KEY (`key`),"
