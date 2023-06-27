@@ -27,6 +27,8 @@ class MariaDBDatabase(SQLBase):
         # Create super call just in case
         super().__init__()
 
+        self.prepare_logging()
+
         # Store the input
         self.user = user
         self.host = host
