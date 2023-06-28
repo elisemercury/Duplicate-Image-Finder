@@ -1360,16 +1360,19 @@ class FastDifPy(FastDiffPyBase):
         # TODO test for existence (for stop recovery)
         if max_number is None:
             number_dequeues = 0
+            number_exited = 0
 
             while True:
-                if not self._process_one_second_result(out_queue=self.second_loop_out):
+                proc_suc, proc_exit = self._process_one_second_result(out_queue=self.second_loop_out)
+                if not proc_suc:
                     return number_dequeues
 
                 number_dequeues += 1
 
         # we have a max_number
         for i in range(max_number):
-            if not self._process_one_second_result(out_queue=self.second_loop_out):
+            proc_suc, proc_exit = self._process_one_second_result(out_queue=self.second_loop_out)
+            if not proc_suc:
                 return i
 
         return max_number
