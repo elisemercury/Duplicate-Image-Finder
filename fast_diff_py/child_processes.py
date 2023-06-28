@@ -1,6 +1,10 @@
 from fast_diff_py.cpu_image_processor import CPUImageProcessing
+from fast_diff_py.mariadb_database import MariaDBDatabase
+from fast_diff_py.fastDif import FastDiffPyBase
 from fast_diff_py.datatransfer import PreprocessArguments, PreprocessResults, CompareImageArguments, CompareImageResults
+from fast_diff_py.utils import Messages
 import multiprocessing as mp
+from multiprocessing.connection import Connection
 import warnings
 import queue
 import os
@@ -227,3 +231,142 @@ def find_best_image(args: Tuple[list, FunctionType]) -> Tuple[dict, list]:
         duplicates.append(fp)
 
     return result, duplicates
+
+
+def build_base_obj(config: dict, db_config: dict) -> FastDiffPyBase:
+    """
+    Instantiate a FastDiffPyBase object and add the appropriate database.
+
+    :param config: config for the FastDiffPyBase class
+    :param db_config: config required for database.
+    :return:
+    """
+    fdb = FastDiffPyBase(cfg=config)
+    if db_config["type"] == "mariadb":
+        mdb = MariaDBDatabase(user=db_config["user"],
+                              password=db_config["password"],
+                              host=db_config["host"],
+                              port=db_config["port"],
+                              database=db_config["database"],
+                              table_suffix=db_config["table_suffix"],
+                              **db_config["kwargs"])
+        fdb.db = mdb
+    else:
+        raise ValueError(f"Unsupported database type {db_config['type']}")
+
+    return fdb
+
+
+def first_loop_enqueue_worker(target_queue: mp.Queue, com: Connection, config: dict, db_config: dict):
+    """
+    Enqueues until all images have been processed and the Nones have been submitted as well.
+
+    :param target_queue: queue to enqueue the tasks into
+    :param com: Pipe for communication with parent process
+    :param config: config dict form parent object
+    :param db_config: config for database to connect to it.
+    :return:
+    """
+    fdb = build_base_obj(config=config, db_config=db_config)
+
+    none_counter = 0
+    insert_counter = 0
+    current_task = None
+    timeout = 0
+
+    # Scheduling of tasks
+    while True:
+        if com.poll(timeout=0.01):
+            msg = com.recv()
+
+            # Iterate over message types and perform associated action.
+            if msg == Messages.Stop:
+                return
+
+        # fetching a new task if the current task is empty
+        if current_task is None:
+            current_task = fdb.generate_first_loop_obj()
+
+        # exit loop if all elements are processed.
+        if current_task is None:
+            break
+
+        # submit to queue
+        try:
+            target_queue.put(current_task.to_json(), timeout=1.0)
+            insert_counter += 1
+            timeout = 0
+        except queue.Full:
+            timeout += 1
+
+        # prevent immortal process.
+        if timeout > 60:
+            com.send("First Loop Enqueue Worker timeout. Exit.")
+            return
+
+        # Progress to parent
+        if insert_counter % 100 == 0:
+            com.send(insert_counter)
+
+    # Scheduling of tasks
+    while True:
+        if com.poll(timeout=0.01):
+            msg = com.recv()
+
+            # Iterate over message types and perform associated action.
+            if msg == Messages.Stop:
+                return
+
+        if none_counter >= fdb.config.fl_cpu_proc:
+            return
+
+        # submit to queue
+        try:
+            target_queue.put(None, timeout=0.1)
+            none_counter += 1
+            timeout = 0
+        except queue.Full:
+            timeout += 1
+
+        # prevent immortal process.
+        if timeout > 60:
+            com.send("First Loop Enqueue Worker timeout. Exit.")
+            return
+
+
+def first_loop_dequeue_worker(target_queue: mp.Queue, com: Connection, config: dict, db_config: dict):
+    """
+    Dequeues until enough Nones have been received.
+
+    :param target_queue: queue to dequeue from
+    :param com: communication object to talk to parent.
+    :param config: config to instantiate base class.
+    :param db_config: config for database.
+    :return:
+    """
+    fdb = build_base_obj(config=config, db_config=db_config)
+    none_counter = 0
+    result_counter = 0
+    timeout = 0
+
+    while none_counter <= fdb.config.fl_cpu_proc:
+        if com.poll(timeout=0.01):
+            msg = com.recv()
+
+            # Iterate over message types and perform associated action.
+            if msg == Messages.Stop:
+                return
+
+        proc_suc, proc_exit = fdb.handle_result_of_first_loop(target_queue)
+        result_counter += int(proc_suc)
+        none_counter += int(proc_exit)
+
+        if proc_suc or proc_exit:
+            timeout = 0
+        else:
+            timeout += 1
+
+        if timeout > 60:
+            com.send("First Loop Dequeue Worker timeout. Exit.")
+            return
+
