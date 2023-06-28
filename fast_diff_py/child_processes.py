@@ -146,11 +146,12 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
         try:
             args_str = in_q.get(timeout=1)
         except queue.Empty:
+            print(f"{identifier:03} Timeout Parallel Compare")
             timeout += 1
             continue
 
         if args_str is None:
-            print(f"{identifier:03} Terminating")
+            print(f"{identifier:03} Terminating Parallel Compare")
             break
 
         args = CompareImageArguments.from_json(args_str)
