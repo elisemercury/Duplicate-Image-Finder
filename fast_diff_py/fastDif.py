@@ -518,20 +518,22 @@ class FastDiffPyBase:
             return True
         return False
 
-    def _process_one_second_result(self, out_queue: mp.Queue) -> bool:
+    def _process_one_second_result(self, out_queue: mp.Queue) -> Tuple[bool, bool]:
         """
         Perform dequeue of one element of the second process results queue. Insert the result into the database
         subsequently.
 
         :param out_queue: Queue to dequeue the stuff from.
 
-        :return: True -> inserted one element, False, timeout reached for fetching the next element.
-        (Useful to prevent infinite loops)
+        :return: element processed (no timeout), if a process exited.
         """
         try:
             res = out_queue.get(timeout=0.1)
         except queue.Empty:
-            return False
+            return False, False
+
+        if res is None:
+            return False, True
 
         assert type(res) is str, "Result of comparison was not string"
         res_obj = CompareImageResults.from_json(res)
@@ -541,7 +543,7 @@ class FastDiffPyBase:
             self.db.insert_diff_success(key_a=res_obj.key_a, key_b=res_obj.key_b, dif=res_obj.min_avg_diff)
         else:
             self.db.insert_diff_error(key_a=res_obj.key_a, key_b=res_obj.key_b, error=res_obj.error)
-        return True
+        return True, False
 
 
 class FastDifPy(FastDiffPyBase):
