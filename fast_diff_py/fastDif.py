@@ -930,15 +930,15 @@ class FastDifPy(FastDiffPyBase):
         self.cpu_handles = []
         self.gpu_handles = []
 
-        self.first_loop_in = mp.Queue()
-        self.first_loop_out = mp.Queue()
+        self.first_loop_in =  mp.Queue(self.config.max_queue_size) if self.db.thread_safe else mp.Queue()
+        self.first_loop_out = mp.Queue(self.config.max_queue_size) if self.db.thread_safe else mp.Queue()
 
         # var for following while loop:
         run = True
 
         # prefill loop
         for i in range(self.config.fl_cpu_proc):
-            arg = self._generate_first_loop_obj()
+            arg = self.generate_first_loop_obj()
 
             # stop if there's nothing left to do.
             if arg is None:
@@ -949,7 +949,79 @@ class FastDifPy(FastDiffPyBase):
             self.first_loop_in.put(arg.to_json())
             self.config.fl_inserted_counter += 1
 
+        if self.db.thread_safe:
+            self.__thread_safe_first_loop(run=run)
+            return
+
+        self.__non_thread_safe_first_loop(run=run)
+
+    def __thread_safe_first_loop(self, run: bool):
         v = self.verbose
+
+        # start processes for cpu
+        for i in range(self.config.fl_cpu_proc):
+            p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, False, v))
+            p.start()
+            self.cpu_handles.append(p)
+
+        en_com_1, en_com_2,  = mp.Pipe()
+        enqueue_worker = None
+        if run:
+            enqueue_worker = mp.Process(target=first_loop_enqueue_worker,
+                                        args=(self.first_loop_in, en_com_2, self.config._task_dict,
+                                              self.db.create_config_dump()))
+            enqueue_worker.start()
+        de_com_1, de_com_2 = mp.Pipe()
+        dequeue_worker = mp.Process(target=first_loop_dequeue_worker,
+                                    args=(self.first_loop_out, de_com_2, self.config._task_dict,
+                                          self.db.create_config_dump()))
+        en_com_1: con.Connection
+        de_com_1: con.Connection
+        dequeue_worker.start()
+
+        while enqueue_worker is not None and enqueue_worker.is_alive():
+            # Handling communications.
+            if run:
+                # polling the queues:
+                if en_com_1.poll(timeout = 0.01):
+                    self.logger.info(en_com_1.recv())
+
+            if de_com_1.poll(timeout= 0.01):
+                self.logger.info(de_com_1.recv())
+
+            time.sleep(0.1)
+
+        # Joining.
+        if run:
+            enqueue_worker.join()
+        else:
+            self.send_termination_signal(first_loop=True)
+
+        self.join_all_children()
+
+        # waiting for dequeue_worker
+        while dequeue_worker.is_alive():
+            if de_com_1.poll(timeout= 0.01):
+                self.logger.info(de_com_1.recv())
+
+        dequeue_worker.join()
+        assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
+                                            f"Remaining: {self.first_loop_out.qsize()}"
+
+        self.config.state = "first_loop_done"
+        self.config.write_to_file()
+        self.logger.info("All Images have been preprocessed.")
+
+    def __non_thread_safe_first_loop(self, run: bool):
+        """
+        The main stage of the first loop. Starting the child processes and managing those and having the main thread
+        taking care of enqueueing and dequeue the tasks and results.
+
+        :param run: boolean if the continuous enqueue and dequeue loop needs to run.
+        :return:
+        """
+        v = self.verbose
+
         # start processes for cpu
         for i in range(self.config.fl_cpu_proc):
             p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, False, v))
@@ -959,14 +1031,17 @@ class FastDifPy(FastDiffPyBase):
         # turn main loop into handler and perform monitoring of the threads.
         none_counter = 0
         timeout = 0
+        exit_count = 0
 
         # handle the running state of the loop
         while run:
             if self.config.fl_inserted_counter % 100 == 0:
                 self.logger.info(f"Inserted {self.config.fl_inserted_counter} images.")
 
-            if self.handle_result_of_first_loop(self.first_loop_out):
-                arg = self._generate_first_loop_obj()
+            proc_suc, proc_exit = self.handle_result_of_first_loop(self.first_loop_out)
+            exit_count += int(proc_exit)
+            if proc_suc:
+                arg = self.generate_first_loop_obj()
 
                 # if there's no task left, stop the loop.
                 if arg is None:
@@ -978,7 +1053,6 @@ class FastDifPy(FastDiffPyBase):
                     self.config.fl_inserted_counter += 1
                     timeout = 0
             else:
-                time.sleep(1)
                 timeout += 1
 
             # if this point is reached, all processes should be done and the queues empty.
@@ -990,14 +1064,26 @@ class FastDifPy(FastDiffPyBase):
                 self.logger.info("Timeout reached, stopping.")
                 run = False
 
+            if exit_count == self.config.fl_cpu_proc:
+                self.logger.info("All processes exited - stopping.")
+                run = False
+
         self.send_termination_signal(first_loop=True)
+        self.logger.debug("Termination signal sent")
 
         counter = 0
         # try to handle any remaining results that are in the queue.
         while counter < 5:
-            if not self.handle_result_of_first_loop(self.first_loop_out):
+            proc_suc, proc_exit = self.handle_result_of_first_loop(self.first_loop_out)
+            exit_count += int(proc_exit)
+
+            if not (proc_suc or proc_exit):
                 counter += 1
+                self.logger.debug("Timeout while dequeue")
                 continue
+
+            if exit_count == self.config.fl_cpu_proc:
+                break
 
             counter = 0
 
