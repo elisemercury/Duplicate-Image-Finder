@@ -8,13 +8,15 @@ from typing import List, Tuple, Dict
 from types import FunctionType
 from fast_diff_py.utils import *
 import multiprocessing as mp
+import multiprocessing.connection as con
 import threading as th
 import queue
 from fast_diff_py.datatransfer import *
 from concurrent.futures import ProcessPoolExecutor
 from fast_diff_py.sql_database import SQLiteDatabase
 from fast_diff_py.config import FastDiffPyConfig
-from fast_diff_py.child_processes import parallel_resize, parallel_compare, find_best_image
+from fast_diff_py.child_processes import parallel_resize, parallel_compare, find_best_image, \
+    first_loop_dequeue_worker, first_loop_enqueue_worker
 import logging
 
 
@@ -56,6 +58,21 @@ class FastDiffPyBase:
     # config
     config: Union[FastDiffPyConfig, None] = None
 
+    def __init__(self, cfg: dict = None):
+        """
+        Init of Base class.
+
+        Provided the base class is instantiated itself and not just called as the parent for FastDiffPy, the config
+        from the main class is copied into this one and stored.
+
+        :param cfg: config dict form parent class.
+        """
+        if cfg is not None:
+            self.config = FastDiffPyConfig()
+            self.config.retain_config = False
+            self.config._task_dict = cfg
+
+
     @property
     def db(self):
         return self.__db
@@ -71,7 +88,7 @@ class FastDiffPyBase:
     # FIRST LOOP COMMON FUNCTIONS
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _generate_first_loop_obj(self) \
+    def generate_first_loop_obj(self) \
             -> Union[PreprocessArguments, None]:
         """
         Short wrapper function which creates the PreprocessingArguments and updates the DB.
@@ -120,19 +137,22 @@ class FastDiffPyBase:
         name = self.db.generate_new_thumb_name(key, filename, dir_a=dir_a, retry_limit=self.config.retry_limit)
         return os.path.join(directory, name)
 
-    def handle_result_of_first_loop(self, res_q: mp.Queue) -> bool:
+    def handle_result_of_first_loop(self, res_q: mp.Queue) -> Tuple[bool, bool]:
         """
         Dequeues a result of the first loop results queue and updates the database accordingly.
 
         :param res_q: results queue
 
-        :return: if a result was handled.
+        :return: if a result was handled, if the process exited.
         """
         # retrieve the result from the queue
         try:
             res = res_q.get(timeout=1.0)
         except queue.Empty:
-            return False
+            return False, False
+
+        if res is None:
+            return False, True
 
         # sanitize result
         assert type(res) is str, "Result is not a string"
@@ -141,7 +161,7 @@ class FastDiffPyBase:
         # Handle the case when an error occurred.
         if not result_obj.success:
             self.db.update_dir_error(key=result_obj.key, msg=result_obj.error)
-            return True
+            return True, False
 
         # store the hash if computed
         if self.config.fl_compute_hash:
@@ -160,7 +180,7 @@ class FastDiffPyBase:
 
         # to be sure commit here.
         self.db.commit()
-        return True
+        return True, False
 
     # ------------------------------------------------------------------------------------------------------------------
     # SECOND LOOP COMMON FUNCTIONS
