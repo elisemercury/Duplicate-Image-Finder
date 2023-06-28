@@ -358,6 +358,7 @@ def first_loop_dequeue_worker(target_queue: mp.Queue, com: Connection, config: d
 
             # Iterate over message types and perform associated action.
             if msg == Messages.Stop:
+                fdb.db.commit()
                 return
 
         proc_suc, proc_exit = fdb.handle_result_of_first_loop(target_queue)
@@ -371,5 +372,8 @@ def first_loop_dequeue_worker(target_queue: mp.Queue, com: Connection, config: d
 
         if timeout > 60:
             com.send("First Loop Dequeue Worker timeout. Exit.")
+            fdb.db.commit()
             return
+
+    fdb.db.commit()
 
