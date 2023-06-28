@@ -67,6 +67,10 @@ class FastDiffPyBase:
             self.config.database = self.__db.create_config_dump()
             self.config.write_to_file()
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # FIRST LOOP COMMON FUNCTIONS
+    # ------------------------------------------------------------------------------------------------------------------
+
     def _generate_first_loop_obj(self) \
             -> Union[PreprocessArguments, None]:
         """
@@ -157,6 +161,10 @@ class FastDiffPyBase:
         # to be sure commit here.
         self.db.commit()
         return True
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # SECOND LOOP COMMON FUNCTIONS
+    # ------------------------------------------------------------------------------------------------------------------
 
     def sl_refill_queues(self, in_queue: Union[List[mp.Queue], mp.Queue]) -> int:
         """
@@ -489,6 +497,32 @@ class FastDiffPyBase:
         elif row_a["px"] == row_b["py"] and row_a["py"] == row_b["px"]:
             return True
         return False
+
+    def _process_one_second_result(self, out_queue: mp.Queue) -> bool:
+        """
+        Perform dequeue of one element of the second process results queue. Insert the result into the database
+        subsequently.
+
+        :param out_queue: Queue to dequeue the stuff from.
+
+        :return: True -> inserted one element, False, timeout reached for fetching the next element.
+        (Useful to prevent infinite loops)
+        """
+        try:
+            res = out_queue.get(timeout=0.1)
+        except queue.Empty:
+            return False
+
+        assert type(res) is str, "Result of comparison was not string"
+        res_obj = CompareImageResults.from_json(res)
+
+        # store in database
+        if res_obj.success:
+            self.db.insert_diff_success(key_a=res_obj.key_a, key_b=res_obj.key_b, dif=res_obj.min_avg_diff)
+        else:
+            self.db.insert_diff_error(key_a=res_obj.key_a, key_b=res_obj.key_b, error=res_obj.error)
+        return True
+
 
 class FastDifPy(FastDiffPyBase):
     # relative to child processes
@@ -1217,40 +1251,17 @@ class FastDifPy(FastDiffPyBase):
             number_dequeues = 0
 
             while True:
-                if not self.__process_one_second_result():
+                if not self._process_one_second_result(out_queue=self.second_loop_out):
                     return number_dequeues
 
                 number_dequeues += 1
 
         # we have a max_number
         for i in range(max_number):
-            if not self.__process_one_second_result():
+            if not self._process_one_second_result(out_queue=self.second_loop_out):
                 return i
 
         return max_number
-
-    def __process_one_second_result(self) -> bool:
-        """
-        Perform dequeue of one element of the second process results queue. Insert the result into the database
-        subsequently.
-
-        :return: True -> inserted one element, False, timeout reached for fetching the next element.
-        (Useful to prevent infinite loops)
-        """
-        try:
-            res = self.second_loop_out.get(timeout=0.1)
-        except queue.Empty:
-            return False
-
-        assert type(res) is str, "Result of comparison was not string"
-        res_obj = CompareImageResults.from_json(res)
-
-        # store in database
-        if res_obj.success:
-            self.db.insert_diff_success(key_a=res_obj.key_a, key_b=res_obj.key_b, dif=res_obj.min_avg_diff)
-        else:
-            self.db.insert_diff_error(key_a=res_obj.key_a, key_b=res_obj.key_b, error=res_obj.error)
-        return True
 
     def check_children(self, gpu: bool = False, cpu: bool = False):
         """
