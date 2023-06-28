@@ -463,6 +463,7 @@ class FastDifPy(FastDiffPyBase):
         self.__non_thread_safe_first_loop(run=run)
 
     def __thread_safe_first_loop(self, run: bool):
+        self.db.commit()
         v = self.verbose
 
         # start processes for cpu
