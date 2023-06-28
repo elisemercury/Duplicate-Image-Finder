@@ -1202,7 +1202,7 @@ class FastDifPy(FastDiffPyBase):
 
                 self.config.sl_queue_status.append(temp)
 
-        self._refill_queues_optimized()
+        self._refill_queues_optimized(queue_list=self.second_loop_in)
 
     def handle_results_second_queue(self, max_number: int = None) -> int:
         """
