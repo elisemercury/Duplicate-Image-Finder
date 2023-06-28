@@ -7,7 +7,7 @@ from typing import Union, List
 class FastDiffPyConfig:
     cfg_path: str
     update_timeout: int = 30
-    retain_config: bool = True
+    retain_config: bool = False
 
     __task_dict: dict
     __last_update: datetime.datetime = datetime.datetime.now()
