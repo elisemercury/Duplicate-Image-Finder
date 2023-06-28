@@ -88,11 +88,11 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
             args_str = iq.get(timeout=1)
         except queue.Empty:
             timeout += 1
+            # print(f"{identifier:03} Timeout Parallel Resize")
             continue
 
         if args_str is None:
-            if verbose:
-                print(f"{identifier:03} Terminating")
+            # print(f"{identifier:03} Terminating Parallel Resize")
             break
 
         args = PreprocessArguments.from_json(args_str)
