@@ -580,6 +580,8 @@ class FastDifPy(FastDiffPyBase):
         - config_path: str - Path to the config that stores the progress of the program (for progress recovery on stop)
         - config_purge: str - Ignore preexisting config and overwrite it.
         """
+        super().__init__()
+
         config_path = None
         if "config_path" in kwargs.keys():
             config_path = kwargs.get("config_path")
@@ -589,6 +591,7 @@ class FastDifPy(FastDiffPyBase):
             config_purge = kwargs.get("config_purge")
 
         self.config = FastDiffPyConfig(task_path=config_path, task_purge=config_purge)
+        self.config.retain_config = True
 
         if not self.verify_config():
             # Only set the directory_a and directory_b when the config is not set.
