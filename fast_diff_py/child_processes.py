@@ -249,7 +249,8 @@ def build_base_obj(config: dict, db_config: dict) -> FastDiffPyBase:
                               port=db_config["port"],
                               database=db_config["database"],
                               table_suffix=db_config["table_suffix"],
-                              **db_config["kwargs"])
+                              **db_config["kwargs"],
+                              purge=False)
         fdb.db = mdb
     else:
         raise ValueError(f"Unsupported database type {db_config['type']}")
@@ -294,8 +295,10 @@ def first_loop_enqueue_worker(target_queue: mp.Queue, com: Connection, config: d
         # submit to queue
         try:
             target_queue.put(current_task.to_json(), timeout=1.0)
+            fdb.db.commit()
             insert_counter += 1
             timeout = 0
+            current_task = None
         except queue.Full:
             timeout += 1
 
