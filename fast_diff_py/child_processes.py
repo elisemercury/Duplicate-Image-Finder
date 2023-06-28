@@ -1,6 +1,6 @@
 from fast_diff_py.cpu_image_processor import CPUImageProcessing
 from fast_diff_py.mariadb_database import MariaDBDatabase
-from fast_diff_py.fastDif import FastDiffPyBase
+from fast_diff_py.fast_diff_base import FastDiffPyBase
 from fast_diff_py.datatransfer import PreprocessArguments, PreprocessResults, CompareImageArguments, CompareImageResults
 from fast_diff_py.utils import Messages
 import multiprocessing as mp
