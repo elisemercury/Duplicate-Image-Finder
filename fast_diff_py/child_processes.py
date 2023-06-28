@@ -105,6 +105,8 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
         # Sending the result to the handler
         output.put(result.to_json())
 
+    # Putting a None in the output to detect when all processes have exited.
+    output.put(None, block=True)
     return True
 
 
@@ -179,6 +181,7 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
         # Sending the result to the handler
         out_q.put(result.to_json())
 
+    out_q.put(None, block=True)
     return True
 
 
