@@ -30,6 +30,7 @@ class FastDiffPyConfig:
             "ignore_names": [],
             "ignore_paths": [],
             "enough_images_to_compare": [],
+            "max_queue_size": 200,
             "first_loop":{
                 "compute_thumbnails": True,
                 "compute_hash": False,
@@ -363,3 +364,11 @@ class FastDiffPyConfig:
     @retain_db.setter
     def retain_db(self, value: bool):
         self._task_dict["retain_db"] = value
+
+    @property
+    def max_queue_size(self) -> int:
+        return self._task_dict["max_queue_size"]
+
+    @max_queue_size.setter
+    def max_queue_size(self, value: int):
+        self._task_dict["max_queue_size"] = value
