@@ -1,6 +1,11 @@
 import math
 import hashlib
 import numpy as np
+import enum
+
+class Messages(enum.Enum):
+    Stop = 1
+
 
 """
 File contains a small list of utilities for the main classes. The utilities are not specific to this project but are a 

@@ -1,4 +1,5 @@
 from typing import Union, List
+from fast_diff_py.datatransfer import CompareImageResults
 
 """
 Interface of the Database Class
@@ -10,75 +11,18 @@ Inherit from this class and implement all its functions to fully use your own db
 
 
 class Database:
-    def __init__(self):
+    def __init__(self, purge=False):
         """
         Init function for your implementation of the database
+        Create all tables needed here.
+
+        :param purge: If the tables should be deleted if they exist and recreated.
         """
         pass
-    # ------------------------------------------------------------------------------------------------------------------
-    # CONFIG TABLE
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def create_config(self, config: dict, type_name: str) -> bool:
-        """
-        Create the config table and insert a config dictionary.
-
-        :param config: config dict
-        :param type_name: name under which config is stored
-        :return: bool -> insert successful or not (key already exists)
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def get_config(self, type_name: str) -> Union[dict, None]:
-        """
-        Get the config dictionary from the database.
-
-        :param type_name: name under which config is stored
-        :return: config dict or None if not found
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def delete_config(self, type_name: str):
-        """
-        Delete the config from the database.
-
-        :param type_name: name under which config is stored
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def update_config(self, config: dict, type_name: str):
-        """
-        Update the config to the database.
-
-        :param config: config dict
-        :param type_name: name under which config is stored
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def config_table_exists(self):
-        """
-        Check the master table if the config table exists. DOES NOT VERIFY THE TABLE DEFINITION!
-
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
     # ------------------------------------------------------------------------------------------------------------------
     # DIRECTORY TABLES
     # ------------------------------------------------------------------------------------------------------------------
-
-    def create_directory_tables(self, purge: bool = True):
-        """
-        Create the directory tables. Default for purge is true, to recompute it in case the program is stopped during 
-        indexing. ASSUMPTION: Indexing is a very fast operation. TODO Handle Stop mid Indexing.
-
-        :param purge: if True, purge the tables before creating them.
-        :return:
-        """
-
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
     def add_file(self, path: str, filename: str, dir_a: bool = True):
         """
@@ -141,6 +85,14 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
+    def reset_first_loop_mark(self):
+        """
+        Reset the mark from mark_processing on all files that are currently in processing. Intended for resume of
+        processing.
+        :return:
+        """
+        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
+
     def fetch_many_after_key(self, directory_a: bool = True, starting: int = None, count=100) -> List[dict]:
         """
         Fetch count number of rows from a table a or table b starting at a specific key (WHERE key > starting)
@@ -152,7 +104,7 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    def fetch_one_key(self, key: int):
+    def fetch_row_of_key(self, key: int):
         """
         Fetch exactly the row matching the key and directory.
 
@@ -222,17 +174,7 @@ class Database:
     # THUMBNAIL FILENAME TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
-    def create_thumb_table(self, purge: bool = False):
-        """
-        Create tables which contain the names of the thumbnails (to make sure there's no collisions ahead of time)
-
-        :param purge: if True, purge the tables before creating them.
-        :return:
-        """
-
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def test_thumb_table_existence(self):
+    def test_thumb_existence(self):
         """
         Check the table for thumbnails of directory table, exists. DOES NOT VERIFY THE TABLE DEFINITION!
 
@@ -267,15 +209,6 @@ class Database:
     # PLOT TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
-    def create_plot_table(self, purge: bool = False):
-        """
-        Create tables which contain the filenames of the plots (to make sure there's no collisions ahead of time)
-
-        :param purge: if True, purge the tables before creating them.
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
     def get_plot_name(self, key_a: int, key_b: int):
         """
         Get the plot name associated with the two keys.
@@ -307,33 +240,26 @@ class Database:
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
     # ------------------------------------------------------------------------------------------------------------------
-    # HASH TABLE
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def create_hash_table(self, purge: bool = False):
-        """
-        Create the hash table and purge preexisting table if desirerd.
-
-        :param purge: if True, purge the table before creating it.
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    # ------------------------------------------------------------------------------------------------------------------
     # ERROR TABLE
     # ------------------------------------------------------------------------------------------------------------------
 
-    def create_dif_table(self, purge: bool = False):
+    def insert_many_diff_success(self, tasks: List[CompareImageResults]):
         """
-        Create the dif table. If purge is true, drop a preexisting dif table.
-
-        :param purge: if True, purge the table before creating it.
-        :return:
+        Insert a list into table with single statement. Statement need to be successes
+        :param tasks: list of elements to insert
+        :return: None
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
+    def insert_many_diff_errors(self, tasks: List[CompareImageResults]):
+        """
+        Insert a list into table with single statement. Statement need to be errors
+        :param tasks: list of elements to insert
+        :return: None
+        """
+        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    def insert_dif_success(self, key_a: int, key_b: int, dif: float) -> bool:
+    def insert_diff_success(self, key_a: int, key_b: int, dif: float) -> bool:
         """
         Insert a new row into the database. If the value exists already, return False, else return True
 
@@ -344,7 +270,7 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    def insert_dif_error(self, key_a: int, key_b: int, error: str) -> bool:
+    def insert_diff_error(self, key_a: int, key_b: int, error: str) -> bool:
         """
         Insert a new row into the database. If the value exists already, return False, else return True
 
@@ -374,14 +300,14 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    def update_pair_row(self, key_a: int, key_b: int, dif: float = None) -> bool:
+    def update_pair_row(self, key_a: int, key_b: int, diff: float = None) -> bool:
         """
         Updates a pair with the new data. if the data is not specified, the preexisting data is used.
         Return true if the update was successful. Return False if the row didn't exist.
 
         :param key_a: key of first image in directory_X table
         :param key_b: key of second image in directory_X table
-        :param dif: difference measurement
+        :param diff: difference measurement
         :return: if update was successful
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
@@ -439,3 +365,18 @@ class Database:
         :return:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
+
+    def create_config_dump(self):
+        """
+        Creates a dump of all the relevant information for the database as well as the type of database used.
+        :return:
+        """
+        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
+
+    @property
+    def thread_safe(self):
+        """
+        Returns weather the implementation of the database is thread safe (for improved performance)
+        :return:
+        """
+        return False
