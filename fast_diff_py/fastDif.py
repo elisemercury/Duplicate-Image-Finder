@@ -959,7 +959,7 @@ class FastDifPy(FastDiffPyBase):
 
         self._refill_queues_optimized(queue_list=self.second_loop_in)
 
-    def handle_results_second_queue(self, max_number: int = None) -> int:
+    def handle_results_second_queue(self, max_number: int = None) -> Tuple[int, int]:
         """
         Dequeue up to max_number of entries of the result queue of the second loop and insert the results into the
         database.
@@ -968,24 +968,27 @@ class FastDifPy(FastDiffPyBase):
         :return: -> Number actually dequeued elements
         """
         # TODO test for existence (for stop recovery)
+        number_dequeues = 0
+        number_exited = 0
         if max_number is None:
-            number_dequeues = 0
-            number_exited = 0
-
             while True:
-                proc_suc, proc_exit = self._process_one_second_result(out_queue=self.second_loop_out)
-                if not proc_suc:
-                    return number_dequeues
+                proc_suc, proc_exit = self.process_one_second_result(out_queue=self.second_loop_out)
+                if not proc_suc and not proc_exit:
+                    return number_dequeues, number_exited
 
-                number_dequeues += 1
+                number_dequeues += int(proc_suc)
+                number_exited += int(proc_exit)
 
         # we have a max_number
         for i in range(max_number):
-            proc_suc, proc_exit = self._process_one_second_result(out_queue=self.second_loop_out)
-            if not proc_suc:
-                return i
+            proc_suc, proc_exit = self.process_one_second_result(out_queue=self.second_loop_out)
+            number_dequeues += int(proc_suc)
+            number_exited += int(proc_exit)
 
-        return max_number
+            if not proc_suc and not proc_exit:
+                return number_dequeues, number_exited
+
+        return max_number, number_exited
 
     def check_children(self, gpu: bool = False, cpu: bool = False):
         """
