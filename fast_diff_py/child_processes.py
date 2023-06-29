@@ -456,14 +456,20 @@ def second_loop_dequeue_worker(target_queue: mp.Queue, com: Connection, config: 
                 fdb.db.commit()
                 return
 
-        proc_suc, proc_exit = fdb.process_one_second_result(out_queue=target_queue)
-        processed_counter += int(proc_suc)
-        none_counter += int(proc_exit)
+        # proc_suc, proc_exit = fdb.process_one_second_result(out_queue=target_queue)
+        # processed_counter += int(proc_suc)
+        # none_counter += int(proc_exit)
+        proc_suc, proc_exit = fdb.process_up_to_second_result(out_queue=target_queue)
+        processed_counter += proc_suc
+        none_counter += proc_exit
 
         if last_processed_counter == processed_counter and last_none_counter == none_counter:
             timeout += 0.1
         else:
             timeout = 0
+
+        if processed_counter % 100 == 0:
+            fdb.db.commit()
 
         if processed_counter % 1000 == 0:
             fdb.db.commit()
