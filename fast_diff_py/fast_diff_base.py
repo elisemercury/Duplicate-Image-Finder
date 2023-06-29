@@ -508,3 +508,39 @@ class FastDiffPyBase:
         else:
             self.db.insert_diff_error(key_a=res_obj.key_a, key_b=res_obj.key_b, error=res_obj.error)
         return True, False
+
+    def process_up_to_second_result(self, out_queue: mp.Queue, count: int = 1000) -> Tuple[int, int]:
+        """
+        Dequeue up to count elements from the output queue, aggregate the results and add them into one huge sql statement.
+
+        :param out_queue: queue to dequeue from
+        :param count: maximum number of elements to dequeue.
+
+        :return: number of tasks processed, number of exited processes
+        """
+
+        task_counter = 0
+        none_counter = 0
+        successes = []
+        errors = []
+
+        for i in range(count):
+            try:
+                res = out_queue.get(timeout=0.1)
+            except queue.Empty:
+                break
+
+            if res is None:
+                none_counter += 1
+                continue
+
+            task_counter += 1
+            res_obj = CompareImageResults.from_json(res)
+            if res_obj.success:
+                successes.append(res_obj)
+            else:
+                errors.append(res_obj)
+
+        self.db.insert_many_diff_success(tasks=successes)
+        self.db.insert_many_diff_errors(tasks=errors)
+        return task_counter, none_counter
