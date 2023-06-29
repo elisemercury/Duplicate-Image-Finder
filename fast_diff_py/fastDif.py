@@ -14,8 +14,9 @@ from concurrent.futures import ProcessPoolExecutor
 from fast_diff_py.sql_database import SQLiteDatabase
 from fast_diff_py.config import FastDiffPyConfig
 from fast_diff_py.fast_diff_base import FastDiffPyBase
-from fast_diff_py.child_processes import parallel_resize, parallel_compare, find_best_image, \
-    first_loop_dequeue_worker, first_loop_enqueue_worker
+from fast_diff_py.child_processes import parallel_resize, parallel_compare, find_best_image
+from fast_diff_py.child_processes import first_loop_dequeue_worker, first_loop_enqueue_worker
+from fast_diff_py.child_processes import second_loop_dequeue_worker, second_loop_enqueue_worker
 import logging
 
 
@@ -509,8 +510,8 @@ class FastDifPy(FastDiffPyBase):
             if de_com_1.poll(timeout= 0.01):
                 self.logger.info(de_com_1.recv())
 
-            _, _, _, all_exit = self.check_children(gpu=False, cpu=True)
-            if all_exit:
+            _, _, _, all_exited = self.check_children(gpu=False, cpu=True)
+            if all_exited:
                 break
 
         self.join_all_children()
