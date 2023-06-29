@@ -155,7 +155,7 @@ class FastDiffPyBase:
 
         return self._refill_queues_optimized(queue_list=in_queue)
 
-    def __refill_queues_non_optimized(self, target_queue: mp.Queue) -> Union[int, None]:
+    def __refill_queues_non_optimized(self, target_queue: mp.Queue) -> Tuple[int, int]:
         """
         Refilling queues without the load optimized algorithm.
 
@@ -169,11 +169,17 @@ class FastDiffPyBase:
                                            "assumes that the attribute second_loop_in is of type mp.Queue and " \
                                            "not List[mp.Queue]"
         assert type(self.config.sl_queue_status) is dict, "less optimized not with dict in sl_queue_status"
-        assert ["fix_key", "shift_key", "done"] == list(
+        assert ["fix_key", "shift_key", "done", "none_count"] == list(
             self.config.sl_queue_status.keys()), "Verify keys of sl_queue_status"
 
         if self.config.sl_queue_status["done"]:
-            return 0
+            while self.config.sl_queue_status["none_count"] < self.config.sl_cpu_proc + self.config.sl_gpu_proc:
+                try:
+                    target_queue.put(None, block=False)
+                    self.config.sl_queue_status["none_count"] += 1
+                except queue.Full:
+                    break
+            return 0, self.config.sl_queue_status["none_count"]
 
         # initialize loop vars
         procs = self.config.sl_cpu_proc + self.config.sl_gpu_proc
@@ -198,16 +204,16 @@ class FastDiffPyBase:
                 # We have a directory_b, and we've exhausted every picture in directory_a. => Stop
                 if self.config.has_dir_b and len(next_row) == 0:
                     self.config.sl_queue_status["done"] = True
-                    return add_count
+                    return add_count, self.config.sl_queue_status["none_count"]
 
                 # verify that we have at least another image to compare if we don't have dir_b, so the fixed picture
                 # is the second to last image in directory_a.
                 elif not self.config.has_dir_b and len(next_row) == 1:
                     self.config.sl_queue_status["done"] = True
-                    return add_count
+                    return add_count, self.config.sl_queue_status["none_count"]
 
                 # We have at least one more row to go:
-                self.config.sl_queue_status["fix_key"] = fix_key =next_row[0]["key"]
+                self.config.sl_queue_status["fix_key"] = fix_key = next_row[0]["key"]
                 cur_f_row = next_row[0]
 
                 # The shift key needs to be none since we start from the beginning if we have a directory_b or
@@ -216,22 +222,20 @@ class FastDiffPyBase:
                 # We need to continue since we need to refetch the shifting_rows
                 continue
 
-            # TODO needs to be implemented with while loop to be able to continuously insert into the queue until
-            #  everything is depleted.
             # go through the shifting rows and schedule them.
             for row in shifting_rows:
                 insert_success, queue_full = self._schedule_pair(row_a=cur_f_row, row_b=row, in_queue=target_queue)
 
                 # Queue is full
                 if queue_full:
-                    return add_count
+                    return add_count, self.config.sl_queue_status["none_count"]
 
                 # regardless weather the insert was successful or aborted because of match aspect, set the config.
                 self.config.sl_queue_status["shift_key"] = shift_key = row["key"]
                 add_count += int(insert_success)
 
         # We added successfully the full number of images to the queue, return the add count.
-        return add_count
+        return add_count, self.config.sl_queue_status["none_count"]
 
 
     def _refill_queues_optimized(self, queue_list: List[mp.Queue]):
