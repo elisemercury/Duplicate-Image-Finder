@@ -737,12 +737,20 @@ class FastDifPy(FastDiffPyBase):
             if de_com_1.poll(timeout=0.01):
                 self.logger.info(de_com_1.recv())
 
-            time.sleep(0.1)
-
         if enqueue_thread is not None:
             enqueue_thread.join()
         else:
             self.send_termination_signal(first_loop=False)
+
+        # emptying pipe
+        while en_com_1.poll(timeout=0.01):
+            self.logger.info(en_com_1.recv())
+
+        # waiting for dequeue_worker
+        while dequeue_thread.is_alive():
+            # polling the queues:
+            if de_com_1.poll(timeout=0.01):
+                self.logger.info(de_com_1.recv())
 
         for i in range(6000):
             if de_com_1.poll(timeout=0.01):
@@ -753,11 +761,6 @@ class FastDifPy(FastDiffPyBase):
                 break
 
         self.join_all_children()
-
-        # waiting for dequeue_worker
-        while dequeue_thread.is_alive():
-            if de_com_1.poll(timeout=0.01):
-                self.logger.info(de_com_1.recv())
 
         dequeue_thread.join()
         assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
