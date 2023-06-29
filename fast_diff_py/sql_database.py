@@ -6,7 +6,7 @@ import json
 from typing import Any, Union, List
 import datetime
 from fast_diff_py.database import Database
-
+from fast_diff_py.datatransfer import CompareImageResults
 
 """
 Default implementation of the Database.
@@ -56,7 +56,7 @@ class SQLBase(Database):
         return result
 
     @staticmethod
-    def all_to_dict_dif(row: tuple):
+    def all_to_dict_dif(row: tuple) -> Union[dict, None]:
         if row is None:
             return None
 
@@ -749,6 +749,52 @@ class SQLiteDatabase(SQLBase):
         """
         self.debug_execute(f"DROP TABLE dif_table")
 
+    def insert_many_diff_success(self, tasks: List[CompareImageResults]):
+        """
+        Insert a list into table with single statement. Statement need to be successes
+        :param tasks: list of elements to insert
+        :return: None
+        """
+
+        statement = f"INSERT INTO dif_table (key_a, key_b, dif, success) VALUES "
+        if len(tasks) == 0:
+            return
+
+        statement += f"({tasks[0].key_a}, {tasks[0].key_b}, {tasks[0].min_avg_diff}, 1)"
+
+        for entry in tasks[1:]:
+            statement += f", ({entry.key_a}, {entry.key_b}, {entry.min_avg_diff}, 1)"
+
+        # Try builk insert otherwise perform slower insert.
+        try:
+            self.debug_execute(statement)
+        except Exception as e:
+            self.logger.exception(e)
+            for task in tasks:
+                self.insert_diff_success(key_a=task.key_a, key_b=task.key_b, dif=task.min_avg_diff)
+
+    def insert_many_diff_errors(self, tasks: List[CompareImageResults]):
+        """
+        Insert a list into table with single statement. Statement need to be errors
+        :param tasks: list of elements to insert
+        :return: None
+        """
+        statement = f"INSERT INTO dif_table (key_a, key_b, success, error) VALUES "
+        if len(tasks) == 0:
+            return
+
+        statement += f"({tasks[0].key_a}, {tasks[0].key_b}, 0, '{tasks[0].error}')"
+
+        for entry in tasks[1:]:
+            statement += f", ({entry.key_a}, {entry.key_b}, 0, {entry.error})"
+
+        try:
+            self.debug_execute(statement)
+        except Exception as e:
+            self.logger.exception(e)
+            for task in tasks:
+                self.insert_diff_error(key_a=task.key_a, key_b=task.key_b, error=task.error)
+
     def insert_diff_success(self, key_a: int, key_b: int, dif: float) -> bool:
         """
         Insert a new row into the database. If the value exists already, return False, else return True
@@ -781,7 +827,7 @@ class SQLiteDatabase(SQLBase):
                            f"VALUES ({key_a}, {key_b}, 0, '{error}')")
         return True
 
-    def get_by_pair(self, key_a: int, key_b: int):
+    def get_by_pair(self, key_a: int, key_b: int) -> Union[dict, None]:
         """
         Get the row matching the pair of keys. Return the row wrapped in a dict or None if it doesn't exist.
 
