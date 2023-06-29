@@ -775,7 +775,8 @@ class SQLiteDatabase(SQLBase):
         except Exception as e:
             self.logger.exception(e)
             for task in tasks:
-                self.insert_diff_success(key_a=task.key_a, key_b=task.key_b, dif=task.min_avg_diff)
+                if not self.insert_diff_success(key_a=task.key_a, key_b=task.key_b, dif=task.min_avg_diff):
+                    raise IntegrityError("Process was force killed - data is corrupt. Purge DB and start again.")
 
     def insert_many_diff_errors(self, tasks: List[CompareImageResults]):
         """
@@ -797,7 +798,8 @@ class SQLiteDatabase(SQLBase):
         except Exception as e:
             self.logger.exception(e)
             for task in tasks:
-                self.insert_diff_error(key_a=task.key_a, key_b=task.key_b, error=task.error)
+                if not self.insert_diff_error(key_a=task.key_a, key_b=task.key_b, error=task.error):
+                    raise IntegrityError("Process was force killed - data is corrupt. Purge DB and start again.")
 
     def insert_diff_success(self, key_a: int, key_b: int, dif: float) -> bool:
         """
