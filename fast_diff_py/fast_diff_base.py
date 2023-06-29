@@ -172,14 +172,16 @@ class FastDiffPyBase:
         assert ["fix_key", "shift_key", "done", "none_count"] == list(
             self.config.sl_queue_status.keys()), "Verify keys of sl_queue_status"
 
+        none_count = 0
         if self.config.sl_queue_status["done"]:
             while self.config.sl_queue_status["none_count"] < self.config.sl_cpu_proc + self.config.sl_gpu_proc:
                 try:
                     target_queue.put(None, block=False)
+                    none_count += 1
                     self.config.sl_queue_status["none_count"] += 1
                 except queue.Full:
                     break
-            return 0, self.config.sl_queue_status["none_count"]
+            return 0, none_count
 
         # initialize loop vars
         procs = self.config.sl_cpu_proc + self.config.sl_gpu_proc
@@ -204,13 +206,13 @@ class FastDiffPyBase:
                 # We have a directory_b, and we've exhausted every picture in directory_a. => Stop
                 if self.config.has_dir_b and len(next_row) == 0:
                     self.config.sl_queue_status["done"] = True
-                    return add_count, self.config.sl_queue_status["none_count"]
+                    return add_count, none_count
 
                 # verify that we have at least another image to compare if we don't have dir_b, so the fixed picture
                 # is the second to last image in directory_a.
                 elif not self.config.has_dir_b and len(next_row) == 1:
                     self.config.sl_queue_status["done"] = True
-                    return add_count, self.config.sl_queue_status["none_count"]
+                    return add_count, none_count
 
                 # We have at least one more row to go:
                 self.config.sl_queue_status["fix_key"] = fix_key = next_row[0]["key"]
@@ -228,14 +230,14 @@ class FastDiffPyBase:
 
                 # Queue is full
                 if queue_full:
-                    return add_count, self.config.sl_queue_status["none_count"]
+                    return add_count, none_count
 
                 # regardless weather the insert was successful or aborted because of match aspect, set the config.
                 self.config.sl_queue_status["shift_key"] = shift_key = row["key"]
                 add_count += int(insert_success)
 
         # We added successfully the full number of images to the queue, return the add count.
-        return add_count, self.config.sl_queue_status["none_count"]
+        return add_count, none_count
 
 
     def _refill_queues_optimized(self, queue_list: List[mp.Queue]) -> Tuple[int, int]:
