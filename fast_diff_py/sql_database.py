@@ -15,6 +15,10 @@ to interface with another database.
 """
 
 
+class IntegrityError(RuntimeError):
+    pass
+
+
 class SQLBase(Database):
     @staticmethod
     def all_to_dict_dir(row: Union[tuple, None]):
