@@ -505,6 +505,14 @@ class FastDifPy(FastDiffPyBase):
         else:
             self.send_termination_signal(first_loop=True)
 
+        for i in range(6000):
+            if de_com_1.poll(timeout= 0.01):
+                self.logger.info(de_com_1.recv())
+
+            _, all_exit, _, _ = self.check_children(gpu=False, cpu=True)
+            if all_exit:
+                break
+
         self.join_all_children()
 
         # waiting for dequeue_worker
