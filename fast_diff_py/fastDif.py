@@ -912,9 +912,9 @@ class FastDifPy(FastDiffPyBase):
         self.config.sl_plot_output_dir = diff_location
 
     def update_queues(self):
-        enqueued = self.sl_refill_queues(in_queue=self.second_loop_in)
-        dequeued = self.handle_results_second_queue(enqueued)
-        return enqueued, dequeued
+        enqueued, none_count  = self.sl_refill_queues(in_queue=self.second_loop_in)
+        dequeued, _ = self.handle_results_second_queue(enqueued)
+        return enqueued, dequeued, none_count
 
     def __init_queues(self):
         """
