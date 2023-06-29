@@ -1,5 +1,5 @@
 import mariadb
-from fast_diff_py.sql_database import SQLBase
+from fast_diff_py.sql_database import SQLBase, IntegrityError
 from fast_diff_py.datatransfer import CompareImageResults
 import datetime
 from typing import Union, List
