@@ -139,7 +139,7 @@ class FastDiffPyBase:
     # SECOND LOOP COMMON FUNCTIONS
     # ------------------------------------------------------------------------------------------------------------------
 
-    def sl_refill_queues(self, in_queue: Union[List[mp.Queue], mp.Queue]) -> int:
+    def sl_refill_queues(self, in_queue: Union[List[mp.Queue], mp.Queue]) -> Tuple[int, int]:
         """
         Call to either the optimized or non optimized filler.
 
