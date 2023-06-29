@@ -1,5 +1,6 @@
 import mariadb
 from fast_diff_py.sql_database import SQLBase
+from fast_diff_py.datatransfer import CompareImageResults
 import datetime
 from typing import Union, List
 import os
@@ -707,6 +708,52 @@ class MariaDBDatabase(SQLBase):
         self.debug_execute(f"INSERT INTO {self.diff_table} (key_a, key_b, dif, success) "
                            f"VALUES ({key_a}, {key_b}, {dif}, 1)")
         return True
+
+    def insert_many_diff_success(self, tasks: List[CompareImageResults]):
+        """
+        Insert a list into table with single statement. Statement need to be successes
+        :param tasks: list of elements to insert
+        :return: None
+        """
+
+        statement = f"INSERT INTO {self.diff_table} (key_a, key_b, dif, success) VALUES "
+        if len(tasks) == 0:
+            return
+
+        statement += f"({tasks[0].key_a}, {tasks[0].key_b}, {tasks[0].min_avg_diff}, 1)"
+
+        for entry in tasks[1:]:
+            statement += f", ({entry.key_a}, {entry.key_b}, {entry.min_avg_diff}, 1)"
+
+        # Try builk insert otherwise perform slower insert.
+        try:
+            self.debug_execute(statement)
+        except Exception as e:
+            self.logger.exception(e)
+            for task in tasks:
+                self.insert_diff_success(key_a=task.key_a, key_b=task.key_b, dif=task.min_avg_diff)
+
+    def insert_many_diff_errors(self, tasks: List[CompareImageResults]):
+        """
+        Insert a list into table with single statement. Statement need to be errors
+        :param tasks: list of elements to insert
+        :return: None
+        """
+        statement = f"INSERT INTO {self.diff_table} (key_a, key_b, success, error) VALUES "
+        if len(tasks) == 0:
+            return
+
+        statement += f"({tasks[0].key_a}, {tasks[0].key_b}, 0, '{tasks[0].error}')"
+
+        for entry in tasks[1:]:
+            statement += f", ({entry.key_a}, {entry.key_b}, 0, {entry.error})"
+
+        try:
+            self.debug_execute(statement)
+        except Exception as e:
+            self.logger.exception(e)
+            for task in tasks:
+                self.insert_diff_error(key_a=task.key_a, key_b=task.key_b, error=task.error)
 
     def insert_diff_error(self, key_a: int, key_b: int, error: str) -> bool:
         """
