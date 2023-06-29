@@ -925,7 +925,8 @@ class FastDifPy(FastDiffPyBase):
         # we are using less optimized, so we are going straight for the not optimized algorithm.
         if self.config.less_optimized:
             first_key = self.db.fetch_many_after_key(directory_a=True, starting=None, count=1)
-            self.config.sl_queue_status = {"fix_key": first_key[0]["key"], "shift_key": None, "done": False}
+            self.config.sl_queue_status = {"fix_key": first_key[0]["key"], "shift_key": None, "done": False,
+                                           "none_count": 0}
 
 
             # Only on dir to itself - only upper matrix to be computed.
