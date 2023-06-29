@@ -282,6 +282,7 @@ def first_loop_enqueue_worker(target_queue: mp.Queue, com: Connection, config: d
 
             # Iterate over message types and perform associated action.
             if msg == Messages.Stop:
+                fdb.db.commit()
                 return
 
         # fetching a new task if the current task is empty
@@ -305,11 +306,12 @@ def first_loop_enqueue_worker(target_queue: mp.Queue, com: Connection, config: d
         # prevent immortal process.
         if timeout > 60:
             com.send("First Loop Enqueue Worker timeout. Exit.")
+            fdb.db.commit()
             return
 
         # Progress to parent
         if insert_counter % 100 == 0:
-            com.send(insert_counter)
+            com.send(f"Submitted: {insert_counter}")
 
     # Scheduling of tasks
     while True:
@@ -318,9 +320,11 @@ def first_loop_enqueue_worker(target_queue: mp.Queue, com: Connection, config: d
 
             # Iterate over message types and perform associated action.
             if msg == Messages.Stop:
+                fdb.db.commit()
                 return
 
         if none_counter >= fdb.config.fl_cpu_proc:
+            fdb.db.commit()
             return
 
         # submit to queue
@@ -334,6 +338,7 @@ def first_loop_enqueue_worker(target_queue: mp.Queue, com: Connection, config: d
         # prevent immortal process.
         if timeout > 60:
             com.send("First Loop Enqueue Worker timeout. Exit.")
+            fdb.db.commit()
             return
 
 
@@ -352,7 +357,7 @@ def first_loop_dequeue_worker(target_queue: mp.Queue, com: Connection, config: d
     result_counter = 0
     timeout = 0
 
-    while none_counter <= fdb.config.fl_cpu_proc:
+    while none_counter < fdb.config.fl_cpu_proc:
         if com.poll(timeout=0.01):
             msg = com.recv()
 
@@ -374,6 +379,10 @@ def first_loop_dequeue_worker(target_queue: mp.Queue, com: Connection, config: d
             com.send("First Loop Dequeue Worker timeout. Exit.")
             fdb.db.commit()
             return
+
+        if result_counter % 100 == 0:
+            com.send(f"Done with: {result_counter}")
+            fdb.db.commit()
 
     fdb.db.commit()
 
