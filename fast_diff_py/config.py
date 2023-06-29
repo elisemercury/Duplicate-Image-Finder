@@ -16,7 +16,7 @@ class FastDiffPyConfig:
     # Class Config Storage
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, task_path: str = None, task_purge: bool = False):
+    def __init__(self, task_path: str = None, task_purge: bool = False, cfg: dict = None):
         # set the config_path
         if task_path is None:
             self.cfg_path = os.path.join(os.path.dirname(__file__), "task.json")
@@ -65,7 +65,10 @@ class FastDiffPyConfig:
             if task_purge:
                 os.remove(self.cfg_path)
             else:
-                self.load_config()
+                if cfg is not None:
+                    self.__task_dict = cfg
+                else:
+                    self.load_config()
 
     def load_config(self):
         """
