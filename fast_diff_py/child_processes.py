@@ -8,7 +8,7 @@ from multiprocessing.connection import Connection
 import warnings
 import queue
 import os
-from typing import Tuple
+from typing import Tuple, Union, List
 from types import FunctionType
 
 def process_image(proc: CPUImageProcessing, args: PreprocessArguments) -> PreprocessResults:
@@ -386,3 +386,95 @@ def first_loop_dequeue_worker(target_queue: mp.Queue, com: Connection, config: d
 
     fdb.db.commit()
 
+def second_loop_enqueue_worker(target_queue: Union[mp.Queue, List[mp.Queue]], com: Connection, config: dict,
+                               db_config: dict):
+    fdb = build_base_obj(config=config, db_config=db_config)
+    last_insert_count = 0
+    last_none_count = 0
+    timeout = 0
+
+    insert_counter = 0
+    none_counter = 0
+
+    while True:
+        if com.poll(timeout=0.01):
+            msg = com.recv()
+
+            # Iterate over message types and perform associated action.
+            if msg == Messages.Stop:
+                fdb.db.commit()
+                return
+
+        # fetching a new task if the current task is empty
+        new_insert_count, new_none_counter = fdb.sl_refill_queues(target_queue)
+        if not fdb.config.less_optimized:
+            none_counter += new_none_counter
+        else:
+            none_counter = new_none_counter
+
+        insert_counter += new_insert_count
+        fdb.db.commit()
+
+        # Timeout
+        if insert_counter == last_insert_count and none_counter == last_none_count:
+            timeout += 1
+        else:
+            timeout = 0
+            last_insert_count = insert_counter
+            last_none_count = none_counter
+
+        # prevent immortal process.
+        if timeout > 60:
+            com.send("Second Loop Enqueue Worker timeout. Exit.")
+            fdb.db.commit()
+            return
+
+        if none_counter >= fdb.config.sl_cpu_proc + fdb.config.sl_gpu_proc:
+            com.send("Second Loop Enqueue Worker done. Exit.")
+            fdb.db.commit()
+            return
+
+        com.send(f"Submitted tally: {insert_counter}")
+
+
+def second_loop_dequeue_worker(target_queue: mp.Queue, com: Connection, config: dict, db_config: dict):
+    fdb = build_base_obj(config=config, db_config=db_config)
+    processed_counter = 0
+    none_counter = 0
+
+    last_none_counter = 0
+    last_processed_counter = 0
+
+    timeout = 0
+
+    while True:
+        if com.poll(timeout=0.01):
+            msg = com.recv()
+
+            # Iterate over message types and perform associated action.
+            if msg == Messages.Stop:
+                fdb.db.commit()
+                return
+
+        proc_suc, proc_exit = fdb.process_one_second_result(out_queue=target_queue)
+        processed_counter += int(proc_suc)
+        none_counter += int(proc_exit)
+
+        if last_processed_counter == processed_counter and last_none_counter == none_counter:
+            timeout += 0.1
+        else:
+            timeout = 0
+
+        if processed_counter % 1000 == 0:
+            fdb.db.commit()
+            com.send(f"Done with: {processed_counter}")
+
+        if timeout >= 60:
+            com.send("Second Loop Dequeue Worker timeout. Exit.")
+            fdb.db.commit()
+            return
+
+        if none_counter >= none_counter >= fdb.config.sl_cpu_proc + fdb.config.sl_gpu_proc:
+            com.send("Second Loop Dequeue Worker done. Exit.")
+            fdb.db.commit()
+            return
