@@ -1,4 +1,5 @@
 from typing import Union, List
+from fast_diff_py.datatransfer import CompareImageResults
 
 """
 Interface of the Database Class
@@ -241,6 +242,22 @@ class Database:
     # ------------------------------------------------------------------------------------------------------------------
     # ERROR TABLE
     # ------------------------------------------------------------------------------------------------------------------
+
+    def insert_many_diff_success(self, tasks: List[CompareImageResults]):
+        """
+        Insert a list into table with single statement. Statement need to be successes
+        :param tasks: list of elements to insert
+        :return: None
+        """
+        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
+
+    def insert_many_diff_errors(self, tasks: List[CompareImageResults]):
+        """
+        Insert a list into table with single statement. Statement need to be errors
+        :param tasks: list of elements to insert
+        :return: None
+        """
+        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
     def insert_diff_success(self, key_a: int, key_b: int, dif: float) -> bool:
         """
