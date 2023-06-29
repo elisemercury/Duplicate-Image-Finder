@@ -771,7 +771,7 @@ class MariaDBDatabase(SQLBase):
                            f"VALUES ({key_a}, {key_b}, 0, '{error}')")
         return True
 
-    def get_by_pair(self, key_a: int, key_b: int):
+    def get_by_pair(self, key_a: int, key_b: int) -> Union[dict, None]:
         """
         Get the row matching the pair of keys. Return the row wrapped in a dict or None if it doesn't exist.
 
