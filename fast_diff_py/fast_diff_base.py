@@ -480,7 +480,7 @@ class FastDiffPyBase:
             return True
         return False
 
-    def _process_one_second_result(self, out_queue: mp.Queue) -> Tuple[bool, bool]:
+    def process_one_second_result(self, out_queue: mp.Queue) -> Tuple[bool, bool]:
         """
         Perform dequeue of one element of the second process results queue. Insert the result into the database
         subsequently.
@@ -490,7 +490,7 @@ class FastDiffPyBase:
         :return: element processed (no timeout), if a process exited.
         """
         try:
-            res = out_queue.get(timeout=0.1)
+            res = out_queue.get(block=False)
         except queue.Empty:
             return False, False
 
