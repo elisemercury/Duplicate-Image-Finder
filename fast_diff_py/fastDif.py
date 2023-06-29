@@ -990,7 +990,7 @@ class FastDifPy(FastDiffPyBase):
             if not proc_suc and not proc_exit:
                 return number_dequeues, number_exited
 
-        return max_number, number_exited
+        return number_dequeues, number_exited
 
     def check_children(self, gpu: bool = False, cpu: bool = False):
         """
