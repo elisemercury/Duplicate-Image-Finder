@@ -693,9 +693,9 @@ class FastDifPy(FastDiffPyBase):
         # prefill
         self.__init_queues()
 
-        # if self.db.thread_safe:
-        #     self.__thread_safe_second_loop(loop_args=child_args)
-        #     return
+        if self.db.thread_safe:
+            self.__thread_safe_second_loop(loop_args=child_args)
+            return
 
         self.__non_thread_safe_second_loop(loop_args=child_args)
 
