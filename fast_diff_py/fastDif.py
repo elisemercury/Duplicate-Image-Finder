@@ -509,7 +509,7 @@ class FastDifPy(FastDiffPyBase):
             if de_com_1.poll(timeout= 0.01):
                 self.logger.info(de_com_1.recv())
 
-            _, all_exit, _, _ = self.check_children(gpu=False, cpu=True)
+            _, _, _, all_exit = self.check_children(gpu=False, cpu=True)
             if all_exit:
                 break
 
