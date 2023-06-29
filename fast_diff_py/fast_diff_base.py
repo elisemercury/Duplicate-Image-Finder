@@ -238,13 +238,15 @@ class FastDiffPyBase:
         return add_count, self.config.sl_queue_status["none_count"]
 
 
-    def _refill_queues_optimized(self, queue_list: List[mp.Queue]):
+    def _refill_queues_optimized(self, queue_list: List[mp.Queue]) -> Tuple[int, int]:
         """
         Performs the optimized filling of the queues.
 
         :return:
         """
         inserted = 0
+        none_count = 0
+
         for p in range(len(queue_list)):
             # fetch possible candidates for the row.
             row_a, row_b = self._fetch_rows(p=p)
@@ -296,6 +298,7 @@ class FastDiffPyBase:
                 if len(row_a) == 0 and len(row_b) == 0:
                     # we don't have any images left to process.
                     if not self._increment_fixed_image(queue_list=queue_list, p=p):
+                        none_count += 1
                         break
 
                     row_a, row_b = self._fetch_rows(p=p)
@@ -308,7 +311,7 @@ class FastDiffPyBase:
                 if inserted_count <= 0:
                     not_full = False
 
-        return inserted if inserted > 0 else None
+        return inserted, none_count
 
     def _schedule_pair(self, row_a: dict, row_b: dict, in_queue: Union[List[mp.Queue], mp.Queue]) -> Tuple[bool, bool]:
         """
