@@ -660,8 +660,7 @@ class FastDifPy(FastDiffPyBase):
             # diff_location is stored in config in this function.
             self.create_plot_dir(diff_location=diff_location)
 
-            if type(similarity_threshold) is int:
-                similarity_threshold = float(similarity_threshold)
+        self.config.write_to_file()
 
         self.__sl_determine_algo()
 
