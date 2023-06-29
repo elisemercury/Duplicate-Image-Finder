@@ -791,7 +791,11 @@ class FastDifPy(FastDiffPyBase):
         self.config.less_optimized = True
 
     def __require_queue_refill(self):
-        done = False
+        """
+        Check if the queues need to be continuously refilled as in not all comparisons have been scheduled.
+        :return: true - more comparisons need to be scheduled.
+        """
+        done = True
         a_count = self.db.get_dir_count(dir_a=True)
         b_count = self.db.get_dir_count(dir_a=False)
 
@@ -800,14 +804,14 @@ class FastDifPy(FastDiffPyBase):
 
             if comps < (self.config.sl_cpu_proc + self.config.sl_gpu_proc) * 100:
                 self.send_termination_signal(first_loop=False)
-                done = True
+                done = False
                 self.logger.info("Less comparisons than available space. Not performing continuous enqueue.")
 
         else:
             comps = a_count * (a_count - 1) / 2
             if comps < (self.config.sl_cpu_proc + self.config.sl_gpu_proc) * 100:
                 self.send_termination_signal(first_loop=False)
-                done = True
+                done = False
                 self.logger.info("Less comparisons than available space. Not performing continuous enqueue.")
         return done
 
