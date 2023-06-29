@@ -693,6 +693,82 @@ class FastDifPy(FastDiffPyBase):
         # prefill
         self.__init_queues()
 
+        # if self.db.thread_safe:
+        #     self.__thread_safe_second_loop(loop_args=child_args)
+        #     return
+
+        self.__non_thread_safe_second_loop(loop_args=child_args)
+
+    def __thread_safe_second_loop(self, loop_args: list):
+        self.db.commit()
+        en_com_1, en_com_2 = mp.Pipe()
+        de_com_1, de_com_2 = mp.Pipe()
+        enqueue_thread = None
+
+        if self.__require_queue_refill():
+            enqueue_thread = mp.Process(target=second_loop_enqueue_worker,
+                                        args=(self.second_loop_in, en_com_2, self.config._task_dict,
+                                              self.db.create_config_dump()))
+            enqueue_thread.start()
+
+        # starting all processes
+        for i in range(self.config.sl_cpu_proc):
+            p = mp.Process(target=parallel_compare, args=loop_args[i])
+            p.start()
+            self.cpu_handles.append(p)
+
+        for i in range(self.config.sl_cpu_proc, self.config.sl_cpu_proc + self.config.sl_gpu_proc):
+            p = mp.Process(target=parallel_compare, args=loop_args[i])
+            p.start()
+            self.gpu_handles.append(p)
+
+        dequeue_thread = mp.Process(target=second_loop_dequeue_worker,
+                                    args=(self.second_loop_out, de_com_2,
+                                          self.config._task_dict, self.db.create_config_dump()))
+        dequeue_thread.start()
+
+        while enqueue_thread is not None and enqueue_thread.is_alive():
+            # Handling communications.
+            if enqueue_thread is not None:
+                # polling the queues:
+                if en_com_1.poll(timeout=0.01):
+                    self.logger.info(en_com_1.recv())
+
+            if de_com_1.poll(timeout=0.01):
+                self.logger.info(de_com_1.recv())
+
+            time.sleep(0.1)
+
+        if enqueue_thread is not None:
+            enqueue_thread.join()
+        else:
+            self.send_termination_signal(first_loop=False)
+
+        for i in range(6000):
+            if de_com_1.poll(timeout=0.01):
+                self.logger.info(de_com_1.recv())
+
+            _, _, _, all_exited = self.check_children(gpu=self.config.sl_gpu_proc > 0, cpu=self.config.sl_cpu_proc > 0)
+            if all_exited:
+                break
+
+        self.join_all_children()
+
+        # waiting for dequeue_worker
+        while dequeue_thread.is_alive():
+            if de_com_1.poll(timeout=0.01):
+                self.logger.info(de_com_1.recv())
+
+        dequeue_thread.join()
+        assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
+                                            f"Remaining: {self.first_loop_out.qsize()}"
+
+        self.config.state = "second_loop_done"
+        self.config.write_to_file()
+        self.logger.info("Data should be committed")
+
+
+    def __non_thread_safe_second_loop(self, loop_args: list):
         # starting all processes
         for i in range(self.config.sl_cpu_proc):
             p = mp.Process(target=parallel_compare, args=loop_args[i])
