@@ -153,7 +153,221 @@ class FastDiffPyBase:
                                                             f"{type(self.config.sl_queue_status).__name__}, " \
                                                             f"valid are list and dict"
 
-        return self._refill_queues_optimized(queue_list=in_queue)
+        if self.config.has_dir_b:
+            self._refill_queues_optimized_b(in_queue=in_queue)
+        else:
+            return self._refill_queues_optimized_base(queue_list=in_queue)
+
+    def _smart_increment_fixed_image(self, p: int, in_queue: List[mp.Queue]):
+        """
+        Given a process p, it searches for the next 'row' in the matching matrix to find the next key to keep constant
+        for the process p
+
+        :param p: index of process spec in self.config.sl_queue_status
+        :return: True -> free image found, False, -> no new image found.
+        """
+        next_key = 0
+
+        if "parent" in self.config.sl_queue_status[p].keys():
+            if self._smart_check_indirection(p=p):
+                return True
+
+            if not in_queue[p].full():
+                in_queue[p].put(None)
+            return False
+
+        # get the limit for the next key
+        for i in range(len(self.config.sl_queue_status)):
+            # select proper status
+            if "parent" in self.config.sl_queue_status[i].keys():
+                target_status = self.config.sl_queue_status[self.config.sl_queue_status[i]["parent"]]
+            else:
+                target_status = self.config.sl_queue_status[i]
+
+            if self.config.has_dir_b:
+                if not self.config.sl_base_a:
+                    next_key = max(target_status["row_b"]["key"], next_key)
+                    continue
+
+            next_key = max(target_status["row_a"]["key"], next_key)
+
+        # process case, when we're looking to move the dir_b
+        if not self.config.sl_base_a:
+            rows = self.db.fetch_many_after_key(directory_a=False, starting=next_key, count=1)
+
+            # no completely unprocessed key found
+            if len(rows) == 0:
+                if not in_queue[p].full():
+                    in_queue[p].put(None)
+                return False
+
+            # update the dict
+            self.config.sl_queue_status[p] = {"row_b": rows[0], "last_key": None}
+            return True
+
+        rows = self.db.fetch_many_after_key(directory_a=True, starting=next_key, count=1)
+
+        # no completely unprocessed key found
+        if len(rows) == 0:
+            if self._smart_check_indirection(p=p):
+                # Delete the unnecessary dict entries.
+                del self.config.sl_queue_status[p]["last_key"]
+                if "row_b" in self.config.sl_queue_status[p].keys():
+                    del self.config.sl_queue_status[p]["row_b"]
+                if "row_a" in self.config.sl_queue_status[p].keys():
+                    del self.config.sl_queue_status[p]["row_a"]
+
+                return True
+
+            if not in_queue[p].full():
+                in_queue[p].put(None)
+            return False
+
+        # update the dict
+        self.config.sl_queue_status[p] = {"row_a": rows[0], "last_key": rows[0]["key"]}
+        return True
+
+    def _smart_check_indirection(self, p: int) -> bool:
+        """
+        Go through all processes and check if a new parent is available (so we coprocess a row in the matrix.)
+        If this is not the case, we return False and proceed to put None's into the queue to tell the process to stop.
+
+        :param p: index in the process status list, i.e. the current process id.
+        :return: weather a new parent was found or not.
+        """
+        success = False
+        for i in range(len(self.config.sl_queue_status)):
+            if "parent" in self.config.sl_queue_status[i].keys():
+                continue
+
+            # Cannot be the parent of yourself.
+            if i == p:
+                continue
+
+            # Find a new parent.
+            self.config.sl_queue_status[p]["parent"] = i
+            success = True
+            break
+
+        # increment the children of the process when it is the time that its row runs out of elements to process too
+        for status in self.config.sl_queue_status:
+            if "parent" in status.keys() and status["parent"] == p:
+                status["parent"] = self.config.sl_queue_status[p]["parent"]
+
+        return success
+
+    def _smart_fetch_rows(self, p: int, count: int = 100) -> Tuple[list, list]:
+        """
+        Fetch the next up to 100 rows for the ingest process into the children.
+
+        :param p: Index of the process
+        :return:
+        """
+        row_a = []
+        row_b = []
+        assert type(self.config.sl_queue_status) is list, "__fetch_rows called with not_optimized process"
+
+        # Alias for easier access:
+        slqs = self.config.sl_queue_status
+
+        # get the last key.
+        if "parent" in slqs[p].keys():
+            # get the last_key of the *parent* of the current second_loop_queue_status
+            last_key = slqs[slqs[p]["parent"]]["last_key"]
+        else:
+            # get the last_key from the second_loop_queue_status
+            last_key = slqs[p]["last_key"]
+
+        # we don't keep the images of dir_a fixed but the ones of dir_b
+        if not self.config.sl_base_a:
+            row_a = self.db.fetch_many_after_key(directory_a=True, count=count, starting=last_key)
+        # we keep the images of dir_b fixed
+        else:
+            row_b = self.db.fetch_many_after_key(directory_a=False, count=count, starting=last_key)
+        return row_a, row_b
+
+
+    def _refill_queues_optimized_b(self, in_queue: List[mp.Queue]):
+        """
+        Performs the optimized filling of the queues.
+
+        :return:
+        """
+        assert self.config.has_dir_b, "May only be called with directory b selected."
+        inserted = 0
+        none_count = 0
+        for p in range(len(in_queue)):
+            # fetch possible candidates for the row.
+            row_a, row_b = self._smart_fetch_rows(p=p)
+
+            # if the rows are empty => Nothing left to do, skip updating for this process
+            if len(row_a) == 0 and len(row_b) == 0:
+                in_queue[p].put(None)
+                continue
+
+            inserted_count = 100
+
+            not_full = True
+            iterations = 0
+            slqs = self.config.sl_queue_status
+
+            while not_full:
+                if self.config.sl_base_a:
+                    for i in range(len(row_b)):
+                        # Fetch the row from self or the parent.
+                        row_a_tmp = slqs[slqs[p]["parent"]]["row_a"] if "parent" in slqs[p].keys() else slqs[p]["row_a"]
+
+                        insertion_success, full = self._schedule_pair(row_a=row_a_tmp, row_b=row_b[i],
+                                                                      in_queue=in_queue[p])
+                        if full:
+                            break
+                        inserted_count -= int(insertion_success)
+                        inserted += int(insertion_success)
+
+                else:
+                    for i in range(len(row_a)):
+                        # Fetch the row from self or the parent.
+                        row_b_tmp = slqs[slqs[p]["parent"]]["row_b"] if "parent" in slqs[p].keys() else slqs[p]["row_b"]
+
+                        insertion_success, full = self._schedule_pair(row_a=row_a[i], row_b=row_b_tmp,
+                                                                      in_queue=in_queue[p])
+                        if full:
+                            break
+                        inserted_count -= int(insertion_success)
+                        inserted += int(insertion_success)
+
+                iterations += 1
+
+                # get the correct slqs
+                target = slqs[slqs[p]["parent"]] if "parent" in slqs[p].keys() else slqs[p]
+
+                # update last key
+                if not self.config.sl_base_a:
+                    target["last_key"] = row_a[-1]["key"]
+                else:
+                    target["last_key"] = row_b[-1]["key"]
+
+                row_a, row_b = self._smart_fetch_rows(p=p)
+
+                # try to increment key. If the increment method returns False, then no more keys are available, so
+                # stop trying to add more to the queue
+                if len(row_a) == 0 and len(row_b) == 0:
+                    # we don't have any images left to process.
+                    if not self._smart_increment_fixed_image(p=p, in_queue=in_queue):
+                        none_count += 1
+                        break
+
+                    row_a, row_b = self._smart_fetch_rows(p=p)
+
+                    # case when we are at the last image (which can only be compared against itself,
+                    # ergo nothing to do)
+                    if len(row_a) == 0 and len(row_b) == 0:
+                        break
+
+                if inserted_count <= 0:
+                    not_full = False
+
+        return inserted, none_count
 
     def __refill_queues_non_optimized(self, target_queue: mp.Queue) -> Tuple[int, int]:
         """
@@ -240,7 +454,7 @@ class FastDiffPyBase:
         return add_count, none_count
 
 
-    def _refill_queues_optimized(self, queue_list: List[mp.Queue]) -> Tuple[int, int]:
+    def _refill_queues_optimized_base(self, queue_list: List[mp.Queue]) -> Tuple[int, int]:
         """
         Performs the optimized filling of the queues.
 
