@@ -22,9 +22,8 @@ class FastDiffPyBase:
         :param cfg: config dict form parent class.
         """
         if cfg is not None:
-            self.config = FastDiffPyConfig()
+            self.config = FastDiffPyConfig(cfg=cfg)
             self.config.retain_config = False
-            self.config._task_dict = cfg
 
 
     @property
