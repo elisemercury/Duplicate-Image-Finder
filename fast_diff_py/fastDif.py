@@ -669,10 +669,19 @@ class FastDifPy(FastDiffPyBase):
 
         # create queues
         self.second_loop_out = mp.Queue()
-        self.second_loop_in = mp.Queue()
+        if self.db.thread_safe:
+            self.second_loop_in = mp.Queue(self.config.max_queue_size *
+                                           (self.config.sl_cpu_proc + self.config.sl_gpu_proc))
+        else:
+            self.second_loop_in = mp.Queue()
 
         if not self.config.less_optimized:
-            self.second_loop_in = [mp.Queue() for _ in range(self.config.sl_gpu_proc + self.config.sl_cpu_proc)]
+            if self.db.thread_safe:
+                self.second_loop_in = [mp.Queue(self.config.max_queue_size)
+                                       for _ in range(self.config.sl_gpu_proc + self.config.sl_cpu_proc)]
+            else:
+                self.second_loop_in = [mp.Queue()
+                                       for _ in range(self.config.sl_gpu_proc + self.config.sl_cpu_proc)]
 
         child_args = [(self.second_loop_in if self.config.less_optimized else self.second_loop_in[i],
                        self.second_loop_out, i, i >= self.config.sl_cpu_proc ,
