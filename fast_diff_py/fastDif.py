@@ -695,12 +695,12 @@ class FastDifPy(FastDiffPyBase):
 
         # starting all processes
         for i in range(self.config.sl_cpu_proc):
-            p = mp.Process(target=parallel_compare, args=child_args[i])
+            p = mp.Process(target=parallel_compare, args=loop_args[i])
             p.start()
             self.cpu_handles.append(p)
 
         for i in range(self.config.sl_cpu_proc, self.config.sl_cpu_proc + self.config.sl_gpu_proc):
-            p = mp.Process(target=parallel_compare, args=child_args[i])
+            p = mp.Process(target=parallel_compare, args=loop_args[i])
             p.start()
             self.gpu_handles.append(p)
 
@@ -708,19 +708,21 @@ class FastDifPy(FastDiffPyBase):
         done = self.__require_queue_refill()
         count = 0
         timeout = 0
+        none_count = 0
 
         # update everything
-        while not done:
+        while done:
             # update the queues and store if there are more tasks to process
-            current_inserted, current_count = self.update_queues()
+            current_inserted, current_count, current_none_count = self.update_queues()
             count += current_count
+            none_count += current_none_count
             self.logger.info(f"Number of Processed Images: {count:,}".replace(",", "'"))
 
             # We have no more images to enqueue
-            if current_inserted == 0 or current_inserted is None:
+            if current_inserted == 0 or none_count >= self.config.sl_gpu_proc + self.config.sl_cpu_proc:
                 self.send_termination_signal(first_loop=False)
                 self.logger.debug("End of images reached.")
-                done = True
+                done = False
 
             if current_count == 0:
                 timeout += 1
@@ -728,15 +730,16 @@ class FastDifPy(FastDiffPyBase):
                 time.sleep(1)
 
                 if timeout > 5:
-                    done = True
+                    done = False
             else:
                 timeout = 0
 
+            self.handle_results_second_queue()
             # exit the while loop if all children have exited.
             _, _, _, all_exited = self.check_children(cpu=self.config.sl_cpu_proc > 0, gpu=self.config.sl_gpu_proc > 0)
             if all_exited:
                 self.logger.debug("All Exited")
-                done = True
+                done = False
 
         # check if it was the children's fault
         _, all_errored, _, _ = self.check_children(cpu=self.config.sl_cpu_proc > 0, gpu=self.config.sl_gpu_proc > 0)
@@ -749,14 +752,14 @@ class FastDifPy(FastDiffPyBase):
 
         while count < 5:
             # handle last results:
-            if 0 == self.handle_results_second_queue():
+            if (0, 0) == self.handle_results_second_queue():
                 count += 1
                 continue
 
             count = 0
 
         # check if the tasks were empty.
-        assert not self.handle_results_second_queue(), "Existed without having run out of tasks and without all " \
+        assert (0, 0) ==  self.handle_results_second_queue(), "Existed without having run out of tasks and without all " \
                                                        "processes having stopped."
 
         self.db.commit()
