@@ -146,6 +146,8 @@ class SQLBase(Database):
         json_string = bytes_string.decode("utf-8")
         return json.loads(json_string)
 
+
+# TODO Has "insert or ignore" for to perform update later on. => Faster.
 class SQLiteDatabase(SQLBase):
     path: str = None
     con: Union[sqlite3.Connection, None] = None
