@@ -1,6 +1,11 @@
 from dataclasses import dataclass
 import json
 from typing import Union
+import enum
+
+
+class Messages(enum.Enum):
+    Stop = 1
 
 
 @dataclass

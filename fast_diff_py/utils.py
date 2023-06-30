@@ -1,10 +1,6 @@
 import math
 import hashlib
 import numpy as np
-import enum
-
-class Messages(enum.Enum):
-    Stop = 1
 
 
 """
