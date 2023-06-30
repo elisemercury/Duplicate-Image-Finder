@@ -37,6 +37,7 @@ class FastDiffPyConfig:
                 "shift_amount": 4,
                 "cpu_proc": None,
                 "inserted_counter": 0,
+                "use_workers": True,
             },
             "second_loop": {
                 "matching_hash": False,
@@ -48,6 +49,8 @@ class FastDiffPyConfig:
                 "gpu_proc": 0,
                 "queue_status": [] ,
                 "loop_base_a": True ,
+                "use_workers": True,
+                "use_special_b_algo": True
             },
             "database":{
                 "type": "sqlite",
@@ -273,6 +276,22 @@ class FastDiffPyConfig:
         self._task_dict["second_loop"]["loop_base_a"] = value
 
     @property
+    def sl_use_workers(self) -> bool:
+        return self._task_dict["second_loop"]["use_workers"]
+
+    @sl_use_workers.setter
+    def sl_use_workers(self, value: bool):
+        self._task_dict["second_loop"]["use_workers"] = value
+
+    @property
+    def use_special_b_algo(self) -> bool:
+        return self._task_dict["second_loop"]["use_special_b_algo"]
+
+    @use_special_b_algo.setter
+    def use_special_b_algo(self, value: bool):
+        self._task_dict["second_loop"]["use_special_b_algo"] = value
+
+    @property
     def supported_file_types(self) -> List[str]:
         return self._task_dict["supported_file_types"]
 
@@ -351,6 +370,14 @@ class FastDiffPyConfig:
     @fl_inserted_counter.setter
     def fl_inserted_counter(self, value: int):
         self._task_dict["first_loop"]["inserted_counter"] = value
+
+    @property
+    def fl_use_workers(self) -> bool:
+        return self._task_dict["first_loop"]["use_workers"]
+
+    @fl_use_workers.setter
+    def fl_use_workers(self, value: bool):
+        self._task_dict["first_loop"]["use_workers"] = value
 
     @property
     def database(self) -> dict:
