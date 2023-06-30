@@ -1255,6 +1255,7 @@ class FastDifPy(FastDiffPyBase):
         the value from the call to second_loop_iteration
         :return:
         """
+        self.db.commit()
         if similarity is None:
             similarity = self.config.similarity_threshold
 
