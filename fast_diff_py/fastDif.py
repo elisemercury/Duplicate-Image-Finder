@@ -829,13 +829,14 @@ class FastDifPy(FastDiffPyBase):
         self.join_all_children()
         self.logger.debug("All child processes terminated")
 
-        while count < 5:
+        timeout = 0
+        while timeout < 5:
             # handle last results:
             if (0, 0) == self.handle_results_second_queue():
-                count += 1
+                timeout += 1
                 continue
 
-            count = 0
+            timeout = 0
 
         # check if the tasks were empty.
         assert (0, 0) ==  self.handle_results_second_queue(), "Existed without having run out of tasks and without all " \
