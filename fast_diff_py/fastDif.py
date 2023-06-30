@@ -18,6 +18,7 @@ from fast_diff_py.child_processes import parallel_resize, parallel_compare, find
 from fast_diff_py.child_processes import first_loop_dequeue_worker, first_loop_enqueue_worker
 from fast_diff_py.child_processes import second_loop_dequeue_worker, second_loop_enqueue_worker
 import logging
+import signal
 
 
 """
@@ -72,6 +73,10 @@ class FastDifPy(FastDiffPyBase):
     file_handler: logging.FileHandler = None
     stream_handler: logging.StreamHandler = None
     debug_logger: logging.FileHandler = None
+
+    loop_run: bool = False
+    en_com_1: Union[None, con.Connection] = None
+    de_com_1: Union[None, con.Connection] = None
 
     def __init__(self, directory_a: str, directory_b: str = None, default_db: bool = True, **kwargs):
         """
@@ -142,6 +147,29 @@ class FastDifPy(FastDiffPyBase):
         # Setting the first stuff in the config
         self.config.state = "init"
         self.config.write_to_file()
+
+    def interrupt_handler(self):
+        """
+        Adds handlers for sigint and sigterm
+        :return:
+        """
+        signal.signal(signal.SIGINT, self.sig_int)
+        signal.signal(signal.SIGTERM, self.sig_int)
+
+    def sig_int(self):
+        """
+        Handler to trigger the stopping of the loop functions.
+        :return:
+        """
+        self.loop_run = False
+
+        if self.en_com_1 is not None:
+            self.en_com_1.send(Messages.Stop)
+
+        if self.de_com_1 is not None:
+            self.de_com_1.send(Messages.Stop)
+
+        self.logger.info("Stop signal received, shutting down...")
 
     def verify_config(self, full_depth: bool = False):
         """
@@ -467,6 +495,7 @@ class FastDifPy(FastDiffPyBase):
     def __thread_safe_first_loop(self, run: bool):
         self.db.commit()
         v = self.verbose
+        self.loop_run = True
 
         # start processes for cpu
         for i in range(self.config.fl_cpu_proc):
@@ -474,14 +503,14 @@ class FastDifPy(FastDiffPyBase):
             p.start()
             self.cpu_handles.append(p)
 
-        en_com_1, en_com_2,  = mp.Pipe()
+        self.en_com_1, en_com_2,  = mp.Pipe()
         enqueue_worker = None
         if run:
             enqueue_worker = mp.Process(target=first_loop_enqueue_worker,
                                         args=(self.first_loop_in, en_com_2, self.config._task_dict,
                                               self.db.create_config_dump()))
             enqueue_worker.start()
-        de_com_1, de_com_2 = mp.Pipe()
+        self.de_com_1, de_com_2 = mp.Pipe()
         dequeue_worker = mp.Process(target=first_loop_dequeue_worker,
                                     args=(self.first_loop_out, de_com_2, self.config._task_dict,
                                           self.db.create_config_dump()))
@@ -489,27 +518,27 @@ class FastDifPy(FastDiffPyBase):
         de_com_1: con.Connection
         dequeue_worker.start()
 
-        while enqueue_worker is not None and enqueue_worker.is_alive():
+        while enqueue_worker is not None and enqueue_worker.is_alive() and self.loop_run:
             # Handling communications.
             if run:
                 # polling the queues:
-                if en_com_1.poll(timeout = 0.01):
-                    self.logger.info(en_com_1.recv())
+                if self.en_com_1.poll(timeout = 0.01):
+                    self.logger.info(self.en_com_1.recv())
 
-            if de_com_1.poll(timeout= 0.01):
-                self.logger.info(de_com_1.recv())
+            if self.de_com_1.poll(timeout= 0.01):
+                self.logger.info(self.de_com_1.recv())
 
             time.sleep(0.1)
 
         # Joining.
-        if run:
+        if run and self.loop_run:
             enqueue_worker.join()
         else:
             self.send_termination_signal(first_loop=True)
 
         for i in range(6000):
-            if de_com_1.poll(timeout= 0.01):
-                self.logger.info(de_com_1.recv())
+            if self.de_com_1.poll(timeout= 0.01):
+                self.logger.info(self.de_com_1.recv())
 
             _, _, _, all_exited = self.check_children(gpu=False, cpu=True)
             if all_exited:
@@ -518,14 +547,18 @@ class FastDifPy(FastDiffPyBase):
         self.join_all_children()
 
         # waiting for dequeue_worker
-        while dequeue_worker.is_alive():
-            if de_com_1.poll(timeout= 0.01):
-                self.logger.info(de_com_1.recv())
+        while dequeue_worker.is_alive() and self.loop_run:
+            if self.de_com_1.poll(timeout= 0.01):
+                self.logger.info(self.de_com_1.recv())
 
         dequeue_worker.join()
         assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
                                             f"Remaining: {self.first_loop_out.qsize()}"
 
+
+        self.loop_run = False
+        self.en_com_1 = None
+        self.de_com_1 = None
         self.config.state = "first_loop_done"
         self.config.write_to_file()
         self.logger.info("All Images have been preprocessed.")
@@ -539,6 +572,7 @@ class FastDifPy(FastDiffPyBase):
         :return:
         """
         v = self.verbose
+        self.loop_run = True
 
         # start processes for cpu
         for i in range(self.config.fl_cpu_proc):
@@ -552,7 +586,7 @@ class FastDifPy(FastDiffPyBase):
         exit_count = 0
 
         # handle the running state of the loop
-        while run:
+        while run and self.loop_run:
             if self.config.fl_inserted_counter % 100 == 0:
                 self.logger.info(f"Inserted {self.config.fl_inserted_counter} images.")
 
@@ -609,6 +643,7 @@ class FastDifPy(FastDiffPyBase):
         assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
                                             f"Remaining: {self.first_loop_out.qsize()}"
 
+        self.loop_run = False
         self.config.state = "first_loop_done"
         self.config.write_to_file()
         self.logger.info("All Images have been preprocessed.")
@@ -692,7 +727,8 @@ class FastDifPy(FastDiffPyBase):
                           for i in range(self.config.sl_gpu_proc + self.config.sl_cpu_proc)]
 
         # prefill
-        self.__init_queues()
+        if self.config.sl_queue_status is None:
+            self.__init_queues()
 
         if self.db.thread_safe and self.config.sl_use_workers:
             self.__thread_safe_second_loop(loop_args=child_args)
@@ -702,9 +738,10 @@ class FastDifPy(FastDiffPyBase):
 
     def __thread_safe_second_loop(self, loop_args: list):
         self.db.commit()
-        en_com_1, en_com_2 = mp.Pipe()
-        de_com_1, de_com_2 = mp.Pipe()
+        self.en_com_1, en_com_2 = mp.Pipe()
+        self.de_com_1, de_com_2 = mp.Pipe()
         enqueue_thread = None
+        self.loop_run = True
 
         if self.__require_queue_refill():
             enqueue_thread = mp.Process(target=second_loop_enqueue_worker,
@@ -728,15 +765,15 @@ class FastDifPy(FastDiffPyBase):
                                           self.config._task_dict, self.db.create_config_dump()))
         dequeue_thread.start()
 
-        while enqueue_thread is not None and enqueue_thread.is_alive():
+        while enqueue_thread is not None and enqueue_thread.is_alive() and self.loop_run:
             # Handling communications.
             if enqueue_thread is not None:
                 # polling the queues:
-                if en_com_1.poll(timeout=0.01):
-                    self.logger.info(en_com_1.recv())
+                if self.en_com_1.poll(timeout=0.01):
+                    self.logger.info(self.en_com_1.recv())
 
-            if de_com_1.poll(timeout=0.01):
-                self.logger.info(de_com_1.recv())
+            if self.de_com_1.poll(timeout=0.01):
+                self.logger.info(self.de_com_1.recv())
 
         if enqueue_thread is not None:
             enqueue_thread.join()
@@ -744,29 +781,33 @@ class FastDifPy(FastDiffPyBase):
             self.send_termination_signal(first_loop=False)
 
         # emptying pipe
-        while en_com_1.poll(timeout=0.01):
-            self.logger.info(en_com_1.recv())
+        while self.en_com_1.poll(timeout=0.01) and self.loop_run:
+            self.logger.info(self.en_com_1.recv())
 
         # waiting for dequeue_worker
-        while dequeue_thread.is_alive():
+        while dequeue_thread.is_alive() and self.loop_run:
             # polling the queues:
-            if de_com_1.poll(timeout=0.01):
-                self.logger.info(de_com_1.recv())
+            if self.de_com_1.poll(timeout=0.01):
+                self.logger.info(self.de_com_1.recv())
 
         for i in range(6000):
-            if de_com_1.poll(timeout=0.01):
-                self.logger.info(de_com_1.recv())
+            if self.de_com_1.poll(timeout=0.01):
+                self.logger.info(self.de_com_1.recv())
 
             _, _, _, all_exited = self.check_children(gpu=self.config.sl_gpu_proc > 0, cpu=self.config.sl_cpu_proc > 0)
             if all_exited:
                 break
-
+        if not self.loop_run:
+            self.send_termination_signal(first_loop=False)
         self.join_all_children()
 
         dequeue_thread.join()
         assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
                                             f"Remaining: {self.first_loop_out.qsize()}"
 
+        self.loop_run = False
+        self.en_com_1 = None
+        self.de_com_1 = None
         self.config.state = "second_loop_done"
         self.config.write_to_file()
         self.logger.info("Data should be committed")
@@ -789,9 +830,10 @@ class FastDifPy(FastDiffPyBase):
         count = 0
         timeout = 0
         none_count = 0
+        self.loop_run = True
 
         # update everything
-        while done:
+        while done and self.loop_run:
             # update the queues and store if there are more tasks to process
             current_inserted, current_count, current_none_count = self.update_queues()
             count += current_count
@@ -821,6 +863,9 @@ class FastDifPy(FastDiffPyBase):
                 self.logger.debug("All Exited")
                 done = False
 
+        if not self.loop_run:
+            self.send_termination_signal(first_loop=False)
+
         # check if it was the children's fault
         _, all_errored, _, _ = self.check_children(cpu=self.config.sl_cpu_proc > 0, gpu=self.config.sl_gpu_proc > 0)
 
@@ -843,6 +888,7 @@ class FastDifPy(FastDiffPyBase):
         assert (0, 0) ==  self.handle_results_second_queue(), "Existed without having run out of tasks and without all " \
                                                        "processes having stopped."
 
+        self.loop_run = False
         self.db.commit()
         self.config.state = "second_loop_done"
         self.config.write_to_file()
