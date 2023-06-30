@@ -40,6 +40,7 @@ Features:
 # TODO single processing handler
 # TODO Implement process stop recovery.
 # TODO plot table is redundant. Use key from diff table and if create plot insert an empty row in the diff table.
+# TODO bulk processing first loop.
 # ----------------------------------------------------------------------------------------------------------------------
 # FEATURES
 # ----------------------------------------------------------------------------------------------------------------------
