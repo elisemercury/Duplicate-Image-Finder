@@ -47,7 +47,7 @@ class FastDiffPyConfig:
                 "plot_output_dir": None,
                 "cpu_proc": None,
                 "gpu_proc": 0,
-                "queue_status": [] ,
+                "queue_status": None ,
                 "loop_base_a": True ,
                 "use_workers": True,
                 "use_special_b_algo": True
@@ -260,11 +260,11 @@ class FastDiffPyConfig:
         self._task_dict["second_loop"]["cpu_proc"] = value
 
     @property
-    def sl_queue_status(self) -> Union[List[dict], dict]:
+    def sl_queue_status(self) -> Union[List[dict], dict, None]:
         return self._task_dict["second_loop"]["queue_status"]
 
     @sl_queue_status.setter
-    def sl_queue_status(self, value: Union[List[dict], dict]):
+    def sl_queue_status(self, value: Union[List[dict], dict, None]):
         self._task_dict["second_loop"]["queue_status"] = value
 
     @property
