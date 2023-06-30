@@ -146,7 +146,7 @@ class FastDiffPyBase:
         :return:
         """
         # testing if the
-        if type(self.config.sl_queue_status) is dict:
+        if self.config.less_optimized:
             return self.__refill_queues_non_optimized(target_queue=in_queue)
 
         assert type(self.config.sl_queue_status) is list, f"Unexpected type of config.sl_queue_status: " \
@@ -154,7 +154,7 @@ class FastDiffPyBase:
                                                             f"valid are list and dict"
 
         if self.config.has_dir_b:
-            self._refill_queues_optimized_b(in_queue=in_queue)
+            return self._refill_queues_optimized_b(in_queue=in_queue)
         else:
             return self._refill_queues_optimized_base(queue_list=in_queue)
 
