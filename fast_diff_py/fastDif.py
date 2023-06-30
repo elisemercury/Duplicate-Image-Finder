@@ -458,7 +458,7 @@ class FastDifPy(FastDiffPyBase):
             self.first_loop_in.put(arg.to_json())
             self.config.fl_inserted_counter += 1
 
-        if self.db.thread_safe:
+        if self.db.thread_safe and self.config.fl_use_workers:
             self.__thread_safe_first_loop(run=run)
             return
 
@@ -694,7 +694,7 @@ class FastDifPy(FastDiffPyBase):
         # prefill
         self.__init_queues()
 
-        if self.db.thread_safe:
+        if self.db.thread_safe and self.config.sl_use_workers:
             self.__thread_safe_second_loop(loop_args=child_args)
             return
 

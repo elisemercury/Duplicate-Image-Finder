@@ -153,7 +153,7 @@ class FastDiffPyBase:
                                                             f"{type(self.config.sl_queue_status).__name__}, " \
                                                             f"valid are list and dict"
 
-        if self.config.has_dir_b:
+        if self.config.has_dir_b and self.config.sl_use_special_b_algo:
             return self._refill_queues_optimized_b(in_queue=in_queue)
         else:
             return self._refill_queues_optimized_base(queue_list=in_queue)

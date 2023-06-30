@@ -284,11 +284,11 @@ class FastDiffPyConfig:
         self._task_dict["second_loop"]["use_workers"] = value
 
     @property
-    def use_special_b_algo(self) -> bool:
+    def sl_use_special_b_algo(self) -> bool:
         return self._task_dict["second_loop"]["use_special_b_algo"]
 
-    @use_special_b_algo.setter
-    def use_special_b_algo(self, value: bool):
+    @sl_use_special_b_algo.setter
+    def sl_use_special_b_algo(self, value: bool):
         self._task_dict["second_loop"]["use_special_b_algo"] = value
 
     @property
