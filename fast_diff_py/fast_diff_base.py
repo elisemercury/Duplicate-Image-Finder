@@ -1,6 +1,6 @@
 from fast_diff_py.database import Database
 import os
-from typing import List, Tuple, Dict
+from typing import List, Tuple
 import multiprocessing as mp
 import queue
 from fast_diff_py.datatransfer import *
