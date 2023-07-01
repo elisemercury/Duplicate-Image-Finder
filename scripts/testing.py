@@ -81,6 +81,7 @@ def test_block():
     db.print_preprocessing_errors()
 
     clusters, low_quality = db.get_duplicates()
+    db.clean_up()
     print(clusters)
     print(low_quality)
 
