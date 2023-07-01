@@ -17,6 +17,7 @@ from fast_diff_py.fast_diff_base import FastDiffPyBase
 from fast_diff_py.child_processes import parallel_resize, parallel_compare, find_best_image
 from fast_diff_py.child_processes import first_loop_dequeue_worker, first_loop_enqueue_worker
 from fast_diff_py.child_processes import second_loop_dequeue_worker, second_loop_enqueue_worker
+from fast_diff_py.mariadb_database import MariaDBDatabase
 import logging
 import signal
 
@@ -93,19 +94,30 @@ class FastDifPy(FastDiffPyBase):
         - debug: bool - Enable Debug File in the logs.
         - config_path: str - Path to the config that stores the progress of the program (for progress recovery on stop)
         - config_purge: str - Ignore preexisting config and overwrite it.
+        - config: FastDiffPyConfig - Pass a preexisting config. (process recovery)
+                                      Ignores config_path, config_purge kwarg!!!
         """
         super().__init__()
 
-        config_path = None
-        if "config_path" in kwargs.keys():
-            config_path = kwargs.get("config_path")
+        if "config" in kwargs.keys():
+            if type(kwargs.get("config")) is not FastDiffPyConfig:
+                raise ValueError(f"Unsupported type for config: {kwargs.get('config').__name__}, "
+                                 f"only FastDiffPyConfig allowed")
+            self.config = kwargs.get("config")
 
-        config_purge = True
-        if "config_purge" in kwargs.keys():
-            config_purge = kwargs.get("config_purge")
+            if self.config.database["type"] == "sqlite":
+                self.db = SQLiteDatabase(path=self.config.database["path"])
+            elif self.config.database["type"] == "mariadb":
+                self.db = MariaDBDatabase(
+                    user=self.config.database["user"],
+                    password=self.config.database["password"],
+                    host=self.config.database["host"],
+                    port=self.config.database["port"],
+                    database=self.config.database["database"],
+                    table_suffix=self.config.database["table_suffix"]
+                )
 
-        self.config = FastDiffPyConfig(task_path=config_path, task_purge=config_purge)
-        self.config.retain_config = True
+            return
 
         if not self.verify_config():
             # Only set the directory_a and directory_b when the config is not set.
