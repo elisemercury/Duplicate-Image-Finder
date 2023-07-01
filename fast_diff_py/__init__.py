@@ -1,1 +1,2 @@
-from fast_diff_py.dif import dif
+from fast_diff_py.fastDif import FastDifPy
+from fast_diff_py.mariadb_database import MariaDBDatabase
