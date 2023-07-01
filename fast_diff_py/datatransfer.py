@@ -128,7 +128,6 @@ class PreprocessResults:
         :param out_path: the thumbnail destination
         :param error: encountered error
         :param key: key of file in directory table
-        :param dir_a: if file was in dir a
         :return:
         """
         return PreprocessResults(
@@ -154,7 +153,6 @@ class PreprocessResults:
         :param in_path: original source file
         :param out_path: the thumbnail destination
         :param key: key of file in directory table
-        :param dir_a: if file was in dir a
         :param original_x: number of horizontal pixels
         :param original_y: number of vertical pixels
         :return:
