@@ -758,7 +758,13 @@ class FastDifPy(FastDiffPyBase):
 
         self.__non_thread_safe_second_loop()
 
-    def __thread_safe_second_loop(self, loop_args: list):
+    def __thread_safe_second_loop(self):
+        """
+        Thread safe implementation of the main loop of the second loop iteration. Thread safe specific inits and
+        termination sequences.
+
+        :return:
+        """
         self.db.commit()
         self.en_com_1, en_com_2 = mp.Pipe()
         self.de_com_1, de_com_2 = mp.Pipe()
@@ -825,6 +831,12 @@ class FastDifPy(FastDiffPyBase):
 
 
     def __non_thread_safe_second_loop(self):
+        """
+        None thread safe implementation of the main loop of the second loop iteration. Thread safe specific inits and
+        termination sequences.
+        
+        :return:
+        """
         # check if we need multiple iterations of the main loop.
         done = self.__require_queue_refill()
         count = 0
