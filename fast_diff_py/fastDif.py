@@ -741,11 +741,22 @@ class FastDifPy(FastDiffPyBase):
         if self.config.sl_queue_status is None:
             self.__init_queues()
 
+        # starting all processes
+        for i in range(self.config.sl_cpu_proc):
+            p = mp.Process(target=parallel_compare, args=child_args[i])
+            p.start()
+            self.cpu_handles.append(p)
+
+        for i in range(self.config.sl_cpu_proc, self.config.sl_cpu_proc + self.config.sl_gpu_proc):
+            p = mp.Process(target=parallel_compare, args=child_args[i])
+            p.start()
+            self.gpu_handles.append(p)
+
         if self.db.thread_safe and self.config.sl_use_workers:
-            self.__thread_safe_second_loop(loop_args=child_args)
+            self.__thread_safe_second_loop()
             return
 
-        self.__non_thread_safe_second_loop(loop_args=child_args)
+        self.__non_thread_safe_second_loop()
 
     def __thread_safe_second_loop(self, loop_args: list):
         self.db.commit()
@@ -824,18 +835,7 @@ class FastDifPy(FastDiffPyBase):
         self.logger.info("Data should be committed")
 
 
-    def __non_thread_safe_second_loop(self, loop_args: list):
-        # starting all processes
-        for i in range(self.config.sl_cpu_proc):
-            p = mp.Process(target=parallel_compare, args=loop_args[i])
-            p.start()
-            self.cpu_handles.append(p)
-
-        for i in range(self.config.sl_cpu_proc, self.config.sl_cpu_proc + self.config.sl_gpu_proc):
-            p = mp.Process(target=parallel_compare, args=loop_args[i])
-            p.start()
-            self.gpu_handles.append(p)
-
+    def __non_thread_safe_second_loop(self):
         # check if we need multiple iterations of the main loop.
         done = self.__require_queue_refill()
         count = 0
