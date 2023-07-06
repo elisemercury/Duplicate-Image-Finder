@@ -499,6 +499,7 @@ class FastDifPy(FastDiffPyBase):
             self.config.fl_inserted_counter += 1
 
         v = self.verbose
+        self.loop_run = True
 
         # start processes for cpu
         for i in range(self.config.fl_cpu_proc):
@@ -512,6 +513,17 @@ class FastDifPy(FastDiffPyBase):
 
         self.__non_thread_safe_first_loop(run=run)
 
+        assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
+                                            f"Remaining: {self.first_loop_out.qsize()}"
+        # only update the config if the process wasn't terminated by a sigint.
+        if self.loop_run:
+            self.config.state = "first_loop_done"
+            self.logger.info("All Images have been preprocessed.")
+        else:
+            self.logger.info("Successfully shutting down first loop.")
+        self.config.write_to_file()
+        self.loop_run = False
+
     def __thread_safe_first_loop(self, run: bool):
         """
         Contains the main loop of the first loop iteration with some initialisations that are specific to the
@@ -521,7 +533,6 @@ class FastDifPy(FastDiffPyBase):
         :return:
         """
         self.db.commit()
-        self.loop_run = True
 
         self.en_com_1, en_com_2 = mp.Pipe()
         self.de_com_1, de_com_2 = mp.Pipe()
@@ -574,16 +585,6 @@ class FastDifPy(FastDiffPyBase):
                 self.logger.info(self.de_com_1.recv())
 
         dequeue_worker.join()
-        assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
-                                            f"Remaining: {self.first_loop_out.qsize()}"
-        # only update the config if the process wasn't terminated by a sigint.
-        if self.loop_run:
-            self.config.state = "first_loop_done"
-            self.logger.info("All Images have been preprocessed.")
-        else:
-            self.logger.info("Successfully shutting down first loop.")
-        self.config.write_to_file()
-        self.loop_run = False
         self.en_com_1 = None
         self.de_com_1 = None
 
@@ -596,7 +597,6 @@ class FastDifPy(FastDiffPyBase):
         :return:
         """
         # turn main loop into handler and perform monitoring of the threads.
-        self.loop_run = True
         none_counter = 0
         timeout = 0
         exit_count = 0
@@ -656,17 +656,6 @@ class FastDifPy(FastDiffPyBase):
             counter = 0
 
         self.join_all_children()
-        assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
-                                            f"Remaining: {self.first_loop_out.qsize()}"
-
-        # Only print the result and write update the state in the config if we exited normally without an external interrupt.
-        if self.loop_run:
-            self.config.state = "first_loop_done"
-            self.logger.info("All Images have been preprocessed.")
-        else:
-            self.logger.info("Successfully shutting down first loop.")
-        self.config.write_to_file()
-        self.loop_run = False
 
     # ==================================================================================================================
     # SECOND LOOP ITERATION / DIFFERENCE RATING
