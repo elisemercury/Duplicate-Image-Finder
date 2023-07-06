@@ -8,7 +8,7 @@ setup(
   author = 'Alexander Sotoudeh',                   # Type in your name
   author_email = 'alisot200@gmail.com',      # Type in your E-Mail
   url = 'https://github.com/AliSot2000/Fast-Image-Deduplicator',   # Provide either the link to your github or to your website
-  download_url = 'https://github.com/user/reponame/archive/v_01.tar.gz',    # I explain this later on
+  download_url = 'https://github.com/AliSot2000/Fast-Image-Deduplicator/archive/refs/tags/v0.1.0.tar.gz',    # I explain this later on
   keywords = ['python', 'image deduplicator', 'fast image deduplicator'],   # Keywords that define your package best
   install_requires=[            # I get to this in a second
       "matplotlib",
