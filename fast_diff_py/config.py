@@ -69,7 +69,7 @@ class FastDiffPyConfig:
                 "use_special_b_algo": True
             },
             "database":{
-                "type": "sqlite",
+                "type": None,
                 "path": ""
             },
             "supported_file_types" : [".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".gif", ".webp"],
