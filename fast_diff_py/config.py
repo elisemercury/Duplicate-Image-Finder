@@ -80,14 +80,13 @@ class FastDiffPyConfig:
             "retain_db": True,
         }
 
-        if os.path.exists(self.cfg_path):
+        if os.path.exists(self.cfg_path) and cfg is None:
             if task_purge:
                 os.remove(self.cfg_path)
             else:
-                if cfg is not None:
-                    self.__task_dict = cfg
-                else:
-                    self.load_config()
+                self.load_config()
+        elif cfg is not None:
+            self.__task_dict = cfg
 
     def load_config(self):
         """
