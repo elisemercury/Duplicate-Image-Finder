@@ -365,17 +365,16 @@ class FastDifPy(FastDiffPyBase):
         :return:
         """
         if first_loop:
-            for i in range((len(self.cpu_handles) + len(self.gpu_handles)) * 4):
+            for i in range((len(self.cpu_handles) + len(self.gpu_handles))):
                 self.first_loop_in.put(None)
             return
 
         if self.config.less_optimized:
-            for i in range((len(self.cpu_handles) + len(self.gpu_handles)) * 4):
+            for i in range((len(self.cpu_handles) + len(self.gpu_handles))):
                 self.second_loop_in.put(None)
             return
 
-        for q in self.second_loop_in:
-            [q.put(None) for _ in range(4)]
+        [q.put(None) for q in self.second_loop_in]
 
     def join_all_children(self):
         """
