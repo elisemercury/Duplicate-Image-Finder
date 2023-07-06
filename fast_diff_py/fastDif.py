@@ -523,20 +523,23 @@ class FastDifPy(FastDiffPyBase):
         self.db.commit()
         self.loop_run = True
 
-        self.en_com_1, en_com_2,  = mp.Pipe()
+        self.en_com_1, en_com_2 = mp.Pipe()
+        self.de_com_1, de_com_2 = mp.Pipe()
+
         enqueue_worker = None
         if run:
             enqueue_worker = mp.Process(target=first_loop_enqueue_worker,
                                         args=(self.first_loop_in, en_com_2, self.config.export_task_dict(),
                                               self.db.create_config_dump()))
             enqueue_worker.start()
-        self.de_com_1, de_com_2 = mp.Pipe()
+
         dequeue_worker = mp.Process(target=first_loop_dequeue_worker,
                                     args=(self.first_loop_out, de_com_2, self.config.export_task_dict(),
                                           self.db.create_config_dump()))
+        dequeue_worker.start()
+
         en_com_1: con.Connection
         de_com_1: con.Connection
-        dequeue_worker.start()
 
         while enqueue_worker is not None and enqueue_worker.is_alive() and self.loop_run:
             # Handling communications.
