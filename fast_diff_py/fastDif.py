@@ -792,7 +792,8 @@ class FastDifPy(FastDiffPyBase):
 
         if enqueue_thread is not None:
             enqueue_thread.join()
-        else:
+
+        if not self.loop_run or enqueue_thread is None:
             self.send_termination_signal(first_loop=False)
 
         # emptying pipe
