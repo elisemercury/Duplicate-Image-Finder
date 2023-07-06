@@ -1,6 +1,8 @@
 """
 fast_diff_py - Python package for finding duplicate or similar images within folders
-https://github.com/elisemercury/Duplicate-Image-Finder
+https://github.com/elisemercury/Duplicate-Image-Finder,
+Fast implementation by Alexander Sotoudeh
+https://github.com/AliSot2000/Fast-Image-Deduplicator
 """
 
 from datetime import datetime
