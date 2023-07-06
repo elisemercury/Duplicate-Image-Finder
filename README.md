@@ -22,44 +22,44 @@ Some Testing I did showed, that for small sets of images (~500) with 16 cores, S
 For larger datasets `MariaDB` _might_ be faster, but I stopped testing since I found the other repos.
 
 ### Configuration options:
-- cfg_path: Path where config is stored
-- update_timeout: Time interval after which the config on the file system is updated.
-- retain_config: If the config should be written to the file system.
-- thumbnail_size_x, thumbnail_size_y: Size to reduce the images down to.
-- p_root_dir_a: Directory to search images in 
-- p_root_dir_b: Second directory to compare against (if not set, images will be compared against themselves in single directory.)
-- thumb_dir_a: Thumbnail directory in directory_a (ro)
-- thumb_dir_b: Thumbnail directory in directory_b (ro)
-- has_dir_b: If the second directory is populated or not (ro)
-- similarity_threshold: MSE of two thumbnails below which they are deemed duplicates
-- ignore_names: list of filenames which are not indexed
-- ignore_paths: list of paths which are not indexed 
-- enough_images_to_compare: Set by `index_dirs` function used to short circuit out in the loops if there's not enough to compare
-- supported_file_types: List of file endings including the '.' of supported file types
-- less_optimized: If a less optimized version of the second loop should be used (doesn't reuse already loaded image.)
-- retry_limit: Number of times to search for a new thumbnail name before an error is thrown.
-- verbose: If the child processes print a lot.
-- state: Current state of the algorithm. (Indexing done, First loop, Second loop ...)
-- fl_compute_thumbnails: If the thumbnails should be precomputed and written to disk in the first loop
-- fl_compute_hash: If file hashes of the images should be computed in the first loop
-- fl_shift_amount: How much the bits of the image channels RGB should be shifted
-- fl_cpu_proc: Number of cpu processes to spawn for first loop.
-- fl_inserted_counter: Number of images already processed.
-- fl_use_workers: If an enqueue and dequeue worker should be used instead of having the main process handle it. (Requires Thread Safe DB.)
-- database: Contains the dict created by `create_config_dump` method of databases.
-- retain_db: If the database config should be stored (maybe undesirable because of password for mariadb)
-- max_queue_size: Maximum Size of queues created for child processes.
-- sl_matching_hash: If images with matching file hash should even be compared for MSE
-- sl_has_thumb: If the thumbnails exist and don't need to be computed.
-- sl_matching_aspect: If the aspect ratio of the images must match before they are compared with MSE
-- sl_make_diff_plots: If Plots containing two images which have lower MSE than threshold should be made
-- sl_plot_output_dir: Directory where plots are stored.
-- sl_gpu_proc: Number of GPU processes for second loop (requires cupy)
-- sl_cpu_proc: Number of CPU processes for second loop
-- sl_queue_status: Contains the progress info for the second loop (should not be touched)
-- sl_base_a: If the fixed images are coming from directory a (should not be touched)
-- sl_use_workers: If an enqueue and dequeue worker should be used instead of having the main process handle it. (Requires Thread Safe DB.
-- sl_use_special_b_algo: If a different algorithm for the fixed images should be used for the second loop if we have a directory b (causes a slight speed up by reusing processes at the end of the loop.)
+- `cfg_path`: Path where config is stored
+- `update_timeout`: Time interval after which the config on the file system is updated.
+- `retain_config`: If the config should be written to the file system.
+- `thumbnail_size_x`, `thumbnail_size_y`: Size to reduce the images down to.
+- `p_root_dir_a`: Directory to search images in 
+- `p_root_dir_b`: Second directory to compare against (if not set, images will be compared against themselves in single directory.)
+- `thumb_dir_a`: Thumbnail directory in directory_a (ro)
+- `thumb_dir_b`: Thumbnail directory in directory_b (ro)
+- `has_dir_b`: If the second directory is populated or not (ro)
+- `similarity_threshold`: MSE of two thumbnails below which they are deemed duplicates
+- `ignore_names`: list of filenames which are not indexed
+- `ignore_paths`: list of paths which are not indexed 
+- `enough_images_to_compare`: Set by `index_dirs` function used to short circuit out in the loops if there's not enough to compare
+- `supported_file_types`: List of file endings including the '.' of supported file types
+- `less_optimized`: If a less optimized version of the second loop should be used (doesn't reuse already loaded image.)
+- `retry_limit`: Number of times to search for a new thumbnail name before an error is thrown.
+- `verbose`: If the child processes print a lot.
+- `state`: Current state of the algorithm. (Indexing done, First loop, Second loop ...)
+- `fl_compute_thumbnails`: If the thumbnails should be precomputed and written to disk in the first loop
+- `fl_compute_hash`: If file hashes of the images should be computed in the first loop
+- `fl_shift_amount`: How much the bits of the image channels RGB should be shifted
+- `fl_cpu_proc`: Number of cpu processes to spawn for first loop.
+- `fl_inserted_counter`: Number of images already processed.
+- `fl_use_workers`: If an enqueue and dequeue worker should be used instead of having the main process handle it. (Requires Thread Safe DB.)
+- `database`: Contains the dict created by `create_config_dump` method of databases.
+- `retain_db`: If the database config should be stored (maybe undesirable because of password for mariadb)
+- `max_queue_size`: Maximum Size of queues created for child processes.
+- `sl_matching_hash`: If images with matching file hash should even be compared for MSE
+- `sl_has_thumb`: If the thumbnails exist and don't need to be computed.
+- `sl_matching_aspect`: If the aspect ratio of the images must match before they are compared with MSE
+- `sl_make_diff_plots`: If Plots containing two images which have lower MSE than threshold should be made
+- `sl_plot_output_dir`: Directory where plots are stored.
+- `sl_gpu_proc`: Number of GPU processes for second loop (requires cupy)
+- `sl_cpu_proc`: Number of CPU processes for second loop
+- `sl_queue_status`: Contains the progress info for the second loop (should not be touched)
+- `sl_base_a`: If the fixed images are coming from directory a (should not be touched)
+- `sl_use_workers`: If an enqueue and dequeue worker should be used instead of having the main process handle it. (Requires Thread Safe DB.
+- `sl_use_special_b_algo`: If a different algorithm for the fixed images should be used for the second loop if we have a directory b (causes a slight speed up by reusing processes at the end of the loop.)
 
 ### Example
 ```python
