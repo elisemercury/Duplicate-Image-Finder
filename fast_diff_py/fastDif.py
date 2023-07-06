@@ -784,10 +784,8 @@ class FastDifPy(FastDiffPyBase):
 
         while enqueue_thread is not None and enqueue_thread.is_alive() and self.loop_run:
             # Handling communications.
-            if enqueue_thread is not None:
-                # polling the queues:
-                if self.en_com_1.poll(timeout=0.01):
-                    self.logger.info(self.en_com_1.recv())
+            if self.en_com_1.poll(timeout=0.01):
+                self.logger.info(self.en_com_1.recv())
 
             if self.de_com_1.poll(timeout=0.01):
                 self.logger.info(self.de_com_1.recv())
