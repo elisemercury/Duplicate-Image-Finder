@@ -655,10 +655,14 @@ class FastDifPy(FastDiffPyBase):
         assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
                                             f"Remaining: {self.first_loop_out.qsize()}"
 
-        self.loop_run = False
-        self.config.state = "first_loop_done"
+        # Only print the result and write update the state in the config if we exited normally without an external interrupt.
+        if self.loop_run:
+            self.config.state = "first_loop_done"
+            self.logger.info("All Images have been preprocessed.")
+        else:
+            self.logger.info("Successfully shutting down first loop.")
         self.config.write_to_file()
-        self.logger.info("All Images have been preprocessed.")
+        self.loop_run = False
 
     # ==================================================================================================================
     # SECOND LOOP ITERATION / DIFFERENCE RATING
