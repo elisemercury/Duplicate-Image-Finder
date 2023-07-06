@@ -12,7 +12,7 @@ import threading as th
 from fast_diff_py.datatransfer import *
 from concurrent.futures import ProcessPoolExecutor
 from fast_diff_py.sql_database import SQLiteDatabase
-from fast_diff_py.config import FastDiffPyConfig
+from fast_diff_py.config import FastDiffPyConfig, test_existing_config
 from fast_diff_py.fast_diff_base import FastDiffPyBase
 from fast_diff_py.child_processes import parallel_resize, parallel_compare, find_best_image
 from fast_diff_py.child_processes import first_loop_dequeue_worker, first_loop_enqueue_worker
@@ -79,84 +79,170 @@ class FastDifPy(FastDiffPyBase):
     en_com_1: Union[None, con.Connection] = None
     de_com_1: Union[None, con.Connection] = None
 
-    def __init__(self, directory_a: str, directory_b: str = None, default_db: bool = True, **kwargs):
+    @classmethod
+    def init_new(cls, directory_a: str, directory_b: str = None, default_db: bool = True, **kwargs):
         """
-        Provide the directories to be searched. If a different implementation of the database is used,
-        set the test_db to false.
+        Creates a fresh instance of the FastDiffPy class.
+
+        A Config will be generated, if the config exists, it will be purged (with warning, that can be disabled)
+        If default_db is True, an instance of the SQLiteDatabase will be created located in the default location.
+
+        If the debug option is passed as a kwarg, more verbose printing in the console is enabled.
 
         :param directory_a: first directory to search for differentiation.
         :param directory_b: second directory to compare against. Otherwise, comparison will be done against directory
         :param default_db: create a sqlite database in the a_directory.
-        itself.
+        :param kwargs:  - debug: bool - Enable Debug File in the logs.
+                        - disable_config_timeout: bool - if a config exists at the default location, a timeout of 10s is
+                                                         given to the user to halt the process. Turn this off if you are
+                                                         not using the script or use different init method.
+                        - config_path: str - Path to the config that stores the progress of the program
+                                             (for progress recovery on stop)
+                        - retain_config: bool - Default True, You can disable the retention of the config.
 
-        kwarg:
-        ------
-        - debug: bool - Enable Debug File in the logs.
-        - config_path: str - Path to the config that stores the progress of the program (for progress recovery on stop)
-        - config_purge: str - Ignore preexisting config and overwrite it.
-        - config: FastDiffPyConfig - Pass a preexisting config. (process recovery)
-                                      Ignores config_path, config_purge kwarg!!!
+        :return: FastDiffPy
         """
-        super().__init__()
-
-        if "config" in kwargs.keys():
-            if type(kwargs.get("config")) is not FastDiffPyConfig:
-                raise ValueError(f"Unsupported type for config: {kwargs.get('config').__name__}, "
-                                 f"only FastDiffPyConfig allowed")
-            self.config = kwargs.get("config")
-
-            if self.config.database["type"] == "sqlite":
-                self.db = SQLiteDatabase(path=self.config.database["path"])
-            elif self.config.database["type"] == "mariadb":
-                self.db = MariaDBDatabase(
-                    user=self.config.database["user"],
-                    password=self.config.database["password"],
-                    host=self.config.database["host"],
-                    port=self.config.database["port"],
-                    database=self.config.database["database"],
-                    table_suffix=self.config.database["table_suffix"]
-                )
-
-            return
-
-        if not self.verify_config():
-            # Only set the directory_a and directory_b when the config is not set.
-            if not os.path.isdir(directory_a):
-                raise NotADirectoryError(f"{directory_a} is not a directory")
-
-            if directory_b is not None and not os.path.isdir(directory_b):
-                raise NotADirectoryError(f"{directory_b} is not a directory")
-
-            directory_a = os.path.abspath(directory_a)
-            directory_b = os.path.abspath(directory_b) if directory_b is not None else None
-
-            # make sure the paths aren't sub-dirs of each other.
-            if directory_b is not None:
-                temp_a = directory_a + os.sep
-                temp_b = directory_b + os.sep
-                if temp_a.startswith(temp_b):
-                    raise ValueError(f"{directory_a} is a subdirectory of {directory_b}")
-                elif temp_b.startswith(temp_a):
-                    raise ValueError(f"{directory_b} is a subdirectory of {directory_a}")
-
-            self.config.p_root_dir_b = directory_b
-            self.config.p_root_dir_a = directory_a
-
-            # Creating default database if desired.
-            if default_db:
-                self.db = SQLiteDatabase(path=os.path.join(self.config.p_root_dir_a, "diff.db"))
-
-            self.config.ignore_paths = []
-            self.config.ignore_names = []
-
-
+        # fetch debug information
         debug = False
         if "debug" in kwargs.keys():
             debug = kwargs.get("debug")
 
-        self.prepare_logging(debug=debug)
+        obj = cls(debug=debug)
 
-        # Setting the first stuff in the config
+        config_path = None
+        if "config_path" in kwargs.keys():
+            config_path = kwargs.get("config_path")
+
+        disable_config_timeout = False
+        if "disable_config_timeout" in kwargs.keys():
+            disable_config_timeout = kwargs.get("disable_config_timeout")
+
+        # Testing for config existence
+        if not disable_config_timeout:
+            if config_path is None and test_existing_config() or os.path.exists(config_path):
+                obj.logger.warning("Preexisting config will be overwritten!!!")
+                obj.logger.warning("You have 10s to stop the process if this is an error.")
+                time.sleep(10)
+
+        config = FastDiffPyConfig(task_path=config_path, task_purge=True)
+        config.retain_config = kwargs.get("retain_config") if "retain_config" in kwargs.keys() else True
+
+        if not os.path.isdir(directory_a):
+            raise NotADirectoryError(f"{directory_a} is not a directory")
+
+        if directory_b is not None and not os.path.isdir(directory_b):
+            raise NotADirectoryError(f"{directory_b} is not a directory")
+
+        directory_a = os.path.abspath(directory_a)
+        directory_b = os.path.abspath(directory_b) if directory_b is not None else None
+
+        # make sure the paths aren't sub-dirs of each other.
+        if directory_b is not None:
+            temp_a = directory_a + os.sep
+            temp_b = directory_b + os.sep
+            if temp_a.startswith(temp_b):
+                raise ValueError(f"{directory_a} is a subdirectory of {directory_b}")
+            elif temp_b.startswith(temp_a):
+                raise ValueError(f"{directory_b} is a subdirectory of {directory_a}")
+
+        config.p_root_dir_b = directory_b
+        config.p_root_dir_a = directory_a
+
+        # Creating default database if desired.
+        if default_db:
+            obj.db = SQLiteDatabase(path=os.path.join(config.p_root_dir_a, "diff.db"))
+
+        config.ignore_paths = []
+        config.ignore_names = []
+
+        obj.config = config
+        obj.init_completed()
+        return obj
+
+    @classmethod
+    def init_preexisting_config(cls, config: FastDiffPyConfig = None, config_path: str = None,
+                                retain_config: bool = True, db = None, integrity_check: bool = False):
+        """
+        Create FastDiffPy object from preexisting config. The config can either be at the default path
+        (config_path is None), at a user defined path (config_path is not None) or a config object can be passed in as
+        an argument (config is not None).
+
+        The config argument has higher priority than config_path, i.e. if you provide a config, the config_path argument
+        is ignored since it is assumed, that you set the config path already when instantiating the FastDiffPyConfig
+        object.
+
+        You can pass in a database. This is required, if you have a config that has an empty database type.
+        You can have an empty database type in the case where you don't retain the database in the config since you
+        don't want the password of you mariadb to be in plain text.
+
+        You can set the database to not be retained by setting the `retain_db` attribute of the config to False.
+
+        :param config: Provide a Config Object that is already instantiated.
+        :param config_path: Load config from user specified path otherwise use default path.
+        :param retain_config: if config should be written to file in regular intervals
+        :param db: database to use for object. Otherwise, try to reconstruct db from config.
+        :param integrity_check: Performs check that all images in database are also present on file system.
+        :return: FastDiffPy
+        """
+
+        obj = cls(debug=False)
+
+        if config is not None:
+            fdc = config
+            obj.logger.info("Adding config provided as argument.")
+        else:
+            fdc = FastDiffPyConfig(task_path=config_path)
+            if config_path is not None:
+                obj.logger.info("Creating config object and using given path.")
+            else:
+                obj.logger.info("Creating config object and using default path.")
+
+        fdc.retain_config = retain_config
+
+        # Need to pass in verbose from top to set the verbose settings in the parent class as well.
+        obj.verbose = fdc.verbose
+
+        # reconnecting database
+        if fdc.database["type"] == "sqlite":
+            obj.db = SQLiteDatabase(path=f.database["path"])
+        elif fdc.database["type"] == "mariadb":
+            obj.db = MariaDBDatabase(
+                user=fdc.database["user"],
+                password=fdc.database["password"],
+                host=fdc.database["host"],
+                port=fdc.database["port"],
+                database=fdc.database["database"],
+                table_suffix=fdc.database["table_suffix"]
+            )
+        elif fdc.database["type"] is None:
+            if db is not None:
+                obj.db = db
+            else:
+                raise ValueError("Couldn't reconnect database - "
+                                 "No database specified in config and no database provided as argument")
+        obj.config = fdc
+        if integrity_check:
+            obj.verify_dir_content()
+        return obj
+
+    def __init__(self, debug: bool = False):
+        """
+        Skeleton init function. Main logic of init function is supposed to happen in `init_new` and
+        `init_preexisting_config`
+
+        :param debug: used for loggers and preparation of logging.
+        """
+
+        super().__init__()
+
+        csl_lvl = logging.DEBUG if debug else logging.WARNING
+        self.prepare_logging(console_level=csl_lvl, debug=debug)
+
+
+    def init_completed(self):
+        """
+        Updates the config object to indicate that the initialisation of the object has been completed
+        """
         self.config.state = "init"
         self.config.write_to_file()
 
@@ -183,28 +269,12 @@ class FastDifPy(FastDiffPyBase):
 
         self.logger.info("Stop signal received, shutting down...")
 
-    def verify_config(self, full_depth: bool = False):
-        """
-        Load the config and verify that the folders match and the content if the directories too.
-
-        :param full_depth: Check that every file in the database exists.
-
-        :return: returns False if no Config is found. otherwise returns true.
-        """
-        # Empty dict, we have nothing.
-        if not os.path.exists(self.config.cfg_path):
-            return False
-
-        if full_depth:
-            self.verify_dir_content()
-        return True
-
     def verify_dir_content(self):
         """
         Function should go through dir table and make sure every file exists. If a file doesn't exist, raises ValueError.
         :return:
         """
-        pass
+        self.logger.warning("Integrity check not implemented !!!")
 
     def index_the_dirs(self):
         """
