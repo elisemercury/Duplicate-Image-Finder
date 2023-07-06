@@ -904,9 +904,12 @@ class FastDifPy(FastDiffPyBase):
 
         self.loop_run = False
         self.db.commit()
-        self.config.state = "second_loop_done"
+        if self.loop_run:
+            self.config.state = "second_loop_done"
+            self.logger.debug("Data should be committed")
+        else:
+            self.logger.info("Successfully shutting down second loop.")
         self.config.write_to_file()
-        self.logger.debug("Data should be committed")
 
     def __sl_determine_algo(self):
         """
