@@ -538,8 +538,8 @@ class FastDifPy(FastDiffPyBase):
                                           self.db.create_config_dump()))
         dequeue_worker.start()
 
-        en_com_1: con.Connection
-        de_com_1: con.Connection
+        self.en_com_1: con.Connection
+        self.de_com_1: con.Connection
 
         if run:
             while enqueue_worker.is_alive() and self.loop_run:
