@@ -22,7 +22,11 @@ class FastDiffPyBase:
         :param cfg: config dict form parent class.
         """
         if cfg is not None:
+            # Instantiate config and ignore any existing config that is already there (done with cfg option)
             self.config = FastDiffPyConfig(cfg=cfg)
+
+            # Retention of config explicitly set to False since this class is intended to be instantiated in child
+            # workers.
             self.config.retain_config = False
 
 
