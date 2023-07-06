@@ -4,6 +4,15 @@ import datetime
 import warnings
 from typing import Union, List
 
+
+def test_existing_config() -> bool:
+    """
+    Tests the default config path if it exists.
+    :return: True if there's a config.
+    """
+    return os.path.exists(os.path.join(os.path.dirname(__file__), "task.json"))
+
+
 class FastDiffPyConfig:
     cfg_path: str
     update_timeout: int = 30
