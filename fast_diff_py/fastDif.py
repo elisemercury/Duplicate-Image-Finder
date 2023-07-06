@@ -773,13 +773,13 @@ class FastDifPy(FastDiffPyBase):
 
         if self.__require_queue_refill():
             enqueue_thread = mp.Process(target=second_loop_enqueue_worker,
-                                        args=(self.second_loop_in, en_com_2, self.config._task_dict,
+                                        args=(self.second_loop_in, en_com_2, self.config.export_task_dict(),
                                               self.db.create_config_dump()))
             enqueue_thread.start()
 
         dequeue_thread = mp.Process(target=second_loop_dequeue_worker,
                                     args=(self.second_loop_out, de_com_2,
-                                          self.config._task_dict, self.db.create_config_dump()))
+                                          self.config.export_task_dict(), self.db.create_config_dump()))
         dequeue_thread.start()
 
         while enqueue_thread is not None and enqueue_thread.is_alive() and self.loop_run:
