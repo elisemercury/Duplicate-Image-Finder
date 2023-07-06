@@ -513,6 +513,13 @@ class FastDifPy(FastDiffPyBase):
         self.__non_thread_safe_first_loop(run=run)
 
     def __thread_safe_first_loop(self, run: bool):
+        """
+        Contains the main loop of the first loop iteration with some initialisations that are specific to the
+        thread_safe implementation.
+
+        :param run: if there's images in the database that have not been enqueued.
+        :return:
+        """
         self.db.commit()
         self.loop_run = True
 
