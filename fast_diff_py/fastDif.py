@@ -576,14 +576,16 @@ class FastDifPy(FastDiffPyBase):
         dequeue_worker.join()
         assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
                                             f"Remaining: {self.first_loop_out.qsize()}"
-
-
+        # only update the config if the process wasn't terminated by a sigint.
+        if self.loop_run:
+            self.config.state = "first_loop_done"
+            self.logger.info("All Images have been preprocessed.")
+        else:
+            self.logger.info("Successfully shutting down first loop.")
+        self.config.write_to_file()
         self.loop_run = False
         self.en_com_1 = None
         self.de_com_1 = None
-        self.config.state = "first_loop_done"
-        self.config.write_to_file()
-        self.logger.info("All Images have been preprocessed.")
 
     def __non_thread_safe_first_loop(self, run: bool):
         """
