@@ -26,6 +26,13 @@ class FastDiffPyConfig:
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, task_path: str = None, task_purge: bool = False, cfg: dict = None):
+        """
+        Create config object
+
+        :param task_path: path to where config is stored.
+        :param task_purge: If a config exists at the specified path, the config will be removed if it exists
+        :param cfg: an initial state of the config - used for config created in child processes.
+        """
         # set the config_path
         if task_path is None:
             self.cfg_path = os.path.join(os.path.dirname(__file__), "task.json")
