@@ -813,6 +813,7 @@ class FastDifPy(FastDiffPyBase):
             _, _, _, all_exited = self.check_children(gpu=self.config.sl_gpu_proc > 0, cpu=self.config.sl_cpu_proc > 0)
             if all_exited:
                 break
+
         if not self.loop_run:
             self.send_termination_signal(first_loop=False)
         self.join_all_children()
@@ -821,13 +822,15 @@ class FastDifPy(FastDiffPyBase):
         assert self.first_loop_out.empty(), f"Result queue is not empty after all processes have been killed.\n " \
                                             f"Remaining: {self.first_loop_out.qsize()}"
 
-        self.loop_run = False
         self.en_com_1 = None
         self.de_com_1 = None
-        self.config.state = "second_loop_done"
+        if self.loop_run:
+            self.config.state = "second_loop_done"
+            self.logger.info("Data should be committed")
+        else:
+            self.logger.info("Successfully shutting down second loop.")
         self.config.write_to_file()
-        self.logger.info("Data should be committed")
-
+        self.loop_run = False
 
     def __non_thread_safe_second_loop(self):
         """
