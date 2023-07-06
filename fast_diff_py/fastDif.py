@@ -92,13 +92,14 @@ class FastDifPy(FastDiffPyBase):
         :param directory_a: first directory to search for differentiation.
         :param directory_b: second directory to compare against. Otherwise, comparison will be done against directory
         :param default_db: create a sqlite database in the a_directory.
-        :param kwargs:  - debug: bool - Enable Debug File in the logs.
+        :param kwargs:  - debug: bool - Enable Debug File in the logs. Default False
                         - disable_config_timeout: bool - if a config exists at the default location, a timeout of 10s is
                                                          given to the user to halt the process. Turn this off if you are
                                                          not using the script or use different init method.
+                                                         Default False
                         - config_path: str - Path to the config that stores the progress of the program
-                                             (for progress recovery on stop)
-                        - retain_config: bool - Default True, You can disable the retention of the config.
+                                             (for progress recovery on stop) Default None
+                        - retain_config: bool - Default True, You can disable the retention of the config. Default True
 
         :return: FastDiffPy
         """
