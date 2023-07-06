@@ -541,22 +541,21 @@ class FastDifPy(FastDiffPyBase):
         en_com_1: con.Connection
         de_com_1: con.Connection
 
-        while enqueue_worker is not None and enqueue_worker.is_alive() and self.loop_run:
-            # Handling communications.
-            if run:
-                # polling the queues:
+        if run:
+            while enqueue_worker.is_alive() and self.loop_run:
+                # Handling communications.
                 if self.en_com_1.poll(timeout = 0.01):
                     self.logger.info(self.en_com_1.recv())
 
-            if self.de_com_1.poll(timeout= 0.01):
-                self.logger.info(self.de_com_1.recv())
+                if self.de_com_1.poll(timeout= 0.01):
+                    self.logger.info(self.de_com_1.recv())
 
-            time.sleep(0.1)
+                time.sleep(0.1)
+
+            enqueue_worker.join()
 
         # Joining.
-        if run and self.loop_run:
-            enqueue_worker.join()
-        else:
+        if not( run and self.loop_run):
             self.send_termination_signal(first_loop=True)
 
         for i in range(6000):
