@@ -498,6 +498,14 @@ class FastDifPy(FastDiffPyBase):
             self.first_loop_in.put(arg.to_json())
             self.config.fl_inserted_counter += 1
 
+        v = self.verbose
+
+        # start processes for cpu
+        for i in range(self.config.fl_cpu_proc):
+            p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, False, v))
+            p.start()
+            self.cpu_handles.append(p)
+
         if self.db.thread_safe and self.config.fl_use_workers:
             self.__thread_safe_first_loop(run=run)
             return
@@ -506,14 +514,7 @@ class FastDifPy(FastDiffPyBase):
 
     def __thread_safe_first_loop(self, run: bool):
         self.db.commit()
-        v = self.verbose
         self.loop_run = True
-
-        # start processes for cpu
-        for i in range(self.config.fl_cpu_proc):
-            p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, False, v))
-            p.start()
-            self.cpu_handles.append(p)
 
         self.en_com_1, en_com_2,  = mp.Pipe()
         enqueue_worker = None
@@ -583,16 +584,8 @@ class FastDifPy(FastDiffPyBase):
         :param run: boolean if the continuous enqueue and dequeue loop needs to run.
         :return:
         """
-        v = self.verbose
-        self.loop_run = True
-
-        # start processes for cpu
-        for i in range(self.config.fl_cpu_proc):
-            p = mp.Process(target=parallel_resize, args=(self.first_loop_in, self.first_loop_out, i, False, v))
-            p.start()
-            self.cpu_handles.append(p)
-
         # turn main loop into handler and perform monitoring of the threads.
+        self.loop_run = True
         none_counter = 0
         timeout = 0
         exit_count = 0
