@@ -771,17 +771,6 @@ class FastDifPy(FastDiffPyBase):
                                               self.db.create_config_dump()))
             enqueue_thread.start()
 
-        # starting all processes
-        for i in range(self.config.sl_cpu_proc):
-            p = mp.Process(target=parallel_compare, args=loop_args[i])
-            p.start()
-            self.cpu_handles.append(p)
-
-        for i in range(self.config.sl_cpu_proc, self.config.sl_cpu_proc + self.config.sl_gpu_proc):
-            p = mp.Process(target=parallel_compare, args=loop_args[i])
-            p.start()
-            self.gpu_handles.append(p)
-
         dequeue_thread = mp.Process(target=second_loop_dequeue_worker,
                                     args=(self.second_loop_out, de_com_2,
                                           self.config._task_dict, self.db.create_config_dump()))
