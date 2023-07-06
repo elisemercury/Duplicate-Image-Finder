@@ -519,12 +519,12 @@ class FastDifPy(FastDiffPyBase):
         enqueue_worker = None
         if run:
             enqueue_worker = mp.Process(target=first_loop_enqueue_worker,
-                                        args=(self.first_loop_in, en_com_2, self.config._task_dict,
+                                        args=(self.first_loop_in, en_com_2, self.config.export_task_dict(),
                                               self.db.create_config_dump()))
             enqueue_worker.start()
         self.de_com_1, de_com_2 = mp.Pipe()
         dequeue_worker = mp.Process(target=first_loop_dequeue_worker,
-                                    args=(self.first_loop_out, de_com_2, self.config._task_dict,
+                                    args=(self.first_loop_out, de_com_2, self.config.export_task_dict(),
                                           self.db.create_config_dump()))
         en_com_1: con.Connection
         de_com_1: con.Connection

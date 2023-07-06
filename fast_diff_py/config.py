@@ -104,6 +104,13 @@ class FastDiffPyConfig:
             self.write_to_file()
             self.__last_update = datetime.datetime.now()
 
+    def export_task_dict(self):
+        """
+        Function used to extract config for child processes.
+        :return:
+        """
+        return self.__task_dict
+
     @property
     def thumbnail_size_x(self) -> int:
         return self._task_dict["thumbnail_size_x"]
