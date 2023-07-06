@@ -282,6 +282,7 @@ def first_loop_enqueue_worker(target_queue: mp.Queue, com: Connection, config: d
 
             # Iterate over message types and perform associated action.
             if msg == Messages.Stop:
+                com.send("First Loop Enqueue Worker received kill signal - shutdown.")
                 fdb.db.commit()
                 return
 
@@ -320,6 +321,7 @@ def first_loop_enqueue_worker(target_queue: mp.Queue, com: Connection, config: d
 
             # Iterate over message types and perform associated action.
             if msg == Messages.Stop:
+                com.send("First Loop Enqueue Worker received kill signal - shutdown.")
                 fdb.db.commit()
                 return
 
@@ -363,6 +365,7 @@ def first_loop_dequeue_worker(target_queue: mp.Queue, com: Connection, config: d
 
             # Iterate over message types and perform associated action.
             if msg == Messages.Stop:
+                com.send("First Loop Dequeue Worker received kill signal - shutdown.")
                 fdb.db.commit()
                 return
 
@@ -402,16 +405,13 @@ def second_loop_enqueue_worker(target_queue: Union[mp.Queue, List[mp.Queue]], co
 
             # Iterate over message types and perform associated action.
             if msg == Messages.Stop:
+                com.send("Second Loop Enqueue Worker received kill signal - shutdown.")
                 fdb.db.commit()
                 return
 
         # fetching a new task if the current task is empty
         new_insert_count, new_none_counter = fdb.sl_refill_queues(target_queue)
-        if not fdb.config.less_optimized:
-            none_counter += new_none_counter
-        else:
-            none_counter = new_none_counter
-
+        none_counter += new_none_counter
         insert_counter += new_insert_count
         fdb.db.commit()
 
@@ -453,6 +453,7 @@ def second_loop_dequeue_worker(target_queue: mp.Queue, com: Connection, config: 
 
             # Iterate over message types and perform associated action.
             if msg == Messages.Stop:
+                com.send("Second Loop Dequeue Worker received kill signal - shutdown.")
                 fdb.db.commit()
                 return
 
