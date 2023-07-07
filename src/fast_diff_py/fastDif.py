@@ -1221,7 +1221,7 @@ class FastDifPy(FastDiffPyBase):
 
         if not dif_based:
             raise NotImplementedError("hash_based is in todos.")
-        clusters = self.build_loose_duplicate_cluster(similarity)
+        clusters = self._build_loose_duplicate_cluster(similarity)
         return self.find_best_image(clusters)
 
     def spawn_duplicate_pair_worker(self, queue_size: int = 1000, start_id: int = None, threshold: float = 200) \
@@ -1382,7 +1382,7 @@ class FastDifPy(FastDiffPyBase):
         """
         raise NotImplementedError("Need to implement that one")
 
-    def build_loose_duplicate_cluster(self, similarity: float = None):
+    def _build_loose_duplicate_cluster(self, similarity: float = None):
         """
         Function generates a list of dicts containing duplicates. Each dict in the list satisfies that there exists at
         least **one** path between each two images. It is **not** guaranteed that within a cluster each pair of images
