@@ -102,9 +102,11 @@ if __name__ == "__main__":
             if resp.lower() == "y":
                 print("Finishing previous run - your current input arguments will be ignored.")
                 use_existing = True
+                break
             elif resp.lower() == "n":
                 print("Deleting previous config...")
                 fastDif.remove_existing_config()
+                break
             else:
                 print(f"Unsupported response: {resp}, only y and n are allowed.")
 
