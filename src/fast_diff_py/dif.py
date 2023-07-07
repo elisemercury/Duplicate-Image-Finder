@@ -92,8 +92,6 @@ if __name__ == "__main__":
     parser.add_argument("-D", "--silent_del", type=bool, help='(optional) Supresses the user confirmation when deleting images.', required=False, nargs='?', choices=[True, False], default=False)
     args = parser.parse_args()
 
-    warnings.warn("Show_progress does not have an effect but is left for compatibility with difpy")
-
     use_existing = False
     # verify first if there exists already a config that was in progress.
     if fastDif.test_existing_config():
