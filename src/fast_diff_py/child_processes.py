@@ -1,5 +1,4 @@
 from src.fast_diff_py.cpu_image_processor import CPUImageProcessing
-from src.fast_diff_py.mariadb_database import MariaDBDatabase
 from src.fast_diff_py.fast_diff_base import FastDiffPyBase
 from src.fast_diff_py.datatransfer import PreprocessArguments, PreprocessResults, CompareImageArguments, CompareImageResults
 from src.fast_diff_py.datatransfer import Messages
@@ -243,6 +242,7 @@ def build_base_obj(config: dict, db_config: dict) -> FastDiffPyBase:
     """
     fdb = FastDiffPyBase(cfg=config)
     if db_config["type"] == "mariadb":
+        from src.fast_diff_py.mariadb_database import MariaDBDatabase
         mdb = MariaDBDatabase(user=db_config["user"],
                               password=db_config["password"],
                               host=db_config["host"],
