@@ -1,4 +1,3 @@
-from fast_diff_py import dif
 import cv2
 import numpy as np
 import hashlib

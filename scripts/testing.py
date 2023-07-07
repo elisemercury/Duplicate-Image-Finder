@@ -1,4 +1,4 @@
-import fast_diff_py.fastDif as fd
+import src.fast_diff_py.fastDif as fd
 import os
 import shutil
 import time

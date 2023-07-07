@@ -1,8 +1,8 @@
-from fast_diff_py.cpu_image_processor import CPUImageProcessing
-from fast_diff_py.mariadb_database import MariaDBDatabase
-from fast_diff_py.fast_diff_base import FastDiffPyBase
-from fast_diff_py.datatransfer import PreprocessArguments, PreprocessResults, CompareImageArguments, CompareImageResults
-from fast_diff_py.datatransfer import Messages
+from src.fast_diff_py.cpu_image_processor import CPUImageProcessing
+from src.fast_diff_py.mariadb_database import MariaDBDatabase
+from src.fast_diff_py.fast_diff_base import FastDiffPyBase
+from src.fast_diff_py.datatransfer import PreprocessArguments, PreprocessResults, CompareImageArguments, CompareImageResults
+from src.fast_diff_py.datatransfer import Messages
 import multiprocessing as mp
 from multiprocessing.connection import Connection
 import warnings
@@ -81,7 +81,7 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
             warnings.warn(f"{identifier:03}: Cupy not available. Using CPU instead.")
 
     if cupy_avail:
-        from fast_diff_py.gpu_image_processor import GPUImageProcessing
+        from src.fast_diff_py.gpu_image_processor import GPUImageProcessing
         img_proc = GPUImageProcessing(identifier=identifier)
     else:
         img_proc = CPUImageProcessing(identifier=identifier)
@@ -140,7 +140,7 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
             warnings.warn(f"{identifier:03}: Cupy not available. Using CPU instead.")
 
     if cupy_avail:
-        from fast_diff_py.gpu_image_processor import GPUImageProcessing
+        from src.fast_diff_py.gpu_image_processor import GPUImageProcessing
         processor = GPUImageProcessing(identifier=identifier)
     else:
         processor = CPUImageProcessing(identifier=identifier)

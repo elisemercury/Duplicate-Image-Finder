@@ -1,12 +1,11 @@
-import numpy as np
 from types import FunctionType
-from fast_diff_py.datatransfer import *
+from src.fast_diff_py.datatransfer import *
 import os
 from typing import Tuple, Union
 import cv2
 from matplotlib import pyplot as plt
 import skimage
-from fast_diff_py.utils import *
+from src.fast_diff_py.utils import *
 
 
 # sample for the idiot I am.

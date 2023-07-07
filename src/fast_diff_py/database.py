@@ -1,5 +1,5 @@
 from typing import Union, List
-from fast_diff_py.datatransfer import CompareImageResults
+from src.fast_diff_py.datatransfer import CompareImageResults
 
 """
 Interface of the Database Class
