@@ -37,7 +37,7 @@ class FastDiffPyBase:
     @db.setter
     def db(self, value):
         self.__db = value
-        if self.config.retain_db:
+        if self.config.retain_db and self.__db is not None:
             self.config.database = self.__db.create_config_dump()
             self.config.write_to_file()
 
