@@ -201,11 +201,12 @@ class FastDifPy(FastDiffPyBase):
         fdc.retain_config = retain_config
 
         # Need to pass in verbose from top to set the verbose settings in the parent class as well.
+        obj.config = fdc
         obj.verbose = fdc.verbose
 
         # reconnecting database
         if fdc.database["type"] == "sqlite":
-            obj.db = SQLiteDatabase(path=f.database["path"])
+            obj.db = SQLiteDatabase(path=fdc.database["path"])
         elif fdc.database["type"] == "mariadb":
             obj.db = MariaDBDatabase(
                 user=fdc.database["user"],
@@ -221,7 +222,6 @@ class FastDifPy(FastDiffPyBase):
             else:
                 raise ValueError("Couldn't reconnect database - "
                                  "No database specified in config and no database provided as argument")
-        obj.config = fdc
         if integrity_check:
             obj.verify_dir_content()
         return obj
