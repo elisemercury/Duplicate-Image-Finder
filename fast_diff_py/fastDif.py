@@ -749,7 +749,6 @@ class FastDifPy(FastDiffPyBase):
         # TODO check the number of images with self.db.get_dir_count() -> set the less optimized flag there and then
         #   make the adjustment fro there.
         # Writing to config.
-        self.config.state = "second_loop_in_progress"
         self.config.sl_gpu_proc = gpu_proc
         self.config.sl_cpu_proc = cpu_proc
         self.config.sl_matching_aspect = only_matching_aspect
