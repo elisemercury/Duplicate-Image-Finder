@@ -80,7 +80,8 @@ class FastDifPy(FastDiffPyBase):
     de_com_1: Union[None, con.Connection] = None
 
     @classmethod
-    def init_new(cls, directory_a: str, directory_b: str = None, default_db: bool = True, **kwargs):
+    def init_new(cls, directory_a: str, directory_b: str = None, default_db: bool = True, progress: bool = True,
+                 **kwargs):
         """
         Creates a fresh instance of the FastDiffPy class.
 
@@ -89,6 +90,8 @@ class FastDifPy(FastDiffPyBase):
 
         If the debug option is passed as a kwarg, more verbose printing in the console is enabled.
 
+        :param progress: Responsible for setting the filter in the logger - if true allows info messages to be
+                            propagated, giving you more information about the state of the process.
         :param directory_a: first directory to search for differentiation.
         :param directory_b: second directory to compare against. Otherwise, comparison will be done against directory
         :param default_db: create a sqlite database in the a_directory.
@@ -108,7 +111,7 @@ class FastDifPy(FastDiffPyBase):
         if "debug" in kwargs.keys():
             debug = kwargs.get("debug")
 
-        obj = cls(debug=debug)
+        obj = cls(debug=debug, progress=progress)
 
         config_path = None
         if "config_path" in kwargs.keys():
@@ -161,7 +164,7 @@ class FastDifPy(FastDiffPyBase):
         return obj
 
     @classmethod
-    def init_preexisting_config(cls, config: FastDiffPyConfig = None, config_path: str = None,
+    def init_preexisting_config(cls, config: FastDiffPyConfig = None, config_path: str = None, progress: bool = True,
                                 retain_config: bool = True, db = None, integrity_check: bool = False):
         """
         Create FastDiffPy object from preexisting config. The config can either be at the default path
@@ -178,6 +181,8 @@ class FastDifPy(FastDiffPyBase):
 
         You can set the database to not be retained by setting the `retain_db` attribute of the config to False.
 
+        :param progress: Responsible for setting the filter in the logger - if true allows info messages to be
+                            propagated, giving you more information about the state of the process.
         :param config: Provide a Config Object that is already instantiated.
         :param config_path: Load config from user specified path otherwise use default path.
         :param retain_config: if config should be written to file in regular intervals
@@ -226,7 +231,7 @@ class FastDifPy(FastDiffPyBase):
             obj.verify_dir_content()
         return obj
 
-    def __init__(self, debug: bool = False):
+    def __init__(self, debug: bool = False, progress: bool = True):
         """
         Skeleton init function. Main logic of init function is supposed to happen in `init_new` and
         `init_preexisting_config`
@@ -236,7 +241,13 @@ class FastDifPy(FastDiffPyBase):
 
         super().__init__()
 
-        csl_lvl = logging.DEBUG if debug else logging.WARNING
+        if debug:
+            csl_lvl = logging.DEBUG
+        elif progress:
+            csl_lvl = logging.INFO
+        else:
+            csl_lvl = logging.WARNING
+
         self.prepare_logging(console_level=csl_lvl, debug=debug)
 
 
