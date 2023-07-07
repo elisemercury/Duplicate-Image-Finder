@@ -13,6 +13,14 @@ def test_existing_config() -> bool:
     return os.path.exists(os.path.join(os.path.dirname(__file__), "task.json"))
 
 
+def remove_existing_config():
+    """
+    Removes a preexisting config. Needed because config path is relative to file.
+    :return:
+    """
+    if test_existing_config():
+        os.remove(os.path.join(os.path.dirname(__file__), "task.json"))
+
 class FastDiffPyConfig:
     cfg_path: str
     update_timeout: int = 30
