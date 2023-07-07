@@ -12,7 +12,7 @@ import threading as th
 from src.fast_diff_py.datatransfer import *
 from concurrent.futures import ProcessPoolExecutor
 from src.fast_diff_py.sql_database import SQLiteDatabase
-from src.fast_diff_py.config import FastDiffPyConfig, test_existing_config
+from src.fast_diff_py.config import FastDiffPyConfig, test_existing_config, remove_existing_config
 from src.fast_diff_py.fast_diff_base import FastDiffPyBase
 from src.fast_diff_py.child_processes import parallel_resize, parallel_compare, find_best_image
 from src.fast_diff_py.child_processes import first_loop_dequeue_worker, first_loop_enqueue_worker
