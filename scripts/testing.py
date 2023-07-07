@@ -66,7 +66,7 @@ def test_block():
     time.sleep(1)
     print("FS Should have had enough time to update.")
 
-    db = fd.FastDifPy(directory_a="/home/alisot2000/Desktop/SAMPLE_MIRA/ola/")
+    db = fd.FastDifPy.init_new(directory_a="/home/alisot2000/Desktop/SAMPLE_MIRA/ola/")
     db.index_the_dirs()
     db.estimate_disk_usage()
 
