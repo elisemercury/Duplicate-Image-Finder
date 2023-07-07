@@ -86,6 +86,7 @@ class FastDiffPyConfig:
             "verbose": False,
             "state": None,
             "retain_db": True,
+            "cli_args": None
         }
 
         if os.path.exists(self.cfg_path) and cfg is None:
@@ -432,3 +433,11 @@ class FastDiffPyConfig:
     @max_queue_size.setter
     def max_queue_size(self, value: int):
         self._task_dict["max_queue_size"] = value
+
+    @property
+    def cli_args(self):
+        return self._task_dict["cli_args"]
+
+    @cli_args.setter
+    def cli_args(self, value: dict):
+        self._task_dict["cli_args"] = value
