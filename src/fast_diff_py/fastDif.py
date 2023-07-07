@@ -120,7 +120,7 @@ class FastDifPy(FastDiffPyBase):
 
         # Testing for config existence
         if not disable_config_timeout:
-            if config_path is None and test_existing_config() or os.path.exists(config_path):
+            if (config_path is not None and os.path.exists(config_path)) or test_existing_config():
                 obj.logger.warning("Preexisting config will be overwritten!!!")
                 obj.logger.warning("You have 10s to stop the process if this is an error.")
                 time.sleep(10)
@@ -148,6 +148,7 @@ class FastDifPy(FastDiffPyBase):
 
         config.p_root_dir_b = directory_b
         config.p_root_dir_a = directory_a
+        obj.config = config
 
         # Creating default database if desired.
         if default_db:
@@ -156,7 +157,6 @@ class FastDifPy(FastDiffPyBase):
         config.ignore_paths = []
         config.ignore_names = []
 
-        obj.config = config
         obj.init_completed()
         return obj
 
