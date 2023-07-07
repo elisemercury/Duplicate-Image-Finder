@@ -191,7 +191,7 @@ class FastDifPy(FastDiffPyBase):
         :return: FastDiffPy
         """
 
-        obj = cls(debug=False)
+        obj = cls(debug=False, progress=progress)
 
         if config is not None:
             fdc = config
