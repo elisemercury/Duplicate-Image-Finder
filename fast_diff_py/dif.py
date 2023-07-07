@@ -92,19 +92,85 @@ if __name__ == "__main__":
     parser.add_argument("-D", "--silent_del", type=bool, help='(optional) Supresses the user confirmation when deleting images.', required=False, nargs='?', choices=[True, False], default=False)
     args = parser.parse_args()
 
+    warnings.warn("Show_progress does not have an effect but is left for compatibility with difpy")
+
+    use_existing = False
+    # verify first if there exists already a config that was in progress.
+    if fastDif.test_existing_config():
+        while True:
+            resp = input("A Config exists from a previous run - do you want to finish it first [y,n]")
+            if resp.lower() == "y":
+                print("Finishing previous run - your current input arguments will be ignored.")
+                use_existing = True
+            elif resp.lower() == "n":
+                print("Deleting previous config...")
+                fastDif.remove_existing_config()
+            else:
+                print(f"Unsupported response: {resp}, only y and n are allowed.")
+
     start = datetime.now()
-    fdp = fastDif.FastDifPy(directory_a=args.directory_A, directory_b=args.directory_B)
-    fdp.index_the_dirs()
-    fdp.first_loop_iteration()
-    fdp.second_loop_iteration(similarity_threshold=parse_similarity(args.similarity),
-                              make_diff_plots=args.show_output,
-                              diff_location=os.path.join(os.path.dirname(__file__), "diff_plots"))
-    results = fdp.build_loose_duplicate_cluster(parse_similarity(args.similarity))
+    if use_existing:
+        config = fastDif.FastDiffPyConfig()
+        print(f"Current progress is: {config.state}")
+
+        comparing_str = f"Comparing directory: {config.p_root_dir_a}"
+        if config.has_dir_b:
+            comparing_str += f"\nwith: {config.p_root_dir_b}"
+        else:
+            comparing_str += " with itself."
+        print(comparing_str)
+
+        fdp = fastDif.FastDifPy.init_preexisting_config(config=config)
+        if config.state is None:
+            print("Config empty, terminating.")
+            config.retain_config = False
+            fdp.clean_up(config=True, db=False, thumbs=False)
+            del config
+            exit(0)
+
+    else:
+        fdp = fastDif.FastDifPy.init_new(directory_a=args.directory_A, directory_b=args.directory_B)
+        fdp.config.thumbnail_size_x, fdp.config.thumbnail_size_y = args.px_size, args.px_size
+        fdp.config.cli_args = {
+            "directory_a": args.directory_A,
+            "directory_b": args.directory_B,
+            "output_directory": args.output_directory,
+            "similarity": parse_similarity(args.similarity),
+            "px_size": args.px_size,
+            "show_progress": args.show_progress,
+            "show_output": args.show_output,
+            "delete": args.delete,
+            "silent_del": args.silent_del,
+        }
+        fdp.config.write_to_file()
+
+    if fdp.config.state == "init":
+        if fdp.config.cli_args is None:
+            print("Config empty, terminating.")
+            fdp.config.retain_config = False
+            fdp.clean_up(config=True, db=False, thumbs=False)
+            del config
+            exit(0)
+
+        fdp.index_the_dirs()
+
+    if fdp.config.state == "indexed_dirs" or fdp.config.state == "first_loop_in_progress":
+        fdp.first_loop_iteration()
+
+    if fdp.config.state == "first_loop_done" or fdp.config.state=="second_loop_in_progress":
+        fdp.second_loop_iteration(
+            similarity_threshold=parse_similarity(fdp.config.cli_args["similarity"]),
+            make_diff_plots=fdp.config.cli_args["show_output"],
+            diff_location=os.path.join(os.path.dirname(__file__), "diff_plots")
+        )
+        print(f"Comparison images located at {os.path.join(os.path.dirname(__file__), 'diff_plots')}")
+
+    results = fdp.build_loose_duplicate_cluster(parse_similarity(fdp.config.cli_args["similarity"]))
     fdp.clean_up(thumbs=True, config=True, db=True)
     stop = datetime.now()
 
     delete = False
-    if not args.silent_del:
+    if not fdp.config.cli_args["silent_del"]:
         usr = input(
             "Are you sure you want to delete all lower resolution duplicate images? \nThis cannot be undone. (y/n)")
         if str(usr) == "y":
@@ -116,14 +182,14 @@ if __name__ == "__main__":
     a_count = fdp.db.get_dir_count(dir_a=True)
     b_count = fdp.db.get_dir_count(dir_a=False)
     if fdp.config.has_dir_b:
-        comps = a_count * b_count
+        comp = a_count * b_count
     else:
         comp = a_count * (a_count - 1) / 2
 
     low_quality = build_low_quality_and_delete(res=results, del_img=delete)
     sts = stats(dir_a=fdp.config.p_root_dir_a,
                 dir_b=fdp.config.p_root_dir_b,
-                similarity=args.similarity,
+                similarity=fdp.config.cli_args["similarity"],
                 start=start, end=stop,
                 total_found=len(results),
                 total_searched=comp)
@@ -134,8 +200,8 @@ if __name__ == "__main__":
     lq_file = "difPy_lower_quality_" + timestamp + ".txt"
     stats_file = "difPy_stats_" + timestamp + ".json"
 
-    if args.output_directory is not None:
-        t_dir = args.output_directory
+    if fdp.config.cli_args["output_directory"] is not None:
+        t_dir = fdp.config.cli_args["output_directory"]
     else:
         t_dir = os.getcwd()
 
