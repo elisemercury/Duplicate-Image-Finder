@@ -31,3 +31,7 @@ dependencies = [
 [project.optional-dependencies]
 gpu= ["cupy"]
 mariadb = ["mariadb"]
+
+[build-system]
+requires = ["setuptools>=43.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
