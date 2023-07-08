@@ -167,7 +167,7 @@ if __name__ == "__main__":
         )
         print(f"Comparison images located at {os.path.join(os.path.dirname(__file__), 'diff_plots')}")
 
-    results = fdp.build_loose_duplicate_cluster(parse_similarity(config.cli_args["similarity"]))
+    results, low_quality = fdp.get_duplicates(parse_similarity(config.cli_args["similarity"]))
     a_count = fdp.db.get_dir_count(dir_a=True)
     b_count = fdp.db.get_dir_count(dir_a=False)
     fdp.clean_up(thumbs=True, config=True, db=True)
