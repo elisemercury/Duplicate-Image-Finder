@@ -207,7 +207,11 @@ class FastDifPy(FastDiffPyBase):
 
         # Need to pass in verbose from top to set the verbose settings in the parent class as well.
         obj.config = fdc
-        obj.verbose = fdc.verbose
+
+        # Only set the verbose if it is True. Otherwise, the show_progress setting with console level = info will be
+        # overwritten.
+        if fdc.verbose:
+            obj.verbose = fdc.verbose
 
         # reconnecting database
         if fdc.database["type"] == "sqlite":
