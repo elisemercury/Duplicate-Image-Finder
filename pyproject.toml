@@ -1,0 +1,33 @@
+[project]
+name = "fast_diff_py"
+readme = "README.md"
+version = "0.2.0"
+description = "Multithreaded implementation of difpy with progress retention."
+requires-python = ">=3.8"
+license = {file = "LICENSE.txt"}
+keywords = ['python', 'image deduplicator', 'fast image deduplicator']
+authors = [
+    {name = "Alexander Sotoudeh", email="alisot200@gmail.com"},
+    {name = "Elise Landman"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    'Intended Audience :: Developers',
+    "Programming Language :: Python :: 3",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    'License :: OSI Approved :: MIT License',   # Again, pick a license
+    'Programming Language :: Python :: 3.8',
+  ]
+dependencies = [
+      "matplotlib",
+      "numpy",
+      "opencv-python",
+      "scikit-image",
+      "scipy",
+]
+
+[project.optional-dependencies]
+gpu= ["cupy"]
+mariadb = ["mariadb"]
