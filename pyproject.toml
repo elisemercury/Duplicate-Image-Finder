@@ -32,6 +32,9 @@ dependencies = [
 gpu= ["cupy"]
 mariadb = ["mariadb"]
 
+[project.scripts]
+dif = "fast_diff_py.dif:main"
+
 [build-system]
 requires = ["setuptools>=43.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
