@@ -212,6 +212,7 @@ class FastDifPy(FastDiffPyBase):
         if fdc.database["type"] == "sqlite":
             obj.db = SQLiteDatabase(path=fdc.database["path"])
         elif fdc.database["type"] == "mariadb":
+            from fast_diff_py.mariadb_database import MariaDBDatabase
             obj.db = MariaDBDatabase(
                 user=fdc.database["user"],
                 password=fdc.database["password"],
