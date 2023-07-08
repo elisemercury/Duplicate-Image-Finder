@@ -263,6 +263,7 @@ class FastDifPy(FastDiffPyBase):
         Adds handlers for sigint and sigterm
         :return:
         """
+        self.logger.info("Added handling for Interrupts")
         signal.signal(signal.SIGINT, self.sig_int)
         signal.signal(signal.SIGTERM, self.sig_int)
 
