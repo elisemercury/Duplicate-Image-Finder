@@ -121,6 +121,7 @@ if __name__ == "__main__":
         print(comparing_str)
 
         fdp = fastDif.FastDifPy.init_preexisting_config(config=config, progress=args.show_progress)
+        fdp.interrupt_handler()
         if config.state is None:
             print("Config empty, terminating.")
             config.retain_config = False
@@ -131,6 +132,7 @@ if __name__ == "__main__":
     else:
         fdp = fastDif.FastDifPy.init_new(directory_a=args.directory_A, directory_b=args.directory_B,
                                          progress=args.show_progress)
+        fdp.interrupt_handler()
         config = fdp.config
         config.thumbnail_size_x, config.thumbnail_size_y = args.px_size, args.px_size
         config.cli_args = {
