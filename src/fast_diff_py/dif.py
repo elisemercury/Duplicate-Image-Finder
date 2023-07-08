@@ -11,7 +11,7 @@ import time
 import argparse
 import json
 import warnings
-import fastDif
+import fast_diff_py.fastDif
 warnings.filterwarnings('ignore')
 
 
