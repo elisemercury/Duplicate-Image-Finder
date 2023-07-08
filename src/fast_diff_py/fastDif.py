@@ -267,7 +267,7 @@ class FastDifPy(FastDiffPyBase):
         signal.signal(signal.SIGINT, self.sig_int)
         signal.signal(signal.SIGTERM, self.sig_int)
 
-    def sig_int(self):
+    def sig_int(self, *args, **kwargs):
         """
         Handler to trigger the stopping of the loop functions.
         :return:
