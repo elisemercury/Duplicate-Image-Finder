@@ -1,7 +1,7 @@
 [project]
 name = "fast_diff_py"
 readme = "README.md"
-version = "0.2.1"
+version = "0.2.2"
 description = "Multithreaded implementation of difpy with progress retention."
 requires-python = ">=3.8"
 license = {file = "LICENSE.txt"}
