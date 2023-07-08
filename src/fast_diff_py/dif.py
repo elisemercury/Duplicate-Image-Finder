@@ -179,12 +179,13 @@ if __name__ == "__main__":
     a_count = fdp.db.get_dir_count(dir_a=True)
     b_count = fdp.db.get_dir_count(dir_a=False)
     fdp.clean_up(thumbs=True, config=True, db=True)
+    config.retain_config = False
     stop = datetime.now()
 
     delete = False
     if not config.cli_args["silent_del"]:
         usr = input(
-            "Are you sure you want to delete all lower resolution duplicate images? \nThis cannot be undone. (y/n)")
+            "Are you sure you want to delete all lower resolution duplicate images? \nThis cannot be undone. (y/n)\n")
         if str(usr) == "y":
             delete = True
         else:
