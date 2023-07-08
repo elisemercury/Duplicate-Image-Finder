@@ -75,6 +75,7 @@ class FastDifPy(FastDiffPyBase):
     debug_logger: logging.FileHandler = None
 
     loop_run: bool = False
+    stop_received: bool = False
     en_com_1: Union[None, con.Connection] = None
     de_com_1: Union[None, con.Connection] = None
 
@@ -273,6 +274,11 @@ class FastDifPy(FastDiffPyBase):
         :return:
         """
         self.loop_run = False
+
+        if self.stop_received:
+            exit(100)
+
+        self.stop_received = True
 
         if self.en_com_1 is not None:
             self.en_com_1.send(Messages.Stop)
