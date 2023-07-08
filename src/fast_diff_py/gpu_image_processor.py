@@ -1,7 +1,7 @@
 import cupy as cp
 from types import FunctionType
 import numpy as np
-from src.fast_diff_py.cpu_image_processor import CPUImageProcessing
+from fast_diff_py.cpu_image_processor import CPUImageProcessing
 
 
 squared_diff_generic = cp.ElementwiseKernel(

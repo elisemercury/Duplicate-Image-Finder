@@ -1,7 +1,7 @@
-from src.fast_diff_py.cpu_image_processor import CPUImageProcessing
-from src.fast_diff_py.fast_diff_base import FastDiffPyBase
-from src.fast_diff_py.datatransfer import PreprocessArguments, PreprocessResults, CompareImageArguments, CompareImageResults
-from src.fast_diff_py.datatransfer import Messages
+from fast_diff_py.cpu_image_processor import CPUImageProcessing
+from fast_diff_py.fast_diff_base import FastDiffPyBase
+from fast_diff_py.datatransfer import PreprocessArguments, PreprocessResults, CompareImageArguments, CompareImageResults
+from fast_diff_py.datatransfer import Messages
 import multiprocessing as mp
 from multiprocessing.connection import Connection
 import warnings

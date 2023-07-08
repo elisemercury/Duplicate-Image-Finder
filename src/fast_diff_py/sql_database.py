@@ -5,8 +5,8 @@ import base64
 import json
 from typing import Any, Union, List
 import datetime
-from src.fast_diff_py.database import Database
-from src.fast_diff_py.datatransfer import CompareImageResults
+from fast_diff_py.database import Database
+from fast_diff_py.datatransfer import CompareImageResults
 
 """
 Default implementation of the Database.

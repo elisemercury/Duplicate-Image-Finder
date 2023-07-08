@@ -1,10 +1,10 @@
-from src.fast_diff_py.database import Database
+from fast_diff_py.database import Database
 import os
 from typing import List, Tuple
 import multiprocessing as mp
 import queue
-from src.fast_diff_py.datatransfer import *
-from src.fast_diff_py.config import FastDiffPyConfig
+from fast_diff_py.datatransfer import *
+from fast_diff_py.config import FastDiffPyConfig
 
 class FastDiffPyBase:
     __db: Union[Database, None]
