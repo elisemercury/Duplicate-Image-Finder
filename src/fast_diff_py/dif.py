@@ -161,6 +161,9 @@ if __name__ == "__main__":
     if config.state == "indexed_dirs" or config.state == "first_loop_in_progress":
         fdp.first_loop_iteration()
 
+    if fdp.stop_received:
+        exit(0)
+
     if config.state == "first_loop_done" or config.state=="second_loop_in_progress":
         fdp.second_loop_iteration(
             similarity_threshold=parse_similarity(config.cli_args["similarity"]),
@@ -168,6 +171,9 @@ if __name__ == "__main__":
             diff_location=os.path.join(os.path.dirname(__file__), "diff_plots")
         )
         print(f"Comparison images located at {os.path.join(os.path.dirname(__file__), 'diff_plots')}")
+
+    if fdp.stop_received:
+        exit(0)
 
     results, low_quality = fdp.get_duplicates(parse_similarity(config.cli_args["similarity"]))
     a_count = fdp.db.get_dir_count(dir_a=True)
