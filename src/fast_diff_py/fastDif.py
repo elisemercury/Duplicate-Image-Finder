@@ -154,7 +154,7 @@ class FastDifPy(FastDiffPyBase):
 
         # Creating default database if desired.
         if default_db:
-            obj.db = SQLiteDatabase(path=os.path.join(config.p_root_dir_a, "diff.db"))
+            obj.db = SQLiteDatabase(path=os.path.join(config.p_root_dir_a, "diff.db"), purge=True)
 
         config.ignore_paths = []
         config.ignore_names = []
