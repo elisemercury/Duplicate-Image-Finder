@@ -6,6 +6,7 @@ import cv2
 from matplotlib import pyplot as plt
 import skimage
 from fast_diff_py.utils import *
+import copy
 
 
 # sample for the idiot I am.
@@ -268,6 +269,19 @@ class CPUImageProcessing:
             self.load_image(True)
         if load_b:
             self.load_image(False)
+
+    def preload_image(self, path: str) -> np.ndarray:
+        """
+        Preload an image and returns the matrix. This function is used for the ram_cache.
+
+        :param path: path to the image to preload
+        """
+        img, err, resize = self.__image_loader(path, "Ram Preloader")
+
+        if err != "" or resize:
+            return None
+
+        return  img
 
     def load_image(self, image_a: bool = True, perform_resize: bool = True):
         """
