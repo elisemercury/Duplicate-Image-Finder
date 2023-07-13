@@ -85,8 +85,9 @@ class CPUImageProcessing:
     error: str = None
 
     compare_func = None
+    ram_storage: dict = None
 
-    def __init__(self, identifier: int, comp: FunctionType = None):
+    def __init__(self, identifier: int, comp: FunctionType = None, ram_storage: dict = None):
         """
         Identifier provided by the parent process. Used to identify the process in the console.
 
@@ -96,12 +97,14 @@ class CPUImageProcessing:
 
         :param identifier: process id (not pid)
         :param comp: comparison function to use. If none is provided, the default is used.
+        :param ram_storage: dictionary to try and fetch thumbnails from.
         """
         self.identifier = identifier
         if comp is not None:
             self.compare_func = comp
         else:
             self.compare_func = self.mse
+        self.ram_storage = ram_storage
 
     def reset(self):
         """
