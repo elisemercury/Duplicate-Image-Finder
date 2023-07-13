@@ -86,7 +86,8 @@ class FastDiffPyConfig:
             "verbose": False,
             "state": None,
             "retain_db": True,
-            "cli_args": None
+            "cli_args": None,
+            "ram_cache": True,
         }
 
         if os.path.exists(self.cfg_path) and cfg is None:
@@ -441,3 +442,11 @@ class FastDiffPyConfig:
     @cli_args.setter
     def cli_args(self, value: dict):
         self._task_dict["cli_args"] = value
+
+    @property
+    def ram_cache(self) -> bool:
+        return self._task_dict["ram_cache"]
+
+    @ram_cache.setter
+    def ram_cache(self, value: bool):
+        self._task_dict["ram_cache"] = value
