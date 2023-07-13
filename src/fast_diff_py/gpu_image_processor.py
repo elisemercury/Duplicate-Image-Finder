@@ -34,7 +34,7 @@ class GPUImageProcessing(CPUImageProcessing):
     class.
     """
 
-    def __init__(self, identifier: int, comp: FunctionType = None):
+    def __init__(self, identifier: int, comp: FunctionType = None, ram_storage: dict = None):
         """
         Identifier provided by the parent process. Used to identify the process in the console.
 
@@ -44,8 +44,9 @@ class GPUImageProcessing(CPUImageProcessing):
 
         :param identifier: process id (not pid)
         :param comp: comparison function to use. If none is provided, the default is used.
+        :param ram_storage: dictionary to try and fetch thumbnails from.
         """
-        super().__init__(identifier, comp)
+        super().__init__(identifier, comp, ram_storage)
 
     @staticmethod
     def mse(image_a: np.ndarray, image_b: np.ndarray) -> float:
