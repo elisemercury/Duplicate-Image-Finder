@@ -510,7 +510,7 @@ class SQLiteDatabase(SQLBase):
         self.debug_execute("CREATE TABLE thumb ( "
                            "key INTEGER PRIMARY KEY, "
                            "filename TEXT , "
-                           "dir_b INTEGER DEFAULT 0 CHECK (dir_b >= 0 AND dir_b <= 1),"
+                           "dir_b INTEGER DEFAULT 0 CHECK dir_b IN (0, 1),"
                            "UNIQUE (filename, dir_b)  )")
 
     def test_thumb_table_existence(self):
