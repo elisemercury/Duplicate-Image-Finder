@@ -17,6 +17,7 @@ from fast_diff_py.fast_diff_base import FastDiffPyBase
 from fast_diff_py.child_processes import parallel_resize, parallel_compare, find_best_image
 from fast_diff_py.child_processes import first_loop_dequeue_worker, first_loop_enqueue_worker
 from fast_diff_py.child_processes import second_loop_dequeue_worker, second_loop_enqueue_worker
+from fast_diff_py.cpu_image_processor import CPUImageProcessing
 import logging
 import signal
 
@@ -775,6 +776,12 @@ class FastDifPy(FastDiffPyBase):
         self.config.sl_matching_hash = only_matching_hash
         self.config.similarity_threshold = float(similarity_threshold)
         self.config.state = "second_loop_in_progress"
+        ran_cache = None
+
+        # Prepare ram cache
+        if self.config.ram_cache and self.config.fl_compute_thumbnails:
+            ram_cache = {}
+            self.fill_ram_rache(ram_cache=ram_cache)
 
         # Short circuit if there are no images in the database.
         if not self.config.enough_images_to_compare:
@@ -820,10 +827,11 @@ class FastDifPy(FastDiffPyBase):
                                        for _ in range(self.config.sl_gpu_proc + self.config.sl_cpu_proc)]
 
         child_args = [(self.second_loop_in if self.config.less_optimized else self.second_loop_in[i],
-                       self.second_loop_out, i, i >= self.config.sl_cpu_proc ,
+                       self.second_loop_out, i, i >= self.config.sl_cpu_proc,
                        False,
                        False,
-                       self.verbose)
+                       self.verbose,
+                       ram_cache)
                           for i in range(self.config.sl_gpu_proc + self.config.sl_cpu_proc)]
 
         # prefill
