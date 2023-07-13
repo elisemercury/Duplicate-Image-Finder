@@ -301,6 +301,15 @@ class CPUImageProcessing:
             thumbnail_path = self.thumb_a_path
 
         if thumbnail_path is not None and os.path.exists(thumbnail_path):
+            # Try to load from ram first.
+            success, img = self.__load_from_ram(img_path=thumbnail_path)
+            if success:
+                if image_a:
+                    self.image_a_matrix = img
+                else:
+                    self.image_b_matrix = img
+                return
+
             result, err_str, rescale = self.__image_loader(thumbnail_path, f"{source} thumbnail")
 
             # The thumbnail size matches and no error occurred while loading it. Storing the result and returning.
@@ -407,6 +416,20 @@ class CPUImageProcessing:
 
         # Nothing selected, don't return anything.
         return None
+
+    def __load_from_ram(self, img_path: str):
+        """
+        Provided, the image is in the RAM, load it from there.
+        """
+        if self.ram_storage is None:
+            return False, None
+
+        img = self.ram_storage.get(img_path)
+        assert type(img) is np.ndarray, "The image was not loaded from the RAM correctly."
+        if img.shape[0] != self.target_size_x or img.shape[1] != self.target_size_y:
+            return False, None
+
+        return True, copy.deepcopy(img)
 
     def __image_loader(self, img_path: str, source: str) -> Tuple[Union[np.ndarray, None], str, bool]:
         """
