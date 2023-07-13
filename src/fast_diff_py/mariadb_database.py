@@ -493,12 +493,12 @@ class MariaDBDatabase(SQLBase):
         free = False
 
         name, ext = os.path.splitext(file_name)
-        thumb_name = f"{name}_thumb_{index:03}{ext}"
+        thumb_name = f"{name}_thumb_{index:03}.png"
 
         while not free:
             if self.thumb_name_exists(thumb_name, dir_a):
                 index += 1
-                thumb_name = f"{name}_thumb_{index:03}{ext}"
+                thumb_name = f"{name}_thumb_{index:03}.png"
             else:
                 break
 

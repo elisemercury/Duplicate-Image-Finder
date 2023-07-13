@@ -205,6 +205,12 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
+    def get_many_thumbnail_names(self, start_key: int = None, count: int = 1000) -> List[dict]:
+        """
+        Fetches paths of thumbnails and starting from the starting key. The maximum number of results is count.
+        """
+        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
+
     # ------------------------------------------------------------------------------------------------------------------
     # PLOT TABLE
     # ------------------------------------------------------------------------------------------------------------------
