@@ -143,7 +143,7 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
 
 
 def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy: bool,
-                     sc_size: bool = False, sc_hash: bool = False, verbose: bool = False) -> bool:
+                     sc_size: bool = False, sc_hash: bool = False, verbose: bool = False, ram_cache: dict = None) -> bool:
     """
     Parallel implementation of first loop iteration.
 
@@ -154,6 +154,8 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
     :param try_cupy: check if cupy is available and use cupy instead.
     :param sc_size: Perform short_circuiting logic with image size
     :param sc_hash: Perform shirt_circuiting logic with image hashes.
+    :param ram_cache: ram cache to use for image loading.
+
     :return: True, running was successful and no error encountered, otherwise exit without return or return False
     """
     timeout = 0
@@ -169,9 +171,9 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
 
     if cupy_avail:
         from src.fast_diff_py.gpu_image_processor import GPUImageProcessing
-        processor = GPUImageProcessing(identifier=identifier)
+        processor = GPUImageProcessing(identifier=identifier, ram_storage=ram_cache)
     else:
-        processor = CPUImageProcessing(identifier=identifier)
+        processor = CPUImageProcessing(identifier=identifier, ram_storage=ram_cache)
 
     # stay awake for 60s, otherwise kill
     while timeout < 60:
