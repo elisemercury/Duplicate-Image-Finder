@@ -1220,6 +1220,43 @@ class FastDifPy(FastDiffPyBase):
 
         return error, all_error, exited, all_exited
 
+    def fill_ram_rache(self, ram_cache: dict, bulk_size: int = 10000):
+        """
+        Function fills the ram cache with the thumbnails. Fetches up to bulk_size images from the database at a time.
+
+        :param ram_cache: ram cache to fill
+        :param bulk_size: number of rows to be fetched at a time
+        :return:
+        """
+        if not self.config.fl_compute_thumbnails:
+            return
+
+        # Create a ImageProcessor object to load the images
+        processor = CPUImageProcessing(identifier=-1)
+        processor.target_size_x = self.config.thumbnail_size_x
+        processor.target_size_y = self.config.thumbnail_size_y
+        start_key = None
+
+        while True:
+            # Fetch the rows from the database
+            rows = self.db.get_many_thumbnail_names(start_key=start_key, count=bulk_size)
+
+            if len(rows) == 0:
+                return
+
+            for row in rows:
+                # Prepare the path to the thumbnail
+                thumb_dir = self.config.thumb_dir_b if row["dir_b"] else self.config.thumb_dir_b
+                thumb_path = os.path.join(thumb_dir, row["filename"])
+
+                # Load the image and store it in the ram cache
+                img_mat = processor.preload_image(thumb_path)
+                ram_cache[thumb_path] = img_mat
+
+            start_key = rows[-1]["key"]
+
+
+
     # ==================================================================================================================
     # DATA RETRIEVAL FUNCTIONS
     # ==================================================================================================================
