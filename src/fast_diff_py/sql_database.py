@@ -593,6 +593,28 @@ class SQLiteDatabase(SQLBase):
         self.debug_execute(f"SELECT * FROM thumb WHERE filename IS '{thumb_name}' AND dir_b = {0 if dir_a else 1}")
         return self.cur.fetchone() is not None
 
+    def get_many_thumbnail_names(self, start_key: int = None, count: int = 1000) -> List[dict]:
+        """
+        Fetches paths of thumbnails and starting from the starting key. The maximum number of results is count.
+
+        :param start_key: Starting key.
+        :param count: Number of Results to be returned at maximum.
+
+        :return: List of dict {'key': key in table, 'filename': filename of thumb, 'dir_b': if it's from dir_B.
+        """
+        # fetching from the beginning
+        if start_key is None:
+            self.debug_execute(f"SELECT key, filename, dir_b FROM thumb ORDER BY key ASC")
+            return self.cur.fetchmany(count)
+
+        # fetching from starting key.
+        self.debug_execute(f"SELECT key, filename, dir_b FROM thumb WHERE key > {start_key} ORDER BY key ASC")
+
+        results = self.cur.fetchmany(count)
+        ret_val = [{"key": row[0], "filename": row[1], "dir_b": row[2]} for row in results]
+
+        return ret_val
+
     # ------------------------------------------------------------------------------------------------------------------
     # PLOT TABLE
     # ------------------------------------------------------------------------------------------------------------------
