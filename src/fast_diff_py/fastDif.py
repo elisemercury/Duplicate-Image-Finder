@@ -53,7 +53,6 @@ Features:
 #  processed. => Wont allow for smart algo for increment => for very large datasets. (Maybe with check?)
 
 
-
 class FastDifPy(FastDiffPyBase):
     # relative to child processes
     first_loop_in: mp.Queue = None  # the tasks sent to the child processes
