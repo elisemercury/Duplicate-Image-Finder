@@ -29,7 +29,6 @@ class FastDiffPyBase:
             # workers.
             self.config.retain_config = False
 
-
     @property
     def db(self):
         return self.__db
