@@ -547,6 +547,17 @@ class MariaDBDatabase(SQLBase):
 
         return ret_val
 
+    def get_count_of_thumbnails(self) -> int:
+        """
+        Get the number of thumbnails in the database.
+
+        :return:
+        """
+        self.debug_execute(f"SELECT COUNT(key) FROM {self.thumbnail_table}")
+        row = self.cur.fetchone()
+        return row[0]
+
+
     # ------------------------------------------------------------------------------------------------------------------
     # PLOT TABLE
     # ------------------------------------------------------------------------------------------------------------------

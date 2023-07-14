@@ -211,6 +211,12 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
+    def get_count_of_thumbnails(self) -> int:
+        """
+        Returns the number of thumbnails total created. Caching
+        """
+        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
+
     # ------------------------------------------------------------------------------------------------------------------
     # PLOT TABLE
     # ------------------------------------------------------------------------------------------------------------------
