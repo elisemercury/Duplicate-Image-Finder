@@ -1246,7 +1246,7 @@ class FastDifPy(FastDiffPyBase):
 
             for row in rows:
                 # Prepare the path to the thumbnail
-                thumb_dir = self.config.thumb_dir_b if row["dir_b"] else self.config.thumb_dir_b
+                thumb_dir = self.config.thumb_dir_b if row["dir_b"] else self.config.thumb_dir_a
                 thumb_path = os.path.join(thumb_dir, row["filename"])
 
                 # Load the image and store it in the ram cache
