@@ -1248,7 +1248,7 @@ class FastDifPy(FastDiffPyBase):
             rows = self.db.get_many_thumbnail_names(start_key=start_key, count=bulk_size)
 
             if len(rows) == 0:
-                return
+                break
 
             for row in rows:
                 # Prepare the path to the thumbnail
