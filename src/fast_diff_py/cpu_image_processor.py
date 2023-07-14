@@ -60,6 +60,9 @@ class CPUImageProcessing:
     thumb_a_path: Union[str, None] = None
     thumb_b_path: Union[str, None] = None
 
+    thumb_a_key: Union[int, None] = None
+    thumb_b_key: Union[int, None] = None
+
     image_a_matrix: Union[np.ndarray, None] = None
     image_b_matrix: Union[np.ndarray, None] = None
 
@@ -119,6 +122,9 @@ class CPUImageProcessing:
 
         self.thumb_a_path = None
         self.thumb_b_path = None
+
+        self.thumb_a_key = None
+        self.thumb_b_key = None
 
         self.image_a_matrix = None
         self.image_b_matrix = None
@@ -243,16 +249,18 @@ class CPUImageProcessing:
             self.reset()
 
         # reload Image A if thumb or image has changed
-        if self.image_a_path != args.img_a or self.thumb_a_path != args.thumb_a:
+        if self.image_a_path != args.img_a or self.thumb_a_path != args.thumb_a or self.thumb_a_key != args.key_a:
             self.image_a_path = args.img_a
             self.thumb_a_path = args.thumb_a
+            self.thumb_a_key = args.key_a
             self.image_a_matrix = None
             load_a = True
 
         # reload Image B if thumb or image has changed
-        if self.image_b_path != args.img_b or self.thumb_b_path != args.thumb_b:
+        if self.image_b_path != args.img_b or self.thumb_b_path != args.thumb_b or self.thumb_b_key != args.key_b:
             self.image_b_path = args.img_b
             self.thumb_b_path = args.thumb_b
+            self.thumb_b_key = args.key_b
             self.image_b_matrix = None
             load_b = True
 
@@ -291,6 +299,9 @@ class CPUImageProcessing:
         :param perform_resize: automatically resize image if they don't match the size.
         :return:
         """
+        if self.__load_from_ram(image_a):
+            return
+
         source = "image_a" if image_a else "image_b"
         image_path = self.image_b_path
         thumbnail_path = self.thumb_b_path
@@ -301,15 +312,6 @@ class CPUImageProcessing:
             thumbnail_path = self.thumb_a_path
 
         if thumbnail_path is not None and os.path.exists(thumbnail_path):
-            # Try to load from ram first.
-            success, img = self.__load_from_ram(img_path=thumbnail_path)
-            if success:
-                if image_a:
-                    self.image_a_matrix = img
-                else:
-                    self.image_b_matrix = img
-                return
-
             result, err_str, rescale = self.__image_loader(thumbnail_path, f"{source} thumbnail")
 
             # The thumbnail size matches and no error occurred while loading it. Storing the result and returning.
@@ -417,19 +419,30 @@ class CPUImageProcessing:
         # Nothing selected, don't return anything.
         return None
 
-    def __load_from_ram(self, img_path: str):
+    def __load_from_ram(self, image_a: bool) -> bool:
         """
         Provided, the image is in the RAM, load it from there.
         """
         if self.ram_storage is None:
-            return False, None
+            return False
 
-        img = self.ram_storage.get(img_path)
+        key = self.thumb_a_key if image_a else self.thumb_b_key
+
+        if not self.ram_storage["valid"][key]:
+            return False
+
+        img = self.ram_storage["images"][key]
+
         assert type(img) is np.ndarray, "The image was not loaded from the RAM correctly."
         if img.shape[0] != self.target_size_x or img.shape[1] != self.target_size_y:
-            return False, None
+            return False
 
-        return True, copy.deepcopy(img)
+        if image_a:
+            self.image_a_matrix = copy.deepcopy(img)
+        else:
+            self.image_b_matrix = copy.deepcopy(img)
+
+        return True
 
     def __image_loader(self, img_path: str, source: str) -> Tuple[Union[np.ndarray, None], str, bool]:
         """
@@ -462,7 +475,7 @@ class CPUImageProcessing:
         img = img[..., 0:3]
 
         # if one aspect is not matching, rescale the image
-        scale = img.shape[0] != self.target_size_x or img.shape[1] != self.target_size_y
+        scale = img.shape[1] != self.target_size_x or img.shape[0] != self.target_size_y
         return img, "", scale
 
     def store_image(self, img_a: bool = True):
