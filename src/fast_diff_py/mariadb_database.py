@@ -534,8 +534,10 @@ class MariaDBDatabase(SQLBase):
         # fetching from the beginning
         if start_key is None:
             self.debug_execute(f"SELECT `key`, filename, dir_b FROM {self.thumbnail_table} ORDER BY key ASC")
-            return self.cur.fetchmany(count)
+            results = self.cur.fetchmany(count)
+            ret_val = [{"key": row[0], "filename": row[1], "dir_b": row[2]} for row in results]
 
+            return ret_val
         # fetching from starting key.
         self.debug_execute(f"SELECT `key`, filename, dir_b FROM {self.thumbnail_table} WHERE key > {start_key} "
                            f"ORDER BY key ASC")
