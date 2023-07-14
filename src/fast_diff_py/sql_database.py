@@ -605,8 +605,10 @@ class SQLiteDatabase(SQLBase):
         # fetching from the beginning
         if start_key is None:
             self.debug_execute(f"SELECT key, filename, dir_b FROM thumb ORDER BY key ASC")
-            return self.cur.fetchmany(count)
+            results = self.cur.fetchmany(count)
+            ret_val = [{"key": row[0], "filename": row[1], "dir_b": row[2]} for row in results]
 
+            return ret_val
         # fetching from starting key.
         self.debug_execute(f"SELECT key, filename, dir_b FROM thumb WHERE key > {start_key} ORDER BY key ASC")
 
