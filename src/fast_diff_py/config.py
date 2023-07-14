@@ -450,3 +450,13 @@ class FastDiffPyConfig:
     @ram_cache.setter
     def ram_cache(self, value: bool):
         self._task_dict["ram_cache"] = value
+
+    @property
+    def max_allowed_ram_usage(self) -> int:
+        return self._task_dict["max_allowed_ram_usage"]
+
+    @max_allowed_ram_usage.setter
+    def max_allowed_ram_usage(self, value: int):
+        if value < 0 or value > 100:
+            raise ValueError("max_allowed_ram_usage must be between 0 and 100")
+        self._task_dict["max_allowed_ram_usage"] = value
