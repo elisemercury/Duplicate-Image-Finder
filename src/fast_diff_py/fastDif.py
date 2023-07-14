@@ -776,7 +776,7 @@ class FastDifPy(FastDiffPyBase):
         self.config.sl_matching_hash = only_matching_hash
         self.config.similarity_threshold = float(similarity_threshold)
         self.config.state = "second_loop_in_progress"
-        ran_cache = None
+        ram_cache = None
 
         # Prepare ram cache
         if self.config.ram_cache and self.config.fl_compute_thumbnails:
