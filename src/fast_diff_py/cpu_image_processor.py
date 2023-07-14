@@ -159,7 +159,7 @@ class CPUImageProcessing:
         :param load: if the image should be loaded after updating the args through the update function.
         :return:
         """
-        self.preprocessing_args = args
+        self.last_args = self.preprocessing_args = args
         self.error = ""
 
         if self.last_args is CompareImageArguments:
@@ -233,7 +233,7 @@ class CPUImageProcessing:
         :param args: new CompareImageArguments object to process
         :return:
         """
-        self.processing_args = args
+        self.last_args = self.processing_args = args
         self.error = ""
         load_a = False
         load_b = False
