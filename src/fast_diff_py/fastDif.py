@@ -5,6 +5,8 @@ import time
 import os
 from typing import List, Tuple, Dict
 from types import FunctionType
+import numpy as np
+
 from fast_diff_py.utils import *
 import multiprocessing as mp
 import multiprocessing.connection as con
@@ -1231,6 +1233,10 @@ class FastDifPy(FastDiffPyBase):
         if not self.config.fl_compute_thumbnails:
             return
 
+        count = self.db.get_count_of_thumbnails() + 1
+        valid = np.array([True] * count)
+        cache = np.ndarray(shape=(count, self.config.thumbnail_size_y, self.config.thumbnail_size_x, 3), dtype=np.uint8)
+
         # Create a ImageProcessor object to load the images
         processor = CPUImageProcessing(identifier=-1)
         processor.target_size_x = self.config.thumbnail_size_x
@@ -1251,11 +1257,15 @@ class FastDifPy(FastDiffPyBase):
 
                 # Load the image and store it in the ram cache
                 img_mat = processor.preload_image(thumb_path)
-                ram_cache[thumb_path] = img_mat
+                if img_mat is None:
+                    valid[row["key"]] = False
+                    continue
+                cache[row["key"]] = img_mat
 
             start_key = rows[-1]["key"]
 
-
+        ram_cache["valid"] = valid
+        ram_cache["images"] = cache
 
     # ==================================================================================================================
     # DATA RETRIEVAL FUNCTIONS
