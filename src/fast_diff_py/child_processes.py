@@ -1,3 +1,4 @@
+import time
 from fast_diff_py.cpu_image_processor import CPUImageProcessing
 from fast_diff_py.fast_diff_base import FastDiffPyBase
 from fast_diff_py.datatransfer import PreprocessArguments, PreprocessResults, CompareImageArguments, CompareImageResults
@@ -120,8 +121,15 @@ def parallel_resize(iq: mp.Queue, output: mp.Queue, identifier: int, try_cupy: b
             args_str = iq.get(timeout=1)
         except queue.Empty:
             timeout += 1
-            # print(f"{identifier:03} Timeout Parallel Resize")
+            print(f"{identifier:03} Timeout Parallel Resize")
             continue
+        # try:
+        #     args_str = iq.get(block=False)
+        # except queue.Empty:
+        #     timeout += 1
+        #     time.sleep(1)
+        #     print(f"{identifier:03} Timeout Parallel Resize")
+        #     continue
 
         if args_str is None:
             # print(f"{identifier:03} Terminating Parallel Resize")
@@ -183,6 +191,13 @@ def parallel_compare(in_q: mp.Queue, out_q: mp.Queue, identifier: int, try_cupy:
             print(f"{identifier:03} Timeout Parallel Compare")
             timeout += 1
             continue
+        # try:
+        #     args_str = in_q.get(block=False)
+        # except queue.Empty:
+        #     time.sleep(1)
+        #     print(f"{identifier:03} Timeout Parallel Compare")
+        #     timeout += 1
+        #     continue
 
         if args_str is None:
             print(f"{identifier:03} Terminating Parallel Compare")
