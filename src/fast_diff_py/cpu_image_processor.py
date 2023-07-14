@@ -270,7 +270,7 @@ class CPUImageProcessing:
         if load_b:
             self.load_image(False)
 
-    def preload_image(self, path: str) -> np.ndarray:
+    def preload_image(self, path: str) -> Union[np.ndarray, None]:
         """
         Preload an image and returns the matrix. This function is used for the ram_cache.
 
@@ -281,7 +281,7 @@ class CPUImageProcessing:
         if err != "" or resize:
             return None
 
-        return  img
+        return img
 
     def load_image(self, image_a: bool = True, perform_resize: bool = True):
         """
