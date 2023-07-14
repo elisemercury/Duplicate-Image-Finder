@@ -1043,6 +1043,8 @@ class SQLiteDatabase(SQLBase):
         :return:
         """
         if self.cur is None and self.con is None:
+            if self.path == ":memory:":
+                return
             os.remove(self.path)
 
     def prepare_logging(self):
