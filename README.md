@@ -60,6 +60,9 @@ For larger datasets `MariaDB` _might_ be faster, but I stopped testing since I f
 - `sl_base_a`: If the fixed images are coming from directory a (should not be touched)
 - `sl_use_workers`: If an enqueue and dequeue worker should be used instead of having the main process handle it. (Requires Thread Safe DB.
 - `sl_use_special_b_algo`: If a different algorithm for the fixed images should be used for the second loop if we have a directory b (causes a slight speed up by reusing processes at the end of the loop.)
+- `cli_args`: Used for the storage of the command line arguments, used for progress recovery. (should not be touched)
+- `ram_cache`: Preload all images into RAM after they have been shrunken down. On most modern systems with ~16Gb of RAM, and 64x64 thumbnail size and < 500k images should fit into ram. This speeds up the second loop. 
+- `max_allowed_ram_usage` Maximum amount of RAM usage before the library automatically chooses to switch to no ram cache and sql db. (Currently not implemented.)
 
 ### Example
 ```python
