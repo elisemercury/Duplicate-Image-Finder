@@ -89,6 +89,7 @@ class FastDiffPyConfig:
             "retain_db": True,
             "cli_args": None,
             "ram_cache": True,
+            "max_allowed_ram_usage": 50,
         }
 
         if os.path.exists(self.cfg_path) and cfg is None:
