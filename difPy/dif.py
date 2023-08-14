@@ -117,37 +117,38 @@ class dif:
         lower_quality = _search._lower_quality(result)
         return result, lower_quality, total_count, duplicate_count, similar_count, invalid_files, skipped_files
 
-    def _generate_stats(self, start_time, end_time, time_elapsed, total_searched, duplicate_count, similar_count, invalid_files, deleted_files, skipped_files):
+    def _generate_stats(self, **kwargs):
         '''Generates stats of the difPy process.
         '''
         if self.logs:
-            invalid_stats = {'count': len(invalid_files),
-                             'logs': invalid_files}
-            deleted_stats = {'count': len(deleted_files), 
-                             'logs': deleted_files}
-            skipped_stats = {'count': len(skipped_files), 
-                             'logs': skipped_files}
+            invalid_stats = {'count': len(kwargs['invalid_files']),
+                             'logs': kwargs['invalid_files']}
+            deleted_stats = {'count': len(kwargs['deleted_files']), 
+                             'logs': kwargs['deleted_files']}
+            skipped_stats = {'count': len(kwargs['skipped_files']), 
+                             'logs': kwargs['skipped_files']}
         else:
-            invalid_stats = {'count': len(invalid_files)}
-            deleted_stats = {'count': len(deleted_files)}
-            skipped_stats = {'count': len(skipped_files)}
+            invalid_stats = {'count': len(kwargs['invalid_files'])}
+            deleted_stats = {'count': len(kwargs['deleted_files'])}
+            skipped_stats = {'count': len(kwargs['skipped_files'])}
              
         stats = {'directory': self.directory,
-                 'duration': {'start_date': time.strftime('%Y-%m-%d', start_time),
-                              'start_time': time.strftime('%H:%M:%S', start_time),
-                              'end_date': time.strftime('%Y-%m-%d', end_time),
-                              'end_time': time.strftime('%H:%M:%S', end_time),
-                              'seconds_elapsed': time_elapsed},
+                 'duration': {'start_date': time.strftime('%Y-%m-%d', kwargs['start_time']),
+                              'start_time': time.strftime('%H:%M:%S', kwargs['start_time']),
+                              'end_date': time.strftime('%Y-%m-%d', kwargs['end_time']),
+                              'end_time': time.strftime('%H:%M:%S', kwargs['end_time']),
+                              'seconds_elapsed': kwargs['time_elapsed']},
                  'fast_search': self.fast_search,
                  'recursive': self.recursive,
                  'match_mse': self.similarity,
                  'px_size': self.px_size,
-                 'files_searched': total_searched,
-                 'matches_found': {'duplicates': duplicate_count,
-                                   'similar': similar_count},
+                 'files_searched': kwargs['total_searched'],
+                 'matches_found': {'duplicates': kwargs['duplicate_count'],
+                                   'similar': kwargs['similar_count']},
                  'invalid_files': invalid_stats,
                  'deleted_files': deleted_stats,
                  'skipped_files': skipped_stats
+                 # TODO change to kwargs
                  }
         return stats
 
@@ -156,6 +157,7 @@ class _validate:
     A class used to validate difPy input parameters.
     '''
     def _directory_type(directory):
+        # Function that ouputs the directory 
         if len(directory) == 0:
             raise ValueError('Invalid directory parameter: no directory provided.')
         if all(isinstance(dir, list) for dir in directory):
@@ -245,7 +247,9 @@ class _validate:
             if not move_to == None:
                 raise Exception('Invalid value for "move_to" parameter: must be of type str or "None"')
         else:
-            _validate._directory_exist([move_to])
+            dir = Path(move_to)
+            if not os.path.isdir(dir):
+                raise FileNotFoundError(f'Directory "{str(dir)}" does not exist')
         return move_to
 
     def _delete(delete, silent_del):
