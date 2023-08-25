@@ -3,13 +3,14 @@ difPy - Python package for finding duplicate or similar images within folders
 https://github.com/elisemercury/Duplicate-Image-Finder
 '''
 from glob import glob
-import matplotlib.pyplot as plt
+from matplotlib.pyplot import figure, suptitle, imshow, axis, show as plt
 import uuid
 import numpy as np
 from PIL import Image
 from distutils.util import strtobool
 import os
-import time
+#from time import time, strftime, localtime
+from datetime import datetime
 from pathlib import Path
 import argparse
 import json
@@ -50,10 +51,8 @@ class dif:
         logs : bool, optional
             Enable log collection for invalid files in stats output    
         '''
-        self.directory = _validate._directory_type(directory)
-        _validate._directory_exist(self.directory)
-        _validate._directory_unique(self.directory)
-        self.directory = sorted(self.directory)
+        # Validate input parameters
+        self.directory = _validate._directory(directory)
         self.recursive = _validate._recursive(recursive)
         self.limit_extensions = _validate._limit_extensions(limit_extensions)
         self.similarity = _validate._similarity(similarity)
@@ -64,37 +63,27 @@ class dif:
         self.move_to = _validate._move_to(move_to)
         self.delete, self.silent_del = _validate._delete(delete, silent_del)
         self.logs = _validate._logs(logs)
-        start_time = time.time()
 
-        self.result, self.lower_quality, total_count, duplicate_count, similar_count, invalid_files, skipped_files = dif._run(self)  # run algorithm
+        # Start timer
+        start_time = datetime.now()
 
-        deleted_files = []
-        if duplicate_count + similar_count != 0:
-            if self.move_to != None:
-                self.lower_quality = _help._move_imgs(self.lower_quality, self.move_to)
-            elif self.delete:
-                if len(self.lower_quality) != 0:
-                    deleted_files = _help._delete_imgs(set(self.lower_quality), silent_del=self.silent_del)
+        # Run difpy algortihm
+        self.result, self.lower_quality, total_count, duplicate_count, similar_count, invalid_files, skipped_files, deleted_files = self._run()
+        
+        # End timer
+        end_time = datetime.now()
+        time_elapsed = np.round((end_time - start_time).total_seconds(), 4)
 
-        end_time = time.time()
-        time_elapsed = np.round(end_time - start_time, 4)
-
+        # Print depending on similarity parameter
         if self.similarity == 0:
             print(f'Found {duplicate_count} pair(s) of duplicate image(s) in {time_elapsed} seconds.')
         else:
             print(f'Found {duplicate_count} pair(s) of duplicate and {similar_count} pair(s) of similar image(s) in {time_elapsed} seconds.')
 
-        self.stats = dif._generate_stats(
-            self, 
-            start_time=time.localtime(start_time), 
-            end_time=time.localtime(end_time), 
-            time_elapsed=time_elapsed, 
-            total_searched=total_count,
-            duplicate_count=duplicate_count, 
-            similar_count=similar_count, 
-            invalid_files=invalid_files,
-            deleted_files=deleted_files,
-            skipped_files=skipped_files)
+        # Generate process stats
+        self.stats = self._generate_stats(start_time=start_time, end_time=end_time, time_elapsed=time_elapsed, 
+                                          total_count=total_count, duplicate_count=duplicate_count, similar_count=similar_count, 
+                                          invalid_files=invalid_files, deleted_files=deleted_files, skipped_files=skipped_files)
     
     def _run(self):
         '''Runs the difPy algorithm.
@@ -115,7 +104,17 @@ class dif:
         imgs_matrices, invalid_files = _compute._imgs_matrices(id_by_location, self.px_size, self.show_progress)
         result, exclude_from_search, total_count, duplicate_count, similar_count = _search._matches(imgs_matrices, id_by_location, self.similarity, self.show_output, self.show_progress, self.fast_search)
         lower_quality = _search._lower_quality(result)
-        return result, lower_quality, total_count, duplicate_count, similar_count, invalid_files, skipped_files
+
+        # Move or delete the lower quality duplicate images
+        deleted_files = np.array([])
+        if duplicate_count + similar_count != 0:
+            if self.move_to != None:
+                self.lower_quality = _help._move_imgs(self.lower_quality, self.move_to)
+            elif self.delete:
+                if self.lower_quality.size != 0:
+                    deleted_files = _help._delete_imgs(set(self.lower_quality), silent_del=self.silent_del)
+
+        return result, lower_quality, total_count, duplicate_count, similar_count, invalid_files, skipped_files,deleted_files
 
     def _generate_stats(self, **kwargs):
         '''Generates stats of the difPy process.
@@ -133,22 +132,21 @@ class dif:
             skipped_stats = {'count': len(kwargs['skipped_files'])}
              
         stats = {'directory': self.directory,
-                 'duration': {'start_date': time.strftime('%Y-%m-%d', kwargs['start_time']),
-                              'start_time': time.strftime('%H:%M:%S', kwargs['start_time']),
-                              'end_date': time.strftime('%Y-%m-%d', kwargs['end_time']),
-                              'end_time': time.strftime('%H:%M:%S', kwargs['end_time']),
+                 'duration': {'start_date': kwargs['start_time'].strftime('%Y-%m-%d'),
+                              'start_time': kwargs['start_time'].strftime('%Y-%m-%d'),
+                              'end_date': kwargs['end_time'].strftime('%Y-%m-%d'),
+                              'end_time': kwargs['end_time'].strftime('%Y-%m-%d'),
                               'seconds_elapsed': kwargs['time_elapsed']},
                  'fast_search': self.fast_search,
                  'recursive': self.recursive,
                  'match_mse': self.similarity,
                  'px_size': self.px_size,
-                 'files_searched': kwargs['total_searched'],
+                 'files_searched': kwargs['total_count'],
                  'matches_found': {'duplicates': kwargs['duplicate_count'],
                                    'similar': kwargs['similar_count']},
                  'invalid_files': invalid_stats,
                  'deleted_files': deleted_stats,
                  'skipped_files': skipped_stats
-                 # TODO change to kwargs
                  }
         return stats
 
@@ -156,28 +154,30 @@ class _validate:
     '''
     A class used to validate difPy input parameters.
     '''
-    def _directory_type(directory):
-        # Function that ouputs the directory 
+    def _directory(directory):
+        # Function that _validates the input directories
+
+        # Check the type of directory parameter provided
         if len(directory) == 0:
             raise ValueError('Invalid directory parameter: no directory provided.')
         if all(isinstance(dir, list) for dir in directory):
-            directory = [item for sublist in directory for item in sublist]
-            return directory
+            directory = np.array([item for sublist in directory for item in sublist])
         elif all(isinstance(dir, str) for dir in directory):
-            return list(directory) 
+            directory = np.array(directory) 
         else:
-            raise ValueError('Invalid directory parameter: directories must be of type list xor string.')
-
-    def _directory_exist(directory):
-        # Function that _validates the input directories
+            raise ValueError('Invalid directory parameter: directories must be of type list or string.')
+        
+        # Check if the directory exists
         for dir in directory:
             dir = Path(dir)
             if not os.path.isdir(dir):
                 raise FileNotFoundError(f'Directory "{str(dir)}" does not exist')
-
-    def _directory_unique(directory):
-        if len(set(directory)) != len(directory):
+            
+        # Check if the directories provided are unique
+        if len(set(directory)) != directory.size:
             raise ValueError('Invalid directory parameters: an attempt to compare a directory with itself.')
+        
+        return sorted(directory)
 
     def _fast_search(fast_search, similarity):
         # Function that _validates the 'show_output' input parameter
@@ -247,9 +247,7 @@ class _validate:
             if not move_to == None:
                 raise Exception('Invalid value for "move_to" parameter: must be of type str or "None"')
         else:
-            dir = Path(move_to)
-            if not os.path.isdir(dir):
-                raise FileNotFoundError(f'Directory "{str(dir)}" does not exist')
+            _validate._directory_exist([move_to])
         return move_to
 
     def _delete(delete, silent_del):
@@ -272,12 +270,12 @@ class _compute:
     '''
     def _id_by_location(directory_files, id_by_location):
         # Function that creates a collection of 'ids : image_location'
-        img_ids = []
+        img_ids = np.array([])
         for i in range(0, len(directory_files)):
             img_id = uuid.uuid4().int
             while img_id in img_ids:
                 img_id = uuid.uuid4().int
-            img_ids.append(img_id)
+            np.append(img_ids, img_id)
 
         if id_by_location == None:
             id_by_location = dict(zip(img_ids, directory_files)) 
@@ -317,8 +315,7 @@ class _compute:
 
     def _mse(img_A, img_B):
         # Function that calculates the mean squared error (mse) between two image matrices
-        mse = np.sum((img_A.astype('float') - img_B.astype('float')) ** 2)
-        mse /= float(img_A.shape[0] * img_A.shape[1])
+        mse = np.square(np.subtract(img_A, img_B)).mean()
         return mse
 
 class _search:
@@ -330,8 +327,10 @@ class _search:
         progress_count = 0
         duplicate_count, similar_count = 0, 0
         total_count = len(imgs_matrices)
-        exclude_from_search = []
+        exclude_from_search = np.array([])
         result = {}
+
+
 
         for number_A, (id_A, matrix_A) in enumerate(imgs_matrices.items()):
             if show_progress:
@@ -365,7 +364,7 @@ class _search:
                                     _help._show_img_figs(matrix_A, matrix_B, mse)
                                     _help._show_file_info(str(Path(id_by_location[id_A])), str(Path(id_by_location[id_B])))
                                 if fast_search == True:
-                                    exclude_from_search.append(id_B)
+                                    np.append(exclude_from_search, id_B)
                                 rotations = 4
                             else:
                                 rotations += 1
@@ -386,12 +385,12 @@ class _search:
 
     def _lower_quality(result):
         # Function that creates a list of all image matches that have the lowest quality within the match group
-        lower_quality = []
+        lower_quality = np.array([])
         for id, results in result.items():
-            match_group = []
-            match_group.append(result[id]['location'])
+            match_group = np.array([])
+            np.append(match_group, result[id]['location'])
             for match_id in result[id]['matches']:
-                match_group.append(result[id]['matches'][match_id]['location'])
+                np.append(match_group, result[id]['matches'][match_id]['location'])
             sort_by_size = _help._check_img_quality(match_group)
             lower_quality = lower_quality + sort_by_size[1:]
         return lower_quality
@@ -401,40 +400,40 @@ class _help:
     A class used for difPy helper functions.
     '''
     def _list_all_files(directory, recursive, limit_extensions):
-        # Function that creates a list of all files in the directory
-        skipped = []
-        directory_files = list(glob(str(directory) + '/**', recursive=recursive))
-        directory_files = [os.path.normpath(file) for file in directory_files if not os.path.isdir(file)]
+        # Function that creates an array of all files in the directory
+        skipped = np.array([])
+        directory_files = np.array(glob(str(directory) + '/**', recursive=recursive))
+        directory_files = np.array([os.path.normpath(file) for file in directory_files if not os.path.isdir(file)])
         if limit_extensions:
             directory_files, skipped = _help._filter_extensions(directory_files)
         return directory_files, skipped
     
     def _filter_extensions(directory_files):
-        # function that filters files into those with & without valid image extensions
+        # Function that filters files into those with & without valid image extensions
         valid_extensions = ('.apng', '.bw', '.cdf', '.cur', '.dcx', '.dds', '.dib', '.emf', '.eps', '.fli', '.flc', '.fpx', '.ftex', '.fits', '.gd', '.gd2', '.gif', '.gbr', '.icb', '.icns', '.iim', '.ico', '.im', '.imt', '.j2k', '.jfif', '.jfi', '.jif', '.jp2', '.jpe', '.jpeg', '.jpg', '.jpm', '.jpf', '.jpx', '.jpeg', '.mic', '.mpo', '.msp', '.nc', '.pbm', '.pcd', '.pcx', '.pgm', '.png', '.ppm', '.psd', '.pixar', '.ras', '.rgb', '.rgba', '.sgi', '.spi', '.spider', '.sun', '.tga', '.tif', '.tiff', '.vda', '.vst', '.wal', '.webp', '.xbm', '.xpm')
-        filtered_list = []
-        skipped_list = []
-        for f in directory_files:
-            file_extension = os.path.splitext(f)[1]
+        filtered_list = np.array([])
+        skipped_list = np.array([])
+        for file in directory_files:
+            file_extension = os.path.splitext(file)[1]
             if file_extension.lower() in valid_extensions:
-                filtered_list.append(f)
+                np.append(filtered_list, file)
             else:
-                skipped_list.append(f)
+                np.append(skipped_list, file)
         return filtered_list, skipped_list
 
     def _show_img_figs(img_A, img_B, err):
         # Function that plots two compared image files and their mse
         fig = plt.figure()
         plt.suptitle('MSE: %.2f' % (err))
-        # plot first image
+        # Plot first image
         ax = fig.add_subplot(1, 2, 1)
         plt.imshow(img_A, cmap=plt.cm.gray)
         plt.axis('off')
-        # plot second image
+        # Plot second image
         ax = fig.add_subplot(1, 2, 2)
         plt.imshow(img_B, cmap=plt.cm.gray)
         plt.axis('off')
-        # show the images
+        # Show the images
         plt.show()
 
     def _show_file_info(img_A, img_B):
@@ -450,11 +449,11 @@ class _help:
 
     def _check_img_quality(img_list):
         # Function for sorting a list of images based on their file sizes
-        imgs_sizes = []
+        imgs_sizes = np.array([])
         for img in img_list:
             img_size = (os.stat(str(img)).st_size, img)
-            imgs_sizes.append(img_size)
-        sort_by_size = [file for size, file in sorted(imgs_sizes, reverse=True)]
+            np.append(imgs_sizes, img_size)
+        sort_by_size = np.array([file for size, file in -np.sort(-imgs_sizes)])
         return sort_by_size
 
     def _show_progress(count, total_count, task='processing images'):
@@ -466,17 +465,17 @@ class _help:
             print(f'difPy {task}: [{count}/{total_count}] [{count/total_count:.0%}]', end='\r')
 
     def _move_imgs(lower_quality, move_to):
-        new_lower_quality = []
+        new_lower_quality = np.array([])
         for file in lower_quality:
             head, tail = os.path.split(file)
             os.replace(file, os.path.join(move_to, tail))
-            new_lower_quality.append(str(Path(os.path.join(move_to, tail))))
+            np.append(new_lower_quality, str(Path(os.path.join(move_to, tail))))
         print(f'Moved {len(lower_quality)} image(s) to {str(Path(move_to))}')
         return new_lower_quality
 
     def _delete_imgs(lower_quality_set, silent_del=False):
         # Function for deleting the lower quality images that were found after the search
-        deleted_files = []
+        deleted_files = np.array([])
         if not silent_del:
             usr = input('Are you sure you want to delete all lower quality matched images? \n! This cannot be undone. (y/n)')
             if str(usr) == 'y':
@@ -484,7 +483,7 @@ class _help:
                     print('\nDeletion in progress...', end='\r')
                     try:
                         os.remove(file)
-                        deleted_files.append(file)
+                        np.append(deleted_files, file)
                         print(f'Deleted file: {file}', end='\r')
                     except:
                         print(f'Could not delete file: {file}', end='\r')       
@@ -496,7 +495,7 @@ class _help:
                 print('\nDeletion in progress...', end='\r')
                 try:
                     os.remove(file)
-                    deleted_files.append(file)
+                    np.append(deleted_files, file)
                     print(f'Deleted file: {file}', end='\r')
                 except:
                     print(f'Could not delete file: {file}', end='\r')
