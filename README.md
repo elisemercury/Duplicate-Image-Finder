@@ -20,7 +20,7 @@
 pip install difPy
 ```
 
-> :point_right: :new: **difPy v4-beta** is out! difPy v4 is up to **10x as fast** as previous difpy versions. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for details. 
+> :point_right: :new: **difPy v4-beta** is out! difPy v4 is up to **10x as fast** as previous difPy versions. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for details. 
 
 > :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy) for more information.
 
@@ -59,6 +59,7 @@ import difPy
 dif = difPy.build(["C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder_C/", ... ])
 search = difPy.search(dif)
 ``` 
+
 Folder paths can be specified as standalone Python strings, or within a list. `difPy.build()` first builds a collection of images by scanning the provided folders and generating image tensors. `difPy.search()` then starts the search for duplicate image.
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
@@ -66,7 +67,7 @@ Folder paths can be specified as standalone Python strings, or within a list. `d
 ## Output
 difPy returns various types of output that you may use depending on your use case: 
 
-### I. Result Dictionary
+### I. Search Result Dictionary
 A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found, where the keys are a **randomly generated unique id** for each image file:
 
 ```python
@@ -82,28 +83,27 @@ search.result
  ...
 }
 ``` 
-### II. Lower Quality List
-A **list** of duplicates/similar images that have the **lowest quality** among match groups: 
+
+### II. Lower Quality Files
+A **JSON formatted collection** of duplicates/similar images that have the **lowest quality** among match groups: 
 
 ```python
 search.lower_quality
 
 > Output:
-["C:/Path/to/Image/duplicate_image1.jpg", 
- "C:/Path/to/Image/duplicate_image2.jpg", ...]
+{"lower_quality" : ["C:/Path/to/Image/duplicate_image1.jpg", 
+                    "C:/Path/to/Image/duplicate_image2.jpg", ...]}
 ``` 
 
 Lower quality images then can be moved to a different location:
 
 ```python
-from difPy.actions import move_to
-move_to(search, destination_path="C:/Path/to/Destination/")
+search.move_to(search, destination_path="C:/Path/to/Destination/")
 ```
-Or automcatically deleted:
+Or deleted:
 
 ```python
-from difPy.actions import delete
-delete(search, silent_del=False)
+search.delete(search, silent_del=False)
 ```
 
 ### III. Statistics
@@ -115,22 +115,22 @@ search.stats
 
 > Output:
 {"directory" : ("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", ... ),
- "process" : {"build" : {"duration" : {"start" : "2023-08-27T22:41:42.741440",
-                                      "end" : "2023-08-27T22:42:45.781104",
-                                      "seconds_elapsed" : "0.185"},
-                        "parameters" : {"recursive" : True,
-                                        "in_folder" : False,
-                                        "limit_extensions" : True,
-                                        "px_size" : 50}},
-              "search" : {"duration" : {"start" : "2023-08-27T22:41:42.741440",
-                                       "end" : "2023-08-27T22:42:45.781104",
-                                       "seconds_elapsed" : "0.185"},
+ "process" : {"build" : {"duration" : {"start" : "2023-08-28T21:22:48.691008",
+                                       "end" : "2023-08-28T21:23:59.104351",
+                                       "seconds_elapsed" : "70.4133"},
+                         "parameters" : {"recursive" : True,
+                                         "in_folder" : False,
+                                         "limit_extensions" : True,
+                                         "px_size" : 50}},
+              "search" : {"duration" : {"start" : "2023-08-28T21:23:59.106351",
+                                        "end" : "2023-08-28T21:25:17.538015",
+                                        "seconds_elapsed" : "78.4317"},
                           "parameters" : {"similarity_mse" : 0}
-                          "files_searched" : 537,
+                          "files_searched" : 5225,
                           "matches_found" : {"duplicates" : 5,
                                              "similar" : 0}}}
-"invalid_files" : {'count' : 5,
-                   'logs' : {}}})
+"invalid_files" : {"count" : 230,
+                   "logs" : {...}}})
 ```
 
 ## Additional Parameters
@@ -183,7 +183,7 @@ When running from the CLI, the output of difPy is written to files and **saved i
 
 ```python
 difPy_xxx_results.json
-difPy_xxx_lower_quality.csv
+difPy_xxx_lower_quality.json
 difPy_xxx_stats.json
 ```
 
