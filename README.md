@@ -1,7 +1,6 @@
-<p align="center">
+<span align="center">
   <img src="static/difPy_logo_3.png" width="300" title="Example Output: Duplicate Image Finder">
-</p>
-
+</span>
 # Duplicate Image Finder (difPy)
 
 [![PyPIv](https://img.shields.io/pypi/v/difPy)](https://pypi.org/project/difPy/)
