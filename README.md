@@ -1,4 +1,4 @@
-<p align="center" margin-bottom=5px>
+<p align="center" margin-bottom=0px>
   <img src="static/difPy_logo_3.png" width="300" title="Example Output: Duplicate Image Finder">
 </p>
 
