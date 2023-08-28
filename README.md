@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="static/difPy_logo_3.png" width="300" title="Example Output: Duplicate Image Finder">
+  <img src="static/difPy_logo_1.png" width="300" title="Example Output: Duplicate Image Finder">
 </p>
 
 # Duplicate Image Finder (difPy)
