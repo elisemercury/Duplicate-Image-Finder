@@ -14,8 +14,9 @@ build:
 sphinx:
    configuration: docs/conf.py
 
-#formats:
-#    - pdf
+formats:
+    - pdf
+    - epub
 
 # Python requirements
 python:
