@@ -19,12 +19,11 @@ Contributions to difPy are always welcomed and are highly appreciated! If you wa
 
 Thank you for your contribution! 💐
 
-Guidelines - Become a difPy Contributor
 ------------
 
-To contribute to the source code of difPy, please follow the instructions:
+To contribute to the source code of difPy, please follow the guidelines below:
 
-1. Fork the difPy project repository.
+1. Fork the `difPy project repository <https://github.com/elisemercury/Duplicate-Image-Finder/>`_.
 2. Clone your fork. Your fork on Github should be called the ``origin`` remote, the original difPy repository should be called the ``upstream`` remote.
 3. **Implement/fix your difPy feature**.
 4. **Test** your changes.

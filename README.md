@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="static/difPy_logo_3.png" width="300" title="Example Output: Duplicate Image Finder">
+</p>
+
 # Duplicate Image Finder (difPy)
 
 [![PyPIv](https://img.shields.io/pypi/v/difPy)](https://pypi.org/project/difPy/)
@@ -16,11 +20,9 @@
 pip install difPy
 ```
 
-> :iphone: **Try the new [difPy Web App](https://difpy.app/)**!
+> :point_right: :new: **difPy v4** is out! difPy v4 comes with up to **10x more performace** than previous difPy versions. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for details. 
 
-> :point_right: :new: With **difPy v3.x** you can count on signifcant **performance increases**, **new features** and **bug fixes**. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for details. 
-
-> :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy) for more information.
+> :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://difpy.readthedocs.io/en/latest/contributing.html) for more information.
 
 Read more on how the algorithm of difPy works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051).
 
@@ -31,32 +33,43 @@ Check out the [difPy package on PyPI.org](https://pypi.org/project/difPy/)
 ## Description
 difPy searches for images in **one or more different folders**, compares the images it found and checks whether these are duplicates. It then outputs the **image files classified as duplicates** as well as the **images having the lowest resolutions**, so you know which of the duplicate images are safe to be deleted. You can then either delete them manually, or let difPy delete them for you.
 
-<p align="center">
-  <img src="example_output.png" width="400" title="Example Output: Duplicate Image Finder">
-</p>
-
 difPy does not compare images based on their hashes. It compares them based on their tensors i. e. the image content - this allows difPy to **not only search for duplicate images, but also for similar images**.
+
+difPy leverages Python's **multiprocessing capabilities** and is therefore able to perform at high performance even on large datasets. 
+
+:notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
+
+## Table of Contents
+1. [Basic Usage](https://github.com/elisemercury/Duplicate-Image-Finder#basic-usage)
+2. [Output](https://github.com/elisemercury/Duplicate-Image-Finder#output)
+3. [Additional Parameters](https://github.com/elisemercury/Duplicate-Image-Finder#additional-parameters)
+4. [CLI Usage](https://github.com/elisemercury/Duplicate-Image-Finder#cli-usage)
+5. [difPy Web App](https://github.com/elisemercury/Duplicate-Image-Finder#difpy-web-app)
 
 ## Basic Usage
 To make difPy search for duplicates **within one folder**:
 
 ```python
-from difPy import dif
-search = dif("C:/Path/to/Folder/")
+import difPy
+dif = difPy.build("C:/Path/to/Folder/")
+search = difPy.search(dif)
 ``` 
 To search for duplicates **within multiple folders**:
 
 ```python
-from difPy import dif
-search = dif(["C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder_C/", ... ])
+import difPy
+dif = difPy.build(["C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder_C/", ... ])
+search = difPy.search(dif)
 ``` 
-Folder paths can be specified as standalone Python strings, or within a list.
+
+Folder paths can be specified as standalone Python strings, or within a list. With `difPy.build()`, difPy first scans the images in the provided folders and builds a collection of images by generating image tensors. `difPy.search()` then starts the search for duplicate images.
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
 ## Output
 difPy returns various types of output that you may use depending on your use case: 
 
+### I. Search Result Dictionary
 A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found, where the keys are a **randomly generated unique id** for each image file:
 
 ```python
@@ -73,46 +86,65 @@ search.result
 }
 ``` 
 
-A **list** of duplicates/similar images that have the **lowest quality** among match groups: 
+### II. Lower Quality Files
+A **JSON formatted collection** of duplicates/similar images that have the **lowest quality** among match groups: 
 
 ```python
 search.lower_quality
 
 > Output:
-["C:/Path/to/Image/duplicate_image1.jpg", 
- "C:/Path/to/Image/duplicate_image2.jpg", ...]
+{"lower_quality" : ["C:/Path/to/Image/duplicate_image1.jpg", 
+                    "C:/Path/to/Image/duplicate_image2.jpg", ...]}
 ``` 
-A **JSON formatted collection** with statistics on the completed difPy process:
+
+Lower quality images then can be **moved** to a different location:
+
+```python
+search.move_to(destination_path="C:/Path/to/Destination/")
+```
+Or **deleted**:
+
+```python
+search.delete(silent_del=False)
+```
+
+### III. Process Statistics
+
+A **JSON formatted collection** with statistics on the completed difPy processes:
 
 ```python
 search.stats
 
 > Output:
 {"directory" : ("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", ... ),
- "duration" : {"start_date" : "2023-02-15",
-               "start_time" : "18:44:19",
-               "end_date" : "2023-02-15",
-               "end_time" : "18:44:38",
-               "seconds_elapsed" : 18.6113},
- "fast_search" : True,
- "recursive" : True,
- "match_mse" : 0,
- "px_size" : 50,
- "files_searched" : 1032,
- "matches_found" : {"duplicates" : 52, 
-                    "similar" : 0},
- "invalid_files" : {"count" : 4},
- "deleted_files" : {"count" : 0},
- "skipped_files" : {"count" : 0}}
+ "process" : {"build" : {"duration" : {"start" : "2023-08-28T21:22:48.691008",
+                                       "end" : "2023-08-28T21:23:59.104351",
+                                       "seconds_elapsed" : "70.4133"},
+                         "parameters" : {"recursive" : True,
+                                         "in_folder" : False,
+                                         "limit_extensions" : True,
+                                         "px_size" : 50}},
+              "search" : {"duration" : {"start" : "2023-08-28T21:23:59.106351",
+                                        "end" : "2023-08-28T21:25:17.538015",
+                                        "seconds_elapsed" : "78.4317"},
+                          "parameters" : {"similarity_mse" : 0}
+                          "files_searched" : 5225,
+                          "matches_found" : {"duplicates" : 5,
+                                             "similar" : 0}}}
+ "invalid_files" : {"count" : 230,
+                    "logs" : {...}}}
 ```
 
 ## Additional Parameters
 difPy supports the following parameters:
 
 ```python
-dif(*directory, fast_search=True, recursive=True, similarity='duplicates', px_size=50, move_to=None, 
-    limit_extensions=False, show_progress=True, show_output=False, delete=False, silent_del=False, 
-    logs=False)
+difPy.build(*directory, recursive=True, in_folder=False, limit_extensions=True, 
+px_size=50, show_progress=False, logs=True)
+```
+
+```python
+difPy.search(difpy_obj, similarity='duplicates', show_progress=False, logs=True)
 ```
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
@@ -121,41 +153,49 @@ dif(*directory, fast_search=True, recursive=True, similarity='duplicates', px_si
 difPy can also be invoked through the CLI by using the following commands:
 
 ```python
+python dif.py #working directory
+
 python dif.py -D "C:/Path/to/Folder/"
 
 python dif.py -D "C:/Path/to/Folder_A/" "C:/Path/to/Folder_B/" "C:/Path/to/Folder_C/"
 ```
-It supports the following arguments:
+
+> :point_right: Windows users can add difPy to their [PATH system variables](https://www.computerhope.com/issues/ch000549.htm) by pointing it to their difPy package installation folder containing the [`difPy.bat`](https://github.com/elisemercury/Duplicate-Image-Finder/difPy/difPy.bat) file. This adds `difPy` as a command in the CLI and will allow direct invocation of `difPy` from anywhere on the device.
+
+difPy CLI supports the following arguments:
 
 ```python
-dif.py [-h] -D DIRECTORY [-Z OUTPUT_DIRECTORY] [-f {True,False}] [-r {True,False}] [-s SIMILARITY] 
-       [-px PX_SIZE] [-mv MOVE_TO] [-le {True,False}] [-p {True,False}] [-o {True,False}]
-       [-d {True,False}] [-sd {True,False}] [-l {True,False}]
+dif.py [-h] [-D DIRECTORY [DIRECTORY ...]] [-Z OUTPUT_DIRECTORY] 
+       [-r {True,False}] [-i {True,False}] [-le {True,False}] 
+       [-px PX_SIZE] [-p {True,False}] [-s SIMILARITY] 
+       [-mv MOVE_TO] [-d {True,False}] [-sd {True,False}] 
+       [-l {True,False}]
 ```
 
 | | Parameter | | Parameter |
 | :---: | ------ | :---: | ------ | 
-| `-D` | directory | `-p` | show_progress |  
-| `-Z` | output_directory | `-o` | show_output |
-| `-f`| fast_search | `-mv` | move_to |
-| `-r`| recursive | `-d` | delete |
-| `-s` | similarity |  `-sd` | silent_del |
+| `-D` | directory | `-le` | limit_extensions 
+| `-Z` | output_directory | `-p` | show_progress | 
+| `-r`| recursive | `-mv` | move_to |
+| `-i`| in_folder | `-d` | delete |
+| `-s`| similarity | `-sd` | silent_del |
 | `-px` | px_size | `-l` | logs |
-| `-le` | limit_extensions | | |
 
-When running from the CLI, the output of difPy is  written to files and saved in the working directory by default. To change the default output directory, specify the `-Z / -output_directory` parameter. The "xxx" in the output filenames is a unique timestamp:
+If no directory parameter is given in the CLI, difPy will **run on the current working directory**.
+
+When running from the CLI, the output of difPy is written to files and **saved in the working directory** by default. To change the default output directory, specify the `-Z / -output_directory` parameter. The "xxx" in the output filenames is the current timestamp:
 
 ```python
-difPy_results_xxx.json
-difPy_lower_quality_xxx.csv
-difPy_stats_xxx.json
+difPy_xxx_results.json
+difPy_xxx_lower_quality.json
+difPy_xxx_stats.json
 ```
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
 ## difPy Web App
 
-difPy can also be accessed via its new **web interface**. With difPy Web, you can compare **up to 200 images** and download a **deduplicated ZIP file** - all powered by difPy. [Read more](https://github.com/elisemercury/difPy-app). 
+difPy can also be accessed via a browser. With difPy Web, you can compare **up to 200 images** and download a **deduplicated ZIP file** - all powered by difPy. [Read more](https://github.com/elisemercury/difPy-app). 
 
 :iphone: **Try the new [difPy Web App](https://difpy.app/)**!
 
@@ -166,5 +206,5 @@ difPy can also be accessed via its new **web interface**. With difPy Web, you ca
 -------
 
 <p align="center"><b>
-We :heart: Open Source
+:heart: Open Source
 </b></p>
