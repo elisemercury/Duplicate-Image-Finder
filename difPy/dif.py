@@ -430,14 +430,14 @@ class search:
         '''
         destination_path = _validate._move_to(destination_path)
         new_lower_quality = []
-        for file in self.lower_quality:
+        for file in self.lower_quality['lower_quality']:
             try:
                 head, tail = os.path.split(file)
                 os.replace(file, os.path.join(destination_path, tail))
                 new_lower_quality = np.append(new_lower_quality, str(Path(os.path.join(destination_path, tail))))
             except:
                 print(f'Could not move file: {file}')            
-        print(f'Moved {len(self.lower_quality)} files(s) to "{str(Path(destination_path))}"')
+        print(f'Moved {len(self.lower_quality["lower_quality"])} files(s) to "{str(Path(destination_path))}"')
         self.lower_quality = new_lower_quality
         return  
 

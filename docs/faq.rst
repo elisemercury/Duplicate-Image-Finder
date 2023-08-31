@@ -3,43 +3,78 @@ FAQ
 
 .. _faq:
 
-.. _How to make difPy faster?:
+.. _What's new in v4?:
 
-How to make difPy faster?
+What's new in v4?
 ----------------
 
-difPy's processing speed can increase or decrease, depending on which parameter configurations are used. Speeding up the comparison process can be especially relevant when using difPy to compare a large number of images. 
+difPy version 4 is the next-generation version of difPy, which not only achieves **up to 10x the performance** compared to version 3.x, but also comes with a variety of **new features** that make it's usage experience even better.
 
-Below is a list of **configuration settings** that can make **difPy's processing faster**:
+**Splitting of Processes**
 
-* Enable :ref:`fast_search` when searching for duplicates.
-* Enable :ref:`limit_extensions`.
-* Set :ref:`px_size` <= 50. Note: the lower the ``px_size``, the less precise the comparison will be. It is not recommended to go below a ``px_size`` of 20.
+difPy has been split into two main processes: first building the image repository with image tensors, and finally executing the search. This means that you will only have to build the image repository once, to then perform multiple search tests on the same repository.
 
-Searching for similar images will always take more processing time, than searching for duplicates. This is due to the fact that difPy has to compare each image to each other image to check if these are similar. Duplicate image searching is more efficient thanks to difPy's Fast Search Algorithm.
+For example, first we can build the ``dif`` object:
 
-.. _Fast Search Algorithm (FSA):
+.. code-block:: python
 
-What is FSA (Fast Search Algorithm)?
-------------
+   import difPy
+   dif = difPy.build("C:/Path/to/Folder/")
 
-.. note::
+And then we can perform two different searches on the same ``dif`` object:
 
-   🆕 difPy >= v3.x supports Fast Search Algorithm (FSA).
+.. code-block:: python
 
-difPy's Fast Search Algorithm (FSA) can provide significant performance increases and time complexity reduction when searching for duplicates.
+   search_duplicates = difPy.search(dif, similarity="duplicates")
+   search_similar = difPy.search(dif, similarity= "similar")
 
-FSA can be enabled/disabled with the :ref:`fast_search` parameter.
+**Multi Processing**
 
-About FSA
-^^^^^^^^^^
+One of the most significant changes to version 4 is the implementation of multiprocessing. difPy leverages Python's multiprocessing capabilities for both the ``difPy.build`` part and the ``difPy.search`` part. This leads to massive performance increases on large datasets, especially for tasks like image tensor generation and computation of the MSEs.
 
-With the classic difPy algorithm, each image would be compared to every other successive image (by order of images found in the directories). Comparing every image is a very precise option, but leads to high time complexity. When searching for duplicates, this time complexity can be reduced by applying FSA. With FSA, difPy compares an image until it finds a duplicate. This duplicate is classified as duplicate and then excluded from the succeeding search, leading to a lower average number of comparisons.
+In a test on a folder containing 6k images, including 3k duplicates, difPy needed on average 4min in total. Approximately 46% of total time were spent on building the image repository, and 55% on the search. That is 10x as fast as previous difPy versions on the same dataset.
 
-   *Example: in the first round, difPy searches for duplicates to imageA and finds imageB and imageC. In the next rounds, the search for duplicates of imageB and imageC will be skipped, since they are all duplicates and no further comparison is required.*
+**New Feature: In-Folder Search**
 
-Due to its nature, FSA is very efficient when run on duplicate searches, but it is **not advised to be used when searching for similar images**, as the result might be inaccurate. **When searching for similar images, difPy's classic algorithm should be used by setting** :ref:`fast_search` **to** ``False``.
+difPy now allows for searching for matches within folders separately, additionally to searching among the union of all images found. 
 
-   *Example: imageA might be similar to imageB and imageC, but this does not imply that imageB is similar to imageC. Nevertheless, FSA would assume imageB and imageC to be equally similar and would therefore potentially return wrong results.*
+To highlight what this means in an example. If we had a folder structure as shown below:
 
-**When searching for similar images, difPy automatically disables FSA** to ensure accurate search results. This applies when :ref:`similarity` is set to ``'similar'`` **or** if :ref:`similarity` is manually set to a value ``> 0``.
+.. code-block:: console
+
+    .
+    |- Folder1
+    |  |-image1_1.jpeg
+    |- Folder2
+    |  |-image2_1.jpeg
+    |-image.jpeg
+
+We can run difPy on the main folder with the  :ref:`in_folder` parameter set to ``True``:
+
+.. code-block:: python
+
+   import difPy
+   dif = difPy.build("C:/Path/to/Folder/")
+   search = difPy.search(dif, in_folder=True)
+
+difPy will then initiate a search for each separate folder considering them as separate search groups. It will search for matches among the main folder, in Folder1 and in Folder2.
+
+**difPy is more Lightweight**
+
+The difPy is now much more lightweight by depending less on external packages, and more on Python native features. Moreover, difPy processes certain functions more efficiently thanks to increased usage of `Numpy <https://www.geeksforgeeks.org/why-numpy-is-faster-in-python/>`_.
+
+.. _Supported File Types:
+
+Supported File Types
+----------------
+
+difPy supports most popular image formats. Nevertheless, since it relies on the Pillow library for image decoding, the supported formats are restricted to the ones listed in the `Pillow Documentation`_. Unsupported file types will by marked as invalid and included in the process statistics output under ``invalid_files`` (see :ref:`Process Statistics`).
+
+.. _Pillow Documentation: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
+
+.. _Report a Bug:
+
+Report a Bug 🐛
+----------------
+
+Should you encounter any issue or unwanted behavior when using difPy, `you can open an issue here <https://github.com/elisemercury/Duplicate-Image-Finder/issues/new/choose>`_.

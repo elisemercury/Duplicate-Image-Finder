@@ -6,8 +6,8 @@ project = 'difPy Guide'
 copyright = '2023, Elise Landman'
 author = 'Elise Landman'
 
-release = 'v3.0.10'
-version = 'v3.0'
+release = 'v4.0.0'
+version = 'v4.0'
 
 # -- General configuration
 
@@ -17,6 +17,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
+    'sphinx_rtd_theme',
 ]
 
 intersphinx_mapping = {

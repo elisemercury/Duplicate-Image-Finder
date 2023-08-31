@@ -20,9 +20,9 @@
 pip install difPy
 ```
 
-> :point_right: :new: **difPy v4-beta** is out! difPy v4 is up to **10x as fast** as previous difPy versions. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for details. 
+> :point_right: :new: **difPy v4** is out! difPy v4 is up to **10x more performace** than previous difPy versions. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for details. 
 
-> :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://github.com/elisemercury/Duplicate-Image-Finder/wiki/Contributing-to-difPy) for more information.
+> :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://difpy.readthedocs.io/en/latest/contributing.html) for more information.
 
 Read more on how the algorithm of difPy works in my Medium article [Finding Duplicate Images with Python](https://towardsdatascience.com/finding-duplicate-images-with-python-71c04ec8051).
 
@@ -60,7 +60,7 @@ dif = difPy.build(["C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/F
 search = difPy.search(dif)
 ``` 
 
-Folder paths can be specified as standalone Python strings, or within a list. `difPy.build()` first builds a collection of images by scanning the provided folders and generating image tensors. `difPy.search()` then starts the search for duplicate image.
+Folder paths can be specified as standalone Python strings, or within a list. With `difPy.build()`, difPy first scans the images in the provided folders and builds a collection of images by generating image tensors. `difPy.search()` then starts the search for duplicate images.
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
@@ -95,18 +95,18 @@ search.lower_quality
                     "C:/Path/to/Image/duplicate_image2.jpg", ...]}
 ``` 
 
-Lower quality images then can be moved to a different location:
+Lower quality images then can be **moved** to a different location:
 
 ```python
-search.move_to(search, destination_path="C:/Path/to/Destination/")
+search.move_to(destination_path="C:/Path/to/Destination/")
 ```
-Or deleted:
+Or **deleted**:
 
 ```python
-search.delete(search, silent_del=False)
+search.delete(silent_del=False)
 ```
 
-### III. Statistics
+### III. Process Statistics
 
 A **JSON formatted collection** with statistics on the completed difPy processes:
 
@@ -129,8 +129,8 @@ search.stats
                           "files_searched" : 5225,
                           "matches_found" : {"duplicates" : 5,
                                              "similar" : 0}}}
-"invalid_files" : {"count" : 230,
-                   "logs" : {...}}})
+ "invalid_files" : {"count" : 230,
+                    "logs" : {...}}}
 ```
 
 ## Additional Parameters
@@ -163,21 +163,23 @@ python dif.py -D "C:/Path/to/Folder_A/" "C:/Path/to/Folder_B/" "C:/Path/to/Folde
 difPy CLI supports the following arguments:
 
 ```python
-dif.py [-h] [-D DIRECTORY] [-Z OUTPUT_DIRECTORY] [-r {True,False}] [-s SIMILARITY] [-px PX_SIZE] 
-       [-mv MOVE_TO] [-le {True,False}] [-p {True,False}] [-d {True,False}] [-sd {True,False}] 
+dif.py [-h] [-D DIRECTORY [DIRECTORY ...]] [-Z OUTPUT_DIRECTORY] 
+       [-r {True,False}] [-i {True,False}] [-le {True,False}] 
+       [-px PX_SIZE] [-p {True,False}] [-s SIMILARITY] 
+       [-mv MOVE_TO] [-d {True,False}] [-sd {True,False}] 
        [-l {True,False}]
 ```
 
 | | Parameter | | Parameter |
 | :---: | ------ | :---: | ------ | 
-| `-D` | directory | `-p` | show_progress |  
-| `-Z` | output_directory | `-mv` | move_to |
-| `-r`| recursive | `-d` | delete |
+| `-D` | directory | `-le` | limit_extensions 
+| `-Z` | output_directory | `-p` | show_progress | 
+| `-r`| recursive | `-mv` | move_to |
+| `-i`| in_folder | `-d` | delete |
 | `-s`| similarity | `-sd` | silent_del |
 | `-px` | px_size | `-l` | logs |
-| `-le` | limit_extensions |  | |
 
-When no directory parameter is given in the CLI, difPy will **run on the current working directory**.
+If no directory parameter is given in the CLI, difPy will **run on the current working directory**.
 
 When running from the CLI, the output of difPy is written to files and **saved in the working directory** by default. To change the default output directory, specify the `-Z / -output_directory` parameter. The "xxx" in the output filenames is the current timestamp:
 
