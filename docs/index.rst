@@ -16,6 +16,8 @@ difPy searches for images in **one or more different directories**, compares the
 
 difPy does not compare images based on their hashes. It compares them based on their tensors i. e. the image content. This allows difPy to **not only search for duplicate images, but also for similar images**.
 
+difPy leverages Python's multiprocessing capabilities and is therefore able to perform at high performance even on large datasets. 
+
 View difPy on `GitHub <https://github.com/elisemercury/Duplicate-Image-Finder>`_ and `PyPi <https://pypi.org/project/difPy/>`_.
 
 Guide Content
