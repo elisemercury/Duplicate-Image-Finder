@@ -8,7 +8,7 @@ FAQ
 What's new in v4?
 ----------------
 
-difPy version 4 is the next-generation version of difPy, which not only achieves **up to 10x the performance** compared to version 3.x, but also comes with a variety of **new features** that make it's usage experience even better.
+difPy version 4 is the next-generation version of difPy, which not only achieves **up to 10x the performance** compared to version 3.x, but also comes with a variety of **new features** that make its usage experience even better.
 
 **Splitting of Processes**
 
@@ -61,7 +61,7 @@ difPy will then initiate a search for each separate folder considering them as s
 
 **difPy is more Lightweight**
 
-The difPy is now much more lightweight by depending less on external packages, and more on Python native features. Moreover, difPy processes certain functions more efficiently thanks to increased usage of `Numpy <https://www.geeksforgeeks.org/why-numpy-is-faster-in-python/>`_.
+difPy is now much more lightweight by depending less on external packages, and more on Python native features. Moreover, difPy processes certain functions more efficiently thanks to increased usage of `Numpy <https://www.geeksforgeeks.org/why-numpy-is-faster-in-python/>`_.
 
 .. _Supported File Types:
 

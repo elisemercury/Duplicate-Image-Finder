@@ -7,7 +7,7 @@ Parameters
 difPy.build
 ------------
 
-Before difPy can perform any search, it needs to build it's image repository and transform the images in the provided directory into tensors. This is what is done when ``difPy.build()`` is invoked.
+Before difPy can perform any search, it needs to build its image repository and transform the images in the provided directory into tensors. This is what is done when ``difPy.build()`` is invoked.
 
 Upon completion, ``difPy.build()`` returns a ``dif`` object that can be used in :ref:`difPy.search` to start the search process.
 
@@ -189,7 +189,7 @@ Depending on which use case you want to apply difPy for, the granularity for the
 
 **Manual setting**: the match MSE threshold can be adjusted manually by setting the ``similarity`` parameter to any ``int`` or ``float``. difPy will then search for images that match an MSE threshold **equal to or lower than** the one specified.
 
-When searching for **similar** images, the choice of MSE threshold becomes very important. A threshold of ``50`` will usually find similarities in regular photographs well, but if applied to images containing for example text with a plain white background, an MSE threshold of ``50`` will usually be too high and difPy will consider all images to be similar, even though they are not. In this case, for more precision, the ``similarity`` parameter should be lowered. Additionally, the ``px_size`` parameter can also be lowered to gain more precision (see :ref:`px_size`).
+When searching for **similar** images, the choice of MSE threshold becomes very important. A threshold of ``50`` will usually find similarities in regular photographs well, but if applied to images containing for example text with a plain white background, an MSE threshold of ``50`` will usually be too high and difPy will consider all images to be similar, even though they are not. In this case, for more precision, the ``similarity`` parameter should be lowered. Additionally, the ``px_size`` parameter can also be increased to gain more precision (see :ref:`px_size`).
 
 .. _show_progress:
 
