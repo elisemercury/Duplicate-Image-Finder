@@ -140,7 +140,13 @@ class build:
     def _filter_extensions(self, directory_files):
         # Function that filters by files with a specific filetype
         valid_extensions = np.array(['apng', 'bw', 'cdf', 'cur', 'dcx', 'dds', 'dib', 'emf', 'eps', 'fli', 'flc', 'fpx', 'ftex', 'fits', 'gd', 'gd2', 'gif', 'gbr', 'icb', 'icns', 'iim', 'ico', 'im', 'imt', 'j2k', 'jfif', 'jfi', 'jif', 'jp2', 'jpe', 'jpeg', 'jpg', 'jpm', 'jpf', 'jpx', 'jpeg', 'mic', 'mpo', 'msp', 'nc', 'pbm', 'pcd', 'pcx', 'pgm', 'png', 'ppm', 'psd', 'pixar', 'ras', 'rgb', 'rgba', 'sgi', 'spi', 'spider', 'sun', 'tga', 'tif', 'tiff', 'vda', 'vst', 'wal', 'webp', 'xbm', 'xpm'])
-        extensions = [file.split(".")[1].lower() for file in directory_files]
+        extensions = list()
+        for file in directory_files:
+            try:
+                ext = file.split(".")[-1].lower()
+                extensions.append(ext)
+            except:
+                extensions.append("_")
         keep_files = directory_files[np.isin(extensions, valid_extensions)]
         skip_files = directory_files[np.logical_not(np.isin(extensions, valid_extensions))]
         return keep_files, skip_files
@@ -455,7 +461,7 @@ class search:
             if not silent_del:
                 usr = input('Are you sure you want to delete all lower quality matched images? \n! This cannot be undone. (y/n)')
                 if str(usr).lower() == 'y':
-                    for file in self.lower_quality:
+                    for file in self.lower_quality['lower_quality']:
                         try:
                             os.remove(file)
                             deleted_files += 1
@@ -465,7 +471,7 @@ class search:
                     print('Deletion canceled.')
                     return
             else:
-                for file in self.lower_quality:
+                for file in self.lower_quality['lower_quality']:
                     try:
                         os.remove(file)
                         deleted_files += 1
