@@ -62,6 +62,14 @@ dif = difPy.build(["C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/F
 search = difPy.search(dif)
 ``` 
 
+To search for duplicates **within files list**:
+
+```python
+import difPy
+dif = difPy.build(["C:/Path/to/Folder_A/image01.jpg", "C:/Path/to/Folder_B/image02.jpg", "C:/Path/to/Folder_C/image03.jpg", ... ])
+search = difPy.search(dif)
+``` 
+
 Folder paths can be specified as standalone Python strings, or within a list. With `difPy.build()`, difPy first scans the images in the provided folders and builds a collection of images by generating image tensors. `difPy.search()` then starts the search for duplicate images.
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
