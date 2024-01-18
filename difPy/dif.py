@@ -667,7 +667,7 @@ if __name__ == '__main__':
     # check 'move_to' parameter
     if args.move_to != None:
         # move lower quality files
-        se.lower_quality = se.move_to(se, args.move_to).lower_quality
+        se.move_to(args.move_to)
 
     # output 'search.lower_quality' to file
     with open(os.path.join(dir, lq_file), 'w') as file:
