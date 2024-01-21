@@ -25,7 +25,7 @@ class build:
         Parameters
         ----------
         directory : str, list
-            Paths of the directories to be searched
+            Paths of the directories or the files to be searched
         recursive : bool (optional)
             Search recursively within the directories (default is True)
         in_folder : bool (optional)
@@ -108,11 +108,14 @@ class build:
         if self.__in_folder:
             # Search directories separately
             directories = []
+            files = []
             for dir in self.__directory:
-                directories += glob(str(dir) + '/**/', recursive=self.__recursive)
+                if os.path.isdir(dir):
+                    directories += glob(str(dir) + '/**/', recursive=self.__recursive)
+                elif os.path.isfile(dir):
+                    files.append(dir)
             for dir in directories:
-                files = glob(str(dir) + '/*', recursive=self.__recursive)
-                
+                files += glob(str(dir) + '/*', recursive=self.__recursive)
                 valid_files, skip_files = self._validate_files(files)
                 valid_files_all.append(valid_files)
                 if len(skip_files) > 0:
@@ -121,7 +124,10 @@ class build:
         else:
             # Search union of all directories
             for dir in self.__directory:
-                files = glob(str(dir) + '/**', recursive=self.__recursive)
+                if os.path.isdir(dir):
+                    files = glob(str(dir) + '/**', recursive=self.__recursive)
+                elif os.path.isfile(dir):
+                    files = (dir, )
                 valid_files, skip_files = self._validate_files(files)
                 valid_files_all = np.concatenate((valid_files_all, valid_files), axis=None)
                 if len(skip_files) > 0:
@@ -500,7 +506,7 @@ class _validate:
         # Check if the directory exists
         for dir in directory:
             dir = Path(dir)
-            if not os.path.isdir(dir):
+            if not (os.path.isdir(dir) or os.path.isfile(dir)):
                 raise FileNotFoundError(f'Directory "{str(dir)}" does not exist')
             
         # Check if the directories provided are unique
