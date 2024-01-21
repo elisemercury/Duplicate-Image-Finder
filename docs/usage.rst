@@ -153,7 +153,7 @@ A **JSON formatted collection** of duplicates/similar images that have the **low
 
 To find the lower quality images, difPy compares all image file sizes within a match group and selects all images that have lowest image file size among the group.
 
-Lower quality images then can be **moved** to a different location (see :ref:`search.ove_to`):
+Lower quality images then can be **moved** to a different location (see :ref:`search.move_to`):
 
 .. code-block:: python
    
