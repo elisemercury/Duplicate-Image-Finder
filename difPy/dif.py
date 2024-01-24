@@ -1,6 +1,6 @@
 '''
-difPy - Python package for finding duplicate and similar images
-2023 Elise Landman
+difPy - Python package for finding duplicate and similar images.
+2024 Elise Landman
 https://github.com/elisemercury/Duplicate-Image-Finder
 '''
 from glob import glob
@@ -15,12 +15,13 @@ from pathlib import Path
 import argparse
 import json
 import warnings
+from memory_profiler import profile
 
 class build:
     '''
     A class used to initialize difPy and build its image repository
     '''
-    def __init__(self, *directory, recursive=True, in_folder=False, limit_extensions=True, px_size=50, show_progress=True, logs=True):
+    def __init__(self, *directory, recursive=True, in_folder=False, limit_extensions=True, px_size=50, show_progress=True, logs=True, processes=None, maxtasksperchild=None):
         '''
         Parameters
         ----------
@@ -39,6 +40,10 @@ class build:
             Show the difPy progress bar in console (default is True)
         logs : bool (optional)
             Collect stats on the difPy process (default is True) 
+        processes : int (optional)
+            Maximum number of simultaneous processes when multiprocessing.
+        maxtasksperchild : int (optional)
+            Maximum number of tasks completed by each child process when multiprocessing.
         '''
         # Validate input parameters
         self.__directory = _validate._directory(directory)
@@ -48,8 +53,11 @@ class build:
         self.__px_size = _validate._px_size(px_size)
         self.__show_progress = _validate._show_progress(show_progress)
         self.__stats = _validate._stats(logs)
+        self.__processes = _validate._processes(processes)
+        self.__maxtasksperchild = _validate._maxtasksperchild(maxtasksperchild)
 
         self._tensor_dictionary, self._filename_dictionary, self._id_to_group_dictionary, self._group_to_id_dictionary, self._invalid_files, self._stats = self._main()
+        return
 
     def _main(self):
         # Function that runs the build workflow
@@ -75,7 +83,6 @@ class build:
             count += 1
             _help._show_progress(count, total_count, task='preparing files')
         return tensor_dictionary, filename_dictionary, id_to_group_dictionary, group_to_id_dictionary, invalid_files, stats
-        # 8m55
 
     def _stats(self, **kwargs):
         # Function that generates build stats
@@ -94,6 +101,8 @@ class build:
                                                          'in_folder' : self.__in_folder,
                                                          'limit_extensions' : self.__limit_extensions,
                                                          'px_size' : self.__px_size,
+                                                         'processes' : self.__processes,
+                                                         'maxtasksperchild' : self.__maxtasksperchild
                                                         }})
         
         stats.update({'invalid_files': {'count' : len(invalid_files),
@@ -102,7 +111,7 @@ class build:
         return stats
 
     def _get_files(self):
-        # Function that searched for files in the input directories
+        # Function that searches for files in the input directories
         valid_files_all = []
         skipped_files_all = np.array([])
         if self.__in_folder:
@@ -170,7 +179,7 @@ class build:
             for j in range(0, len(valid_files)):
                 group_id = f"group_{j}"
                 group_img_ids = []
-                with Pool() as pool:
+                with Pool(processes=self.__processes, maxtasksperchild=self.__maxtasksperchild) as pool:
                     file_nums = [(i, valid_files[j][i]) for i in range(len(valid_files[j]))]
                     for tensor in pool.starmap(self._generate_tensor, file_nums):
                         if isinstance(tensor, dict):
@@ -185,11 +194,13 @@ class build:
                             filename_dictionary.update({img_id : valid_files[j][tensor[0]]})
                             tensor_dictionary.update({img_id : tensor[1]})
                             count += 1
+                        if self.__show_progress:
+                            _help._show_progress(count, len(file_nums), task='preparing files')                            
                 group_to_id_dictionary.update({group_id : group_img_ids})
         
         else:
             # Search union of all directories
-            with Pool() as pool:
+            with Pool(processes=self.__processes, maxtasksperchild=self.__maxtasksperchild) as pool:
                 file_nums = [(i, valid_files[i]) for i in range(len(valid_files))]
                 for tensor in pool.starmap(self._generate_tensor, file_nums):
                     if isinstance(tensor, dict):
@@ -202,10 +213,12 @@ class build:
                         filename_dictionary.update({img_id : valid_files[tensor[0]]})
                         tensor_dictionary.update({img_id : tensor[1]})
                         count += 1
+                    if self.__show_progress:
+                        _help._show_progress(count, len(file_nums), task='preparing files')                          
         return tensor_dictionary, filename_dictionary, id_to_group_dictionary, group_to_id_dictionary, invalid_files
 
     def _generate_tensor(self, num, file):
-        # Function that generates a tesnor of an image
+        # Function that generates a tensor of an image
         try:
             img = Image.open(file)
             if img.getbands() != ('R', 'G', 'B'):
@@ -223,7 +236,8 @@ class search:
     '''
     A class used to search for matches in a difPy image repository
     '''
-    def __init__(self, difpy_obj, similarity='duplicates', show_progress=True, logs=True):
+    @profile
+    def __init__(self, difpy_obj, similarity='duplicates', show_progress=True, logs=True, processes=None, maxtasksperchild=None):
         '''
         Parameters
         ----------
@@ -240,6 +254,8 @@ class search:
         self.__difpy_obj = difpy_obj
         self.__similarity = _validate._similarity(similarity)
         self.__show_progress = _validate._show_progress(show_progress)
+        self.__processes = _validate._processes(processes)
+        self.__maxtasksperchild = _validate._maxtasksperchild(maxtasksperchild)
         self.__in_folder = self.__difpy_obj._stats['process']['build']['parameters']['in_folder']
         if self.__show_progress:
             count = 1
@@ -255,6 +271,7 @@ class search:
             _help._show_progress(count, total_count, task='searching files')
         if logs:
             self.stats = self._stats()
+        return
 
     def _main(self):
         # Function that runs the search workflow
@@ -264,33 +281,47 @@ class search:
         self.similar_count = 0
         if self.__in_folder:
             # Search directories separately
-            with Pool() as pool:
-                grouped_img_ids = [img_ids for group_id, img_ids in self.__difpy_obj._group_to_id_dictionary.items()]
+            grouped_img_ids = [img_ids for group_id, img_ids in self.__difpy_obj._group_to_id_dictionary.items()]
+            count = 0
+            for ids in grouped_img_ids:
                 items = []
-                for ids in grouped_img_ids:
-                    items = []
-                    for i, id_a in enumerate(ids):
-                        for j, id_b in enumerate(ids):
-                            if j > i:
-                                items.append((id_a, id_b, self.__difpy_obj._tensor_dictionary[id_a], self.__difpy_obj._tensor_dictionary[id_b]))
-
+                enum_ids = enumerate(ids)
+                for i, id_a in enum_ids:
+                    for j, id_b in enum_ids:
+                        if j > i:
+                            items.append((id_a, id_b, self.__difpy_obj._tensor_dictionary[id_a], self.__difpy_obj._tensor_dictionary[id_b]))
+                            items.append((id_a, id_b, self.__difpy_obj._tensor_dictionary[id_a], np.rot90(self.__difpy_obj._tensor_dictionary[id_b]))) 
+                            items.append((id_a, id_b, self.__difpy_obj._tensor_dictionary[id_a], np.rot90(self.__difpy_obj._tensor_dictionary[id_b])))
+                            items.append((id_a, id_b, self.__difpy_obj._tensor_dictionary[id_a], np.rot90(self.__difpy_obj._tensor_dictionary[id_b])))
+                with Pool(processes=self.__processes, maxtasksperchild=self.__maxtasksperchild) as pool:
                     for output in pool.starmap(self._compute_mse, items):
+                        count += 1
                         if output[2] <= self.__similarity:
                             self._add_to_result(output)
+                        if self.__show_progress:
+                            _help._show_progress(count, len(self.__difpy_obj._group_to_id_dictionary.items()), task='searching files')                              
             self.end_time = datetime.now()
             return self.result
         else:
             # Search union of all directories
-            with Pool() as pool:       
-                ids = list(self.__difpy_obj._tensor_dictionary.keys())
-                items = []
-                for i, id_a in enumerate(ids):
-                    for j, id_b in enumerate(ids):
-                        if j > i:
-                            items.append((id_a, id_b, self.__difpy_obj._tensor_dictionary[id_a], self.__difpy_obj._tensor_dictionary[id_b]))
+            ids = list(self.__difpy_obj._tensor_dictionary.keys())
+            items = []
+            count = 0
+            #enum_ids = enumerate(ids)
+            for i, id_a in enumerate(ids):
+                for j, id_b in enumerate(ids):
+                    if j > i:
+                        items.append((id_a, id_b, self.__difpy_obj._tensor_dictionary[id_a], self.__difpy_obj._tensor_dictionary[id_b]))
+                        items.append((id_a, id_b, self.__difpy_obj._tensor_dictionary[id_a], np.rot90(self.__difpy_obj._tensor_dictionary[id_b]))) 
+                        items.append((id_a, id_b, self.__difpy_obj._tensor_dictionary[id_a], np.rot90(self.__difpy_obj._tensor_dictionary[id_b])))
+                        items.append((id_a, id_b, self.__difpy_obj._tensor_dictionary[id_a], np.rot90(self.__difpy_obj._tensor_dictionary[id_b])))
+            with Pool(processes=self.__processes, maxtasksperchild=self.__maxtasksperchild) as pool: 
                 for output in pool.starmap(self._compute_mse, items):
+                    count += 1
                     if output[2] <= self.__similarity:
                         self._add_to_result(output)
+                    if self.__show_progress:
+                        _help._show_progress(count, len(ids)*len(ids)*4, task='searching files')                           
             self.end_time = datetime.now()
             return self.result
 
@@ -301,9 +332,11 @@ class search:
         stats['process'].update({'search' : {}})
         stats['process']['search'].update({'duration' : {'start': self.start_time.isoformat(),
                                                          'end' : self.end_time.isoformat(),
-                                                        'seconds_elapsed' : seconds_elapsed 
+                                                         'seconds_elapsed' : seconds_elapsed 
                                                         }})
-        stats['process']['search'].update({'parameters' : {'similarity_mse': self.__similarity
+        stats['process']['search'].update({'parameters' : {'similarity_mse': self.__similarity,
+                                                           'processes' : self.__processes,
+                                                           'maxtasksperchild' : self.__maxtasksperchild                                                           
                                                           }})
         stats['process']['search'].update({'files_searched' : len(self.__difpy_obj._tensor_dictionary)})
         
@@ -451,7 +484,7 @@ class search:
                 print(f'Could not move file: {file}')            
         print(f'Moved {len(self.lower_quality["lower_quality"])} files(s) to "{str(Path(destination_path))}"')
         self.lower_quality = new_lower_quality
-        return  
+        return True
 
     def delete(self, silent_del=False):
         # Function for deleting the lower quality images that were found after the search
@@ -484,7 +517,7 @@ class search:
                     except:
                         print(f'Could not delete file: {file}')
         print(f'Deleted {deleted_files} file(s)')
-        return
+        return True
 
 class _validate:
     '''
@@ -578,6 +611,20 @@ class _validate:
             raise Exception('Invalid value for "stats" parameter: must be of type BOOL.')
         return stats
 
+    def _processes(processes):
+        # Function that validates the 'maxtasksperchild' input parameter
+        if not isinstance(processes, int):
+            if not processes == None:
+                raise Exception('Invalid value for "processes" parameter: must be of type INT.')
+        return processes     
+
+    def _maxtasksperchild(maxtasksperchild):
+        # Function that validates the 'maxtasksperchild' input parameter
+        if not isinstance(maxtasksperchild, int):
+            if not maxtasksperchild == None:
+                raise Exception('Invalid value for "maxtasksperchild" parameter: must be of type INT.')
+        return maxtasksperchild        
+
     def _silent_del(silent_del):
         # Function that _validates the 'delete' and the 'silent_del' input parameter
         if not isinstance(silent_del, bool):
@@ -639,13 +686,16 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--delete', type=lambda x: bool(strtobool(x)), help='Delete lower quality images among matches.', required=False, choices=[True, False], default=False)
     parser.add_argument('-sd', '--silent_del', type=lambda x: bool(strtobool(x)), help='Suppress the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
     parser.add_argument('-l', '--logs', type=lambda x: bool(strtobool(x)), help='Collect statistics during the process.', required=False, choices=[True, False], default=True)
+    parser.add_argument('-proc', '--processes', type=_help._type_str_int, help='Maximum number of simultaneous processes when multiprocessing.', required=False, default=None)
+    parser.add_argument('-maxt', '--maxtasksperchild', type=_help._type_str_int, help='Maximum number of tasks completed by each child process when multiprocessing.', required=False, default=None)
+    
     args = parser.parse_args()
 
     # initialize difPy
-    dif = build(args.directory, recursive=args.recursive, in_folder=args.in_folder, limit_extensions=args.limit_extensions,px_size=args.px_size, show_progress=args.show_progress, logs=args.logs)
+    dif = build(args.directory, recursive=args.recursive, in_folder=args.in_folder, limit_extensions=args.limit_extensions,px_size=args.px_size, show_progress=args.show_progress, logs=args.logs, processes=args.processes, maxtasksperchild=args.maxtasksperchild)
     
     # perform search
-    se = search(dif, similarity=args.similarity)
+    se = search(dif, similarity=args.similarity, processes=args.processes, maxtasksperchild=args.maxtasksperchild)
 
     # create filenames for the output files
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
