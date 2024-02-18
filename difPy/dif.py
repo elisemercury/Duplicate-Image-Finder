@@ -5,7 +5,6 @@ https://github.com/elisemercury/Duplicate-Image-Finder
 '''
 from glob import glob
 from multiprocessing import Pool
-from uuid import uuid4
 import numpy as np
 from PIL import Image
 from distutils.util import strtobool
@@ -17,388 +16,6 @@ import json
 import warnings
 from itertools import combinations
 from collections import defaultdict
-
-class search:
-    '''
-    A class used to search for matches in a difPy image repository
-    '''
-    def __init__(self, difpy_obj, similarity='duplicates', rotate=True, lazy=True, show_progress=True, logs=True, processes=None, maxtasksperchild=None, chunksize=1000):
-        '''
-        Parameters
-        ----------
-        difPy_obj : difPy.dif.build
-            difPy object containing the build image repository
-        similarity : 'duplicates', 'similar', float (optional)
-            Image comparison similarity threshold (mse) (default is 'duplicates', 0)
-        rotate : bool (optional)
-            Rotates images on comparison (default is True)
-        lazy : bool (optional)
-            Compares image dimensions. If not equal, images are automatically classified as not similar/duplicates (default is True)
-        show_progress : bool (optional)
-            Show the difPy progress bar in console (default is True)
-        logs : bool (optional)
-            Collect stats on the difPy process (default is True) ## TODO add new params
-        '''
-        # Validate input parameters
-        self.__difpy_obj = difpy_obj
-        self.__similarity = _validate_param._similarity(similarity)
-        self.__rotate = _validate_param._rotate(rotate)
-        self.__lazy = _validate_param._lazy(lazy)
-        self.__show_progress = _validate_param._show_progress(show_progress)
-        self.__processes = _validate_param._processes(processes)
-        self.__maxtasksperchild = _validate_param._maxtasksperchild(maxtasksperchild)
-        self.__chunksize = _validate_param._chunksize(chunksize)
-        self.__in_folder = self.__difpy_obj.stats['process']['build']['parameters']['in_folder']
-
-        print("Initializing search...", end='\r')
-        self.result, self.lower_quality, self.stats = self._main()
-        return
-
-    def _main(self):
-        # Function that runs the search workflow
-        start_time = datetime.now()
-        
-        if self.__in_folder:
-            # Search directories separately
-            result = self._search_infolder()
-            result = self._format_result_infolder(result)
-            lower_quality, duplicate_count, similar_count = self._search_metadata_infolder(result)
-        else:
-            # Search union of all directories
-            result = self._search_union()
-            result = self._format_result_union(result)
-            # Compare image qualities and computes process metadata
-            lower_quality, duplicate_count, similar_count = self._search_metadata_union(result)
-
-        end_time = datetime.now()
-
-        # Generate process stats
-        stats = _generate_stats().search(build_stats=self.__difpy_obj.stats, start_time=start_time, end_time=end_time, similarity = self.__similarity, rotate=self.__rotate, lazy=self.__lazy, processes=self.__processes, maxtasksperchild=self.__maxtasksperchild, files_searched=len(self.__difpy_obj._tensor_dictionary), duplicate_count=duplicate_count, similar_count=similar_count)
-
-        return result, lower_quality, stats
-    
-    def _format_result_union(self, result):
-        # Helper function that replaces the image IDs in the result dictionary by their filename
-        updated_result = dict()
-        for key, value in result.items():
-            # Replace the key with the corresponding value from dict2
-            new_key = self.__difpy_obj._filename_dictionary.get(key, key)
-            # Replace the values in the inner lists with corresponding values from dict2
-            new_value = [[self.__difpy_obj._filename_dictionary.get(inner[0], inner[0]), inner[1]] for inner in value]
-            # Update the new dictionary
-            updated_result[new_key] = new_value
-        return updated_result
-
-    def _format_result_infolder(self, result):
-        # Helper function that replaces the image IDs in the result dictionary by their filename
-        updated_result = dict()
-        for group_id in result.keys():
-            for key, value in result[group_id].items():
-                # Replace the key with the corresponding value from dict2
-                new_key = self.__difpy_obj._filename_dictionary.get(key, key)
-                # Replace the values in the inner lists with corresponding values from dict2
-                new_value = [[self.__difpy_obj._filename_dictionary.get(inner[0], inner[0]), inner[1]] for inner in value]
-                # Update the new dictionary
-                if group_id not in updated_result.keys():
-                    updated_result.update({group_id : {}})
-                updated_result[group_id][new_key] = new_value
-        return updated_result
-
-
-    def _search_union(self):
-        # Search union of all directories
-        result_raw = list()
-        result_count = 0
-        id_combinations = list(combinations(list(self.__difpy_obj._tensor_dictionary.keys()), 2))
-        total = len(id_combinations)
-        self.__count = 0
-
-        with Pool(processes=5) as pool:
-            output = pool.map(self._find_matches, id_combinations)
-        for i in output:
-            if i:
-                result_raw, result_count = self._add_to_result(result_raw, i, result_count, total)
-        self.__count += 1       
-        if self.__show_progress:
-            _help_progress._show_bar(self.__count, 1, task=f'searching files')
-
-        if self.__in_folder:
-            pass
-        else:
-            result = self._group_result_union(result_raw)
-
-        return result
-
-    def _search_metadata_union(self, result):
-        # Helper function that compares image qualities and computes process metadata
-        duplicate_count, similar_count = 0, 0
-        lower_quality = np.array([])
-        if self.__similarity == 0:
-            for img in result.keys():
-                match_group = [img]
-                duplicate_count += len(result[img])
-                for img_matches in result[img]:
-                    # compare image quality
-                    match_group.append(img_matches[0])
-                match_group = self._sort_imgs_by_size(match_group)
-                lower_quality = np.concatenate((lower_quality, match_group[1:]), axis = None)
-        else:
-            for img in result.keys():
-                match_group = [img]
-                for img_matches in result[img]:
-                    # create list of all imgs in group
-                    match_group.append(img_matches[0])
-                    # count duplicate/similar
-                    if img_matches[1] == 0:
-                        duplicate_count += 1
-                    else:
-                        similar_count += 1    
-                # compare img quality
-                match_group = self._sort_imgs_by_size(match_group)
-                lower_quality = np.concatenate((lower_quality, match_group[1:]), axis = None)
-        
-        lower_quality = {'lower_quality': list(set(lower_quality))}
-        return lower_quality, duplicate_count, similar_count    
-
-    def _search_metadata_infolder(self, result):
-        # Helper function that compares image qualities and computes process metadata
-        duplicate_count, similar_count = 0, 0
-        lower_quality = np.array([])
-        if self.__similarity == 0:
-            for group_id in result.keys():
-                for img in result[group_id].keys():
-                    match_group = [img]
-                    duplicate_count += len(result[group_id][img])
-                    for img_matches in result[group_id][img]:
-                        # compare image quality
-                        match_group.append(img_matches[0])
-                    match_group = self._sort_imgs_by_size(match_group)
-                    lower_quality = np.concatenate((lower_quality, match_group[1:]), axis = None)
-        else:
-            for group_id in result.keys():
-                for img in result[group_id].keys():
-                    match_group = [img]
-                    for img_matches in result[group_id][img]:
-                        # create list of all imgs in group
-                        match_group.append(img_matches[0])
-                        # count duplicate/similar
-                        if img_matches[1] == 0:
-                            duplicate_count += 1
-                        else:
-                            similar_count += 1    
-                    # compare img quality
-                    match_group = self._sort_imgs_by_size(match_group)
-                    lower_quality = np.concatenate((lower_quality, match_group[1:]), axis = None)
-            
-        lower_quality = {'lower_quality': list(set(lower_quality))}
-        return lower_quality, duplicate_count, similar_count  
-
-    def _search_infolder(self):
-        # Search directories separately
-        result_raw = list()
-        result_count = 0
-        grouped_img_ids = [img_ids for group_id, img_ids in self.__difpy_obj._group_to_id_dictionary.items()]
-        total = len(self.__difpy_obj._group_to_id_dictionary.items())
-        self.__count = 0
-
-        with Pool(processes=5) as pool:
-            for ids in grouped_img_ids:
-                id_combinations = list(combinations(ids, 2))
-                output = pool.map(self._find_matches, id_combinations)
-                for i in output:
-                    if i:
-                        result_raw, result_count = self._add_to_result(result_raw, i, result_count, total)
-                self.__count += 1        
-                if self.__show_progress:
-                    _help_progress._show_bar(self.__count, 1, task=f'searching files')
-
-        #print(result_raw)
-        result = self._group_result_infolder(result_raw)
-        print(result)
-        return result
-
-    def _generate_stats(self, **kwargs):
-        # Function that generates search stats
-        stats = self.__difpy_obj._stats
-        seconds_elapsed = np.round((kwargs['end_time'] - kwargs['start_time']).total_seconds(), 4)
-        stats['process'].update({'search' : {}})
-        stats['process']['search'].update({'duration' : {'start': kwargs['start_time'].isoformat(),
-                                                         'end' : kwargs['end_time'].isoformat(),
-                                                         'seconds_elapsed' : seconds_elapsed 
-                                                        }})
-        stats['process']['search'].update({'parameters' : {'similarity_mse': self.__similarity,
-                                                           'rotate' : self.__rotate,
-                                                           'processes' : self.__processes,
-                                                           'maxtasksperchild' : self.__maxtasksperchild                                                           
-                                                          }})
-        stats['process']['search'].update({'files_searched' : len(self.__difpy_obj._tensor_dictionary)})
-        
-        stats['process']['search'].update({'matches_found' : {'duplicates': kwargs['duplicate_count'],
-                                                              'similar' : kwargs['similar_count']
-                                                             }})        
-        return stats
-
-    def _sort_imgs_by_size(self, img_list):
-        # Function for sorting a list of images based on their file sizes
-        imgs_sizes = []
-        for img in img_list:
-            img_size = (os.stat(str(img)).st_size, img)
-            imgs_sizes.append(img_size)
-        sort_by_size = [file for size, file in sorted(imgs_sizes, reverse=True)]
-        return sort_by_size
-
-    def _find_matches(self, ids):
-        id_A = ids[0]
-        id_B = ids[1]
-        tensor_A = self.__difpy_obj._tensor_dictionary[id_A]
-        tensor_B = self.__difpy_obj._tensor_dictionary[id_B] 
-        tensor_shape_A = self.__difpy_obj._id_to_shape_dictionary[id_A]
-        tensor_shape_B = self.__difpy_obj._id_to_shape_dictionary[id_B]
-
-        compare = _compare_imgs(tensor_shape_A, tensor_shape_B, tensor_A, tensor_B)
-        if self.__lazy:
-            if compare._compare_shape():
-                if compare._check_equality():
-                    return (id_A, id_B, 0.0) # mse will always be 0
-                else:
-                    mse = compare._compute_mse(rotate=self.__rotate)
-                    if mse <= self.__similarity:
-                        return (id_A, id_B, mse)
-            else:
-                return False
-        else:
-            if compare._check_equality():
-                return (id_A, id_B, 0.0) # mse will always be 0
-            else:
-                mse = compare._compute_mse(rotate=self.__rotate)
-                if mse <= self.__similarity:
-                    return (id_A, id_B, mse)            
-
-    def _add_to_result(self, result_raw, output, result_count, total):
-        result_raw.append(output)
-
-        return result_raw, result_count
-
-    def _group_result_union(self, tuple_list):
-        result = defaultdict(list)
-        already_added = set()
-        for k, *v in tuple_list:
-            if v[0] not in already_added:
-                result[k].append(v)
-                already_added.add(v[0])
-
-        result = dict(result)
-        del already_added
-        return result
-
-    def _group_result_infolder(self, tuple_list):
-        result = defaultdict(list)
-        already_added = set()
-        for k, *v in tuple_list:
-            k_group = self.__difpy_obj._id_to_group_dictionary[k]
-            if k_group not in result:
-                result.update({k_group:{}})
-            if v[0] not in already_added:
-                result[k_group].update({k : []})
-                result[k_group][k].append(v)
-                #result[k].append(v)
-                already_added.add(v[0])
-
-        result = dict(result)
-        del already_added
-        return result
-
-class _generate_stats:
-    def __init__(self):
-        self.stats = dict()
-
-    def build(self, **kwargs):
-        seconds_elapsed = np.round((kwargs['end_time'] - kwargs['start_time']).total_seconds(), 4)
-        invalid_files = kwargs['invalid_files']
-        for file in kwargs['skipped_files']:
-            invalid_files.update({str(Path(file)) : 'FileSkipped: file type was skipped.'})
-        self.stats.update({'directory' : kwargs['directory']})
-        self.stats.update({'process' : {'build': {}}})   
-        self.stats['process']['build'].update({'duration' : {'start': kwargs['start_time'].isoformat(),
-                                                        'end' : kwargs['end_time'].isoformat(),
-                                                        'seconds_elapsed' : seconds_elapsed
-                                                       }})
-        self.stats['process']['build'].update({'parameters': {'recursive' : kwargs['recursive'],
-                                                         'in_folder' : kwargs['in_folder'],
-                                                         'limit_extensions' : kwargs['limit_extensions'],
-                                                         'px_size' : kwargs['px_size'],
-                                                         'processes' : kwargs['processes'],
-                                                         'maxtasksperchild' : kwargs['maxtasksperchild']
-                                                        }})
-        
-        self.stats.update({'invalid_files': {'count' : len(invalid_files),
-                                        'logs' : invalid_files}})
-        
-        return self.stats
-
-    def search (self, **kwargs):
-        # Function that generates search stats
-        stats = kwargs['build_stats']
-        seconds_elapsed = np.round((kwargs['end_time'] - kwargs['start_time']).total_seconds(), 4)
-        stats['process'].update({'search' : {}})
-        stats['process']['search'].update({'duration' : {'start': kwargs['start_time'].isoformat(),
-                                                         'end' : kwargs['end_time'].isoformat(),
-                                                         'seconds_elapsed' : seconds_elapsed 
-                                                        }})
-        stats['process']['search'].update({'parameters' : {'similarity_mse': kwargs['similarity'],
-                                                           'rotate' : kwargs['rotate'],
-                                                           'lazy' : kwargs['lazy'],
-                                                           'processes' : kwargs['processes'],
-                                                           'maxtasksperchild' : kwargs['maxtasksperchild']                                                           
-                                                          }})
-        stats['process']['search'].update({'files_searched' : kwargs['files_searched']})
-        
-        stats['process']['search'].update({'matches_found' : {'duplicates': kwargs['duplicate_count'],
-                                                              'similar' : kwargs['similar_count']
-                                                             }})        
-        return stats
-
-
-class _compare_imgs:
-    def __init__(self, tensor_shape_A, tensor_shape_B, tensor_A, tensor_B):
-        self.tensor_shape_A = tensor_shape_A
-        self.tensor_shape_B = tensor_shape_B
-        self.tensor_A = tensor_A
-        self.tensor_B = tensor_B
-
-    def _compute_mse(self, rotate=True):
-        if rotate:
-            mse_list = []
-            for rot in range(0, 3):
-                if rot == 0:
-                    mse = np.square(np.subtract(self.tensor_A, self.tensor_B)).mean()
-                    mse_list.append(mse)
-                elif rot <= 3:
-                    self.tensor_B = np.rot90(self.tensor_B)
-                    mse = np.square(np.subtract(self.tensor_A, self.tensor_B)).mean()
-                    mse_list.append(mse)
-            min_mse = min(mse_list)  
-            return min_mse
-        else:
-            mse = np.square(np.subtract(self.tensor_A, self.tensor_B)).mean()
-            return mse
-
-    def _compare_shape(self):
-        if (self.tensor_shape_A==self.tensor_shape_B):
-            return True
-        else:
-            return False
-
-    def _check_equality(self):
-        if (self.tensor_A==self.tensor_B).all():
-            return True
-        else:
-            return False
-
-    
-
-############################################################
-
 
 class build:
     '''
@@ -436,6 +53,7 @@ class build:
         self.__processes = _validate_param._processes(processes)
         self.__maxtasksperchild = _validate_param._maxtasksperchild(maxtasksperchild)
 
+        print("v5")
         self._tensor_dictionary, self._id_to_shape_dictionary, self._filename_dictionary, self._id_to_group_dictionary, self._group_to_id_dictionary, self._invalid_files, self.stats = self._main()
 
         #print(self._group_to_id_dictionary)
@@ -462,7 +80,7 @@ class build:
             _help_progress._show_bar(count, total_count, task='preparing files')
         
 
-        stats = _generate_stats().build(start_time=start_time, end_time=end_time, invalid_files=invalid_files, skipped_files=skipped_files, directory=self.__directory, recursive=self.__recursive, in_folder=self.__in_folder, limit_extensions=self.__limit_extensions, px_size=self.__px_size, processes=self.__processes, maxtasksperchild=self.__maxtasksperchild)
+        stats = _generate_stats().build(start_time=start_time, end_time=end_time, total_files=len(filename_dictionary), invalid_files=invalid_files, skipped_files=skipped_files, directory=self.__directory, recursive=self.__recursive, in_folder=self.__in_folder, limit_extensions=self.__limit_extensions, px_size=self.__px_size, processes=self.__processes, maxtasksperchild=self.__maxtasksperchild)
 
         #stats = self._generate_stats(start_time=start_time, end_time=end_time, #invalid_files=invalid_files, skipped_files=skipped_files)
         if self.__show_progress:
@@ -548,9 +166,9 @@ class build:
                             invalid_files.update(output)
                             count += 1
                         else:
-                            img_id = uuid4().int
-                            while img_id in filename_dictionary:
-                                img_id = uuid4().int
+                            img_id = count #uuid4().int
+                            #while img_id in filename_dictionary:
+                                #img_id = uuid4().int
                             filename = output[0]
                             tensor = output[1]
                             shape = output[2]
@@ -571,9 +189,9 @@ class build:
                         invalid_files.update(output)
                         count += 1
                     else:
-                        img_id = uuid4().int
-                        while img_id in filename_dictionary:
-                            img_id = uuid4().int
+                        img_id = count #uuid4().int
+                        #while img_id in filename_dictionary:
+                            #img_id = uuid4().int
                         filename = output[0]
                         tensor = output[1]
                         shape = output[2]
@@ -601,8 +219,531 @@ class build:
                 return {str(Path(file)) : str(e)}
 
 
+class search:
+    '''
+    A class used to search for matches in a difPy image repository
+    '''
+    def __init__(self, difpy_obj, similarity='duplicates', rotate=True, lazy=True, show_progress=True, logs=True, processes=None, maxtasksperchild=None, chunksize=None):
+        '''
+        Parameters
+        ----------
+        difPy_obj : difPy.dif.build
+            difPy object containing the build image repository
+        similarity : 'duplicates', 'similar', float (optional)
+            Image comparison similarity threshold (mse) (default is 'duplicates', 0)
+        rotate : bool (optional)
+            Rotates images on comparison (default is True)
+        lazy : bool (optional)
+            Compares image dimensions. If not equal, images are automatically classified as not similar/duplicates (default is True)
+        show_progress : bool (optional)
+            Show the difPy progress bar in console (default is True)
+        logs : bool (optional)
+            Collect stats on the difPy process (default is True) ## TODO add new params
+        '''
+        # Validate input parameters
+        self.__difpy_obj = difpy_obj
+        self.__similarity = _validate_param._similarity(similarity)
+        self.__rotate = _validate_param._rotate(rotate)
+        self.__lazy = _validate_param._lazy(lazy)
+        self.__show_progress = _validate_param._show_progress(show_progress)
+        self.__processes = _validate_param._processes(processes)
+        self.__maxtasksperchild = _validate_param._maxtasksperchild(maxtasksperchild)
+        self.__chunksize = _validate_param._chunksize(chunksize)
+        self.__in_folder = self.__difpy_obj.stats['process']['build']['parameters']['in_folder']
 
+        print("Initializing search...", end='\r')
+        self.result, self.lower_quality, self.stats = self._main()
+        return
+
+    def _main(self):
+        # Function that runs the search workflow
+        start_time = datetime.now()
+
+        if self.__in_folder:
+            # Search directories separately
+            result = self._search_infolder()
+            result = self._format_result_infolder(result)
+            lower_quality, duplicate_count, similar_count = self._search_metadata_infolder(result)
+        else:
+            # Search union of all directories
+            result = self._search_union()
+            result = self._format_result_union(result)
+            # Compare image qualities and computes process metadata
+            lower_quality, duplicate_count, similar_count = self._search_metadata_union(result)
+
+        end_time = datetime.now()
+
+        # Generate process stats
+        stats = _generate_stats().search(build_stats=self.__difpy_obj.stats, start_time=start_time, end_time=end_time, similarity = self.__similarity, rotate=self.__rotate, lazy=self.__lazy, processes=self.__processes, maxtasksperchild=self.__maxtasksperchild, files_searched=len(self.__difpy_obj._tensor_dictionary), duplicate_count=duplicate_count, similar_count=similar_count)
+
+        return result, lower_quality, stats
+
+    def _search_union(self):
+        # Search union of all directories
+        result_raw = list()
+        result_count = 0
+        self.__count = 0
+
+        if len(self.__difpy_obj._tensor_dictionary.keys()) <= 5000:
+            self._batching = False
+            print("Under 5k")
+            id_combinations = list(combinations(list(self.__difpy_obj._tensor_dictionary.keys()), 2))
+            total = len(id_combinations)
+            with Pool(processes=5) as pool:
+                output = pool.map(self._find_matches, id_combinations)
+            for i in output:
+                if i:
+                    result_raw = self._add_to_result(result_raw, i)
+            self.__count += 1       
+            if self.__show_progress:
+                _help_progress._show_bar(self.__count, 1, task=f'searching files')
+
+        else:
+            print("Above 5k")
+            if self.__chunksize == None:
+                self.__chunksize = round(1000000 / len(self.__difpy_obj._tensor_dictionary.keys()))
+            #for id_combinations in combinations(self.__difpy_obj._tensor_dictionary.keys(), 2):
+            with Pool(processes=5) as pool:
+                for output in pool.imap_unordered(self._find_matches_highperf, self._yield_comparison_group(), self.__chunksize):
+                    if len(output) > 0:
+                        #print(1)
+                        result_raw = result_raw + output
+                    self.__count += 1  
+                    if self.__show_progress:
+                        print(self.__count, end="\r")
+                        _help_progress._show_bar(self.__count, len(self.__difpy_obj._tensor_dictionary.keys())-1, task=f'searching files')                    
+        print("Res_raw: ", result_raw)
+        result = self._group_result_union(result_raw)
+        print("Res: ", result)
+
+        return result
+
+    def _search_infolder(self):
+        # Search directories separately
+        result_raw = list()
+        result_count = 0
+        grouped_img_ids = [img_ids for group_id, img_ids in self.__difpy_obj._group_to_id_dictionary.items()]
+        total = len(self.__difpy_obj._group_to_id_dictionary.items())
+        self.__count = 0
+
+        with Pool(processes=5) as pool:
+            for ids in grouped_img_ids:
+                if len(ids) <= 5000:
+                    print("Under 5k")
+                    id_combinations = list(combinations(ids, 2))
+                    output = pool.map(self._find_matches, id_combinations)
+                    for i in output:
+                        if i:
+                            result_raw = self._add_to_result(result_raw, i)
+                    self.__count += 1        
+                    if self.__show_progress:
+                        _help_progress._show_bar(self.__count, 1, task=f'searching files')
+                else:
+                    print("Above 5k")
+                    if self.__chunksize == None:
+                        self.__chunksize = round(1000000 / len(ids))
+                    for output in pool.imap_unordered(self._find_matches_highperf, self._yield_comparison_group(), self.__chunksize):
+                        if len(output) > 0:
+                            result_raw = result_raw + output
+                        self.__count += 1  
+                    if self.__show_progress:
+                        _help_progress._show_bar(self.__count, len(ids), task=f'searching files')
         
+
+        print("Res_raw: ", result_raw)
+        result = self._group_result_infolder(result_raw)
+        print("Res: ", result)
+        return result
+
+    def _format_result_union(self, result):
+        # Helper function that replaces the image IDs in the result dictionary by their filename
+        updated_result = dict()
+        print(result)
+        for key, value in result.items():
+            # Replace the key with the corresponding value from dict2
+            new_key = self.__difpy_obj._filename_dictionary.get(key, key)
+            # Replace the values in the inner lists with corresponding values from dict2
+            new_value = [[self.__difpy_obj._filename_dictionary.get(inner[0], inner[0]), inner[1]] for inner in value]
+            # Update the new dictionary
+            updated_result[new_key] = new_value
+        return updated_result
+
+    def _format_result_infolder(self, result):
+        # Helper function that replaces the image IDs in the result dictionary by their filename
+        updated_result = dict()
+        for group_id in result.keys():
+            for key, value in result[group_id].items():
+                # Replace the key with the corresponding value from dict2
+                new_key = self.__difpy_obj._filename_dictionary.get(key, key)
+                # Replace the values in the inner lists with corresponding values from dict2
+                new_value = [[self.__difpy_obj._filename_dictionary.get(inner[0], inner[0]), inner[1]] for inner in value]
+                # Update the new dictionary
+                if group_id not in updated_result.keys():
+                    updated_result.update({group_id : {}})
+                updated_result[group_id][new_key] = new_value
+        return updated_result
+
+    def _find_matches(self, ids):
+        id_A = ids[0]
+        id_B = ids[1]
+        tensor_A = self.__difpy_obj._tensor_dictionary[id_A]
+        tensor_B = self.__difpy_obj._tensor_dictionary[id_B] 
+        tensor_shape_A = self.__difpy_obj._id_to_shape_dictionary[id_A]
+        tensor_shape_B = self.__difpy_obj._id_to_shape_dictionary[id_B]
+
+        #compare = _compare_imgs(tensor_shape_A, tensor_shape_B, tensor_A, tensor_B)
+        if self.__lazy:
+            if _compare_imgs._compare_shape(tensor_shape_A, tensor_shape_B): # compare ratio?
+                if _compare_imgs._check_equality(tensor_A, tensor_B):
+                    #print("dup1")
+                    return (id_A, id_B, 0.0) # mse will always be 0
+                else:
+                    mse = _compare_imgs._compute_mse(tensor_A, tensor_B, rotate=self.__rotate)
+                    if mse <= self.__similarity:
+                        #print("dup2")
+                        return (id_A, id_B, mse)
+            else:
+                #print("nope")
+                return False
+        else:
+            if _compare_imgs._check_equality(tensor_A, tensor_B):
+                #print("dup3")
+                return (id_A, id_B, 0.0) # mse will always be 0
+            else:
+                mse = _compare_imgs._compute_mse(tensor_A, tensor_B, rotate=self.__rotate)
+                if mse <= self.__similarity:
+                    return (id_A, id_B, mse)            
+
+    def _find_matches_highperf(self, ids):
+        result = list()
+        id_A = ids[0][0]
+        tensor_A = self.__difpy_obj._tensor_dictionary[id_A]
+        ids_B_list = np.asarray([x[1] for x in ids])
+        tensor_B_list = np.asarray([self.__difpy_obj._tensor_dictionary[x[1]] for x in ids])
+
+        if self.__lazy:
+            # compare only those that have the same shape
+            shape_A_list = [sorted(self.__difpy_obj._id_to_shape_dictionary[id_A])]*len(ids)
+            shape_B_list = [sorted(self.__difpy_obj._id_to_shape_dictionary[id_B]) for id_B in ids_B_list]
+            same_shape = np.equal(shape_A_list, shape_B_list).all(axis=1)
+            shape_index = np.where(same_shape)
+            if len(shape_index) > 0:
+                ids_B_list = ids_B_list[shape_index]
+                tensor_B_list = tensor_B_list[shape_index] # I only compare these in lazy mode
+            
+        # check if dups
+        sum_B_list = [np.sum(tensor_B) for tensor_B in tensor_B_list]
+        sum_A_list = [np.sum(tensor_A)]*len(sum_B_list)
+        duplicates = np.equal(sum_A_list, sum_B_list)
+        
+        dupl_index = np.where(np.equal(sum_A_list, sum_B_list) == True)
+        #print(dupl_index)
+        non_dupl_index = np.where(np.equal(sum_A_list, sum_B_list) == False)
+
+        # append duplicates
+        if len(dupl_index) > 0:
+            for id_B in ids_B_list[dupl_index]:
+                result.append((id_A, id_B, 0))
+            tensor_B_list = tensor_B_list[non_dupl_index] # I only compare this subset in lazy mode
+            ids_B_list = ids_B_list[non_dupl_index]       
+
+        if self.__similarity > 0:
+            mses = np.asarray([_compare_imgs._compute_mse(tensor_A, tensor_B, 
+                                                            rotate=self.__rotate) for tensor_B in tensor_B_list])
+            mse_index_sim = np.where(mses <= self.__similarity)
+            if len(mse_index_sim) > 0:
+                i = 0
+                for id_B in ids_B_list[mse_index_sim]:
+                    result.append((id_A, id_B, mses[i]))
+                    i+=1                   
+
+        return result # matches it found (id_A, id_B, mse)
+
+    def _add_to_result(self, result_raw, output):
+        #result_raw.append(output)
+        result_raw.append(output)
+
+        return result_raw
+
+    def _yield_comparison_group(self):
+        #buffer = list()
+        max_value = len(self.__difpy_obj._tensor_dictionary.keys())
+        #print(55)
+        for i in range(max_value):
+            #print(7)
+            group = [(i, j) for j in range(i+1, max_value)]
+            if len(group) != 0:
+                yield group
+
+    def _group_result_union(self, tuple_list):
+        result = defaultdict(list)
+        already_added = set()
+        for k, *v in tuple_list:
+            if v[0] not in already_added:
+                result[k].append(v)
+                already_added.add(v[0])
+
+        result = dict(result)
+        del already_added
+        return result
+
+    def _group_result_infolder(self, tuple_list):
+
+        result = defaultdict(list)
+        already_added = set()
+        for k, *v in tuple_list:
+            k_group = self.__difpy_obj._id_to_group_dictionary[k]
+            if k_group not in result:
+                result.update({k_group:{}})
+            if v[0] not in already_added:
+                if k not in result[k_group]:
+                    result[k_group].update({k:[]})
+                result[k_group][k].append(v)
+                already_added.add(v[0])
+
+        result = dict(result)
+        del already_added
+        return result
+
+    def _search_metadata_union(self, result):
+        # Helper function that compares image qualities and computes process metadata
+        duplicate_count, similar_count = 0, 0
+        lower_quality = np.array([])
+        if self.__similarity == 0:
+            for img in result.keys():
+                match_group = [img]
+                duplicate_count += len(result[img])
+                for img_matches in result[img]:
+                    # compare image quality
+                    match_group.append(img_matches[0])
+                match_group = _compare_imgs._sort_imgs_by_size(match_group)
+                lower_quality = np.concatenate((lower_quality, match_group[1:]), axis = None)
+        else:
+            for img in result.keys():
+                match_group = [img]
+                for img_matches in result[img]:
+                    # create list of all imgs in group
+                    match_group.append(img_matches[0])
+                    # count duplicate/similar
+                    if img_matches[1] == 0:
+                        duplicate_count += 1
+                    else:
+                        similar_count += 1    
+                # compare img quality
+                match_group = _compare_imgs._sort_imgs_by_size(match_group)
+                lower_quality = np.concatenate((lower_quality, match_group[1:]), axis = None)
+        
+        lower_quality = {'lower_quality': list(set(lower_quality))}
+        return lower_quality, duplicate_count, similar_count    
+
+    def _search_metadata_infolder(self, result):
+        # Helper function that compares image qualities and computes process metadata
+        duplicate_count, similar_count = 0, 0
+        lower_quality = np.array([])
+        if self.__similarity == 0:
+            for group_id in result.keys():
+                for img in result[group_id].keys():
+                    match_group = [img]
+                    duplicate_count += len(result[group_id][img])
+                    for img_matches in result[group_id][img]:
+                        # compare image quality
+                        match_group.append(img_matches[0])
+                    match_group = _compare_imgs._sort_imgs_by_size(match_group)
+                    lower_quality = np.concatenate((lower_quality, match_group[1:]), axis = None)
+        else:
+            for group_id in result.keys():
+                for img in result[group_id].keys():
+                    match_group = [img]
+                    for img_matches in result[group_id][img]:
+                        # create list of all imgs in group
+                        match_group.append(img_matches[0])
+                        # count duplicate/similar
+                        if img_matches[1] == 0:
+                            duplicate_count += 1
+                        else:
+                            similar_count += 1    
+                    # compare img quality
+                    match_group = _compare_imgs._sort_imgs_by_size(match_group)
+                    lower_quality = np.concatenate((lower_quality, match_group[1:]), axis = None)
+            
+        lower_quality = {'lower_quality': list(set(lower_quality))}
+        return lower_quality, duplicate_count, similar_count  
+
+
+    # def _yield_comparison_tuples(self, img_ids):
+    #     comparison_tuples = set()
+    #     n = len(img_ids)
+    #     for i in range(n):
+    #         for j in range(i+1, n):
+    #             comparison_tuples.add((img_ids[i], img_ids[j]))
+    #     yield sorted(comparison_tuples)
+
+    # def _sort_imgs_by_size(self, img_list):
+    #     # Function for sorting a list of images based on their file sizes
+    #     imgs_sizes = []
+    #     for img in img_list:
+    #         img_size = (os.stat(str(img)).st_size, img)
+    #         imgs_sizes.append(img_size)
+    #     sort_by_size = [file for size, file in sorted(imgs_sizes, reverse=True)]
+    #     return sort_by_size
+
+class _compare_imgs:
+    def __init__():
+        pass
+
+    def _compute_mse(tensor_A, tensor_B, rotate=True):
+        if rotate:
+            mse_list = []
+            for rot in range(0, 3):
+                if rot == 0:
+                    mse = np.square(np.subtract(tensor_A, tensor_B)).mean()
+                    mse_list.append(mse)
+                elif rot <= 3:
+                    tensor_B = np.rot90(tensor_B)
+                    mse = np.square(np.subtract(tensor_A, tensor_B)).mean()
+                    mse_list.append(mse)
+            min_mse = min(mse_list)  
+            return min_mse
+        else:
+            mse = np.square(np.subtract(tensor_A, tensor_B)).mean()
+            return mse
+
+    def _compare_shape(tensor_shape_A, tensor_shape_B):
+        if (sorted(tensor_shape_A)==sorted(tensor_shape_B)):
+            return True
+        else:
+            return False
+
+    def _check_equality(tensor_A, tensor_B):
+        if (tensor_A==tensor_B).all():
+            return True
+        else:
+            return False
+        
+    def _sort_imgs_by_size(img_list):
+        # Function for sorting a list of images based on their file sizes
+        imgs_sizes = []
+        for img in img_list:
+            img_size = (os.stat(str(img)).st_size, img)
+            imgs_sizes.append(img_size)
+        sort_by_size = [file for size, file in sorted(imgs_sizes, reverse=True)]
+        return sort_by_size
+        
+class _generate_stats:
+    def __init__(self):
+        self.stats = dict()
+
+    def build(self, **kwargs):
+        seconds_elapsed = np.round((kwargs['end_time'] - kwargs['start_time']).total_seconds(), 4)
+        total_files = kwargs['total_files']
+        invalid_files = kwargs['invalid_files']
+        for file in kwargs['skipped_files']:
+            invalid_files.update({str(Path(file)) : 'FileSkipped: file type was skipped.'})
+        self.stats.update({'directory' : kwargs['directory']})
+        
+        self.stats.update({'process' : {'build': {}}})   
+        self.stats['process']['build'].update({'duration' : {'start': kwargs['start_time'].isoformat(),
+                                                        'end' : kwargs['end_time'].isoformat(),
+                                                        'seconds_elapsed' : seconds_elapsed
+                                                       }})
+        self.stats['process']['build'].update({'parameters': {'recursive' : kwargs['recursive'],
+                                                         'in_folder' : kwargs['in_folder'],
+                                                         'limit_extensions' : kwargs['limit_extensions'],
+                                                         'px_size' : kwargs['px_size'],
+                                                         'processes' : kwargs['processes'],
+                                                         'maxtasksperchild' : kwargs['maxtasksperchild']
+                                                        }})
+        self.stats.update({'total_files' : {'count': total_files}})   
+        self.stats.update({'invalid_files': {'count' : len(invalid_files),
+                                        'logs' : invalid_files}})
+        
+        return self.stats
+
+    def search (self, **kwargs):
+        # Function that generates search stats
+        stats = kwargs['build_stats']
+        seconds_elapsed = np.round((kwargs['end_time'] - kwargs['start_time']).total_seconds(), 4)
+        stats['process'].update({'search' : {}})
+        stats['process']['search'].update({'duration' : {'start': kwargs['start_time'].isoformat(),
+                                                         'end' : kwargs['end_time'].isoformat(),
+                                                         'seconds_elapsed' : seconds_elapsed 
+                                                        }})
+        stats['process']['search'].update({'parameters' : {'similarity_mse': kwargs['similarity'],
+                                                           'rotate' : kwargs['rotate'],
+                                                           'lazy' : kwargs['lazy'],
+                                                           'processes' : kwargs['processes'],
+                                                           'maxtasksperchild' : kwargs['maxtasksperchild']                                                           
+                                                          }})
+        stats['process']['search'].update({'files_searched' : kwargs['files_searched']})
+        
+        stats['process']['search'].update({'matches_found' : {'duplicates': kwargs['duplicate_count'],
+                                                              'similar' : kwargs['similar_count']
+                                                             }})        
+        return stats
+
+
+# class _compare_imgs_batch:
+#     def __init__(self, id_A, ids, tensor_A, tensors_B):
+#         self.id_A = id_A
+#         self.ids = ids
+#         self.tensor_A = tensor_A
+#         self.tensor_B_list = tensors_B
+
+#     def _check_equality(self, rotate=True):
+#         result = list()
+#         sum_A = np.sum(self.tensor_A)
+#         sum_A_list = [sum_A]*len(self.ids)
+#         sum_B_list = [np.sum(tensor_B) for tensor_B in self.tensor_B_list]
+#         if np.equal(sum_A_list, sum_B_list).any():
+#             dupl_index = np.where(np.equal(sum_A_list, sum_B_list) == True)
+#             for i in dupl_index:
+#                 for j in i:
+#                     result.append((self.id_A, self.ids[j][1], 0))
+            
+#             sim_index = np.where(np.equal(sum_A_list, sum_B_list) == False)
+#             for i in sim_index:
+#                 for j in i:
+#                     mse = _compare_imgs._compute_mse(self.tensor_A, self.tensor_B_list, rotate=self.rotate)
+#                     if mse <= self.__similarity:
+#                         result.append((self.id_A, self.ids[j][1], 0))
+
+#         else:
+#             pass # check for similar only
+#         return result 
+    
+#     def _compute_mse(self, rotate=True):
+#         result = list()
+#         if rotate:
+#             count = 0
+#             for tensor_B in self.tensor_B_list:
+#                 mse_list = []
+#                 for rot in range (0, 3):
+#                     if rot == 0:
+#                         mse = np.square(np.subtract(self.tensor_A, tensor_B)).mean()
+#                         #print(mse)
+#                         mse_list.append(mse)
+#                     elif rot <= 3:
+#                         self.tensor_B_list = np.rot90(self.tensor_B_list)
+#                         mse = np.square(np.subtract(self.tensor_A, tensor_B)).mean()
+#                         mse_list.append(mse)
+                
+#                 min_mse = min(mse_list)  
+#                 #print(444)
+#                 result.append((self.id_A, self.ids[count][1], min_mse))
+#                 count += 1
+
+#         else:
+#             for tensor_B in self.tensor_B_list:
+#                 mse = np.square(np.subtract(self.tensor_A, tensor_B)).mean()
+#                 result.append((self.id_A, self.ids[count][1], min_mse))
+#                 count += 1
+
+#         print(result)
+#         return result
+
+#     def _mse(self, tensor_A, tensor_B_list):
+#         mse = np.square(np.subtract(tensor_A_list,tensor_B_list)).mean()
+#         return mse
 
 class _validate_param:
     '''
@@ -720,7 +861,7 @@ class _validate_param:
         # Function that validates the 'chunksize' input parameter
         if not isinstance(chunksize, int):
             if not chunksize == None:
-                raise Exception('Invalid value for "chunksize" parameter: must be of type INT.')
+                raise Exception('Invalid value for "chunksize" parameter: must be of type INT or None.')
         return chunksize        
 
     def _silent_del(silent_del):
