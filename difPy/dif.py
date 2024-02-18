@@ -21,7 +21,7 @@ class build:
     '''
     A class used to initialize difPy and build its image repository
     '''
-    def __init__(self, *directory, recursive=True, in_folder=False, limit_extensions=True, px_size=50, show_progress=True, processes=5):
+    def __init__(self, *directory, recursive=True, in_folder=False, limit_extensions=True, px_size=50, show_progress=True, processes=5, **kwargs):
         '''
         Parameters
         ----------
@@ -49,6 +49,7 @@ class build:
         self.__px_size = _validate_param._px_size(px_size)
         self.__show_progress = _validate_param._show_progress(show_progress)
         self.__processes = _validate_param._processes(processes)
+        _validate_param._kwargs(kwargs)
 
         self._tensor_dictionary, self._id_to_shape_dictionary, self._filename_dictionary, self._id_to_group_dictionary, self._group_to_id_dictionary, self._invalid_files, self.stats = self._main()
 
@@ -123,7 +124,7 @@ class build:
         if self.__limit_extensions:
             valid_files, skip_files = self._filter_extensions(valid_files)
         else:
-            warnings.warn('"limit_extensions" is set to False: difPy accuracy is not guaranteed.')
+            warnings.warn('Parameter "limit_extensions" is set to False. difPy result accuracy can not be guaranteed for non-supported filetypes.', )
             skip_files = []
         return valid_files, skip_files
 
@@ -216,7 +217,7 @@ class search:
     '''
     A class used to search for matches in a difPy image repository
     '''
-    def __init__(self, difpy_obj, similarity='duplicates', rotate=True, lazy=True, show_progress=True, processes=5, chunksize=None):
+    def __init__(self, difpy_obj, similarity='duplicates', rotate=True, lazy=True, show_progress=True, processes=5, chunksize=None, **kwargs):
         '''
         Parameters
         ----------
@@ -245,6 +246,7 @@ class search:
         self.__processes = _validate_param._processes(processes)
         self.__chunksize = _validate_param._chunksize(chunksize)
         self.__in_folder = self.__difpy_obj.stats['process']['build']['parameters']['in_folder']
+        _validate_param._kwargs(kwargs)
 
         print("Initializing search...", end='\r')
         self.result, self.lower_quality, self.stats = self._main()
@@ -562,6 +564,60 @@ class search:
         lower_quality = list(set(lower_quality))
         return lower_quality, duplicate_count, similar_count  
 
+    def move_to(self, destination_path):
+        # Function for moving the lower quality images that were found after the search
+        '''
+        Parameters
+        ----------
+        destination_path : str
+            Path to move the lower_quality files to
+        '''
+        destination_path = _validate_param._move_to(destination_path)
+        new_lower_quality = []
+        for file in self.lower_quality:
+            try:
+                head, tail = os.path.split(file)
+                os.replace(file, os.path.join(destination_path, tail))
+                new_lower_quality = np.append(new_lower_quality, str(Path(os.path.join(destination_path, tail))))
+            except:
+                print(f'Could not move file: {file}')            
+        print(f'Moved {len(self.lower_quality)} files(s) to "{str(Path(destination_path))}"')
+        self.lower_quality = new_lower_quality
+        return  
+
+    def delete(self, silent_del=False):
+        # Function for deleting the lower quality images that were found after the search
+        '''
+        Parameters
+        ----------
+        silent_del : bool, optional
+            Skip user confirmation when delete=True (default is False)
+        '''
+        silent_del = _validate_param._silent_del(silent_del)
+        deleted_files = 0
+        if len(self.lower_quality) > 0:
+            if not silent_del:
+                usr = input('Are you sure you want to delete all lower quality matched images? \n! This cannot be undone. (y/n)')
+                if str(usr).lower() == 'y':
+                    for file in self.lower_quality:
+                        try:
+                            os.remove(file)
+                            deleted_files += 1
+                        except:
+                            print(f'Could not delete file: {file}')       
+                else:
+                    print('Deletion canceled.')
+                    return
+            else:
+                for file in self.lower_quality:
+                    try:
+                        os.remove(file)
+                        deleted_files += 1
+                    except:
+                        print(f'Could not delete file: {file}')
+        print(f'Deleted {deleted_files} file(s)')
+        return
+
 class _compare_imgs:
     '''
     A class for comparing images, used by the difpy algorithm
@@ -800,6 +856,10 @@ class _validate_param:
                 raise ValueError(f'Invalid value for "move_to" parameter: "{str(dir)}" is not a directory.')
         return dir 
 
+    def _kwargs(kwargs):
+        if "logs" in kwargs:
+            warnings.warn('Parameter "logs" was deprecated with difPy v4.1. Using it might lead to an exception in future versions. Consider updating your script.', FutureWarning)
+
 class _help:
     '''
     A helper class used for throughout the difPy processes
@@ -827,20 +887,24 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--in_folder', type=lambda x: bool(strtobool(x)), help='Search for matches in the union of directories.', required=False, choices=[True, False], default=False)    
     parser.add_argument('-le', '--limit_extensions', type=lambda x: bool(strtobool(x)), help='Limit search to known image file extensions.', required=False, choices=[True, False], default=True)
     parser.add_argument('-px', '--px_size', type=int, help='Compression size of images in pixels.', required=False, default=50)
-    parser.add_argument('-p', '--show_progress', type=lambda x: bool(strtobool(x)), help='Show the real-time progress of difPy.', required=False, choices=[True, False], default=True)
     parser.add_argument('-s', '--similarity', type=_help._convert_str_to_int, help='Similarity grade (mse).', required=False, default='duplicates')
     parser.add_argument('-ro', '--rotate', type=lambda x: bool(strtobool(x)), help='Rotate images during comparison process.', required=False, choices=[True, False], default=True)    
     parser.add_argument('-la', '--lazy', type=lambda x: bool(strtobool(x)), help='Compares image dimensions before comparison process.', required=False, choices=[True, False], default=True)    
     parser.add_argument('-mv', '--move_to', type=str, help='Output directory path of lower quality images among matches.', required=False, default=None)
     parser.add_argument('-d', '--delete', type=lambda x: bool(strtobool(x)), help='Delete lower quality images among matches.', required=False, choices=[True, False], default=False)
     parser.add_argument('-sd', '--silent_del', type=lambda x: bool(strtobool(x)), help='Suppress the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
-    parser.add_argument('-proc', '--processes', type=help._convert_str_to_int, help='Maximum number of simultaneous processes when multiprocessing.', required=False, default=None)
-    parser.add_argument('-ch', '--chunksize', type=help._convert_str_to_int, help='Only relevant when dataset > 5k images. Sets the batch size at which the job is simultaneously processed when multiprocessing.', required=False, default=None)
+    parser.add_argument('-p', '--show_progress', type=lambda x: bool(strtobool(x)), help='Show the real-time progress of difPy.', required=False, choices=[True, False], default=True)
+    parser.add_argument('-proc', '--processes', type=_help._convert_str_to_int, help='Maximum number of simultaneous processes when multiprocessing.', required=False, default=None)
+    parser.add_argument('-ch', '--chunksize', type=_help._convert_str_to_int, help='Only relevant when dataset > 5k images. Sets the batch size at which the job is simultaneously processed when multiprocessing.', required=False, default=None)
+    parser.add_argument('-l', '--logs', type=lambda x: bool(strtobool(x)), help='(Deprecated) Collect statistics during the process.', required=False, choices=[True, False], default=None)
 
     args = parser.parse_args()
 
+    if args.logs != None:
+        _validate_param._kwargs(["logs"])
+
     # initialize difPy
-    dif = build(args.directory, recursive=args.recursive, in_folder=args.in_folder, limit_extensions=args.limit_extensions, px_size=args.px_size, show_progress=args.show_progress, processes=args.processes)
+    dif = build(args.directory, recursive=args.recursive, in_folder=args.in_folder, limit_extensions=args.limit_extensions, px_size=args.px_size, show_progress=args.show_progress, processes=args.processes, )
     
     # perform search
     se = search(dif, similarity=args.similarity, rotate=args.rotate, lazy=args.lazy, processes=args.processes, chunksize=args.chunksize)
