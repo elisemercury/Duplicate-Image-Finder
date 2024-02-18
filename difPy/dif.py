@@ -124,7 +124,7 @@ class build:
         if self.__limit_extensions:
             valid_files, skip_files = self._filter_extensions(valid_files)
         else:
-            warnings.warn('Parameter "limit_extensions" is set to False. difPy result accuracy can not be guaranteed for non-supported filetypes.', )
+            warnings.warn('Parameter "limit_extensions" is set to False. difPy result accuracy can not be guaranteed for file formats not covered by "limit_extensions"', )
             skip_files = []
         return valid_files, skip_files
 
