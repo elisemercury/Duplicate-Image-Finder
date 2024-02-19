@@ -83,7 +83,7 @@ After the search is completed, further actions can be performed using :ref:`sear
 
 .. code-block:: python
 
-   difPy.search(difPy_obj, similarity='duplicates', rotate=True, lazy=True, processes=None, chunksize=None, show_progress=False, logs=True)
+   difPy.search(difPy_obj, similarity='duplicates', lazy=True, rotate=True, processes=None, chunksize=None, show_progress=False, logs=True)
 
 ``difPy.search`` supports the following parameters:
  
@@ -94,8 +94,8 @@ After the search is completed, further actions can be performed using :ref:`sear
 
    :ref:`difPy_obj`,"``difPy_obj``",,
    :ref:`similarity`,"``str``, ``int``",``'duplicates'``, "``'similar'``, any ``int`` or ``float``"
-   :ref:`rotate`,``bool``,``True``,``False``
    :ref:`lazy`,``bool``,``True``,``False``
+   :ref:`rotate`,``bool``,``True``,``False``
    :ref:`show_progress2`,``bool``,``True``,``False``
    :ref:`processes`,``int``,``None`` (``os.cpu_count()``), any ``int``
    :ref:`chunksize`,``int``,``None``, any ``int``
@@ -110,14 +110,14 @@ The required ``difPy_obj`` parameter should be pointing to the ``dif`` object th
 .. _similarity:
 
 .. include:: /parameters/similarity.rst
+   
+.. _lazy:
+
+.. include:: /parameters/lazy.rst
 
 .. _rotate:
 
 .. include:: /parameters/rotate.rst
-
-.. _lazy:
-
-.. include:: /parameters/lazy.rst
 
 .. _show_progress2:
 
