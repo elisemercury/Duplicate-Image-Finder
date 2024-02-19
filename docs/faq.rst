@@ -12,7 +12,7 @@ Starting with `v4.1`_, difPy handles small and larger datasets differently. Sinc
 
 .. _v4.1: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
 
-When difPy received a dataset of **5k images or less**, difPy uses its Classic algorithm and compares **all image combinations at once**, hence all of the image data is loaded into memory. This can speed up the comparison processing time, but in turn is heavier on memory consumption. Therefore, this algorithm is only used on "small" datasets.
+When difPy receives a **"small" dataset** (<= 5k images), it uses its Classic algorithm and compares **all image combinations at once**, hence all of the image data is loaded into memory. This can speed up the comparison processing time, but in turn is heavier on memory consumption. Therefore, this algorithm is only used on "small" datasets.
 
 .. figure:: static/assets/simple_algorithm.png
    :width: 480
@@ -22,7 +22,7 @@ When difPy received a dataset of **5k images or less**, difPy uses its Classic a
 
    Classic algorithm visualized
 
-When difPy receives a dataset that contains **more than 5k images**, images are **split into smaller groups** which are processed one-by-one leveraging `Python generators`_. This leads to a significant reduction in memory overhead, as only a single smaller chunk is loaded into memory once at a time, as compared to the full list of all potential image comparison combinations. Furthermore, images are compared leveraging vectorization which also allows for faster comparison times on large datasets. 
+When difPy receives a **"large" dataset** (> 5k images), the Chunking algorithm is used which **splits images into smaller groups** and processes these chunk-by-chunk leveraging `Python generators`_. This leads to a significant reduction in memory overhead, as less data is loaded into memory once at a time, as compared to the full list of all potential image comparison combinations. Furthermore, images are compared leveraging vectorization which also allows for faster comparison times on larger datasets. 
 
 .. _Python generators: https://docs.python.org/3/reference/expressions.html#yield-expressions
 
@@ -36,7 +36,7 @@ When difPy receives a dataset that contains **more than 5k images**, images are 
 
 The picture above visualizes the chunks that are processed one-by-one by the Chunking algorithm. Each of the columns represent a chunk (a group) of images. 
 
-The ``chunksize`` parameter sets how many of these chunks will be processed at once (see :ref:`chunksize`). By default, ``chunksize`` is set to ``None`` which implies: ``1'000'000 / number of images in dataset``. This ratio is used to automatically size the ``chunksize`` according to the size of the dataset, with the goal of keeping memory consumption low. This is a good technique for datasets smaller than 1 million images. As soon as the number of images will reach more, then heavier memory consumption increase will become inevitable, as the number of potential image combinations (matches) becomes increasingly large. It is **not** recommended to adjust this parameter manually.
+The ``chunksize`` parameter defined **how many of these chunks will be processed at once** (see :ref:`chunksize`). By default, ``chunksize`` is set to ``None`` which implies: ``1'000'000 / number of images in dataset``. This ratio is used to automatically size the ``chunksize`` according to the size of the dataset, with the goal of keeping memory consumption low. This is a good technique for datasets smaller than 1 million images. As soon as the number of images will reach more, then heavier memory consumption increase will become inevitable, as the number of potential image combinations (matches) becomes increasingly large. It is **not** recommended to adjust this parameter manually.
 
 .. _What's new in v4?:
 
