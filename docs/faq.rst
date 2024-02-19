@@ -17,7 +17,7 @@ When difPy receives a dataset that contains **more than 5k images**, images are 
 .. _Python generators: https://docs.python.org/3/reference/expressions.html#yield-expressions
 
 .. figure:: static/assets/batch_algorithm.png
-   :width: 450
+   :width: 4601
    :height: 250
    :alt: Chunking Algorithm Visualized
    :align: center
@@ -31,7 +31,7 @@ The ``chunksize`` parameter sets how many of these chunks will be processed at o
 When dealing with a dataset that has 5k images or less, difPy uses its Classic algorithm and compares all images at once, hence all of the image data is loaded into memory.
 
 .. figure:: static/assets/simple_algorithm.png
-   :width: 450
+   :width: 460
    :height: 170
    :alt: Simple Algorithm Visualized
    :align: center
