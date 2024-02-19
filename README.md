@@ -20,7 +20,7 @@
 pip install difPy
 ```
 
-> :point_right: :new: **difPy v4** is out! difPy v4 comes with up to **10x more performace** than previous difPy versions. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for details. 
+> :point_right: :new: **difPy v4** is out! difPy v4 comes with up to **10x more performance** than previous difPy versions. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for details. 
 
 > :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://difpy.readthedocs.io/en/latest/contributing.html) for more information.
 
