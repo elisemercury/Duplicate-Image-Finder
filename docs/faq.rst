@@ -34,9 +34,9 @@ When difPy receives a **"large" dataset** (> 5k images), the Chunking algorithm 
 
    Chunking algorithm visualized
 
-The picture above visualizes the chunks that are processed one-by-one by the Chunking algorithm. Each of the columns represent a chunk (a group) of images. 
+The picture above visualizes how chunks are processed by the Chunking algorithm. Each of the image columns represent a chunk. 
 
-The ``chunksize`` parameter defined **how many of these chunks will be processed at once** (see :ref:`chunksize`). By default, ``chunksize`` is set to ``None`` which implies: ``1'000'000 / number of images in dataset``. This ratio is used to automatically size the ``chunksize`` according to the size of the dataset, with the goal of keeping memory consumption low. This is a good technique for datasets smaller than 1 million images. As soon as the number of images will reach more, then heavier memory consumption increase will become inevitable, as the number of potential image combinations (matches) becomes increasingly large. It is **not** recommended to adjust this parameter manually.
+The ``chunksize`` parameter defines **how many of these chunks will be processed at once** (see :ref:`chunksize`). By default, ``chunksize`` is set to ``None`` which implies: ``1'000'000 / number of images in dataset``. This ratio is used to automatically size the ``chunksize`` according to the size of the dataset, with the goal of keeping memory consumption low. This is a good technique for datasets smaller than 1 million images. As soon as the number of images will reach more, then heavier memory consumption increase will become inevitable, as the number of potential image combinations (matches) becomes increasingly large. It is **not** recommended to adjust this parameter manually.
 
 .. _What's new in v4?:
 
