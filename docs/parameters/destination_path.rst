@@ -1,8 +1,4 @@
-in_folder (bool)
+destination_path (str)
 ^^^^^^^^^^^^
 
-By default, difPy will search for matches in the union of all directories specified in the :ref:`directory` parameter. To have difPy only search for matches within each folder separately, set ``in_folder`` to ``True``.
-
-``True`` = searches for matches only among each individual directory, including subdirectories
-
-``False`` = (default) searches for matches in the union of all directories
+Directory of where the lower quality files should me moved. Should be given as Python ``string``.
