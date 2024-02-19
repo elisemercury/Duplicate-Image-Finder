@@ -133,9 +133,9 @@ search.stats
                                        'lazy': True,
                                        'processes': 5,
                                        'chunksize': None},
-                    'files_searched': 3232,
-                    'matches_found': {'duplicates': 3030, 
-                                      'similar': 0}}}}
+                        'files_searched': 3232,
+                        'matches_found': {'duplicates': 3030, 
+                                          'similar': 0}}}}
 ```
 
 ## Additional Parameters
