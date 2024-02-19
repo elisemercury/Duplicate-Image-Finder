@@ -107,7 +107,7 @@ difPy_obj
 
 The required ``difPy_obj`` parameter should be pointing to the ``dif`` object that was built during the invocation of :ref:`difPy.build`. 
 
-.. _similarity:
+.. _similarity: 
 
 .. include:: /parameters/similarity.rst
    
