@@ -11,7 +11,7 @@ The search for similar images can be useful when searching for duplicate files t
 
 .. figure:: static/assets/choosing_similarity.png 
    :width: 500
-   :height: 400
+   :height: 390
    :alt: Setting the "similarity" & "lazy" Parameter
    :align: center
 
