@@ -1,5 +1,5 @@
 chunksize (int)
-^^^^^^^^^^^^
+++++++++++++
 
 .. warning::
    Recommended not to change default value. Only adjust this value if you know what you are doing.
