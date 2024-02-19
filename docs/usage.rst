@@ -33,7 +33,7 @@ Search for duplicate images in a single folder:
 .. code-block:: python
 
    import difPy
-   dif = difPy.build("C:/Path/to/Folder/")
+   dif = difPy.build('C:/Path/to/Folder/')
    search = difPy.search(dif)
 
 Multi Folder Search
@@ -44,7 +44,7 @@ Search for duplicate images in multiple folders:
 .. code-block:: python
 
    import difPy
-   dif = difPy.build("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder_C/", ...)
+   dif = difPy.build('C:/Path/to/Folder_A/', 'C:/Path/to/Folder_B/', 'C:/Path/to/Folder_C/', ...)
    search = difPy.search(dif)
 
 or add a ``list`` of folders:
@@ -52,7 +52,7 @@ or add a ``list`` of folders:
 .. code-block:: python
 
    import difPy
-   dif = difPy.build(["C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder_C/", ... ])
+   dif = difPy.build(['C:/Path/to/Folder_A/', 'C:/Path/to/Folder_B/', 'C:/Path/to/Folder_C/', ... ])
    search = difPy.search(dif)
 
 
@@ -73,9 +73,9 @@ difPy can be invoked through a CLI interface by using the following commands:
 
    python dif.py #working directory
 
-   python dif.py -D "C:/Path/to/Folder/"
+   python dif.py -D 'C:/Path/to/Folder/'
 
-   python dif.py -D "C:/Path/to/Folder_A/" "C:/Path/to/Folder_B/" "C:/Path/to/Folder_C/"
+   python dif.py -D 'C:/Path/to/Folder_A/' 'C:/Path/to/Folder_B/' 'C:/Path/to/Folder_C/'
 
 .. note::
 
@@ -86,22 +86,25 @@ difPy in the CLI supports the following arguments:
 .. code-block:: python
    
    dif.py [-h] [-D DIRECTORY [DIRECTORY ...]] [-Z OUTPUT_DIRECTORY] 
-          [-r {True,False}] [-i {True,False}] [-le {True,False}] 
-          [-px PX_SIZE] [-p {True,False}] [-s SIMILARITY] 
-          [-mv MOVE_TO] [-d {True,False}] [-sd {True,False}] 
-          [-l {True,False}]
+         [-r {True,False}] [-i {True,False}] [-le {True,False}] 
+         [-px PX_SIZE]  [-s SIMILARITY] [-ro {True,False}]
+         [-la {True,False}] [-proc PROCESSES] [-ch CHUNKSIZE] 
+         [-mv MOVE_TO] [-d {True,False}] [-sd {True,False}]
+         [-p {True,False}]
 
 .. csv-table::
    :header: Cmd,Parameter,Cmd,Parameter
    :widths: 5, 10, 5, 10
    :class: tight-table
 
-   ``-D``,directory,``-le``,limit_extensions
-   ``-Z``,output_directory,``-p``,show_progress
-   ``-r``,recursive,``-mv``,move_to
-   ``-i``,in_folder,``-d``,delete
-   ``-s``,similarity,``-sd``,silent_del
-   ``-px``,px_size,``-l``,logs
+   ``-D``,directory,``-la``,lazy
+   ``-Z``,output_directory,``-prox``,processes
+   ``-r``,recursive,``-ch``,chunksize
+   ``-i``,in_folder,``-mv``,move_to
+   ``-le``,limit_extensions,``-d``,delete
+   ``-px``,px_size,``-sd``,silent_del
+   ``-s``,similarity,``-p``,show_progress
+   ``-ro``,rotate,
 
 If no directory parameter is given in the CLI, difPy will **run on the current working directory**.
 
@@ -122,34 +125,31 @@ difPy returns various types of output:
 
 I. Search Result Dictionary
 ^^^^^^^^^^
-A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found, where the keys are a **randomly generated unique id** for each image file:
+A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found. Each match group has one "main" image (which is the key of the dictionary) that can have one or more matches. For each match, a list with the match filename and the MSE between "main" image and match are added.
 
 .. code-block:: python
 
    search.result
 
    > Output:
-   {20220819171549 : {"location" : "C:/Path/to/Image/image1.jpg",
-                      "matches" : {30270813251529 : "location": "C:/Path/to/Image/matched_image1.jpg",
-                                                    "mse": 0.0},
-                                  {72214282557852 : "location": "C:/Path/to/Image/matched_image2.jpg",
-                                                    "mse": 0.0},
-                      ... }
-    ...
+   {'C:/Path/to/Image/image1.jpg' : [['C:/Path/to/Image/duplicate_image1a.jpg', 0.0], 
+                                     ['C:/Path/to/Image/duplicate_image1b.jpg', 0.0]],
+    'C:/Path/to/Image/image2.jpg' : [['C:/Path/to/Image/duplicate_image2a.jpg', 0.0]],
+   ...
    }
 
 II. Lower Quality Files
 ^^^^^^^^^^
 
-A **JSON formatted collection** of duplicates/similar images that have the **lowest quality** among match groups: 
+A **list** of duplicates/similar images that have the **lowest quality** among match groups: 
 
 .. code-block:: python
 
    search.lower_quality
 
    > Output:
-   {"lower_quality" : ["C:/Path/to/Image/duplicate_image1.jpg", 
-                     "C:/Path/to/Image/duplicate_image2.jpg", ...]}
+   ['C:/Path/to/Image/duplicate_image1.jpg', 
+    'C:/Path/to/Image/duplicate_image2.jpg', ...]
 
 To find the lower quality images, difPy compares all image file sizes within a match group and selects all images that have lowest image file size among the group.
 
@@ -157,13 +157,13 @@ Lower quality images then can be **moved** to a different location (see :ref:`se
 
 .. code-block:: python
    
-   search.move_to(search, destination_path="C:/Path/to/Destination/")
+   search.move_to(destination_path='C:/Path/to/Destination/')
 
 Or **deleted** (see :ref:`search.delete`):
 
 .. code-block:: python
 
-   search.delete(search, silent_del=False)
+   search.delete(silent_del=False)
 
 
 .. _Process Statistics:
@@ -178,20 +178,26 @@ A **JSON formatted collection** with statistics on the completed difPy process:
    search.stats
 
    > Output:
-   {"directory" : ("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", ... ),
-    "process" : {"build" : {"duration" : {"start" : "2023-08-28T21:22:48.691008",
-                                          "end" : "2023-08-28T21:23:59.104351",
-                                          "seconds_elapsed" : "70.4133"},
-                            "parameters" : {"recursive" : True,
-                                            "in_folder" : False,
-                                            "limit_extensions" : True,
-                                            "px_size" : 50}},
-                 "search" : {"duration" : {"start" : "2023-08-28T21:23:59.106351",
-                                           "end" : "2023-08-28T21:25:17.538015",
-                                           "seconds_elapsed" : "78.4317"},
-                           "parameters" : {"similarity_mse" : 0}
-                           "files_searched" : 5225,
-                           "matches_found" : {"duplicates" : 5,
-                                              "similar" : 0}}}
-    "invalid_files" : {"count" : 230,
-                       "logs" : {...}}}
+   {'directory': ['C:/Path/to/Folder_A/', 'C:/Path/to/Folder_B/', ... ],
+    'process': {'build': {'duration': {'start': '2024-02-18T19:52:39.479548',
+                                       'end': '2024-02-18T19:52:41.630027',
+                                       'seconds_elapsed': 2.1505},
+                        'parameters': {'recursive': True,
+                                       'in_folder': False,
+                                       'limit_extensions': True,
+                                       'px_size': 50,
+                                       'processes': 5},
+                           'total_files': {'count': 3232},
+                           'invalid_files': {'count': 0, 
+                                             'logs': {}}},
+               'search': {'duration': {'start': '2024-02-18T19:52:41.630027',
+                                       'end': '2024-02-18T19:52:46.770077',
+                                       'seconds_elapsed': 5.14},
+                           'parameters': {'similarity_mse': 0,
+                                          'rotate': True,
+                                          'lazy': True,
+                                          'processes': 5,
+                                          'chunksize': None},
+                     'files_searched': 3232,
+                     'matches_found': {'duplicates': 3030, 
+                                       'similar': 0}}}}
