@@ -15,6 +15,6 @@ The search for similar images can be useful when searching for duplicate files t
    :alt: Setting the "similarity" & "lazy" Parameter
    :align: center
 
-   Setting the ``similarity``and ``lazy`` parameter
+   Setting the "similarity" and "lazy" parameter
 
 **Manual setting**: the match MSE threshold can be adjusted manually by setting the ``similarity`` parameter to any ``int`` or ``float``. difPy will then search for images that match an MSE threshold **equal to or lower than** the one specified.
