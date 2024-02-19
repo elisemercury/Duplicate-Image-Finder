@@ -3,14 +3,36 @@ FAQ
 
 .. _faq:
 
-.. _Using difPy with large datasets:
+.. _Using difPy with Large Datasets:
 
-Using difPy with large datasets
+Using difPy with Large Datasets
 ----------------
 
-TODO
+Starting with `v4.1`_, difPy handles small and larger datasets differently. Since the computational overhead and especially memory consumption can become very high on large image datasets, difPy utilizes a different algorithm specifically to process larger datasets more efficiently and less memory intensive. 
 
+.. _v4.1: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
 
+When difPy receives a dataset that contains **more than 5k images**, images are **split in smaller batches** which are processed one-by-one leveraging `Python generators`_. This leads to a significant reduction in memory overhead, as only a single small batch is loaded into memory, as compared to the full list of all potential image comparison combinations. Furthermore, images are compared leveraging vectorization which also allows for faster comparison times on large datasets.
+
+.. _Python generators: https://docs.python.org/3/reference/expressions.html#yield-expressions
+
+.. figure:: static/assets/batch_algorithm.png
+   :width: 520
+   :height: 309
+   :alt: Batch Algorithm Visualized
+   :align: center
+
+   Batch Algorithm Visualized interface
+
+Nonetheless, even using this algorithm, difPy 
+
+.. figure:: static/assets/simple_algorithm.png
+   :width: 520
+   :height: 309
+   :alt: Simple Algorithm Visualized
+   :align: center
+
+   Simple Algorithm Visualized interface
 
 .. _What's new in v4?:
 
