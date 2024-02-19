@@ -219,12 +219,12 @@ After the search is completed, further actions can be performed using :ref:`sear
    :class: tight-table
 
    :ref:`difPy_obj`,"``difPy_obj``",,
-   :ref:`similarity`,"``str``, ``int``",``'duplicates'``, "``'similar'``, any ``int`` or ``float``"
+   :ref:`similarity`,"``str``, ``int``",``'duplicates'``, "``'similar'``,  ``int``, ``float``"
    :ref:`rotate`,``bool``,``True``,``False``
    :ref:`lazy`,``bool``,``True``,``False``
    :ref:`show_progress2`,``bool``,``True``,``False``
-   :ref:`processes`,``int``,``None`` (``os.cpu_count()``), any ``int``
-   :ref:`chunksize`,``int``,``None``, any ``int``
+   :ref:`processes`,``int``,``None`` (``os.cpu_count()``), ``int``
+   :ref:`chunksize`,``int``,``None``, ``int``
 
 .. _difPy_obj:
 
