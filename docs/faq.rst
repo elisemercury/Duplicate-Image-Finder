@@ -26,11 +26,11 @@ When difPy receives a dataset that contains **more than 5k images**, images are 
 
 The picture above visualizes the chunks that are processed one-by-one by the chunking algorithm. Each of the "blocks" represent a chunk of images. The ``chunksize`` parameter sets how many of these chunks will be processed at once (see :ref:`chunksize`).
 
-Nonetheless, even using this algorithm, difPy  
+When dealing with a dataset that has 5k images or less, difPy compares all images at once, hence more all of this data is loaded into memory.
 
 .. figure:: static/assets/simple_algorithm.png
-   :width: 500
-   :height: 100
+   :width: 450
+   :height: 170
    :alt: Simple Algorithm Visualized
    :align: center
 

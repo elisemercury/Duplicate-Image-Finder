@@ -38,8 +38,6 @@ Fast Search (FSA)
 ^^^^^^^^^^
 difPy Web can leverage difPy's **Fast Search Algorithm (FSA)** for increased performance when searching for  duplicate images. FSA can not be enabled when searching for similar images. 
 
-More information on FSA can be found in the :ref:`Fast Search Algorithm (FSA)` section.
-
 Similarity
 ^^^^^^^^^^
 difPy Web can search for **duplicate or similar** images within the uploaded files. By default, difPy will search for duplicate images. Select "similar" to search for similar images. 
