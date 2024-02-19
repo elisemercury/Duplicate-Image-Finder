@@ -24,9 +24,11 @@ When difPy receives a dataset that contains **more than 5k images**, images are 
 
    Chunking Algorithm Visualized interface
 
-The picture above visualizes the chunks that are processed one-by-one by the chunking algorithm. Each of the "blocks" represent a chunk of images. The ``chunksize`` parameter sets how many of these chunks will be processed at once (see :ref:`chunksize`). By default, ``chunksize`` is set to ``None`` which implies: ``1'000'000 / number of images in dataset``. Minimum value is 1. The division is a strategy to size the chunksize according to the size of the dataset, with the goal of containing memory needs. Nevertheless, as soon as the number of images will reach more than 1'000'000, then memory consumption increase will become inevitable, as the number of potential image combinations (matches) becomes increasingly large.
+The picture above visualizes the chunks that are processed one-by-one by the Chunking algorithm. Each of the columns represent a chunk (a group) of images. 
 
-When dealing with a dataset that has 5k images or less, difPy compares all images at once, hence more all of this data is loaded into memory.
+The ``chunksize`` parameter sets how many of these chunks will be processed at once (see :ref:`chunksize`). By default, ``chunksize`` is set to ``None`` which implies: ``1'000'000 / number of images in dataset``. The division is used to size the ``chunksize`` according to the size of the dataset, with the goal of containing memory needs. Nevertheless, as soon as the number of images will reach more than 1'000'000, then memory consumption increase will become inevitable, as the number of potential image combinations (matches) becomes increasingly large.
+
+When dealing with a dataset that has 5k images or less, difPy uses its Classic algorithm and compares all images at once, hence all of the image data is loaded into memory.
 
 .. figure:: static/assets/simple_algorithm.png
    :width: 450
@@ -34,7 +36,7 @@ When dealing with a dataset that has 5k images or less, difPy compares all image
    :alt: Simple Algorithm Visualized
    :align: center
 
-   Simple Algorithm Visualized interface
+   Classic Algorithm Visualized interface
 
 .. _What's new in v4?:
 
