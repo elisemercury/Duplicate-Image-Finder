@@ -1,6 +1,9 @@
 limit_extensions (bool)
 ++++++++++++
 
+.. warning::
+   difPy result accuracy can not be guaranteed for file formats not covered by "limit_extensions".
+
 By default, difPy only searches for images with a predefined filetype. This speeds up the process, since difPy does not have to attempt to decode files it might not support. Nonetheless, you can let difPy try to decode other file types by setting ``limit_extensions`` to ``False``.
 
 .. note::
@@ -14,6 +17,3 @@ By default, difPy only searches for images with a predefined filetype. This spee
 difPy supports most popular image formats. Nevertheless, since it relies on the Pillow library for image decoding, the supported formats are restricted to the ones listed in the `Pillow Documentation`_. Unsupported file types will by marked as invalid and included in the process statistics output under ``invalid_files`` (see :ref:`Process Statistics`).
 
 .. _Pillow Documentation: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
-
-.. warning::
-   difPy result accuracy can not be guaranteed for file formats not covered by "limit_extensions".
