@@ -178,7 +178,7 @@ After the search is completed, further actions can be performed using :ref:`sear
    difPy.search(difPy_obj, similarity='duplicates', rotate=True, lazy=True, processes=None, chunksize=None, show_progress=False, logs=True)
 
 ``difPy.search`` supports the following parameters:
-
+ 
 .. csv-table::
    :header: Parameter,Input Type,Default Value,Other Values
    :widths: 10, 10, 10, 20
