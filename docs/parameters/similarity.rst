@@ -1,5 +1,5 @@
 similarity (str, int)
-^^^^^^^^^^^^
+++++++++++++
 
 difPy compares the images to find duplicates or similarities, based on the MSE (Mean Squared Error) between both image tensors. The target similarity rate i. e. MSE value is set with the ``similarity`` parameter.
 

@@ -1,5 +1,5 @@
 logs (bool)
-^^^^^^^^^^^^
+++++++++++++
 
 ``logs`` was deprecated as of v4.1. See the `release notes`_.
 

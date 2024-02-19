@@ -1,5 +1,5 @@
 directory (str, list)
-^^^^^^^^^^^^
+++++++++++++
 
 difPy supports single and multi-folder search.
 

@@ -1,5 +1,5 @@
 show_progress (bool)
-^^^^^^^^^^^^
+++++++++++++
 
 By default, difPy will show a progress bar of the running process.
 

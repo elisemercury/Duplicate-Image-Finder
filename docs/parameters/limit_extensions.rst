@@ -1,5 +1,5 @@
 limit_extensions (bool)
-^^^^^^^^^^^^
+++++++++++++
 
 By default, difPy only searches for images with a predefined filetype. This speeds up the process, since difPy does not have to attempt to decode files it might not support. Nonetheless, you can let difPy try to decode other file types by setting ``limit_extensions`` to ``False``.
 
