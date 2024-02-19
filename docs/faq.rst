@@ -78,3 +78,6 @@ Report a Bug 🐛
 ----------------
 
 Should you encounter any issue or unwanted behavior when using difPy, `you can open an issue here <https://github.com/elisemercury/Duplicate-Image-Finder/issues/new/choose>`_.
+
+
+.. include:: /reusables/support_difpy.rst
