@@ -42,4 +42,4 @@ Your pull request and implementation will be reviewed and approved if it passes 
 
 ------------
 
-.. include:: /reusables/support_difpy.rst
+.. include:: /misc/support_difpy.rst

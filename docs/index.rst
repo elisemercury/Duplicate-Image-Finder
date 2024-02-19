@@ -33,4 +33,4 @@ Guide Content
 
 ------------
 
-.. include:: /reusables/support_difpy.rst
+.. include:: /misc/support_difpy.rst

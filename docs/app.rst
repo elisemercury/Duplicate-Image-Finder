@@ -66,4 +66,4 @@ Some limitations of difPy Web include:
 
 ------------
 
-.. include:: /reusables/support_difpy.rst
+.. include:: /misc/support_difpy.rst
