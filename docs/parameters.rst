@@ -111,9 +111,11 @@ The required ``difPy_obj`` parameter should be pointing to the ``dif`` object th
 
 .. include:: /parameters/similarity.rst
    
+   
 .. _lazy:
 
 .. include:: /parameters/lazy.rst
+
 
 .. _rotate:
 
