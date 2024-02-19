@@ -220,8 +220,8 @@ After the search is completed, further actions can be performed using :ref:`sear
 
    :ref:`difPy_obj`,"``difPy_obj``",,
    :ref:`similarity`,"``str``, ``int``",``'duplicates'``, "``'similar'``,  ``int``, ``float``"
-   :ref:`rotate`,``bool``,``True``,``False``
    :ref:`lazy`,``bool``,``True``,``False``
+   :ref:`rotate`,``bool``,``True``,``False``
    :ref:`show_progress2`,``bool``,``True``,``False``
    :ref:`processes`,``int``,``None`` (``os.cpu_count()``), ``int``
    :ref:`chunksize`,``int``,``None``, ``int``
@@ -237,13 +237,13 @@ The required ``difPy_obj`` parameter should be pointing to the ``dif`` object th
 
 .. include:: /parameters/similarity.rst
 
-.. _rotate:
-
-.. include:: /parameters/rotate.rst
-
 .. _lazy:
 
 .. include:: /parameters/lazy.rst
+
+.. _rotate:
+
+.. include:: /parameters/rotate.rst
 
 .. _show_progress2:
 
