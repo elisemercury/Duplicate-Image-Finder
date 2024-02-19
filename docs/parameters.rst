@@ -28,7 +28,7 @@ Upon completion, ``difPy.build()`` returns a ``dif`` object that can be used in 
    :ref:`limit_extensions`,``bool``,``True``,``False``
    :ref:`px_size`,"``int``, ``float``",50, ``int``
    :ref:`show_progress`,``bool``,``True``,``False``
-   :ref:`processes`,"``int``, ``float``",``None`` (``os.cpu_count()``), ``int``
+   :ref:`processes`,``int``,``None`` (``os.cpu_count()``), ``int``
 
 .. note::
 
@@ -36,127 +36,35 @@ Upon completion, ``difPy.build()`` returns a ``dif`` object that can be used in 
 
 .. _directory:
 
-directory (str, list)
-^^^^^^^^^^^^
-
-difPy supports single and multi-folder search.
-
-**Single Folder Search**:
-
-.. code-block:: python
-
-   import difPy
-   dif = difPy.build("C:/Path/to/Folder/")
-   search = difPy.search(dif)
-
-**Multi Folder Search**:
-
-.. code-block:: python
-
-   import difPy
-   dif = difPy.build(["C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder_C/", ... ])
-   search = difPy.search(dif)
-
-Folder paths can be specified as standalone Python strings, or within a list.
+.. include:: /parameters/directory.rst
 
 .. _recursive:
 
-recursive (bool)
-^^^^^^^^^^^^
-
-By default, difPy will search for matching images recursively within the subdirectories of the :ref:`directory` parameter. If set to ``False``, subdirectories will not be scanned.
-
-``True`` = (default) searches recursively through all subdirectories in the directory paths
-
-``False`` = disables recursive search through subdirectories in the directory paths
+.. include:: /parameters/recursive.rst
 
 .. _in_folder:
 
-in_folder (bool)
-^^^^^^^^^^^^
-
-By default, difPy will search for matches in the union of all directories specified in the :ref:`directory` parameter. To have difPy only search for matches within each folder separately, set ``in_folder`` to ``True``.
-
-``True`` = searches for matches only among each individual directory, including subdirectories
-
-``False`` = (default) searches for matches in the union of all directories
+.. include:: /parameters/in_folder.rst
 
 .. _limit_extensions:
 
-limit_extensions (bool)
-^^^^^^^^^^^^
-
-By default, difPy only searches for images with a predefined filetype. This speeds up the process, since difPy does not have to attempt to decode files it might not support. Nonetheless, you can let difPy try to decode other file types by setting ``limit_extensions`` to ``False``.
-
-.. note::
-
-   Predefined image types includes: ``apng``, ``bw``, ``cdf``, ``cur``, ``dcx``, ``dds``, ``dib``, ``emf``, ``eps``, ``fli``, ``flc``, ``fpx``, ``ftex``, ``fits``, ``gd``, ``gd2``, ``gif``, ``gbr``, ``icb``, ``icns``, ``iim``, ``ico``, ``im``, ``imt``, ``j2k``, ``jfif``, ``jfi``, ``jif``, ``jp2``, ``jpe``, ``jpeg``, ``jpg``, ``jpm``, ``jpf``, ``jpx``, ``jpeg``, ``mic``, ``mpo``, ``msp``, ``nc``, ``pbm``, ``pcd``, ``pcx``, ``pgm``, ``png``, ``ppm``, ``psd``, ``pixar``, ``ras``, ``rgb``, ``rgba``, ``sgi``, ``spi``, ``spider``, ``sun``, ``tga``, ``tif``, ``tiff``, ``vda``, ``vst``, ``wal``, ``webp``, ``xbm``, ``xpm``.
-
-``True`` = (default) difPy's search is limited to a set of predefined image types
-
-``False`` = difPy searches through all the input files
-
-difPy supports most popular image formats. Nevertheless, since it relies on the Pillow library for image decoding, the supported formats are restricted to the ones listed in the `Pillow Documentation`_. Unsupported file types will by marked as invalid and included in the process statistics output under ``invalid_files`` (see :ref:`Process Statistics`).
-
-.. _Pillow Documentation: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
-
-.. warning::
-   difPy result accuracy can not be guaranteed for file formats not covered by "limit_extensions".
+.. include:: /parameters/limit_extensions.rst
 
 .. _px_size:
 
-px_size (int)
-^^^^^^^^^^^^
-
-.. note::
-
-   Recommended not to change default value.
-
-Absolute size in pixels (width x height) of the images before being compared. The higher the ``px_size``, the more precise the comparison, but in turn more computational resources are required for difPy to compare the images. The lower the ``px_size``, the faster, but the more imprecise the comparison process gets.
-
-By default, ``px_size`` is set to ``50``.
-
-**Manual setting**: ``px_size`` can be manually adjusted by setting it to any ``int``.
+.. include:: /parameters/px_size.rst
 
 .. _show_progress:
 
-show_progress (bool)
-^^^^^^^^^^^^
-
-By default, difPy will show a progress bar of the running process.
-
-``True`` = (default) displays the progress bar
-
-``False`` = disables the progress bar
+.. include:: /parameters/show_progress.rst
 
 .. _processes:
  
-processes (int)
-^^^^^^^^^^^^
-
-.. warning::
-   Recommended not to change default value. Only adjust this value if you know what you are doing.
-
-difPy leverages `Multiprocessing`_ to speed up the image comparison process, meaning multiple comparison tasks will be performed in parallel. The ``processes`` parameter defines the maximum number of worker processes (i. e. parallel tasks) to perform when multiprocessing. The higher the parameter, the more performance can be achieved, but in turn, the more computing resources will be required. To learn more, please refer to the `Python Multiprocessing documentation`_. 
-
-.. _Multiprocessing: https://docs.python.org/3/library/multiprocessing.html
-
-.. _Python Multiprocessing documentation: https://docs.python.org/3/library/multiprocessing.html#multiprocessing.pool.Pool
-
-By default, ``processes`` is set to `os.cpu_count()`_. This means that difPy will spawn as many processes as number of CPUs in your machine, which can lead to increased performance, but can also cause a **big computing overhead** depending on the size of your dataset. To reduce the required computing power, it is recommended to reduce this value.
-
-.. _os.cpu_count(): https://docs.python.org/3/library/os.html#os.cpu_count
-
-**Manual setting**: ``processes`` can be manually adjusted by setting it to any ``int``. It is dependant on values supported by the ``process`` parameter in the Python Multiprocessing package. To learn more about this parameter, please refer to the `Python Multiprocessing documentation`_.
+.. include:: /parameters/processes.rst
 
 .. _logs:
 
-logs (bool)
-^^^^^^^^^^^^
-
-``logs`` was deprecated as of v4.1. See the `release notes`_.
-
-.. _release notes: https://github.com/elisemercury/Duplicate-Image-Finder/releases
+.. include:: /parameters/deprecated/logs.rst
 
 .. raw:: html
 
@@ -189,8 +97,8 @@ After the search is completed, further actions can be performed using :ref:`sear
    :ref:`rotate`,``bool``,``True``,``False``
    :ref:`lazy`,``bool``,``True``,``False``
    :ref:`show_progress2`,``bool``,``True``,``False``
-   :ref:`processes`,"``str``, ``int``",``None`` (``os.cpu_count()``), any ``int`` or ``float``"
-   :ref:`chunksize`,"``str``, ``int``",``None``, any ``int`` or ``float``"
+   :ref:`processes`,``int``,``None`` (``os.cpu_count()``), any ``int``
+   :ref:`chunksize`,``int``,``None``, any ``int``
 
 .. _difPy_obj:
 
@@ -201,98 +109,31 @@ The required ``difPy_obj`` parameter should be pointing to the ``dif`` object th
 
 .. _similarity:
 
-similarity (str, int)
-^^^^^^^^^^^^
-
-difPy compares the images to find duplicates or similarities, based on the MSE (Mean Squared Error) between both image tensors. The target similarity rate i. e. MSE value is set with the ``similarity`` parameter.
-
-``"duplicates"`` = (default) searches for duplicates. MSE threshold is set to ``0``.
-
-``"similar"`` = searches for similar images. MSE threshold is set to ``50``.
-
-Depending on which use case you want to apply difPy for, the granularity for the classification of images can be adjusted.
-
-**Manual setting**: the match MSE threshold can be adjusted manually by setting the ``similarity`` parameter to any ``int`` or ``float``. difPy will then search for images that match an MSE threshold **equal to or lower than** the one specified.
-
-When searching for **similar** images, the choice of MSE threshold becomes very important. A threshold of ``50`` will usually find similarities in regular photographs well, but if applied to images containing for example text with a plain white background, an MSE threshold of ``50`` will usually be too high and difPy will consider all images to be similar, even though they are not. In this case, for more precision, the ``similarity`` parameter should be lowered. Additionally, the ``px_size`` parameter can also be increased to gain more precision (see :ref:`px_size`).
+.. include:: /parameters/similarity.rst
 
 .. _rotate:
 
-rotate (bool)
-^^^^^^^^^^^^
-
-By default, difPy will rotate the images on comparison. In total, 3 rotations are performed: 90°, 180° and 270° degree rotations.  
-
-``True`` = (default) rotates images on comparison
-
-``False`` = images are not rotated before comparison
+.. include:: /parameters/rotate.rst
 
 .. _lazy:
 
-lazy (bool)
-^^^^^^^^^^^^
-
-By default, difPy searches using a "lazy" algorithm. This algorithm assumes that the matches we are looking for have the same dimensions, i. e. width and height lengths. If two images do not have the same dimensions, they are automatically assumed to not be duplicates/similar. Therefore, because these images are skipped, this algorithm can provide a significant improvement in performance.
-
-**When should the "lazy" algorithm not be used?**
-The "lazy" algorithm can speed up the comparison process significantly. Nonetheless, the algorithm might not be suited for your use case and might result in missing some matches. You should disable "lazy" if you are searching for:
-* duplicates/similar images with different **file types** (i. e. imageA.png is a duplicate of imageA.jpg)
-* duplicates/similar images with different **file sizes** (i. e. imageA.png (100MB) is a duplicate of imageA_compressed.png (50MB))
-
-``True`` = (default) applies the "lazy" algorithm
-
-``False`` = regular algorithm is used
+.. include:: /parameters/lazy.rst
 
 .. _show_progress2:
 
-show_progress (bool)
-^^^^^^^^^^^^
-
-By default, difPy will show a progress bar of the running process.
-
-``True`` = (default) displays the progress bar
-
-``False`` = disables the progress bar
+.. include:: /parameters/show_progress.rst
 
 .. _processes2:
 
-processes (int)
-^^^^^^^^^^^^
-
-.. warning::
-   Recommended not to change default value. Only adjust this value if you know what you are doing.
-
-difPy leverages `Multiprocessing`_ to speed up the image comparison process, meaning multiple comparison tasks will be performed in parallel. The ``processes`` parameter defines the maximum number of worker processes (i. e. parallel tasks) to perform when multiprocessing. The higher the parameter, the more performance can be achieved, but in turn, the more computing resources will be required. To learn more, please refer to the `Python Multiprocessing documentation`_. 
-
-.. _Multiprocessing: https://docs.python.org/3/library/multiprocessing.html
-
-.. _Python Multiprocessing documentation: https://docs.python.org/3/library/multiprocessing.html#multiprocessing.pool.Pool
-
-By default, ``processes`` is set to ``None`` which equivalents to `os.cpu_count()`_. This means that difPy will spawn as many processes as number of CPUs in your machine, which can lead to increased performance, but can also cause a **big computing overhead** depending on the size of your dataset. To reduce the required computing power, it is recommended to reduce this value.
-
-.. _os.cpu_count(): https://docs.python.org/3/library/os.html#os.cpu_count
-
-**Manual setting**: ``processes`` can be manually adjusted by setting it to any ``int``. It is dependant on values supported by the ``process`` parameter in the Python Multiprocessing package. To learn more about this parameter, please refer to the `Python Multiprocessing documentation`_.
+.. include:: /parameters/processes.rst
 
 .. _chunksize:
 
-chunksize (bool) # Todo
-^^^^^^^^^^^^
+.. include:: /parameters/chunksize.rst
 
-By default, difPy will show a progress bar of the running process.
+.. _logs2:
 
-``True`` = (default) displays the progress bar
-
-``False`` = disables the progress bar
-
-.. _logs:
-
-logs (bool)
-^^^^^^^^^^^^
-
-``logs`` was deprecated as of v4.1. See the `release notes`_.
-
-.. _release notes: https://github.com/elisemercury/Duplicate-Image-Finder/releases
+.. include:: /parameters/deprecated/logs.rst
 
 .. raw:: html
 
@@ -319,10 +160,7 @@ difPy can automatically move the lower quality duplicate/similar images it found
 
 .. _destination_path:
 
-destination_path (str)
-^^^^^^^^^^^^
-
-Directory of where the lower quality files should me moved. Should be given as Python ``string``.
+.. include:: /parameters/destination_path.rst
 
 .. raw:: html
 
@@ -357,11 +195,4 @@ The images are deleted based on the ``lower_quality`` output as described under 
 
 .. _silent_del:
 
-silent_del (bool)
-^^^^^^^^^^^^
-
-.. note::
-
-   Please use with care, as this cannot be undone.
-
-When set to ``True``, the user confirmation for :ref:`search.delete` is skipped and the lower resolution matched images that were found by difPy are automatically deleted from their folder(s).
+.. include:: /parameters/silent_del.rst
