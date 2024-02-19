@@ -17,12 +17,12 @@ When difPy receives a dataset that contains **more than 5k images**, images are 
 .. _Python generators: https://docs.python.org/3/reference/expressions.html#yield-expressions
 
 .. figure:: static/assets/batch_algorithm.png
-   :width: 4601
+   :width: 460
    :height: 250
-   :alt: Chunking Algorithm Visualized
+   :alt: Chunking algorithm visualized
    :align: center
 
-   Chunking Algorithm Visualized interface
+   Chunking algorithm visualized
 
 The picture above visualizes the chunks that are processed one-by-one by the Chunking algorithm. Each of the columns represent a chunk (a group) of images. 
 
@@ -33,10 +33,10 @@ When dealing with a dataset that has 5k images or less, difPy uses its Classic a
 .. figure:: static/assets/simple_algorithm.png
    :width: 460
    :height: 170
-   :alt: Simple Algorithm Visualized
+   :alt: Simple algorithm visualized
    :align: center
 
-   Classic Algorithm Visualized interface
+   Classic algorithm visualized
 
 .. _What's new in v4?:
 
