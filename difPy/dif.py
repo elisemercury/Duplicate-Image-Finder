@@ -21,7 +21,7 @@ class build:
     '''
     A class used to initialize difPy and build its image repository
     '''
-    def __init__(self, *directory, recursive=True, in_folder=False, limit_extensions=True, px_size=50, show_progress=True, processes=5, **kwargs):
+    def __init__(self, *directory, recursive=True, in_folder=False, limit_extensions=True, px_size=50, show_progress=True, processes=None, **kwargs):
         '''
         Parameters
         ----------
@@ -217,7 +217,7 @@ class search:
     '''
     A class used to search for matches in a difPy image repository
     '''
-    def __init__(self, difpy_obj, similarity='duplicates', rotate=True, lazy=True, show_progress=True, processes=5, chunksize=None, **kwargs):
+    def __init__(self, difpy_obj, similarity='duplicates', rotate=True, lazy=True, show_progress=True, processes=None, chunksize=None, **kwargs):
         '''
         Parameters
         ----------
@@ -232,7 +232,7 @@ class search:
         show_progress : bool (optional)
             Show the difPy progress bar in console (default is True)
         processes : int (optional)
-            Maximum number of simultaneous processes for multiprocessing (see https://docs.python.org/3/library/multiprocessing.html#multiprocessing.pool.Pool)
+            Number of worker processes for multiprocessing (default is os.cpu_count()) (see https://docs.python.org/3/library/multiprocessing.html#multiprocessing.pool.Pool)
         chunksize : int (optional)
             This parameter is only relevant when working with large image datasets (> 5k images). Sets the batch size at which the job is simultaneously processed when multiprocessing. (see https://docs.python.org/3/library/multiprocessing.html#multiprocessing.pool.Pool.imap_unordered)
 
@@ -826,6 +826,8 @@ class _validate_param:
         if not isinstance(processes, int):
             if not processes == None:
                 raise Exception('Invalid value for "processes" parameter: must be of type INT.')
+            else:
+                processes = os.cpu_count()
         return processes     
 
     def _chunksize(chunksize):
@@ -894,7 +896,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--delete', type=lambda x: bool(strtobool(x)), help='Delete lower quality images among matches.', required=False, choices=[True, False], default=False)
     parser.add_argument('-sd', '--silent_del', type=lambda x: bool(strtobool(x)), help='Suppress the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
     parser.add_argument('-p', '--show_progress', type=lambda x: bool(strtobool(x)), help='Show the real-time progress of difPy.', required=False, choices=[True, False], default=True)
-    parser.add_argument('-proc', '--processes', type=_help._convert_str_to_int, help='Maximum number of simultaneous processes when multiprocessing.', required=False, default=None)
+    parser.add_argument('-proc', '--processes', type=_help._convert_str_to_int, help=' Number of worker processes for multiprocessing.', required=False, default=None)
     parser.add_argument('-ch', '--chunksize', type=_help._convert_str_to_int, help='Only relevant when dataset > 5k images. Sets the batch size at which the job is simultaneously processed when multiprocessing.', required=False, default=None)
     parser.add_argument('-l', '--logs', type=lambda x: bool(strtobool(x)), help='(Deprecated) Collect statistics during the process.', required=False, choices=[True, False], default=None)
 
