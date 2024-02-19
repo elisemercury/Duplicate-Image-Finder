@@ -297,6 +297,8 @@ class search:
             # search algorithm for smaller datasets, > 5k images
             if self.__chunksize == None:
                 self.__chunksize = round(1000000 / len(self.__difpy_obj._tensor_dictionary.keys()))
+                if self.__chunksize < 1:
+                    self.__chunksize = 1
             with Pool(processes=self.__processes) as pool:
                 for output in pool.imap_unordered(self._find_matches_batch, self._yield_comparison_group(), self.__chunksize):
                     if len(output) > 0:
@@ -332,6 +334,8 @@ class search:
                     # search algorithm for bigger datasets, > 5k images
                     if self.__chunksize == None:
                         self.__chunksize = round(1000000 / len(ids))
+                        if self.__chunksize < 1:
+                            self.__chunksize = 1
                     for output in pool.imap_unordered(self._find_matches_batch, self._yield_comparison_group(), self.__chunksize):
                         if len(output) > 0:
                             # if matches found, add to result
@@ -835,6 +839,8 @@ class _validate_param:
         if not isinstance(chunksize, int):
             if not chunksize == None:
                 raise Exception('Invalid value for "chunksize" parameter: must be of type INT or None.')
+        if chunksize < 1:
+            raise Exception('Invalid value for "chunksize" parameter: must be >= 1.')
         return chunksize        
 
     def _silent_del(silent_del):
