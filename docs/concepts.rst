@@ -1,6 +1,6 @@
 Concepts of difPy
 ===================================
 
-.. _Concepts:
+.. _concepts:
 
 Test

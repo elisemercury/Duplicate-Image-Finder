@@ -5,6 +5,7 @@ By default, difPy searches using a "lazy" algorithm. This algorithm assumes that
 
 **When should the "lazy" algorithm not be used?**
 The "lazy" algorithm can speed up the comparison process significantly. Nonetheless, the algorithm might not be suited for your use case and might result in missing some matches. You should disable "lazy" if you are searching for:
+
 * duplicates/similar images with different **file types** (i. e. imageA.png is a duplicate of imageA.jpg)
 * duplicates/similar images with different **file sizes** (i. e. imageA.png (100MB) is a duplicate of imageA_compressed.png (50MB))
 
