@@ -12,23 +12,23 @@ Starting with `v4.1`_, difPy handles small and larger datasets differently. Sinc
 
 .. _v4.1: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
 
-When difPy receives a dataset that contains **more than 5k images**, images are **split in smaller batches** which are processed one-by-one leveraging `Python generators`_. This leads to a significant reduction in memory overhead, as only a single small batch is loaded into memory, as compared to the full list of all potential image comparison combinations. Furthermore, images are compared leveraging vectorization which also allows for faster comparison times on large datasets.
+When difPy receives a dataset that contains **more than 5k images**, images are **split into smaller groups** which are processed one-by-one leveraging `Python generators`_. This leads to a significant reduction in memory overhead, as only a single smaller chunk is loaded into memory once at a time, as compared to the full list of all potential image comparison combinations. Furthermore, images are compared leveraging vectorization which also allows for faster comparison times on large datasets.
 
 .. _Python generators: https://docs.python.org/3/reference/expressions.html#yield-expressions
 
 .. figure:: static/assets/batch_algorithm.png
-   :width: 520
-   :height: 309
-   :alt: Batch Algorithm Visualized
+   :width: 400
+   :height: 150
+   :alt: Chunking Algorithm Visualized
    :align: center
 
-   Batch Algorithm Visualized interface
+   Chunking Algorithm Visualized interface
 
 Nonetheless, even using this algorithm, difPy 
 
 .. figure:: static/assets/simple_algorithm.png
-   :width: 520
-   :height: 309
+   :width: 500
+   :height: 50
    :alt: Simple Algorithm Visualized
    :align: center
 
