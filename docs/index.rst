@@ -27,7 +27,6 @@ Guide Content
    :maxdepth: 2
 
    usage
-   parameters
    contributing
    app
    faq
