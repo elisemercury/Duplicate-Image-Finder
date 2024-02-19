@@ -124,7 +124,7 @@ class build:
         if self.__limit_extensions:
             valid_files, skip_files = self._filter_extensions(valid_files)
         else:
-            warnings.warn('Parameter "limit_extensions" is set to False. difPy result accuracy can not be guaranteed for file formats not covered by "limit_extensions"', )
+            warnings.warn('Parameter "limit_extensions" is set to False. difPy result accuracy can not be guaranteed for file formats not covered by "limit_extensions"')
             skip_files = []
         return valid_files, skip_files
 
@@ -241,7 +241,7 @@ class search:
         self.__difpy_obj = difpy_obj
         self.__similarity = _validate_param._similarity(similarity)
         self.__rotate = _validate_param._rotate(rotate)
-        self.__lazy = _validate_param._lazy(lazy)
+        self.__lazy = _validate_param._lazy(lazy, self.__similarity)
         self.__show_progress = _validate_param._show_progress(show_progress)
         self.__processes = _validate_param._processes(processes)
         self.__chunksize = _validate_param._chunksize(chunksize)
@@ -813,10 +813,14 @@ class _validate_param:
             raise Exception('Invalid value for "rotate" parameter: must be of type BOOL.')
         return rotate         
 
-    def _lazy(lazy):
+    def _lazy(lazy, similarity):
         # Function that validates the 'lazy' input parameter
         if not isinstance(lazy, bool):
             raise Exception('Invalid value for "lazy" parameter: must be of type BOOL.')
+        if lazy:
+            if similarity > 0:
+                lazy = False
+                warnings.warn('Lazy search disabled since "similarity" > 0.')
         return lazy
 
     def _show_progress(show_progress):
