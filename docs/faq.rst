@@ -18,17 +18,19 @@ When difPy receives a dataset that contains **more than 5k images**, images are 
 
 .. figure:: static/assets/batch_algorithm.png
    :width: 450
-   :height: 300
+   :height: 250
    :alt: Chunking Algorithm Visualized
    :align: center
 
    Chunking Algorithm Visualized interface
 
+The picture above visualizes the chunks that are processed one-by-one by the chunking algorithm. Each of the "blocks" represent a chunk of images. The ``chunksize`` parameter sets how many of these chunks will be processed at once (see :ref:`chunksize`).
+
 Nonetheless, even using this algorithm, difPy 
 
 .. figure:: static/assets/simple_algorithm.png
    :width: 500
-   :height: 150
+   :height: 100
    :alt: Simple Algorithm Visualized
    :align: center
 
