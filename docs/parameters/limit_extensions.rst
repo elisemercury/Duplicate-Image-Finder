@@ -2,7 +2,7 @@ limit_extensions (bool)
 ++++++++++++
 
 .. warning::
-   difPy result accuracy can not be guaranteed for file formats not covered by "limit_extensions".
+   Recommended not to change default value. Only adjust this value if you know what you are doing. difPy result accuracy can not be guaranteed for file formats not covered by "limit_extensions".
 
 By default, difPy only searches for images with a predefined file type. This speeds up the process, since difPy does not have to attempt to decode files it might not support. Nonetheless, you can let difPy try to decode other file types by setting ``limit_extensions`` to ``False``.
 
