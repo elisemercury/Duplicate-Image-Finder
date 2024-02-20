@@ -10,7 +10,7 @@ Using difPy with Large Datasets
 
 Starting with `v4.1.0`_, difPy handles small and larger datasets differently. Since the computational overhead and especially memory consumption can become very high on large image datasets, difPy utilizes a different algorithm specifically to process larger datasets more efficiently and less memory intensive. 
 
-.. _v4.1.0: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
+.. _v4.1.0: https://github.com/elisemercury/Duplicate-Image-Finder/releases
 
 When difPy receives a **"small" dataset** (<= 5k images), it uses its Classic algorithm and compares **all image combinations at once**, hence all of the image data is loaded into memory. This can speed up the comparison processing time, but in turn is heavier on memory consumption. Therefore, this algorithm is only used on "small" datasets.
 
