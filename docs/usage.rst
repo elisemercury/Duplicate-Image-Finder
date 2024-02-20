@@ -23,9 +23,9 @@ View difPy on `PyPi <https://pypi.org/project/difPy/>`_.
 Basic Usage
 ----------------
 
-difPy supports searching for duplicate and similar images within a single or multiple directories. difPy first needs to be initialized and build its image repository with :ref:`difPy.build`. After the ``dif`` object had been created, by invoking :ref:`difPy.search`, difPy starts the search for matching images. 
+difPy supports searching for duplicate and similar images within a single or multiple directories. difPy first needs to be initialized and build its image repository with :ref:`difPy.build`. After the ``dif`` object has been created, the search for matching images can be invoked using :ref:`difPy.search`,
 
-Single Folder Search
+I. Single Folder Search
 ^^^^^^^^^^
 
 Search for duplicate images in a single folder:
@@ -33,10 +33,10 @@ Search for duplicate images in a single folder:
 .. code-block:: python
 
    import difPy
-   dif = difPy.build("C:/Path/to/Folder/")
+   dif = difPy.build('C:/Path/to/Folder/')
    search = difPy.search(dif)
 
-Multi Folder Search
+II. Multi Folder Search
 ^^^^^^^^^^
 
 Search for duplicate images in multiple folders:
@@ -44,7 +44,7 @@ Search for duplicate images in multiple folders:
 .. code-block:: python
 
    import difPy
-   dif = difPy.build("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder_C/", ...)
+   dif = difPy.build('C:/Path/to/Folder_A/', 'C:/Path/to/Folder_B/', 'C:/Path/to/Folder_C/', ...)
    search = difPy.search(dif)
 
 or add a ``list`` of folders:
@@ -52,15 +52,19 @@ or add a ``list`` of folders:
 .. code-block:: python
 
    import difPy
-   dif = difPy.build(["C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", "C:/Path/to/Folder_C/", ... ])
+   dif = difPy.build(['C:/Path/to/Folder_A/', 'C:/Path/to/Folder_B/', 'C:/Path/to/Folder_C/', ... ])
    search = difPy.search(dif)
 
 
 Folder paths must be specified as either standalone Python strings, or in a Python list. 
 
-difPy can search for duplicates in the union of all folders, or only among the folders and subdirectories itself. See :ref:`in_folder`.
+difPy can search for duplicates in the union of all folders it finds, or only for duplicates within separate/isolated directories. See :ref:`in_folder`.
 
 difPy leverages **multiprocessing** for both the build and the search process.
+
+.. raw:: html
+
+   <hr>
 
 .. _cli_usage:
 
@@ -73,9 +77,9 @@ difPy can be invoked through a CLI interface by using the following commands:
 
    python dif.py #working directory
 
-   python dif.py -D "C:/Path/to/Folder/"
+   python dif.py -D 'C:/Path/to/Folder/'
 
-   python dif.py -D "C:/Path/to/Folder_A/" "C:/Path/to/Folder_B/" "C:/Path/to/Folder_C/"
+   python dif.py -D 'C:/Path/to/Folder_A/' 'C:/Path/to/Folder_B/' 'C:/Path/to/Folder_C/'
 
 .. note::
 
@@ -87,21 +91,24 @@ difPy in the CLI supports the following arguments:
    
    dif.py [-h] [-D DIRECTORY [DIRECTORY ...]] [-Z OUTPUT_DIRECTORY] 
           [-r {True,False}] [-i {True,False}] [-le {True,False}] 
-          [-px PX_SIZE] [-p {True,False}] [-s SIMILARITY] 
-          [-mv MOVE_TO] [-d {True,False}] [-sd {True,False}] 
-          [-l {True,False}]
+          [-px PX_SIZE]  [-s SIMILARITY] [-ro {True,False}]
+          [-la {True,False}] [-proc PROCESSES] [-ch CHUNKSIZE] 
+          [-mv MOVE_TO] [-d {True,False}] [-sd {True,False}]
+          [-p {True,False}]
 
 .. csv-table::
    :header: Cmd,Parameter,Cmd,Parameter
    :widths: 5, 10, 5, 10
    :class: tight-table
 
-   ``-D``,directory,``-le``,limit_extensions
-   ``-Z``,output_directory,``-p``,show_progress
-   ``-r``,recursive,``-mv``,move_to
-   ``-i``,in_folder,``-d``,delete
-   ``-s``,similarity,``-sd``,silent_del
-   ``-px``,px_size,``-l``,logs
+   ``-D``,:ref:`directory`,``-la``,:ref:`lazy`
+   ``-Z``,output_directory,``-proc``,:ref:`processes`
+   ``-r``,:ref:`recursive`,``-ch``,:ref:`chunksize`
+   ``-i``,:ref:`in_folder`,``-mv``,move_to (see :ref:`search.move_to`)
+   ``-le``,:ref:`limit_extensions`,``-d``,delete (see :ref:`search.delete`)
+   ``-px``,:ref:`px_size`,``-sd``,:ref:`silent_del`
+   ``-s``,:ref:`similarity`,``-p``,:ref:`show_progress`
+   ``-ro``,:ref:`rotate`,
 
 If no directory parameter is given in the CLI, difPy will **run on the current working directory**.
 
@@ -110,10 +117,217 @@ The output of difPy is written to files and **saved in the working directory** b
 .. code-block:: python
 
    difPy_xxx_results.json
-   difPy_xxx_lower_quality.json
+   difPy_xxx_lower_quality.txt
    difPy_xxx_stats.json
 
+.. raw:: html
+
+   <hr>
+
+Parameters
+----------------
+
+.. _parameters:
+.. _difPy.build:
+
+difPy.build
+^^^^^^^^^^
+
+Before difPy can perform any search, it needs to build its image repository and transform the images in the provided directory into tensors. This is what is done when ``difPy.build()`` is invoked.
+
+Upon completion, ``difPy.build()`` returns a ``dif`` object that can be used in :ref:`difPy.search` to start the search process.
+
+``difPy.build`` supports the following parameters:
+
+.. code-block:: python
+
+   difPy.build(*directory, recursive=True, in_folder=False, limit_extensions=True, px_size=50, show_progress=True, processes=None)
+
+.. csv-table::
+   :header: Parameter,Input Type,Default Value,Other Values
+   :widths: 10, 10, 10, 20
+   :class: tight-table
+
+   :ref:`directory`,"``str``, ``list``",,
+   :ref:`recursive`,``bool``,``True``,``False``
+   :ref:`in_folder`,"``bool``, ``False``",``True``
+   :ref:`limit_extensions`,``bool``,``True``,``False``
+   :ref:`px_size`,"``int``, ``float``",50, ``int``
+   :ref:`show_progress`,``bool``,``True``,``False``
+   :ref:`processes`,``int``,``None`` (``os.cpu_count()``), ``int``
+
+.. note::
+
+   If you want to reuse the image tensors generated by difPy, you can access the generated repository by calling ``difPy.build._tensor_dictionary``. To reverse the image IDs to the original filenames, use ``difPy.build._filename_dictionary``.
+
+.. _directory:
+
+.. include:: /parameters/directory.rst
+
+.. _recursive:
+
+.. include:: /parameters/recursive.rst
+
+.. _in_folder:
+
+.. include:: /parameters/in_folder.rst
+
+.. _limit_extensions:
+
+.. include:: /parameters/limit_extensions.rst
+
+.. _px_size:
+
+.. include:: /parameters/px_size.rst
+
+.. _show_progress:
+
+.. include:: /parameters/show_progress.rst
+
+.. _processes:
+ 
+.. include:: /parameters/processes.rst
+
+.. _logs:
+
+.. include:: /parameters/deprecated/logs.rst
+
+.. raw:: html
+
+   <hr>
+
+.. _difPy.search:
+
+difPy.search
+^^^^^^^^^^
+
+After the ``dif`` object has been built using :ref:`difPy.build`, the search can be initiated with ``difPy.search``. 
+
+When invoking ``difPy.search()``, difPy starts comparing the images to find duplicates or similarities, based on the MSE (Mean Squared Error) between both image tensors. The target similarity rate i. e. MSE value is set with the :ref:`similarity` parameter.
+
+After the search is completed, further actions can be performed using :ref:`search.move_to` and :ref:`search.delete`.
+
+.. code-block:: python
+
+   difPy.search(difPy_obj, similarity='duplicates', rotate=True, lazy=True, processes=None, chunksize=None, show_progress=False)
+
+``difPy.search`` supports the following parameters:
+ 
+.. csv-table::
+   :header: Parameter,Input Type,Default Value,Other Values
+   :widths: 10, 10, 10, 20
+   :class: tight-table
+
+   :ref:`difPy_obj`,"``difPy_obj``",,
+   :ref:`similarity`,"``str``, ``int``",``'duplicates'``, "``'similar'``,  ``int``, ``float``"
+   :ref:`lazy`,``bool``,``True``,``False``
+   :ref:`rotate`,``bool``,``True``,``False``
+   :ref:`show_progress2`,``bool``,``True``,``False``
+   :ref:`processes`,``int``,``None`` (``os.cpu_count()``), ``int``
+   :ref:`chunksize`,``int``,``None``, ``int``
+
+.. _difPy_obj:
+
+difPy_obj
+++++++++++++
+
+The required ``difPy_obj`` parameter should be pointing to the ``dif`` object that was built during the invocation of :ref:`difPy.build`. 
+
+.. _similarity:
+
+.. include:: /parameters/similarity.rst
+
+.. _lazy:
+
+.. include:: /parameters/lazy.rst
+
+.. _rotate:
+
+.. include:: /parameters/rotate.rst
+
+.. _show_progress2:
+
+.. include:: /parameters/show_progress.rst
+
+.. _processes2:
+
+.. include:: /parameters/processes.rst
+
+.. _chunksize:
+
+.. include:: /parameters/chunksize.rst
+
+.. _logs2:
+
+.. include:: /parameters/deprecated/logs.rst
+
+.. raw:: html
+
+   <hr>
+
+.. _search.move_to:
+
+search.move_to
+^^^^^^^^^^
+
+difPy can automatically move the lower quality duplicate/similar images it found to another directory. Images can be moved by invoking ``search.move_to``:
+
+.. code-block:: python
+
+   import difPy
+   dif = difPy.build("C:/Path/to/Folder_A/")
+   search = difPy.search(dif)
+   search.move_to(destination_path="C:/Path/to/Destination/")
+
+.. code-block:: console
+
+   > Output
+   Moved 756 files(s) to "C:/Path/to/Destination"
+
+.. _destination_path:
+
+.. include:: /parameters/destination_path.rst
+
+.. raw:: html
+
+   <hr>
+
+.. _search.delete:
+
+search.delete
+^^^^^^^^^^
+
+difPy can automatically delete the lower quality duplicate/similar images it found. Images can be deleted by invoking ``search.delete``:
+
+.. note::
+
+   Please use with care, as this cannot be undone.
+
+.. code-block:: python
+
+   import difPy
+   dif = difPy.build("C:/Path/to/Folder_A/")
+   search = difPy.search(dif)
+   search.delete(silent_del=False)
+
+.. code-block:: console
+
+   > Output
+   Deleted 756 files(s)
+
+The images are deleted based on the ``lower_quality`` output as described under section :ref:`output`. After auto-deleting the images, every match group will be left with one single image: the image with the highest quality among its match group.
+
+``delete`` asks for user confirmation before deleting the images. The user confirmation can be skipped by setting :ref:`silent_del` to ``True``.
+
+.. _silent_del:
+
+.. include:: /parameters/silent_del.rst
+
 .. _output:
+
+.. raw:: html
+
+   <hr>
 
 Output
 ----------------
@@ -122,49 +336,30 @@ difPy returns various types of output:
 
 I. Search Result Dictionary
 ^^^^^^^^^^
-A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found, where the keys are a **randomly generated unique id** for each image file:
+A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found. Each match group has a primary image (the key of the dictionary) which holds the list of its duplicates including their filename and MSE (Mean Squared Error). The lower the MSE, the more similar the primary image and the matched images are. Therefore, an MSE of 0 indicates that two images are exact duplicates.
 
-.. code-block:: python
-
-   search.result
-
-   > Output:
-   {20220819171549 : {"location" : "C:/Path/to/Image/image1.jpg",
-                      "matches" : {30270813251529 : "location": "C:/Path/to/Image/matched_image1.jpg",
-                                                    "mse": 0.0},
-                                  {72214282557852 : "location": "C:/Path/to/Image/matched_image2.jpg",
-                                                    "mse": 0.0},
-                      ... }
-    ...
-   }
+.. include:: /output/result.rst
 
 II. Lower Quality Files
 ^^^^^^^^^^
 
-A **JSON formatted collection** of duplicates/similar images that have the **lowest quality** among match groups: 
+A **list** of duplicates/similar images that have the **lowest quality** among match groups: 
 
-.. code-block:: python
-
-   search.lower_quality
-
-   > Output:
-   {"lower_quality" : ["C:/Path/to/Image/duplicate_image1.jpg", 
-                     "C:/Path/to/Image/duplicate_image2.jpg", ...]}
+.. include:: /output/lower_quality.rst
 
 To find the lower quality images, difPy compares all image file sizes within a match group and selects all images that have lowest image file size among the group.
 
-Lower quality images then can be **moved** to a different location (see :ref:`search.ove_to`):
+Lower quality images then can be **moved** to a different location (see :ref:`search.move_to`):
 
 .. code-block:: python
    
-   search.move_to(search, destination_path="C:/Path/to/Destination/")
+   search.move_to(destination_path='C:/Path/to/Destination/')
 
 Or **deleted** (see :ref:`search.delete`):
 
 .. code-block:: python
 
-   search.delete(search, silent_del=False)
-
+   search.delete(silent_del=False)
 
 .. _Process Statistics:
 
@@ -173,25 +368,4 @@ III. Process Statistics
 
 A **JSON formatted collection** with statistics on the completed difPy process:
 
-.. code-block:: python
-
-   search.stats
-
-   > Output:
-   {"directory" : ("C:/Path/to/Folder_A/", "C:/Path/to/Folder_B/", ... ),
-    "process" : {"build" : {"duration" : {"start" : "2023-08-28T21:22:48.691008",
-                                          "end" : "2023-08-28T21:23:59.104351",
-                                          "seconds_elapsed" : "70.4133"},
-                            "parameters" : {"recursive" : True,
-                                            "in_folder" : False,
-                                            "limit_extensions" : True,
-                                            "px_size" : 50}},
-                 "search" : {"duration" : {"start" : "2023-08-28T21:23:59.106351",
-                                           "end" : "2023-08-28T21:25:17.538015",
-                                           "seconds_elapsed" : "78.4317"},
-                           "parameters" : {"similarity_mse" : 0}
-                           "files_searched" : 5225,
-                           "matches_found" : {"duplicates" : 5,
-                                              "similar" : 0}}}
-    "invalid_files" : {"count" : 230,
-                       "logs" : {...}}}
+.. include:: /output/stats.rst
