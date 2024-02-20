@@ -70,7 +70,7 @@ Folder paths can be specified as standalone Python strings, or within a list. Wi
 difPy returns various types of output that you may use depending on your use case: 
 
 ### I. Search Result Dictionary
-A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found. Each match group has one "main" image (which is the key of the dictionary) that can have one or more matches. For each match, a list with the match filename and the MSE between "main" image and match are added.
+A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found. Each match group has a primary image (key of the dictionary) which holds the list of duplicates including their MSE (Mean Squared Error). The lower the MSE, the more similar two images are, therefore, an MSE of 0 indicates duplicates.
 
 ```python
 search.result
@@ -142,11 +142,13 @@ search.stats
 difPy supports the following parameters:
 
 ```python
-difPy.build(*directory, recursive=True, in_folder=False, limit_extensions=True, px_size=50, show_progress=True, processes=5)
+difPy.build(*directory, recursive=True, in_folder=False, limit_extensions=True, 
+            px_size=50, show_progress=True, processes=5)
 ```
 
 ```python
-difPy.search(difpy_obj, similarity='duplicates', rotate=True, lazy=True, show_progress=True, processes=5, chunksize=None)
+difPy.search(difpy_obj, similarity='duplicates', rotate=True, lazy=True, 
+                        show_progress=True, processes=5, chunksize=None)
 ```
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
