@@ -102,10 +102,10 @@ difPy in the CLI supports the following arguments:
    :class: tight-table
 
    ``-D``,:ref:`directory`,``-la``,:ref:`lazy`
-   ``-Z``,output_directory,``-prox``,:ref:`processes`
+   ``-Z``,output_directory,``-proc``,:ref:`processes`
    ``-r``,:ref:`recursive`,``-ch``,:ref:`chunksize`
-   ``-i``,:ref:`in_folder`,``-mv``,:ref:`move_to`
-   ``-le``,:ref:`limit_extensions`,``-d``,:ref:`delete`
+   ``-i``,:ref:`in_folder`,``-mv``,move_to (see :ref:`search.move_to`)
+   ``-le``,:ref:`limit_extensions`,``-d``,delete (see :ref:`search.delete`)
    ``-px``,:ref:`px_size`,``-sd``,:ref:`silent_del`
    ``-s``,:ref:`similarity`,``-p``,:ref:`show_progress`
    ``-ro``,:ref:`rotate`,
@@ -205,7 +205,7 @@ After the ``dif`` object has been built using :ref:`difPy.build`, the search can
 
 When invoking ``difPy.search()``, difPy starts comparing the images to find duplicates or similarities, based on the MSE (Mean Squared Error) between both image tensors. The target similarity rate i. e. MSE value is set with the :ref:`similarity` parameter.
 
-After the search is completed, further actions can be performed using :ref:`search.move_to` and :ref:`delete`.
+After the search is completed, further actions can be performed using :ref:`search.move_to` and :ref:`search.delete`.
 
 .. code-block:: python
 
@@ -292,14 +292,14 @@ difPy can automatically move the lower quality duplicate/similar images it found
 
    <hr>
 
-.. _delete:
+.. _search.delete:
 
 search.delete
 ^^^^^^^^^^
 
-difPy can automatically delete the lower quality duplicate/similar images it found. Images can be deleted by invoking ``search.delete()``:
+difPy can automatically delete the lower quality duplicate/similar images it found. Images can be deleted by invoking ``search.delete``:
 
-.. note:: 
+.. note::
 
    Please use with care, as this cannot be undone.
 
@@ -355,7 +355,7 @@ Lower quality images then can be **moved** to a different location (see :ref:`se
    
    search.move_to(destination_path='C:/Path/to/Destination/')
 
-Or **deleted** (see :ref:`delete`):
+Or **deleted** (see :ref:`search.delete`):
 
 .. code-block:: python
 

@@ -8,7 +8,7 @@ FAQ
 Using difPy with Large Datasets
 ----------------
 
-Starting with `v4.1`_, difPy handles small and larger datasets differently. Since the computational overhead and especially memory consumption can become very high on large image datasets, difPy utilizes a different algorithm specifically to process larger datasets more efficiently and less memory intensive. 
+Starting with `v4.1.0`_, difPy handles small and larger datasets differently. Since the computational overhead and especially memory consumption can become very high on large image datasets, difPy utilizes a different algorithm specifically to process larger datasets more efficiently and less memory intensive. 
 
 .. _v4.1: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
 

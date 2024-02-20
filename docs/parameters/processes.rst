@@ -10,7 +10,7 @@ difPy leverages `Multiprocessing`_ to speed up the image comparison process, mea
 
 .. _Python Multiprocessing documentation: https://docs.python.org/3/library/multiprocessing.html#multiprocessing.pool.Pool
 
-By default, ``processes`` is set to `os.cpu_count()`_. This means that difPy will spawn as many processes as number of CPUs in your machine, which can lead to increased performance, but can also cause a **big computing overhead** depending on the size of your dataset. To reduce the required computing power, it is recommended to reduce this value.
+By default, ``processes`` is set to `os.cpu_count()`_. This means that difPy will spawn as many processes as number of CPUs in your machine, which can lead to increased performance, but can also cause a **big computational overhead** depending on the size of your dataset. To reduce the required computing power, it is recommended to reduce this value.
 
 .. _os.cpu_count(): https://docs.python.org/3/library/os.html#os.cpu_count
 
