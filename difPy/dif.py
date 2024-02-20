@@ -843,7 +843,7 @@ class _validate_param:
         if not isinstance(chunksize, int):
             if not chunksize == None:
                 raise Exception('Invalid value for "chunksize" parameter: must be of type INT or None.')
-        if chunksize < 1:
+        elif chunksize < 1:
             raise Exception('Invalid value for "chunksize" parameter: must be >= 1.')
         return chunksize        
 
