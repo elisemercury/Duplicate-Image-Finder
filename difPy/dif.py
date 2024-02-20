@@ -124,7 +124,7 @@ class build:
         if self.__limit_extensions:
             valid_files, skip_files = self._filter_extensions(valid_files)
         else:
-            warnings.warn('Parameter "limit_extensions" is set to False. difPy result accuracy can not be guaranteed for file formats not covered by "limit_extensions"')
+            warnings.warn('Parameter "limit_extensions" is set to False. difPy result accuracy can not be guaranteed for file formats not covered by "limit_extensions"', stacklevel=2)
             skip_files = []
         return valid_files, skip_files
 
@@ -767,7 +767,7 @@ class _validate_param:
         if not isinstance(in_folder, bool):
             raise Exception('Invalid value for "in_folder" parameter: must be of type BOOL.')
         elif not recursive and in_folder:
-            warnings.warn('Parameter "in_folder" cannot be "True" if "recursive" is set to "False". "in_folder" will be ignored.')
+            warnings.warn('Parameter "in_folder" cannot be "True" if "recursive" is set to "False". "in_folder" will be ignored.', stacklevel=2)
             in_folder = False
         return in_folder
     
@@ -820,7 +820,6 @@ class _validate_param:
         if lazy:
             if similarity > 0:
                 lazy = False
-                warnings.warn('Lazy search disabled since "similarity" > 0.')
         return lazy
 
     def _show_progress(show_progress):
@@ -870,7 +869,7 @@ class _validate_param:
 
     def _kwargs(kwargs):
         if "logs" in kwargs:
-            warnings.warn('Parameter "logs" was deprecated with difPy v4.1. Using it might lead to an exception in future versions. Consider updating your script.', FutureWarning)
+            warnings.warn('Parameter "logs" was deprecated with difPy v4.1. Using it might lead to an exception in future versions. Consider updating your script.', FutureWarning, stacklevel=2)
 
 class _help:
     '''
