@@ -142,11 +142,13 @@ search.stats
 difPy supports the following parameters:
 
 ```python
-difPy.build(*directory, recursive=True, in_folder=False, limit_extensions=True, px_size=50, show_progress=True, processes=None)
+difPy.build(*directory, recursive=True, in_folder=False, limit_extensions=True, px_size=50, 
+            show_progress=True, processes=None)
 ```
 
 ```python
-difPy.search(difpy_obj, similarity='duplicates', rotate=True, lazy=True, show_progress=True, processes=None, chunksize=None)
+difPy.search(difpy_obj, similarity='duplicates', rotate=True, lazy=True, show_progress=True, 
+             processes=None, chunksize=None)
 ```
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
