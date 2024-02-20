@@ -336,7 +336,7 @@ difPy returns various types of output:
 
 I. Search Result Dictionary
 ^^^^^^^^^^
-A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found. Each match group has one "main" image (which is the key of the dictionary) that can have one or more matches. For each match, a list with the match filename and the MSE between "main" image and match are added.
+A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found. Each match group has a primary image (the key of the dictionary) which holds the list of its duplicates including their filename and MSE (Mean Squared Error). The lower the MSE, the more similar the primary image and the matched images are. Therefore, an MSE of 0 indicates that two images are exact duplicates.
 
 .. include:: /output/result.rst
 

@@ -70,7 +70,7 @@ Folder paths can be specified as standalone Python strings, or within a list. Wi
 difPy returns various types of output that you may use depending on your use case: 
 
 ### I. Search Result Dictionary
-A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found. Each match group has a primary image (key of the dictionary) which holds the list of duplicates including their MSE (Mean Squared Error). The lower the MSE, the more similar two images are, therefore, an MSE of 0 indicates duplicates.
+A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found. Each match group has a primary image (the key of the dictionary) which holds the list of its duplicates including their filename and MSE (Mean Squared Error). The lower the MSE, the more similar the primary image and the matched images are. Therefore, an MSE of 0 indicates that two images are exact duplicates.
 
 ```python
 search.result
