@@ -685,7 +685,7 @@ class _generate_stats:
         total_files = kwargs['total_files']
         invalid_files = kwargs['invalid_files']
         for file in kwargs['skipped_files']:
-            invalid_files.update({str(Path(file)) : 'FileSkipped: file type was skipped.'})
+            invalid_files.update({str(Path(file)) : 'Unsupported file type'})
         self.stats.update({'directory' : kwargs['directory']})
         
         self.stats.update({'process' : {'build': {}}})   
@@ -699,8 +699,8 @@ class _generate_stats:
                                                          'px_size' : kwargs['px_size'],
                                                          'processes' : kwargs['processes']
                                                         }})
-        self.stats['process']['build'].update({'total_files' : {'count': total_files+len(invalid_files)}})   
-        self.stats['process']['build'].update({'invalid_files': {'count' : len(invalid_files),
+        self.stats.update({'total_files' : total_files+len(invalid_files)})   
+        self.stats.update({'invalid_files': {'count' : len(invalid_files),
                                                'logs' : invalid_files}})
         
         return self.stats
