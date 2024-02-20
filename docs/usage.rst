@@ -299,7 +299,7 @@ search.delete
 
 difPy can automatically delete the lower quality duplicate/similar images it found. Images can be deleted by invoking ``search.delete()``:
 
-.. note::
+.. note:: 
 
    Please use with care, as this cannot be undone.
 
