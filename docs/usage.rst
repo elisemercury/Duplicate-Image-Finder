@@ -102,7 +102,7 @@ difPy in the CLI supports the following arguments:
    :class: tight-table
 
    ``-D``,:ref:`directory`,``-la``,:ref:`lazy`
-   ``-Z``,:ref:`output_directory`,``-prox``,:ref:`processes`
+   ``-Z``,output_directory,``-prox``,:ref:`processes`
    ``-r``,:ref:`recursive`,``-ch``,:ref:`chunksize`
    ``-i``,:ref:`in_folder`,``-mv``,:ref:`move_to`
    ``-le``,:ref:`limit_extensions`,``-d``,:ref:`delete`
@@ -205,7 +205,7 @@ After the ``dif`` object has been built using :ref:`difPy.build`, the search can
 
 When invoking ``difPy.search()``, difPy starts comparing the images to find duplicates or similarities, based on the MSE (Mean Squared Error) between both image tensors. The target similarity rate i. e. MSE value is set with the :ref:`similarity` parameter.
 
-After the search is completed, further actions can be performed using :ref:`search.move_to` and :ref:`search.delete`.
+After the search is completed, further actions can be performed using :ref:`search.move_to` and :ref:`delete`.
 
 .. code-block:: python
 
@@ -292,12 +292,12 @@ difPy can automatically move the lower quality duplicate/similar images it found
 
    <hr>
 
-.. _search.delete:
+.. _delete:
 
 search.delete
 ^^^^^^^^^^
 
-difPy can automatically delete the lower quality duplicate/similar images it found. Images can be deleted by invoking ``search.delete``:
+difPy can automatically delete the lower quality duplicate/similar images it found. Images can be deleted by invoking ``search.delete()``:
 
 .. note::
 
@@ -355,7 +355,7 @@ Lower quality images then can be **moved** to a different location (see :ref:`se
    
    search.move_to(destination_path='C:/Path/to/Destination/')
 
-Or **deleted** (see :ref:`search.delete`):
+Or **deleted** (see :ref:`delete`):
 
 .. code-block:: python
 
