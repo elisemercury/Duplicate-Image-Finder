@@ -196,9 +196,21 @@ class build:
              
         return tensor_dictionary, id_to_shape_dictionary, filename_dictionary, id_to_group_dictionary, group_to_id_dictionary, invalid_files
 
-    def _generate_tensor(self, num, file):
-        # Function that generates a tensor of an image
+    def _generate_tensor(self, num: int, file: str) -> dict | tuple:
+        """Function that generates a tensor of an image.
+
+        Args:
+            num (int): File number or id.
+            file (str): Filename string.
+
+        Returns:
+            dict | tuple: return a dictionary if there is an error, a tuple if success.
+        """
         try:
+            # Handle warnings as exceptions
+            warnings.simplefilter('error', UserWarning)
+            warnings.simplefilter('error', Image.DecompressionBombWarning)
+
             img = Image.open(file)
             if img.getbands() != ('R', 'G', 'B'):
                 img = img.convert('RGB')
@@ -207,6 +219,7 @@ class build:
             img = np.asarray(img)
             return (num, img, shape)
         except Exception as e:
+            print(f"Error {e.__class__.__name__} loading image #{num} : '{file}' -> {e}")
             if e.__class__.__name__== 'UnidentifiedImageError':
                 return {str(Path(file)) : 'UnidentifiedImageError: file could not be identified as image.'}
             else:
@@ -460,9 +473,18 @@ class search:
 
     def _yield_comparison_group(self):
         # Yields a list of images ready for comparison
-        max_value = len(self.__difpy_obj._tensor_dictionary.keys())
+
+        # The old code assumed a contiguous list of file IDs.
+        max_value = max(self.__difpy_obj._tensor_dictionary.keys())
+        missing_ids = list(
+            set(range(max_value+1)).difference(
+                set(self.__difpy_obj._tensor_dictionary.keys())
+            )
+        )
         for i in range(max_value):
-            group = [(i, j) for j in range(i+1, max_value)]
+            if i in missing_ids:
+                continue
+            group = [(i, j) for j in filter(lambda x: x not in missing_ids, range(i+1, max_value))]
             if len(group) != 0:
                 yield group
 
