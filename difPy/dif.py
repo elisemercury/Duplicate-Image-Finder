@@ -609,28 +609,20 @@ class search:
             Skip user confirmation when delete=True (default is False)
         '''
         silent_del = _validate_param._silent_del(silent_del)
-        deleted_files = 0
+        
         if len(self.lower_quality) > 0:
             if not silent_del:
                 usr = input('Are you sure you want to delete all lower quality matched images? \n! This cannot be undone. (y/n)')
                 if str(usr).lower() == 'y':
-                    for file in self.lower_quality:
-                        try:
-                            os.remove(file)
-                            deleted_files += 1
-                        except:
-                            print(f'Could not delete file: {file}')       
+                    deleted_files = self._delete_files()
                 else:
                     print('Deletion canceled.')
                     return
             else:
-                for file in self.lower_quality:
-                    try:
-                        os.remove(file)
-                        deleted_files += 1
-                    except:
-                        print(f'Could not delete file: {file}')
+                deleted_files = self._delete_files()
+
         print(f'Deleted {deleted_files} file(s)')
+
         return
 
 class _compare_imgs:
