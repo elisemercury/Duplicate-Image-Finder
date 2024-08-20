@@ -566,6 +566,18 @@ class search:
             
         lower_quality = list(set(lower_quality))
         return lower_quality, duplicate_count, similar_count  
+    
+    def _delete_files(self):
+        deleted_files = 0
+
+        for file in self.lower_quality:
+            try:
+                os.remove(file)
+                deleted_files += 1
+            except:
+                print(f'Could not delete file: {file}')
+
+        return deleted_files
 
     def move_to(self, destination_path):
         # Function for moving the lower quality images that were found after the search
