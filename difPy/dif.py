@@ -4,7 +4,7 @@ difPy - Python package for finding duplicate and similar images.
 https://github.com/elisemercury/Duplicate-Image-Finder
 '''
 from glob import glob
-from multiprocessing import Pool
+from multiprocessing import Pool, current_process, freeze_support
 import numpy as np
 from PIL import Image
 import os
@@ -15,6 +15,11 @@ import json
 import warnings
 from itertools import combinations
 from collections import defaultdict
+
+def _initialize_multiprocessing():
+    # Function that 
+    if current_process().name == 'MainProcess':
+        freeze_support()
 
 class build:
     '''
@@ -49,6 +54,9 @@ class build:
         self.__show_progress = _validate_param._show_progress(show_progress)
         self.__processes = _validate_param._processes(processes)
         _validate_param._kwargs(kwargs)
+
+        # Initialize multiprocessing
+        _initialize_multiprocessing()
 
         self._tensor_dictionary, self._id_to_shape_dictionary, self._filename_dictionary, self._id_to_group_dictionary, self._group_to_id_dictionary, self._invalid_files, self.stats = self._main()
 
@@ -246,6 +254,9 @@ class search:
         self.__chunksize = _validate_param._chunksize(chunksize)
         self.__in_folder = self.__difpy_obj.stats['process']['build']['parameters']['in_folder']
         _validate_param._kwargs(kwargs)
+
+        # Initialize multiprocessing
+        _initialize_multiprocessing()
 
         print("Initializing search...", end='\r')
         self.result, self.lower_quality, self.stats = self._main()
