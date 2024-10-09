@@ -3,10 +3,10 @@
 # -- Project information
 
 project = 'difPy Guide'
-copyright = '2023, Elise Landman'
+copyright = '2024, Elise Landman'
 author = 'Elise Landman'
 
-release = 'v4.1.0'
+release = 'v4.1.1'
 version = 'v4.1'
 
 # -- General configuration
