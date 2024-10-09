@@ -17,7 +17,7 @@ from itertools import combinations
 from collections import defaultdict
 
 def _initialize_multiprocessing():
-    # Function that 
+    # Function that initializes multiprocessing
     if current_process().name == 'MainProcess':
         freeze_support()
 
