@@ -7,7 +7,7 @@ copyright = '2024, Elise Landman'
 author = 'Elise Landman'
 
 release = 'v4.1.1'
-version = 'v4.1'
+version = 'v4.1.1'
 
 # -- General configuration
 
