@@ -204,9 +204,21 @@ class build:
              
         return tensor_dictionary, id_to_shape_dictionary, filename_dictionary, id_to_group_dictionary, group_to_id_dictionary, invalid_files
 
-    def _generate_tensor(self, num, file):
-        # Function that generates a tensor of an image
+    def _generate_tensor(self, num: int, file: str) -> dict | tuple:
+        """Function that generates a tensor of an image.
+
+        Args:
+            num (int): File number or id.
+            file (str): Filename string.
+
+        Returns:
+            dict | tuple: return a dictionary if there is an error, a tuple if success.
+        """
         try:
+            # Handle warnings as exceptions
+            warnings.simplefilter('error', UserWarning)
+            warnings.simplefilter('error', Image.DecompressionBombWarning)
+
             img = Image.open(file)
             if img.getbands() != ('R', 'G', 'B'):
                 img = img.convert('RGB')
@@ -215,6 +227,7 @@ class build:
             img = np.asarray(img)
             return (num, img, shape)
         except Exception as e:
+            print(f"Error {e.__class__.__name__} loading image #{num} : '{file}' -> {e}")
             if e.__class__.__name__== 'UnidentifiedImageError':
                 return {str(Path(file)) : 'UnidentifiedImageError: file could not be identified as image.'}
             else:
@@ -471,9 +484,18 @@ class search:
 
     def _yield_comparison_group(self):
         # Yields a list of images ready for comparison
-        max_value = len(self.__difpy_obj._tensor_dictionary.keys())
+
+        # The old code assumed a contiguous list of file IDs.
+        max_value = max(self.__difpy_obj._tensor_dictionary.keys())
+        missing_ids = list(
+            set(range(max_value+1)).difference(
+                set(self.__difpy_obj._tensor_dictionary.keys())
+            )
+        )
         for i in range(max_value):
-            group = [(i, j) for j in range(i+1, max_value)]
+            if i in missing_ids:
+                continue
+            group = [(i, j) for j in filter(lambda x: x not in missing_ids, range(i+1, max_value))]
             if len(group) != 0:
                 yield group
 
@@ -577,6 +599,18 @@ class search:
             
         lower_quality = list(set(lower_quality))
         return lower_quality, duplicate_count, similar_count  
+    
+    def _delete_files(self):
+        deleted_files = 0
+
+        for file in self.lower_quality:
+            try:
+                os.remove(file)
+                deleted_files += 1
+            except:
+                print(f'Could not delete file: {file}')
+
+        return deleted_files
 
     def move_to(self, destination_path):
         # Function for moving the lower quality images that were found after the search
@@ -608,28 +642,20 @@ class search:
             Skip user confirmation when delete=True (default is False)
         '''
         silent_del = _validate_param._silent_del(silent_del)
-        deleted_files = 0
+        
         if len(self.lower_quality) > 0:
             if not silent_del:
                 usr = input('Are you sure you want to delete all lower quality matched images? \n! This cannot be undone. (y/n)')
                 if str(usr).lower() == 'y':
-                    for file in self.lower_quality:
-                        try:
-                            os.remove(file)
-                            deleted_files += 1
-                        except:
-                            print(f'Could not delete file: {file}')       
+                    deleted_files = self._delete_files()
                 else:
                     print('Deletion canceled.')
                     return
             else:
-                for file in self.lower_quality:
-                    try:
-                        os.remove(file)
-                        deleted_files += 1
-                    except:
-                        print(f'Could not delete file: {file}')
+                deleted_files = self._delete_files()
+
         print(f'Deleted {deleted_files} file(s)')
+
         return
 
 class _compare_imgs:
