@@ -1,10 +1,14 @@
-import mariadb
-from fast_diff_py.sql_database import SQLBase, IntegrityError
-from fast_diff_py.datatransfer import CompareImageResults
 import datetime
-from typing import Union, List
-import os
 import logging
+import os
+import typing_extensions
+from typing import Union, List
+
+import mariadb
+
+from fast_diff_py.datatransfer import CompareImageResults
+from fast_diff_py.sql_database import SQLBase, IntegrityError
+
 
 # TODO Special more advanced insert to bulk insert first loop.
 # INSERT INTO mytable (id, a, b, c)
@@ -33,6 +37,7 @@ class MariaDBDatabase(SQLBase):
     cur: Union[mariadb.Cursor, None] = None
     logger: logging.Logger
 
+    @typing_extensions.deprecated
     def __init__(self, user: str, host: str, port: int, database: str, password: str = None, table_suffix: str = None,
                  purge: bool = False, **kwargs):
 
