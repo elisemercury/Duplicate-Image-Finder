@@ -402,41 +402,6 @@ class SQLiteDatabase(SQLBase):
         # return true if the for loop was unsuccessful.
         return True
 
-    def has_any_hash(self, key: int):
-        """
-        Check if a file has any hash already populated.
-
-        :param key: key of the file in the directory table
-        :return: if a file has any entry.
-        """
-        self.debug_execute(f"SELECT hash_0, hash_90, hash_180, hash_270 FROM directory WHERE key = {key}")
-        row = self.cur.fetchone()
-
-        # check all values are set
-        for c in row:
-            if c is not None:
-                return True
-
-        # return true if the for loop was unsuccessful.
-        return False
-
-    def del_all_hashes(self, key: int):
-        """
-        Delete all the 4 possible hashes of a given file.
-
-        :param key: key in the directory table
-        :return:
-        """
-        hashes = self.get_hash_of_key(key=key)
-        for hs in hashes:
-            if hs is None:
-                continue
-
-            self.__decrement_hash(hs)
-
-        self.debug_execute(f"UPDATE directory SET hash_0 = NULL, hash_90 = NULL, hash_180 = NULL, hash_270 = NULL "
-                           f"WHERE key = {key}")
-
     def __decrement_hash(self, key: int):
         """
         Decrement the count of a hash in the hash table.

@@ -133,24 +133,6 @@ class Database:
         """
         raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
 
-    def has_any_hash(self, key: int):
-        """
-        Check if a file has any hash already populated.
-
-        :param key: key of the file in the directory table
-        :return: if a file has any entry.
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
-    def del_all_hashes(self, key: int):
-        """
-        Delete all the 4 possible hashes of a given file.
-
-        :param key: key in the directory table
-        :return:
-        """
-        raise NotImplementedError("This is only an abstract class ment to layout the signatures.")
-
     def get_hash_of_key(self, key: int) -> list:
         """
         Get the hashes associated with a certain image.
