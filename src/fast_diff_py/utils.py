@@ -1,6 +1,9 @@
 import math
 import hashlib
 import numpy as np
+import json
+import base64
+from typing import Any
 
 
 """
@@ -182,3 +185,27 @@ def h(x: int, unit: str, base2: bool = False) -> str:
         # Default
         else:
             return f"{x} {unit}"
+
+
+def to_b64(to_encode: Any):
+    """
+    Convert an object to a b64 string
+
+    :param to_encode: object to encode
+    :return: base64 string
+    """
+    json_str = json.dumps(to_encode)
+    bytes_string = json_str.encode("utf-8")
+    return base64.standard_b64encode(bytes_string).decode("utf-8")
+
+
+def from_b64(b64_string: str):
+    """
+    Convert a b64 string to a python object
+
+    :param b64_string: a b64 encoded python object
+    :return: a python object
+    """
+    bytes_string = base64.standard_b64decode(b64_string.encode("utf-8"))
+    json_string = bytes_string.decode("utf-8")
+    return json.loads(json_string)
