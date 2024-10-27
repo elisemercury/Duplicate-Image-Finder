@@ -121,9 +121,6 @@ class FastDiffPyBase:
 
         # store the hash if computed
         if self.config.fl_compute_hash:
-            # Drop hashes if they are only partly computed.
-            if self.db.has_any_hash(key=result_obj.key):
-                self.db.del_all_hashes(key=result_obj.key)
 
             # Store all hashes
             self.db.insert_hash(key=result_obj.key, file_hash=result_obj.hash_0, rotation=0)
