@@ -83,10 +83,10 @@ class PreprocessResults:
     original_x: int
     original_y: int
 
-    hash_0: str
-    hash_90: str
-    hash_180: str
-    hash_270: str
+    hash_0: Union[str, int]
+    hash_90: Union[str, int]
+    hash_180: Union[str, int]
+    hash_270: Union[str, int]
 
     error: str
 
