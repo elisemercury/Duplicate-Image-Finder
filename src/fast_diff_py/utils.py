@@ -80,6 +80,31 @@ def fill(base: str, length: int, fill_char: str = " ", left: bool = True) -> str
         return fill_char * (length - len(base)) + base
 
 
+def sizeof_fmt(num: Union[int, float], suffix: str = "B", base2: bool = False) -> str:
+    """
+    Return a Human readable number given an integer
+
+    :param num: Number to format human-readable
+    :param suffix: Unit Suffix for the Number
+    :param base2: If the Output is in Base2 or Base10
+
+    :return: Human-Readable String of the size
+    """
+    if base2:
+        for unit in ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"):
+            if abs(num) < 1024.0:
+                return f"{num:3.1f}{unit}{suffix}"
+            num /= 1024.0
+        return f"{num:.1f}Yi{suffix}"
+    else:
+        for unit in ("", "K", "M", "G", "T", "P", "E", "Z"):
+            if abs(num) < 1000.0:
+                return f"{num:3.1f}{unit}{suffix}"
+            num /= 1000.0
+        return f"{num:.1f}Y{suffix}"
+
+
+
 def h(x: int, unit: str, base2: bool = False) -> str:
     """
     Convert an integer representing a byte number into a human-readable format. I.e. 3 digits of precision.
