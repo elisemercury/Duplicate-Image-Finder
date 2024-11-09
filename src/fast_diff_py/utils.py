@@ -3,7 +3,7 @@ import hashlib
 import numpy as np
 import json
 import base64
-from typing import Any
+from typing import Any, Union
 
 
 """
@@ -29,7 +29,7 @@ def hash_file(path) -> str:
     :param path: file_path to hash
     :return:
     """
-    sha256_hash = hashlib.sha256()
+    sha256_hash = hashlib.sha1()
     with open(path, "rb") as f:
         # Read and update hash string value in blocks of 4K
         for byte_block in iter(lambda: f.read(4096), b""):
