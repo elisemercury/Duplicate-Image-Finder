@@ -26,6 +26,8 @@ class ChildProcess(GracefulWorker):
     cmd_queue: mp.Queue
     res_queue: mp.Queue
 
+    block_timeout: int = 0.01
+
     def __init__(self, identifier: int,
                  cmd_queue: mp.Queue,
                  res_queue: mp.Queue,
@@ -48,12 +50,11 @@ class ChildProcess(GracefulWorker):
         count = 0
         while count < self.timeout and self.run:
             try:
-                arg = self.cmd_queue.get(block=False)
+                arg = self.cmd_queue.get(block=True, timeout=self.block_timeout)
                 count = 0
             except queue.Empty:
                 self.logger.warning("Starving...")
-                count += 1
-                time.sleep(1)
+                count += self.block_timeout
                 continue
 
             # Break if we get a None
