@@ -119,7 +119,10 @@ class FirstLoopWorker(ChildProcess):
         self.thumb_dir = thumb_dir
         self.target_size = target_size
 
-        self.hash_fn = hash_fn
+        if hash_fn is not None:
+            self.hash_fn = hash_fn
+        else:
+            self.hash_fn = imgp.hash_file
 
     def prep_logging(self, level: int = logging.DEBUG, q: mp.Queue = None):
         """
