@@ -21,7 +21,7 @@ class ImageCache:
         self.size = size
         np.ndarray((size, *img_shape), dtype=np.uint8)
 
-    def get_image(self, key: int) -> np.ndarray:
+    def get_image(self, key: int) -> np.ndarray[np.uint8]:
         """
         Get an image from the cache, returns a copy from the cache not the cache itself.
         """
