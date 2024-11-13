@@ -378,14 +378,21 @@ class SecondLoopWorker(ChildProcess):
                     diffs.append(-1)
                     errors[d_key] = tb
 
-            return BatchCompareResult(key=arg.key, key_a=arg.key_a, key_b=arg.key_b, diff=diffs, error=errors)
+            return BatchCompareResult(key=arg.key,
+                                      key_a=arg.key_a, key_b=arg.key_b,
+                                      diff=diffs, errors=errors,
+                                      cache_key=arg.cache_key)
 
         except Exception as e:
-            self.logger.error(f"Error with image a in batch {arg.key_a}: {e}")
+            self.logger.error(f"Error with image a in batch {arg.key_a}: {e}", exc_info=e)
             tb = traceback.format_exc()
             diffs = [-1 for _ in range(size)]
             errors =  {arg.key - i: tb for i in range(size)}
-            return BatchCompareResult(key=arg.key, key_a=arg.key_a, key_b=arg.key_b, diff=diffs, error=errors)
+            return BatchCompareResult(key=arg.key,
+                                      key_a=arg.key_a, key_b=arg.key_b,
+                                      diff=diffs, errors=errors,
+                                      cache_key=arg.cache_key)
+
     def process_batch_thumb(self, arg: BatchCompareArgs) -> BatchCompareResult:
         """
         Process a batch of images and return the results in the BatchCompareResult format
@@ -394,6 +401,49 @@ class SecondLoopWorker(ChildProcess):
         :param arg: The arguments for the batch
         :return: The results of the batch
         """
+        self.cache_key = arg.cache_key
+
+        # Get the size we need to walk for the batch
+        if self.has_dir_b:
+            size = arg.max_size_b
+        else:
+            size = arg.key_b - arg.key_a
+
+        # Prepare the diffs and errors
+        diffs = []
+        errors = {}
+
+        try:
+            img_a = self.generic_fetch_image(key=arg.key_a, path=arg.path_a, is_x=True)
+
+            for i in range(size):
+                d_key = arg.key - i
+                thumb_key = arg.key_b - i
+
+                try:
+                    img_b = self.generic_fetch_image(key=thumb_key, is_x=False)
+                    diff = self.delta_fn(img_a, img_b)
+                    diffs.append(diff)
+                except Exception as e:
+                    self.logger.exception(f"Error in processing Tuple: {arg.key_a}, {thumb_key}", exc_info=e)
+                    tb = traceback.format_exc()
+                    diffs.append(-1)
+                    errors[d_key] = tb
+
+            return BatchCompareResult(key=arg.key,
+                                      key_a=arg.key_a, key_b=arg.key_b,
+                                      diff=diffs, errors=errors,
+                                      cache_key=arg.cache_key)
+
+        except Exception as e:
+            self.logger.error(f"Error with image a in batch {arg.key_a}: {e}", exc_info=e)
+            tb = traceback.format_exc()
+            diffs = [-1 for _ in range(size)]
+            errors =  {arg.key - i: tb for i in range(size)}
+            return BatchCompareResult(key=arg.key,
+                                      key_a=arg.key_a, key_b=arg.key_b,
+                                      diff=diffs, errors=errors,
+                                      cache_key=arg.cache_key)
 
     def process_item(self, arg: ItemCompareArgs) -> ItemCompareResult:
         """
