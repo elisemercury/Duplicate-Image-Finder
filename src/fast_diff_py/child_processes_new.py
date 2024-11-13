@@ -337,9 +337,10 @@ class SecondLoopWorker(ChildProcess):
         """
         return imgp.load_std_image(img_path=path, target_size=self.target_size, resize=True)
 
-    def process_batch(self, arg: BatchCompareArgs) -> BatchCompareResult:
+    def process_batch_paths(self, arg: BatchCompareArgs) -> BatchCompareResult:
         """
         Process a batch of images and return the results in the BatchCompareResult format
+        Function is intended for no ram cache and no thumb.
 
         :param arg: The arguments for the batch
         :return: The results of the batch
@@ -385,6 +386,14 @@ class SecondLoopWorker(ChildProcess):
             diffs = [-1 for _ in range(size)]
             errors =  {arg.key - i: tb for i in range(size)}
             return BatchCompareResult(key=arg.key, key_a=arg.key_a, key_b=arg.key_b, diff=diffs, error=errors)
+    def process_batch_thumb(self, arg: BatchCompareArgs) -> BatchCompareResult:
+        """
+        Process a batch of images and return the results in the BatchCompareResult format
+        Intended for cases when thumbnails exist or when we have a ram cache
+
+        :param arg: The arguments for the batch
+        :return: The results of the batch
+        """
 
     def process_item(self, arg: ItemCompareArgs) -> ItemCompareResult:
         """
