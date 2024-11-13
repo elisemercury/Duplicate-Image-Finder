@@ -60,10 +60,15 @@ class ChildProcess(GracefulWorker):
             # Break if we get a None
             if arg is None:
                 self.res_queue.put(None)
+                self.logger.info("Received None. Shutting down")
                 return
 
             # Perform the processing
             self.res_queue.put(self.processing_fn(arg))
+
+        if count >= self.timeout:
+            self.res_queue.put(None)
+            self.logger.warning("Timeout reached. Shutting down")
 
     def set_processing_function(self):
         """
