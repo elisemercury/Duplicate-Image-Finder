@@ -19,7 +19,7 @@ class ImageCache:
         self.img_shape = img_shape
         self.offset = offset
         self.size = size
-        np.ndarray((size, *img_shape), dtype=np.uint8)
+        self.data = np.ndarray((size, *img_shape), dtype=np.uint8)
 
     def get_image(self, key: int) -> np.ndarray[np.uint8]:
         """
