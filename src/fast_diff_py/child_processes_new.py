@@ -491,7 +491,10 @@ class SecondLoopWorker(ChildProcess):
         Set the processing function based on the configuration
         """
         if self.batched_args:
-            self.processing_fn = self.process_batch
+            if self.thumb_dir is None and self.ram_cache is None:
+                self.processing_fn = self.process_batch_paths
+            else:
+                self.processing_fn = self.process_batch_thumb
         else:
             self.processing_fn = self.process_item
 
