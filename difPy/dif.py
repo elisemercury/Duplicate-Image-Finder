@@ -103,8 +103,6 @@ class build:
             for dir in self.__directory:
                 if os.path.isdir(dir):
                     directories += glob(str(dir) + '/**/', recursive=self.__recursive)
-                elif os.path.isfile(dir):
-                    files.append(dir)
             for dir in directories:
                 files = glob(str(dir) + '/*', recursive=self.__recursive)
                 valid_files, skip_files = self._validate_files(files)
@@ -123,6 +121,8 @@ class build:
                 valid_files_all = np.concatenate((valid_files_all, valid_files), axis=None)
                 if len(skip_files) > 0:
                     skipped_files_all = np.concatenate((skipped_files_all, skip_files), axis=None)
+
+        #print(valid_files_all)
         return valid_files_all, skipped_files_all
 
     def _validate_files(self, directory): 
@@ -785,7 +785,9 @@ class _validate_param:
             dir = Path(dir)
             if not (os.path.isdir(dir) or os.path.isfile(dir)):
                 raise FileNotFoundError(f'Directory "{str(dir)}" does not exist')
-            
+            if ("[" in dir) or ("]" in dir):
+                raise ValueError('Invalid directory parameter: unsupported filepaths. Some filepaths contain brackets ("[", "]") which is not supported.')
+                  
         # Check if the directories provided are unique
         if len(set(directory)) != directory.size:
             raise ValueError('Invalid directory parameters: invalid attempt to compare a directory with itself.')
