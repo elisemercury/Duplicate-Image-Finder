@@ -98,20 +98,28 @@ class build:
         valid_files_all = []
         skipped_files_all = np.array([])
         if self.__in_folder:
+            print("In folder:")
             # search directories separately
             directories = []
             for dir in self.__directory:
                 if os.path.isdir(dir):
                     directories += glob(str(dir) + '/**/', recursive=self.__recursive)
+                    print(directories)
             for dir in directories:
-                files = [f for f in glob(f'{dir}*',recursive=self.__recursive) if os.path.isfile(f)]
-                #files = glob(str(dir) + '/*', recursive=self.__recursive)
-                valid_files, skip_files = self._validate_files(files)
-                valid_files_all.append(valid_files)
-                if len(skip_files) > 0:
-                    skipped_files_all = np.concatenate((skipped_files_all, skip_files), axis=None)
+                if not any(x in str(dir) for x in ['[', ']']):
+                    files = [f for f in glob(f'{dir}*',recursive=False) if os.path.isfile(f)]
+                    #files = [file for file in files if not any(x in str(file) for x in ['[', ']'])]
+                    #print(files)
+                    #files = glob(str(dir) + '/*', recursive=self.__recursive)
+                    valid_files, skip_files = self._validate_files(files)
+                    valid_files_all.append(valid_files)
+                    if len(skip_files) > 0:
+                        skipped_files_all = np.concatenate((skipped_files_all, skip_files), axis=None)
+                else:
+                    warnings.warn(f'difPy found filepaths containing brackets ("[" or "]") which is not supported. These filepaths will be skipped.', stacklevel=2)
 
         else:
+            print("Union")
             # search union of all directories
             for dir in self.__directory:
                 if os.path.isdir(dir):
@@ -128,12 +136,19 @@ class build:
 
     def _validate_files(self, directory): 
         # Function that validates a file's filetype
-        valid_files = np.array([os.path.normpath(file) for file in directory if not os.path.isdir(file)])        
+        valid_files = np.array([os.path.normpath(file) for file in directory if not os.path.isdir(file)])
+        unfiltered_files = valid_files.size
+        valid_files = np.array([file for file in valid_files if not any(x in str(file) for x in ['[', ']'])])
+        filtered_files = valid_files.size
+        if unfiltered_files != filtered_files:
+            warnings.warn(f'difPy found filepaths containing brackets ("[" or "]") which is not supported. These filepaths will be skipped.', stacklevel=2)
+
         if self.__limit_extensions:
             valid_files, skip_files = self._filter_extensions(valid_files)
         else:
             warnings.warn('Parameter "limit_extensions" is set to False. difPy result accuracy can not be guaranteed for file formats not covered by "limit_extensions"', stacklevel=2)
             skip_files = []
+        #print(valid_files)
         return valid_files, skip_files
 
     def _filter_extensions(self, directory_files):
@@ -787,7 +802,7 @@ class _validate_param:
             if not (os.path.isdir(dir) or os.path.isfile(dir)):
                 raise FileNotFoundError(f'Directory "{str(dir)}" does not exist')
             if ("[" in str(dir)) or ("]" in str(dir)):
-                raise ValueError('Invalid directory parameter: unsupported filepaths. Some filepaths contain brackets ("[", "]") which is not supported.')
+                raise ValueError('Invalid directory parameter: unsupported filepaths. Some filepaths contain brackets ("[" or "]") which is not supported.')
                   
         # Check if the directories provided are unique
         if len(set(directory)) != directory.size:
