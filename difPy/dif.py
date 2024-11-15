@@ -104,7 +104,8 @@ class build:
                 if os.path.isdir(dir):
                     directories += glob(str(dir) + '/**/', recursive=self.__recursive)
             for dir in directories:
-                files = glob(str(dir) + '/*', recursive=self.__recursive)
+                files = [f for f in glob(f'{dir}*',recursive=self.__recursive) if os.path.isfile(f)]
+                #files = glob(str(dir) + '/*', recursive=self.__recursive)
                 valid_files, skip_files = self._validate_files(files)
                 valid_files_all.append(valid_files)
                 if len(skip_files) > 0:
@@ -785,7 +786,7 @@ class _validate_param:
             dir = Path(dir)
             if not (os.path.isdir(dir) or os.path.isfile(dir)):
                 raise FileNotFoundError(f'Directory "{str(dir)}" does not exist')
-            if ("[" in dir) or ("]" in dir):
+            if ("[" in str(dir)) or ("]" in str(dir)):
                 raise ValueError('Invalid directory parameter: unsupported filepaths. Some filepaths contain brackets ("[", "]") which is not supported.')
                   
         # Check if the directories provided are unique
