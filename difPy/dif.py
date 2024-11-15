@@ -358,6 +358,8 @@ class search:
     def _search_infolder(self):
         # Function that performs search in isolated/separate directories
         result_raw = list()
+        # Get folder paths for each group
+        folder_paths = self._get_paths_from_groups()
         grouped_img_ids = [img_ids for group_id, img_ids in self.__difpy_obj._group_to_id_dictionary.items()]
         self.__count = 0
 
@@ -386,9 +388,21 @@ class search:
                 if self.__show_progress:
                     _help._progress_bar(self.__count, len(grouped_img_ids), task=f'searching files')
         
-        # format the end result
-        result = self._group_result_infolder(result_raw)
+        # format the end result using folder paths instead of group IDs
+        result = self._group_result_infolder(result_raw, folder_paths)
         return result
+
+    def _get_paths_from_groups(self):
+        """Helper function to map group IDs to their parent folder paths"""
+        folder_paths = {}
+        for group_id, img_ids in self.__difpy_obj._group_to_id_dictionary.items():
+            # Get the first image path from the group
+            if img_ids:
+                first_img_path = self.__difpy_obj._filename_dictionary[img_ids[0]]
+                # Get the parent folder path
+                folder_path = os.path.dirname(first_img_path)
+                folder_paths[group_id] = folder_path
+        return folder_paths
 
     def _format_result_union(self, result):
         # Helper function that replaces the image IDs in the result dictionary by their filename
@@ -530,18 +544,19 @@ class search:
         del already_added
         return result
 
-    def _group_result_infolder(self, tuple_list):
-        # Function that formats the final result dict
+    def _group_result_infolder(self, tuple_list, folder_paths):
+        # Function that formats the final result dict using folder paths
         result = defaultdict(list)
         already_added = set()
         for k, *v in tuple_list:
             k_group = self.__difpy_obj._id_to_group_dictionary[k]
-            if k_group not in result:
-                result.update({k_group:{}})
+            folder_path = folder_paths[k_group]
+            if folder_path not in result:
+                result[folder_path] = {}
             if v[0] not in already_added:
-                if k not in result[k_group]:
-                    result[k_group].update({k:[]})
-                result[k_group][k].append(v)
+                if k not in result[folder_path]:
+                    result[folder_path].update({k: []})
+                result[folder_path][k].append(v)
                 already_added.add(v[0])
 
         result = dict(result)
@@ -823,7 +838,7 @@ class _validate_param:
             raise Exception('Invalid value for "in_folder" parameter: must be of type BOOL.')
         elif not recursive and in_folder:
             warnings.warn('Parameter "in_folder" cannot be "True" if "recursive" is set to "False". "in_folder" will be ignored.', stacklevel=2)
-            in_folder = False
+            #in_folder = False
         return in_folder
     
     def _limit_extensions(limit_extensions):
