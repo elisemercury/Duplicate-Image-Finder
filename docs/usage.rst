@@ -349,11 +349,13 @@ The images are deleted based on the ``lower_quality`` output as described under 
 
 .. include:: /parameters/silent_del.rst
 
-.. _output:
+
 
 .. raw:: html
 
    <hr>
+
+.. _output:
 
 Output
 ----------------
