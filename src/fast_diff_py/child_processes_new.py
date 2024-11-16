@@ -423,7 +423,7 @@ class SecondLoopWorker(ChildProcess):
                 thumb_key = arg.key_b - i
 
                 try:
-                    img_b = self.generic_fetch_image(key=thumb_key, is_x=False)
+                    img_b = self.generic_fetch_image(key=thumb_key, is_x=False, path="")
                     diff = self.delta_fn(img_a, img_b)
                     diffs.append(diff)
                 except Exception as e:
