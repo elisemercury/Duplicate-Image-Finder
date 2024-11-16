@@ -95,34 +95,57 @@ class build:
 
     def _get_files(self):
         # Function that searches for files in the input directories
-        valid_files_all = []
-        skipped_files_all = np.array([])
+        valid_files_all = np.array([], dtype=object)  # Initialize as empty numpy array
+        skipped_files_all = np.array([], dtype=object)
+        
         if self.__in_folder:
             # search directories separately
-            directories = []
+            folder_files = []  # Temporary list to collect arrays for each folder
             for dir in self.__directory:
                 if os.path.isdir(dir):
-                    directories += glob(str(dir) + '/**/', recursive=self.__recursive)
+                    # For directory inputs, gather all files recursively if requested
+                    if self.__recursive:
+                        # Get all files using glob recursive pattern
+                        files = glob(str(dir) + '/**/*', recursive=True)
+                    else:
+                        # Only search immediate directory
+                        files = glob(str(dir) + '/*')
                 elif os.path.isfile(dir):
-                    files.append(dir)
-            for dir in directories:
-                files = glob(str(dir) + '/*', recursive=self.__recursive)
+                    files = [dir]
+                    
+                # Filter out directories from glob results
+                files = [f for f in files if not os.path.isdir(f)]
+                
                 valid_files, skip_files = self._validate_files(files)
-                valid_files_all.append(valid_files)
+                if len(valid_files) > 0:
+                    folder_files.append(valid_files)  # Collect valid file arrays
                 if len(skip_files) > 0:
-                    skipped_files_all = np.concatenate((skipped_files_all, skip_files), axis=None)
+                    skipped_files_all = np.concatenate((skipped_files_all, skip_files))
+            
+            if folder_files:  # If we found any valid files
+                valid_files_all = np.array(folder_files, dtype=object)  # Convert list of arrays to 2D array
 
         else:
             # search union of all directories
+            all_files = []
             for dir in self.__directory:
                 if os.path.isdir(dir):
-                    files = glob(str(dir) + '/**', recursive=self.__recursive)
+                    if self.__recursive:
+                        # Use same glob pattern as in_folder mode
+                        files = glob(str(dir) + '/**/*', recursive=True)
+                    else:
+                        files = glob(str(dir) + '/*')
+                    # Filter out directories
+                    files = [f for f in files if not os.path.isdir(f)]
+                    all_files.extend(files)
                 elif os.path.isfile(dir):
-                    files = (dir, )
-                valid_files, skip_files = self._validate_files(files)
-                valid_files_all = np.concatenate((valid_files_all, valid_files), axis=None)
-                if len(skip_files) > 0:
-                    skipped_files_all = np.concatenate((skipped_files_all, skip_files), axis=None)
+                    all_files.append(dir)
+                    
+            valid_files, skip_files = self._validate_files(all_files)
+            valid_files_all = np.array(valid_files, dtype=object)  # Convert to numpy array
+            if len(skip_files) > 0:
+                skipped_files_all = np.concatenate((skipped_files_all, skip_files))
+                        
         return valid_files_all, skipped_files_all
 
     def _validate_files(self, directory): 
@@ -201,19 +224,10 @@ class build:
                         filename_dictionary.update({img_id : valid_files[filename]})
                         tensor_dictionary.update({img_id : tensor})
                         count += 1         
-             
         return tensor_dictionary, id_to_shape_dictionary, filename_dictionary, id_to_group_dictionary, group_to_id_dictionary, invalid_files
 
     def _generate_tensor(self, num: int, file: str) -> dict | tuple:
-        """Function that generates a tensor of an image.
-
-        Args:
-            num (int): File number or id.
-            file (str): Filename string.
-
-        Returns:
-            dict | tuple: return a dictionary if there is an error, a tuple if success.
-        """
+        # Function that generates a tensor of an image.
         try:
             # Handle warnings as exceptions
             warnings.simplefilter('error', UserWarning)
@@ -271,7 +285,8 @@ class search:
         # Initialize multiprocessing
         _initialize_multiprocessing()
 
-        print("Initializing search...", end='\r')
+        if self.__show_progress:
+            print("Initializing search...", end='\r')
         self.result, self.lower_quality, self.stats = self._main()
         return
 
@@ -338,7 +353,8 @@ class search:
 
     def _search_infolder(self):
         # Function that performs search in isolated/separate directories
-        result_raw = list()
+        result = list()
+        # Get folder paths for each group
         grouped_img_ids = [img_ids for group_id, img_ids in self.__difpy_obj._group_to_id_dictionary.items()]
         self.__count = 0
 
@@ -351,7 +367,7 @@ class search:
                     for i in output:
                         if i:
                             # if matches found, add to result
-                            result_raw = self._add_to_result(result_raw, i)
+                            result = self._add_to_result(result, i)
                     self.__count += 1        
                 else:
                     # search algorithm for bigger datasets, > 5k images
@@ -362,14 +378,24 @@ class search:
                     for output in pool.imap_unordered(self._find_matches_batch, self._yield_comparison_group(), self.__chunksize):
                         if len(output) > 0:
                             # if matches found, add to result
-                            result_raw = result_raw + output
+                            result = result + output
                     self.__count += 1  
                 if self.__show_progress:
                     _help._progress_bar(self.__count, len(grouped_img_ids), task=f'searching files')
         
-        # format the end result
-        result = self._group_result_infolder(result_raw)
         return result
+
+    def _get_paths_from_groups(self):
+        # Helper function to map group IDs to their parent folder paths
+        folder_paths = {}
+        for group_id, img_ids in self.__difpy_obj._group_to_id_dictionary.items():
+            # Get the first image path from the group
+            if img_ids:
+                first_img_path = self.__difpy_obj._filename_dictionary[img_ids[0]]
+                # Get the parent folder path
+                folder_path = os.path.dirname(first_img_path)
+                folder_paths[group_id] = folder_path
+        return folder_paths
 
     def _format_result_union(self, result):
         # Helper function that replaces the image IDs in the result dictionary by their filename
@@ -384,7 +410,12 @@ class search:
         return updated_result
 
     def _format_result_infolder(self, result):
-        # Helper function that replaces the image IDs in the result dictionary by their filename
+        # Helper function that replaces the group IDs and image IDs in the result dictionary by their filepaths
+        # Replace group names
+        folder_paths = self._get_paths_from_groups()
+        result = self._group_result_infolder(result, folder_paths)
+
+        # Replace filenames
         updated_result = dict()
         for group_id in result.keys():
             for key, value in result[group_id].items():
@@ -511,18 +542,19 @@ class search:
         del already_added
         return result
 
-    def _group_result_infolder(self, tuple_list):
-        # Function that formats the final result dict
+    def _group_result_infolder(self, tuple_list, folder_paths):
+        # Function that formats the final result dict using folder paths
         result = defaultdict(list)
         already_added = set()
         for k, *v in tuple_list:
             k_group = self.__difpy_obj._id_to_group_dictionary[k]
-            if k_group not in result:
-                result.update({k_group:{}})
+            folder_path = folder_paths[k_group]
+            if folder_path not in result:
+                result[folder_path] = {}
             if v[0] not in already_added:
-                if k not in result[k_group]:
-                    result[k_group].update({k:[]})
-                result[k_group][k].append(v)
+                if k not in result[folder_path]:
+                    result[folder_path].update({k: []})
+                result[folder_path][k].append(v)
                 already_added.add(v[0])
 
         result = dict(result)
@@ -608,7 +640,7 @@ class search:
                 os.remove(file)
                 deleted_files += 1
             except:
-                print(f'Could not delete file: {file}')
+                warnings.warn(f'Could not delete file: {file}', stacklevel=2)
 
         return deleted_files
 
@@ -628,7 +660,7 @@ class search:
                 os.replace(file, os.path.join(destination_path, tail))
                 new_lower_quality = np.append(new_lower_quality, str(Path(os.path.join(destination_path, tail))))
             except:
-                print(f'Could not move file: {file}')            
+                warnings.warn(f'Could not move file: {file}', stacklevel=2)          
         print(f'Moved {len(self.lower_quality)} files(s) to "{str(Path(destination_path))}"')
         self.lower_quality = new_lower_quality
         return  
@@ -757,10 +789,13 @@ class _generate_stats:
                                                            'chunksize' : kwargs['chunksize']                                                         
                                                           }})
         stats['process']['search'].update({'files_searched' : kwargs['files_searched']})
-        
-        stats['process']['search'].update({'matches_found' : {'duplicates': kwargs['duplicate_count'],
-                                                              'similar' : kwargs['similar_count']
-                                                             }})        
+        if kwargs['similarity'] == 0:
+            matches_output = {'duplicates': kwargs['duplicate_count']}
+        else:
+            matches_output = {'duplicates': kwargs['duplicate_count'],
+                              'similar' : kwargs['similar_count']}
+
+        stats['process']['search'].update({'matches_found' : matches_output})        
         return stats
 
 class _validate_param:
@@ -802,9 +837,6 @@ class _validate_param:
         # Function that validates the 'in_folder' input parameter
         if not isinstance(in_folder, bool):
             raise Exception('Invalid value for "in_folder" parameter: must be of type BOOL.')
-        elif not recursive and in_folder:
-            warnings.warn('Parameter "in_folder" cannot be "True" if "recursive" is set to "False". "in_folder" will be ignored.', stacklevel=2)
-            in_folder = False
         return in_folder
     
     def _limit_extensions(limit_extensions):

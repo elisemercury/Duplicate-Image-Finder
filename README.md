@@ -121,10 +121,7 @@ search.stats
                                       'in_folder': False,
                                       'limit_extensions': True,
                                       'px_size': 50,
-                                      'processes': 5},
-                        'total_files': {'count': 3232},
-                        'invalid_files': {'count': 0, 
-                                          'logs': {}}},
+                                      'processes': 5}},
              'search': {'duration': {'start': '2024-02-18T19:52:41.630027',
                                      'end': '2024-02-18T19:52:46.770077',
                                      'seconds_elapsed': 5.14},
@@ -135,7 +132,10 @@ search.stats
                                        'chunksize': None},
                         'files_searched': 3232,
                         'matches_found': {'duplicates': 3030, 
-                                          'similar': 0}}}}
+                                          'similar': 0}}},
+ 'total_files': {'count': 3232},
+ 'invalid_files': {'count': 0, 
+                   'logs': {}}}
 ```
 
 ## Additional Parameters
