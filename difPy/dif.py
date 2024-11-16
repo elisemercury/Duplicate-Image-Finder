@@ -285,7 +285,7 @@ class search:
         # Initialize multiprocessing
         _initialize_multiprocessing()
 
-        if self.__show_progess:
+        if self.__show_progress:
             print("Initializing search...", end='\r')
         self.result, self.lower_quality, self.stats = self._main()
         return
