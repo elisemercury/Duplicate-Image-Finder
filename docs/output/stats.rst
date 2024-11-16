@@ -3,7 +3,7 @@
    search.stats
 
    > Output:
-   {'directory': ['C:/Path/to/Folder_A/', 'C:/Path/to/Folder_B/', ... ],
+   {'directory': ['C:/Path1/', 'C:/Path2/', ... ],
     'process': {'build': {'duration': {'start': '2024-02-18T19:52:39.479548',
                                        'end': '2024-02-18T19:52:41.630027',
                                        'seconds_elapsed': 2.1505},
@@ -25,5 +25,5 @@
                                              'similar': 0}}},
     'total_files': 3232,
     'invalid_files': {'count': 4, 
-                      'logs': {'C:/Path/to/Invalid_File.pdf': 'Unsupported file type', 
+                      'logs': {'C:/Path/invalid_File.pdf': 'Unsupported file type', 
                                ... }}}}

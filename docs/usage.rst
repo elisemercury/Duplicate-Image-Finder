@@ -23,7 +23,33 @@ View difPy on `PyPi <https://pypi.org/project/difPy/>`_.
 Basic Usage
 ----------------
 
-difPy supports searching for duplicate and similar images within a single or multiple directories. difPy first needs to be initialized and build its image repository with :ref:`difPy.build`. After the ``dif`` object has been created, the search for matching images can be invoked using :ref:`difPy.search`,
+difPy is split into two main processes: 
+
+* ``build`` which builds the image repository from the directories provided (:ref:`difPy.build`) and 
+* ``search`` which performs the actual search operation (:ref:`difPy.search`). 
+
+First we need to build the ``dif`` object:
+
+.. code-block:: python
+
+   import difPy
+   dif = difPy.build("C:/Path/to/Folder/")
+
+And then we can perform one or more different searches on the same ``dif`` object:
+
+.. code-block:: python
+
+   search_duplicates = difPy.search(dif, similarity="duplicates")
+   search_similar = difPy.search(dif, similarity= "similar")
+
+We can obtain the search results as follows (see :ref:`output`):
+
+.. code-block:: python
+
+   search_duplicates.result
+   search_similar.result
+
+difPy supports searching for duplicate and similar images within a single or multiple directories.
 
 I. Single Folder Search
 ^^^^^^^^^^
@@ -336,9 +362,14 @@ difPy returns various types of output:
 
 I. Search Result Dictionary
 ^^^^^^^^^^
-A **JSON formatted collection** of duplicates/similar images (i. e. **match groups**) that were found. Each match group has a primary image (the key of the dictionary) which holds the list of its duplicates including their filename and MSE (Mean Squared Error). The lower the MSE, the more similar the primary image and the matched images are. Therefore, an MSE of 0 indicates that two images are exact duplicates.
+A **dictionary** of duplicates/similar images (i. e. **match groups**) that were found. Each match group has a primary image (the key of the dictionary) which holds the list of its duplicates including their filename and MSE (Mean Squared Error). The lower the MSE, the more similar the primary image and the matched images are. Therefore, an MSE of 0 indicates that two images are exact duplicates.
 
 .. include:: /output/result.rst
+
+
+When :ref:`in_folder` is set to ``True``, the result output is slightly modified and matches are grouped in their separate folders, with the key of the dictionary being the folder path.
+
+.. include:: /output/result_infolder.rst
 
 II. Lower Quality Files
 ^^^^^^^^^^

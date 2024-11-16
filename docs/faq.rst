@@ -12,7 +12,7 @@ Starting with `v4.1.0`_, difPy handles small and larger datasets differently. Si
 
 .. _v4.1.0: https://github.com/elisemercury/Duplicate-Image-Finder/releases
 
-When difPy receives a **"small" dataset** (<= 5k images), it uses its Classic algorithm and compares **all image combinations at once**, hence all of the image data is loaded into memory. This can speed up the comparison processing time, but in turn is heavier on memory consumption. Therefore, this algorithm is only used on "small" datasets.
+When difPy receives a **"small" dataset** (<= 5k images), it uses its classic algorithm and compares **all image combinations at once**, hence all of the image data is loaded into memory. This can speed up the comparison processing time, but in turn is heavier on memory consumption. Therefore, this algorithm is only used on smaller datasets.
 
 .. figure:: static/assets/simple_algorithm.png
    :width: 480
@@ -22,7 +22,7 @@ When difPy receives a **"small" dataset** (<= 5k images), it uses its Classic al
 
    Classic algorithm visualized
 
-When difPy receives a **"large" dataset** (> 5k images), the Chunking algorithm is used which **splits images into smaller groups** and processes these chunk-by-chunk leveraging `Python generators`_. This leads to a significant reduction in memory overhead, as less data is loaded into memory once at a time, as compared to the full list of all potential image comparison combinations. Furthermore, images are compared leveraging vectorization which also allows for faster comparison times on larger datasets. 
+When difPy receives a **"large" dataset** (> 5k images), a different algorithm is used which **splits images into smaller groups** and processes these chunk-by-chunk leveraging `Python generators`_. This leads to a significant reduction in memory overhead, as less data is loaded into memory once at a time. Furthermore, images are compared leveraging vectorization which also allows for faster comparison times on larger datasets. 
 
 .. _Python generators: https://docs.python.org/3/reference/expressions.html#yield-expressions
 
@@ -34,16 +34,16 @@ When difPy receives a **"large" dataset** (> 5k images), the Chunking algorithm 
 
    Chunking algorithm visualized
 
-The picture above visualizes how chunks are processed by the Chunking algorithm. Each of the image columns represent a chunk. 
+The picture above visualizes how chunks are processed by the chunking algorithm. Each of the image columns represent a chunk. 
 
-The ``chunksize`` parameter defines **how many of these chunks will be processed at once** (see :ref:`chunksize`). By default, ``chunksize`` is set to ``None`` which implies: ``1'000'000 / number of images in dataset``. This ratio is used to automatically size the ``chunksize`` according to the size of the dataset, with the goal of keeping memory consumption low. This is a good technique for datasets smaller than 1 million images. As soon as the number of images will reach more, then heavier memory consumption increase will become inevitable, as the number of potential image combinations (matches) becomes increasingly large. It is **not** recommended to adjust this parameter manually.
+The ``chunksize`` parameter defines **how many of these chunks will be processed at once** (see :ref:`chunksize`). By default, ``chunksize`` is set to ``None`` which implies: ``1'000'000 / number of images in dataset``. This ratio is used to automatically size the ``chunksize`` according to the size of the dataset, with the goal of keeping memory consumption low. This is a good technique for datasets smaller than 1 million images. As soon as the number of images will reach more, then heavier memory consumption increase will become inevitable, as the number of potential image combinations (matches) becomes increasingly large. **It is not recommended to adjust this parameter manually**.
 
 .. _What's new in v4?:
 
 What's new in v4?
 ----------------
 
-difPy version 4 is the next-generation version of difPy, which not only achieves **up to 10x the performance** compared to version 3.x, but also comes with a variety of **new features** that make its usage experience even better.
+difPy version 4 is the newest version of difPy, which not only achieves **up to 10x the performance** compared to version 3, but also comes with a variety of **new features** that make its usage experience even better.
 
 **Splitting of Processes**
 
@@ -84,15 +84,18 @@ To highlight what this means in an example. If we had a folder structure as show
     |  |-image2_1.jpeg
     |-image.jpeg
 
-We can run difPy on the main folder with the  :ref:`in_folder` parameter set to ``True``:
+We can run difPy on the two folders with the  :ref:`in_folder` parameter set to ``True``:
 
 .. code-block:: python
 
    import difPy
-   dif = difPy.build("C:/Path/to/Folder/")
+   dif = difPy.build("C:/Path/to/Folder1/", "C:/Path/to/Folder2/")
    search = difPy.search(dif, in_folder=True)
 
-difPy will then initiate a search for each separate folder considering them as separate search groups. It will search for matches among the main folder, in Folder1 and in Folder2.
+difPy will then initiate a search for each separate folder in isolation. It will search for matches among Folder1 and among in Folder2. The ``search.result`` output will look as follows:
+
+
+
 
 **difPy is more Lightweight**
 
