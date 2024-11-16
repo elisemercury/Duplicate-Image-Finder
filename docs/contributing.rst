@@ -3,10 +3,7 @@ Contributing to difPy
 
 .. _Contributing:
 
-.. image:: https://img.shields.io/badge/Support-difPy-yellow?style=flat&logo=paypal&labelColor=white&logoWidth=20.svg/"
-   :target: https://paypal.me/eliselandman
-.. image:: https://img.shields.io/badge/Support-difPy-blueviolet?style=flat&logo=revolut&logoColor=black&labelColor=white&logoWidth=20.svg/"
-   :target: https://revolut.me/elisemercury
+.. include:: /misc/support_difpy.rst
 
 difPy is constantly updated with code improvements, new features and requests from the community. Contributions are a good way to give feedback and to improve the functionalities and quality of the package.
 
