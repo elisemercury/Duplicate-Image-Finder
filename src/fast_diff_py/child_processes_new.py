@@ -63,8 +63,15 @@ class ChildProcess(GracefulWorker):
                 self.logger.info("Received None. Shutting down")
                 return
 
-            # Perform the processing
-            self.res_queue.put(self.processing_fn(arg))
+            # Batching support via lists
+            if isinstance(arg, list):
+                res = []
+                for a in arg:
+                    res.append(self.processing_fn(a))
+                self.res_queue.put(res)
+            else:
+                # Perform the processing
+                self.res_queue.put(self.processing_fn(arg))
 
         if count >= self.timeout:
             self.res_queue.put(None)
