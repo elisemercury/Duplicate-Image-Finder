@@ -348,9 +348,8 @@ class search:
 
     def _search_infolder(self):
         # Function that performs search in isolated/separate directories
-        result_raw = list()
+        result = list()
         # Get folder paths for each group
-        folder_paths = self._get_paths_from_groups()
         grouped_img_ids = [img_ids for group_id, img_ids in self.__difpy_obj._group_to_id_dictionary.items()]
         self.__count = 0
 
@@ -363,7 +362,7 @@ class search:
                     for i in output:
                         if i:
                             # if matches found, add to result
-                            result_raw = self._add_to_result(result_raw, i)
+                            result = self._add_to_result(result, i)
                     self.__count += 1        
                 else:
                     # search algorithm for bigger datasets, > 5k images
@@ -374,13 +373,11 @@ class search:
                     for output in pool.imap_unordered(self._find_matches_batch, self._yield_comparison_group(), self.__chunksize):
                         if len(output) > 0:
                             # if matches found, add to result
-                            result_raw = result_raw + output
+                            result = result + output
                     self.__count += 1  
                 if self.__show_progress:
                     _help._progress_bar(self.__count, len(grouped_img_ids), task=f'searching files')
         
-        # format the end result using folder paths instead of group IDs
-        result = self._group_result_infolder(result_raw, folder_paths)
         return result
 
     def _get_paths_from_groups(self):
@@ -408,7 +405,12 @@ class search:
         return updated_result
 
     def _format_result_infolder(self, result):
-        # Helper function that replaces the image IDs in the result dictionary by their filename
+        # Helper function that replaces the group IDs and image IDs in the result dictionary by their filepaths
+        # Replace group names
+        folder_paths = self._get_paths_from_groups()
+        result = self._group_result_infolder(result, folder_paths)
+
+        # Replace filenames
         updated_result = dict()
         for group_id in result.keys():
             for key, value in result[group_id].items():
