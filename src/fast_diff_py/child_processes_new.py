@@ -409,7 +409,7 @@ class SecondLoopWorker(ChildProcess):
         if self.has_dir_b:
             size = arg.max_size_b
         else:
-            size = arg.key_b - arg.key_a
+            size = min(arg.key_b - arg.key_a, arg.max_size_b)
 
         # Prepare the diffs and errors
         diffs = []
