@@ -220,19 +220,10 @@ class build:
                         filename_dictionary.update({img_id : valid_files[filename]})
                         tensor_dictionary.update({img_id : tensor})
                         count += 1         
-             
         return tensor_dictionary, id_to_shape_dictionary, filename_dictionary, id_to_group_dictionary, group_to_id_dictionary, invalid_files
 
     def _generate_tensor(self, num: int, file: str) -> dict | tuple:
-        """Function that generates a tensor of an image.
-
-        Args:
-            num (int): File number or id.
-            file (str): Filename string.
-
-        Returns:
-            dict | tuple: return a dictionary if there is an error, a tuple if success.
-        """
+        # Function that generates a tensor of an image.
         try:
             # Handle warnings as exceptions
             warnings.simplefilter('error', UserWarning)
@@ -393,7 +384,7 @@ class search:
         return result
 
     def _get_paths_from_groups(self):
-        """Helper function to map group IDs to their parent folder paths"""
+        # Helper function to map group IDs to their parent folder paths
         folder_paths = {}
         for group_id, img_ids in self.__difpy_obj._group_to_id_dictionary.items():
             # Get the first image path from the group
