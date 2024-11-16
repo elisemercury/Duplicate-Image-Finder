@@ -640,7 +640,7 @@ class search:
                 os.remove(file)
                 deleted_files += 1
             except:
-                print(f'Could not delete file: {file}')
+                warnings.warn(f'Could not delete file: {file}', stacklevel=2)
 
         return deleted_files
 
@@ -660,7 +660,7 @@ class search:
                 os.replace(file, os.path.join(destination_path, tail))
                 new_lower_quality = np.append(new_lower_quality, str(Path(os.path.join(destination_path, tail))))
             except:
-                print(f'Could not move file: {file}')            
+                warnings.warn(f'Could not move file: {file}', stacklevel=2)          
         print(f'Moved {len(self.lower_quality)} files(s) to "{str(Path(destination_path))}"')
         self.lower_quality = new_lower_quality
         return  
@@ -837,9 +837,6 @@ class _validate_param:
         # Function that validates the 'in_folder' input parameter
         if not isinstance(in_folder, bool):
             raise Exception('Invalid value for "in_folder" parameter: must be of type BOOL.')
-        #elif not recursive and in_folder:
-            #warnings.warn('Parameter "in_folder" cannot be "True" if "recursive" is set to "False". "in_folder" will be ignored.', stacklevel=2)
-            #in_folder = False
         return in_folder
     
     def _limit_extensions(limit_extensions):
