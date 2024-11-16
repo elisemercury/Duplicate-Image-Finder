@@ -791,10 +791,13 @@ class _generate_stats:
                                                            'chunksize' : kwargs['chunksize']                                                         
                                                           }})
         stats['process']['search'].update({'files_searched' : kwargs['files_searched']})
-        
-        stats['process']['search'].update({'matches_found' : {'duplicates': kwargs['duplicate_count'],
-                                                              'similar' : kwargs['similar_count']
-                                                             }})        
+        if kwargs['similarity'] == 0:
+            matches_output = {'duplicates': kwargs['duplicate_count']}
+        else:
+            matches_output = {'duplicates': kwargs['duplicate_count'],
+                              'similar' : kwargs['similar_count']}
+
+        stats['process']['search'].update({'matches_found' : matches_output})        
         return stats
 
 class _validate_param:
@@ -836,8 +839,8 @@ class _validate_param:
         # Function that validates the 'in_folder' input parameter
         if not isinstance(in_folder, bool):
             raise Exception('Invalid value for "in_folder" parameter: must be of type BOOL.')
-        elif not recursive and in_folder:
-            warnings.warn('Parameter "in_folder" cannot be "True" if "recursive" is set to "False". "in_folder" will be ignored.', stacklevel=2)
+        #elif not recursive and in_folder:
+            #warnings.warn('Parameter "in_folder" cannot be "True" if "recursive" is set to "False". "in_folder" will be ignored.', stacklevel=2)
             #in_folder = False
         return in_folder
     
