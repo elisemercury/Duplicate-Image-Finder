@@ -95,11 +95,12 @@ class build:
 
     def _get_files(self):
         # Function that searches for files in the input directories
-        valid_files_all = []
-        skipped_files_all = np.array([])
+        valid_files_all = np.array([], dtype=object)  # Initialize as empty numpy array
+        skipped_files_all = np.array([], dtype=object)
         
         if self.__in_folder:
             # search directories separately
+            folder_files = []  # Temporary list to collect arrays for each folder
             for dir in self.__directory:
                 if os.path.isdir(dir):
                     # For directory inputs, gather all files recursively if requested
@@ -117,9 +118,12 @@ class build:
                 
                 valid_files, skip_files = self._validate_files(files)
                 if len(valid_files) > 0:
-                    valid_files_all.append(valid_files)
+                    folder_files.append(valid_files)  # Collect valid file arrays
                 if len(skip_files) > 0:
-                    skipped_files_all = np.concatenate((skipped_files_all, skip_files), axis=None)
+                    skipped_files_all = np.concatenate((skipped_files_all, skip_files))
+            
+            if folder_files:  # If we found any valid files
+                valid_files_all = np.array(folder_files, dtype=object)  # Convert list of arrays to 2D array
 
         else:
             # search union of all directories
@@ -138,10 +142,10 @@ class build:
                     all_files.append(dir)
                     
             valid_files, skip_files = self._validate_files(all_files)
-            valid_files_all = np.concatenate((valid_files_all, valid_files), axis=None)
+            valid_files_all = np.array(valid_files, dtype=object)  # Convert to numpy array
             if len(skip_files) > 0:
-                skipped_files_all = np.concatenate((skipped_files_all, skip_files), axis=None)
-                    
+                skipped_files_all = np.concatenate((skipped_files_all, skip_files))
+                        
         return valid_files_all, skipped_files_all
 
     def _validate_files(self, directory): 
@@ -281,7 +285,8 @@ class search:
         # Initialize multiprocessing
         _initialize_multiprocessing()
 
-        print("Initializing search...", end='\r')
+        if self.__show_progess:
+            print("Initializing search...", end='\r')
         self.result, self.lower_quality, self.stats = self._main()
         return
 
