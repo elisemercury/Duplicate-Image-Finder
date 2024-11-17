@@ -24,10 +24,8 @@ class SQLiteDB(BaseSQliteDB):
         """
         if temp:
             tbl_name = "directory_temp"
-            index_name = "directory_temp_index"
         else:
             tbl_name = "directory"
-            index_name = "directory_index"
 
         return tbl_name, index_name
 
