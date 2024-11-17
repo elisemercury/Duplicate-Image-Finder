@@ -484,7 +484,7 @@ class SecondLoopWorker(ChildProcess):
             res =  ItemCompareResult(key=arg.key, error=tb, diff=diff)
 
         # Optionally, make plot
-        if self.plot_dir is not None and diff > self.plot_threshold:
+        if self.plot_dir is not None and diff < self.plot_threshold:
             try:
                 imgp.make_dif_plot(min_diff=diff,
                                    img_a=arg.path_a, img_b=arg.path_b,
