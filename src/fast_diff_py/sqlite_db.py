@@ -56,7 +56,21 @@ class SQLiteDB(BaseSQliteDB):
         if not temp:
             self.create_directory_indexes()
 
-        self.debug_execute(f"CREATE INDEX {index_name} ON directory (key)")
+    def create_directory_indexes(self):
+        """
+        Create the indexes on the directory table
+        """
+        self.debug_execute(f"CREATE INDEX directory_key_index ON directory (key)")
+        self.debug_execute(f"CREATE INDEX directory_dir_b_index ON directory (dir_b)")
+        self.debug_execute(f"CREATE INDEX directory_success_index ON directory (success)")
+
+    def drop_directory_index(self):
+        """
+        Drop the index on the directory table
+        """
+        self.debug_execute("DROP INDEX IF EXISTS directory_key_index")
+        self.debug_execute("DROP INDEX IF EXISTS directory_dir_b_index")
+        self.debug_execute("DROP INDEX IF EXISTS directory_success_index")
 
     def create_hash_table_and_index(self):
         """
