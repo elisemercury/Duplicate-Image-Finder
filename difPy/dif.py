@@ -349,6 +349,7 @@ class search:
 
         # format the end result
         result = self._group_result_union(result_raw)
+        
         return result
 
     def _search_infolder(self):
@@ -734,9 +735,11 @@ class _compare_imgs:
         # Function for sorting a list of images based on their file sizes
         imgs_sizes = []
         for img in img_list:
-            img_size = (os.stat(str(img)).st_size, img)
+            with Image.open(img) as image:
+                resolution = image.size
+            img_size = (sum(resolution), img)
             imgs_sizes.append(img_size)
-        sort_by_size = [file for size, file in sorted(imgs_sizes, reverse=True)]
+        sort_by_size = [file for size, file in sorted(imgs_sizes, reverse=True)] # Highest first
         return sort_by_size
         
 class _generate_stats:
