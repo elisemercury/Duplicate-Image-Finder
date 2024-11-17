@@ -1,6 +1,6 @@
 .. _search.stats:
 
-III. Search Statistics
+Search Statistics
 ^^^^^^^^^^
 
 A **JSON formatted collection** with statistics on the completed difPy process:

@@ -5,19 +5,25 @@ Using difPy
 
 **difPy** is a Python package that automates the search for duplicate/similar images.
 
+.. include:: /using/installation.rst
+
 .. include:: /using/basic_usage.rst
 
 .. raw:: html
 
    <hr>
 
+
 .. include:: /using/cli_usage.rst
+
 
 .. raw:: html
 
    <hr>
 
+
 .. include:: /parameters/main.rst
+
 
 .. raw:: html
 
