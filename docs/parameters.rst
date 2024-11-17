@@ -1,7 +1,7 @@
 .. _difPy.build:
 
 difPy.build
-------------
+^^^^^^^^^^
 
 Before difPy can perform any search, it needs to build its image repository and transform the images in the provided directory into tensors. This is what is done when ``difPy.build()`` is invoked.
 
@@ -69,7 +69,7 @@ Upon completion, ``difPy.build()`` returns a ``dif`` object that can be used in 
 .. _difPy.search:
 
 difPy.search
-------------
+^^^^^^^^^^
 
 After the ``dif`` object has been built using :ref:`difPy.build`, the search can be initiated with ``difPy.search``. 
 
@@ -138,7 +138,7 @@ The required ``difPy_obj`` parameter should be pointing to the ``dif`` object th
 .. _search.move_to:
 
 search.move_to
-------------
+^^^^^^^^^^
 
 difPy can automatically move the lower quality duplicate/similar images it found to another directory. Images can be moved by invoking ``move_to`` on the difPy search:
 
@@ -165,7 +165,7 @@ difPy can automatically move the lower quality duplicate/similar images it found
 .. _search.delete:
 
 search.delete
-------------
+^^^^^^^^^^
 
 difPy can automatically delete the lower quality duplicate/similar images it found. Images can be deleted by invoking ``delete`` on the difPy search:
 
