@@ -53,6 +53,8 @@ class SQLiteDB(BaseSQliteDB):
                 f"UNIQUE (path, dir_b))")
 
         self.debug_execute(stmt, )
+        if not temp:
+            self.create_directory_indexes()
 
         self.debug_execute(f"CREATE INDEX {index_name} ON directory (key)")
 
