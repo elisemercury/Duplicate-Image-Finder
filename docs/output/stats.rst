@@ -1,3 +1,8 @@
+.. _search.stats:
+
+III. Search Statistics
+^^^^^^^^^^
+
 A **JSON formatted collection** with statistics on the completed difPy process:
 
 .. code-block:: python

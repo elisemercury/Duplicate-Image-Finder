@@ -1,3 +1,8 @@
+.. _search.lower_quality:
+
+Lower Quality Files
+^^^^^^^^^^
+
 A **list** of duplicates/similar images that have the **lowest resolution** among match groups: 
 
 .. code-block:: python
