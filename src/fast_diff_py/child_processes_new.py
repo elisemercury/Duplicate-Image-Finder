@@ -486,6 +486,13 @@ class SecondLoopWorker(ChildProcess):
         # Optionally, make plot
         if self.plot_dir is not None and diff < self.plot_threshold:
             try:
+                if self.is_compressed:
+                    img_a = imgp.load_std_image(img_path=arg.path_a, target_size=self.target_size, resize=False)
+                    img_b = imgp.load_std_image(img_path=arg.path_b, target_size=self.target_size, resize=False)
+                else:
+                    img_a = self.img_a_mat
+                    img_b = self.img_b_mat
+
                 imgp.make_dif_plot(min_diff=diff,
                                    img_a=arg.path_a, img_b=arg.path_b,
                                    mat_a=self.img_a_mat, mat_b=self.img_b_mat,
