@@ -495,7 +495,7 @@ class SecondLoopWorker(ChildProcess):
 
                 imgp.make_dif_plot(min_diff=diff,
                                    img_a=arg.path_a, img_b=arg.path_b,
-                                   mat_a=self.img_a_mat, mat_b=self.img_b_mat,
+                                   mat_a=img_a, mat_b=img_b,
                                    store_path=os.path.join(self.plot_dir, f"{arg.key}.png"))
             except Exception as e:
                 self.logger.exception(f"Error in making plot: {e}", exc_info=e)
