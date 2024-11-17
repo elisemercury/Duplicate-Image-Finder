@@ -35,22 +35,22 @@ class SQLiteDB(BaseSQliteDB):
         Create the table for the directories
         :param temp: Whether to create the temp table or not
         """
-        tbl_name, index_name = self.__get_directory_table_names(temp)
+        tbl_name = self.__get_directory_table_names(temp)
 
         stmt = (f"CREATE TABLE {tbl_name} ("
-                "key INTEGER PRIMARY KEY AUTOINCREMENT, "
-                "path TEXT, "
-                "filename TEXT, "
-                "error TEXT, "
-                "success INTEGER DEFAULT -1 CHECK (directory.success IN (-2, -1, 0, 1)), "
-                "px INTEGER DEFAULT -1 CHECK (directory.px >= -1), "
-                "py INTEGER DEFAULT -1 CHECK (directory.py >= -1), "
-                "dir_b INTEGER DEFAULT 0 CHECK (directory.dir_b IN (0, 1)), "
-                "hash_0 INTEGER, "
-                "hash_90 INTEGER, "
-                "hash_180 INTEGER, "
-                "hash_270 INTEGER,  "
-                "UNIQUE (path, dir_b))")
+                f"key INTEGER PRIMARY KEY AUTOINCREMENT, "
+                f"path TEXT, "
+                f"filename TEXT, "
+                f"error TEXT, "
+                f"success INTEGER DEFAULT -1 CHECK ({tbl_name}.success IN (-2, -1, 0, 1)), "
+                f"px INTEGER DEFAULT -1 CHECK ({tbl_name}.px >= -1), "
+                f"py INTEGER DEFAULT -1 CHECK ({tbl_name}.py >= -1), "
+                f"dir_b INTEGER DEFAULT 0 CHECK ({tbl_name}.dir_b IN (0, 1)), "
+                f"hash_0 INTEGER, "
+                f"hash_90 INTEGER, "
+                f"hash_180 INTEGER, "
+                f"hash_270 INTEGER,  "
+                f"UNIQUE (path, dir_b))")
 
         self.debug_execute(stmt, )
 
