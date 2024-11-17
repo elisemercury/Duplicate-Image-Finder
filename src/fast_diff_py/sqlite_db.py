@@ -226,29 +226,30 @@ class SQLiteDB(BaseSQliteDB):
         """
         # Create a temp table
         self.create_directory_table_and_index(True)
-        tmp_tbl, tmp_index = self.__get_directory_table_names(True)
-        d_tbl, d_index = self.__get_directory_table_names(False)
+        tmp_tbl = self.__get_directory_table_names(True)
+        d_tbl = self.__get_directory_table_names(False)
 
         # Inserting the directory_b entries first
-        stmt = (f"INSERT INTO {tmp_tbl} (path, filename, error, proc_suc, px, py, dir_b, hash_0, hash_90, hash_180, hash_270)"
-                f" SELECT path, filename, error, proc_suc, px, py, 0 AS dir_b, hash_0, hash_90, hash_180, hash_270 "
+        stmt = (f"INSERT INTO {tmp_tbl} (path, filename, error, success, px, py, dir_b, hash_0, hash_90, hash_180, hash_270)"
+                f" SELECT path, filename, error, success, px, py, 0 AS dir_b, hash_0, hash_90, hash_180, hash_270 "
                 f"FROM {d_tbl} WHERE dir_b = 1")
 
         self.debug_execute(stmt)
 
-        stmt = (f"INSERT INTO {tmp_tbl} (path, filename, error, proc_suc, px, py, dir_b, hash_0, hash_90, hash_180, hash_270)"
-                f" SELECT path, filename, error, proc_suc, px, py, 1 AS dir_b, hash_0, hash_90, hash_180, hash_270 "
+        stmt = (f"INSERT INTO {tmp_tbl} (path, filename, error, success, px, py, dir_b, hash_0, hash_90, hash_180, hash_270)"
+                f" SELECT path, filename, error, success, px, py, 1 AS dir_b, hash_0, hash_90, hash_180, hash_270 "
                 f"FROM {d_tbl} WHERE dir_b = 0")
 
         self.debug_execute(stmt)
 
         # Dropping old table and index
+        # INFO Index is dropped wiht table
         self.debug_execute(f"DROP TABLE {d_tbl}")
-        self.debug_execute(f"DROP INDEX {d_index}")
 
         # Renaming the temp table and index
         self.debug_execute(f"ALTER TABLE {tmp_tbl} RENAME TO {d_tbl}")
-        self.debug_execute(f"ALTER INDEX {tmp_index} RENAME TO {d_index}")
+        self.drop_directory_index()
+        self.create_directory_indexes()
 
     # ==================================================================================================================
     # Hash Table
