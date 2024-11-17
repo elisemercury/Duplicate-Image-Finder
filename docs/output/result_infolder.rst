@@ -1,3 +1,5 @@
+When :ref:`in_folder` is set to ``True``, the result output is slightly modified and matches are grouped in their separate folders, with the key of the dictionary being the folder path.
+
 .. code-block:: python
 
    search.result
