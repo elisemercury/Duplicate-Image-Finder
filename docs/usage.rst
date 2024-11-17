@@ -14,6 +14,8 @@ Using difPy
    <hr>
 
 
+.. include:: /using/test.rst
+
 .. include:: /using/cli_usage.rst
 
 
