@@ -99,7 +99,7 @@ After the search is completed, further actions can be performed using :ref:`sear
 .. _difPy_obj:
 
 difPy_obj 
-^^^^^^^^^^^^
+++++++++++++
 
 The required ``difPy_obj`` parameter should be pointing to the ``dif`` object that was built during the invocation of :ref:`difPy.build`. 
 
