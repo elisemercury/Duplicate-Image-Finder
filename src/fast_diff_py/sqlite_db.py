@@ -16,7 +16,7 @@ class SQLiteDB(BaseSQliteDB):
         self.debug = debug
 
     @staticmethod
-    def __get_directory_table_names(temp: bool = False) -> Tuple[str, str]:
+    def __get_directory_table_names(temp: bool = False) -> str:
         """
         Get the table names for the directories
 
@@ -27,7 +27,7 @@ class SQLiteDB(BaseSQliteDB):
         else:
             tbl_name = "directory"
 
-        return tbl_name, index_name
+        return tbl_name
 
     # Create Tables Command
     def create_directory_table_and_index(self, temp: bool = False):
