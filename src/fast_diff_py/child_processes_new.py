@@ -257,6 +257,7 @@ class SecondLoopWorker(ChildProcess):
     img_b_mat: Optional[np.ndarray] = None
 
     cache_key: Optional[int] = None
+    cache: Optional[BatchCache] = None
 
     processing_fn: Union[
         Callable[[BatchCompareArgs], BatchCompareResult],
@@ -297,7 +298,6 @@ class SecondLoopWorker(ChildProcess):
         self.plot_threshold = plot_threshold
         self.batched_args = batched_args
         self.thumb_dir = thumb_dir
-        self.cache = None
 
         self.delta_fn = compare_fn
 
