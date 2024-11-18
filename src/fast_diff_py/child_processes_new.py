@@ -299,6 +299,9 @@ class SecondLoopWorker(ChildProcess):
 
         self.delta_fn = compare_fn
 
+        self.fetch_x = 0
+        self.fetch_y = 0
+
         # Checks on arguments
         if plot_dir is not None and batched_args:
             raise ValueError("Cannot make plots with batched arguments")
@@ -388,7 +391,9 @@ class SecondLoopWorker(ChildProcess):
         errors = {}
 
         try:
+            s = datetime.datetime.now(datetime.UTC)
             img_a = self.generic_fetch_image(key=arg.key_a, path=arg.path_a, is_x=True)
+            self.fetch_x += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
 
             for i in range(size):
                 d_key = arg.key - i
@@ -396,7 +401,10 @@ class SecondLoopWorker(ChildProcess):
                 p_key = pb_size - 1 - i
 
                 try:
+                    s = datetime.datetime.now(datetime.UTC)
                     img_b = self.generic_fetch_image(key=thumb_key, path=arg.path_b[p_key], is_x=False)
+                    self.fetch_y += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
+
                     diff = self.delta_fn(img_a, img_b)
                     diffs.append(diff)
                 except Exception as e:
@@ -441,14 +449,18 @@ class SecondLoopWorker(ChildProcess):
         errors = {}
 
         try:
+            s = datetime.datetime.now(datetime.UTC)
             img_a = self.generic_fetch_image(key=arg.key_a, path=arg.path_a, is_x=True)
+            self.fetch_x += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
 
             for i in range(size):
                 d_key = arg.key - i
                 thumb_key = arg.key_b - i
 
                 try:
+                    s = datetime.datetime.now(datetime.UTC)
                     img_b = self.generic_fetch_image(key=thumb_key, is_x=False, path="")
+                    self.fetch_y += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
                     diff = self.delta_fn(img_a, img_b)
                     diffs.append(diff)
                 except Exception as e:
@@ -482,24 +494,27 @@ class SecondLoopWorker(ChildProcess):
 
             # Fetch the images
             if self.key_a != arg.key_a:
+                s = datetime.datetime.now(datetime.UTC)
                 self.key_a = arg.key_a
                 self.img_a_mat = self.generic_fetch_image(key=arg.key_a, path=arg.path_a, is_x=True)
+                self.fetch_x += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
 
             if self.key_b != arg.key_b:
+                s = datetime.datetime.now(datetime.UTC)
                 self.key_b = arg.key_b
                 self.img_b_mat = self.generic_fetch_image(key=arg.key_b, path=arg.path_b, is_x=False)
-
+                self.fetch_y += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
             # Typing override
             self.img_a_mat: np.ndarray[np.uint8]
             self.img_b_mat: np.ndarray[np.uint8]
 
             # Compute the difference
             diff = self.delta_fn(self.img_a_mat, self.img_b_mat)
-            res =  ItemCompareResult(key=arg.key, diff=diff)
+            res = ItemCompareResult(key=arg.key, diff=diff)
         except Exception as e:
             self.logger.error(f"Error in processing item: {e}")
             tb = traceback.format_exc()
-            res =  ItemCompareResult(key=arg.key, error=tb, diff=diff)
+            res = ItemCompareResult(key=arg.key, error=tb, diff=diff)
 
         # Optionally, make plot
         if self.plot_dir is not None and diff < self.plot_threshold:
@@ -541,3 +556,12 @@ class SecondLoopWorker(ChildProcess):
         self.log_queue = q
         q_handler = QueueHandler(q)
         self.logger.addHandler(q_handler)
+
+
+    def print_stats(self):
+        """
+        Print Timing Statistics for Debugging
+        """
+        super().print_stats()
+        self.logger.info(f"Fetching X Took: {self.fetch_x}")
+        self.logger.info(f"Fetching Y Took: {self.fetch_y}")
