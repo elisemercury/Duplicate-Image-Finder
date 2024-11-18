@@ -4,6 +4,7 @@ import os
 import queue
 import time
 import traceback
+import datetime
 from logging.handlers import QueueHandler
 from typing import Tuple, Callable, Dict, Optional, Union
 
@@ -41,6 +42,9 @@ class ChildProcess(GracefulWorker):
         self.res_queue = res_queue
         self.prep_logging(level=log_level, q=log_queue)
 
+        self.fetch_arg = 0
+        self.put_res = 0
+
     def main(self):
         """
         Main function to run the child process
@@ -50,7 +54,9 @@ class ChildProcess(GracefulWorker):
         count = 0
         while count < self.timeout and self.run:
             try:
+                s = datetime.datetime.now(datetime.UTC)
                 arg = self.cmd_queue.get(block=True, timeout=self.block_timeout)
+                self.fetch_arg += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
                 count = 0
             except queue.Empty:
                 self.logger.warning("Starving...")
@@ -61,6 +67,7 @@ class ChildProcess(GracefulWorker):
             if arg is None:
                 self.res_queue.put(None)
                 self.logger.info("Received None. Shutting down")
+                self.print_stats()
                 return
 
             # Batching support via lists
@@ -71,11 +78,15 @@ class ChildProcess(GracefulWorker):
                 self.res_queue.put(res)
             else:
                 # Perform the processing
+                s = datetime.datetime.now(datetime.UTC)
                 self.res_queue.put(self.processing_fn(arg))
+                self.put_res += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
 
         if count >= self.timeout:
             self.res_queue.put(None)
             self.logger.warning("Timeout reached. Shutting down")
+
+        self.print_stats()
 
     def set_processing_function(self):
         """
@@ -92,6 +103,13 @@ class ChildProcess(GracefulWorker):
         self.log_queue = q
         q_handler = QueueHandler(q)
         self.logger.addHandler(q_handler)
+
+    def print_stats(self):
+        """
+        Print timing statistics needed for debugging
+        """
+        self.logger.info(f"Fetching Args took: {self.fetch_arg}")
+        self.logger.info(f"Putting Results took: {self.put_res}")
 
 
 class FirstLoopWorker(ChildProcess):
