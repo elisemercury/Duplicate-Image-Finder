@@ -426,7 +426,7 @@ class SecondLoopWorker(ChildProcess):
             self.logger.error(f"Error with image a in batch {arg.key_a}: {e}", exc_info=e)
             tb = traceback.format_exc()
             diffs = [-1 for _ in range(size)]
-            errors =  {arg.key - i: tb for i in range(size)}
+            errors = {arg.key - i: tb for i in range(size)}
             return BatchCompareResult(key=arg.key,
                                       key_a=arg.key_a, key_b=arg.key_b,
                                       diff=diffs, errors=errors,
@@ -484,7 +484,7 @@ class SecondLoopWorker(ChildProcess):
             self.logger.error(f"Error with image a in batch {arg.key_a}: {e}", exc_info=e)
             tb = traceback.format_exc()
             diffs = [-1 for _ in range(size)]
-            errors =  {arg.key - i: tb for i in range(size)}
+            errors = {arg.key - i: tb for i in range(size)}
             return BatchCompareResult(key=arg.key,
                                       key_a=arg.key_a, key_b=arg.key_b,
                                       diff=diffs, errors=errors,
