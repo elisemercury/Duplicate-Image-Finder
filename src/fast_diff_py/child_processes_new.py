@@ -7,6 +7,7 @@ import traceback
 import datetime
 from logging.handlers import QueueHandler
 from typing import Tuple, Callable, Dict, Optional, Union
+import copy
 
 import numpy as np
 
@@ -296,6 +297,7 @@ class SecondLoopWorker(ChildProcess):
         self.plot_threshold = plot_threshold
         self.batched_args = batched_args
         self.thumb_dir = thumb_dir
+        self.cache = None
 
         self.delta_fn = compare_fn
 
@@ -340,9 +342,9 @@ class SecondLoopWorker(ChildProcess):
             raise ValueError("Cache is not set")
 
         if is_x:
-            return self.ram_cache[self.cache_key].x.get_image(key)
+            return self.cache.x.get_image(key)
         else:
-            return self.ram_cache[self.cache_key].y.get_image(key)
+            return self.cache.y.get_image(key)
 
     def get_thumb_path(self, key: int, **kwargs) -> np.ndarray[np.uint8]:
         """
@@ -375,7 +377,9 @@ class SecondLoopWorker(ChildProcess):
         :param arg: The arguments for the batch
         :return: The results of the batch
         """
-        self.cache_key = arg.cache_key
+        if arg.cache_key != self.cache_key and self.cache_key is not None:
+            self.cache_key = arg.cache_key
+            self.cache = copy.deepcopy(self.ram_cache[self.cache_key])
 
         # Get the size we need to walk for the batch
         if self.has_dir_b:
@@ -436,7 +440,9 @@ class SecondLoopWorker(ChildProcess):
         :param arg: The arguments for the batch
         :return: The results of the batch
         """
-        self.cache_key = arg.cache_key
+        if arg.cache_key != self.cache_key and self.cache_key is not None:
+            self.cache_key = arg.cache_key
+            self.cache = copy.deepcopy(self.ram_cache[self.cache_key])
 
         # Get the size we need to walk for the batch
         if self.has_dir_b:
@@ -490,7 +496,9 @@ class SecondLoopWorker(ChildProcess):
         """
         diff = -1
         try:
-            self.cache_key = arg.cache_key
+            if arg.cache_key != self.cache_key and self.cache_key is not None:
+                self.cache_key = arg.cache_key
+                self.cache = copy.deepcopy(self.ram_cache[self.cache_key])
 
             # Fetch the images
             if self.key_a != arg.key_a:
