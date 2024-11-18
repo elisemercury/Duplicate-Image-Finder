@@ -402,7 +402,6 @@ class FastDifPy(GracefulWorker):
 
         # Set up the multiprocessing environment
         self.multiprocessing_preamble(submit_fn, first_loop=first_iteration)
-        print(len(self.handles))
 
         # ==============================================================================================================
         # Benchmarking implementation
