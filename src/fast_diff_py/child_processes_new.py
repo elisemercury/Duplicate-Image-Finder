@@ -322,6 +322,14 @@ class SecondLoopWorker(ChildProcess):
 
         self.set_processing_function()
 
+    def prepare_cache(self, cache_key: Union[int, None]):
+        """
+        Update the Cache we have in the worker. If it's a new cache, we copy it for speed
+        """
+        if self.cache_key != cache_key and self.ram_cache is not None:
+            self.cache_key = cache_key
+            self.cache = copy.deepcopy(self.ram_cache[self.cache_key])
+
     def generic_fetch_image(self, key: int = None, path: str = None, is_x: bool = True) -> np.ndarray[np.uint8]:
         """
         Generic function to fetch an image
@@ -377,9 +385,7 @@ class SecondLoopWorker(ChildProcess):
         :param arg: The arguments for the batch
         :return: The results of the batch
         """
-        if arg.cache_key != self.cache_key and self.cache_key is not None:
-            self.cache_key = arg.cache_key
-            self.cache = copy.deepcopy(self.ram_cache[self.cache_key])
+        self.prepare_cache(arg.cache_key)
 
         # Get the size we need to walk for the batch
         if self.has_dir_b:
@@ -440,9 +446,7 @@ class SecondLoopWorker(ChildProcess):
         :param arg: The arguments for the batch
         :return: The results of the batch
         """
-        if arg.cache_key != self.cache_key and self.cache_key is not None:
-            self.cache_key = arg.cache_key
-            self.cache = copy.deepcopy(self.ram_cache[self.cache_key])
+        self.prepare_cache(arg.cache_key)
 
         # Get the size we need to walk for the batch
         if self.has_dir_b:
@@ -496,9 +500,7 @@ class SecondLoopWorker(ChildProcess):
         """
         diff = -1
         try:
-            if arg.cache_key != self.cache_key and self.cache_key is not None:
-                self.cache_key = arg.cache_key
-                self.cache = copy.deepcopy(self.ram_cache[self.cache_key])
+            self.prepare_cache(arg.cache_key)
 
             # Fetch the images
             if self.key_a != arg.key_a:
