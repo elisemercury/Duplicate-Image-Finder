@@ -896,7 +896,7 @@ class FastDifPy(GracefulWorker):
         """
         Set the dequeue function for the second loop
         """
-        if self.config.second_loop.batched_processing:
+        if self.config.second_loop.batch_args:
             self.dequeue_second_loop = self.dequeue_second_loop_batch
         else:
             self.dequeue_second_loop = self.dequeue_second_loop_item
