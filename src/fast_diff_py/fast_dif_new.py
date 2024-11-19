@@ -86,7 +86,7 @@ class FastDifPy(GracefulWorker):
 
         # check if the config exists
         if config is not None:
-            self.__config = config
+            self.config = config
         else:
             cfg_path = os.path.join(dir_a, ".task.json")
 
@@ -94,11 +94,11 @@ class FastDifPy(GracefulWorker):
             if os.path.exists(cfg_path):
                 with open(cfg_path, "r") as f:
                     # load the config
-                    self.__config = Config.model_validate_json(f.read())
+                    self.config = Config.model_validate_json(f.read())
                     # TODO restart from config
             else:
                 # TODO what happens with children like first loop and second loop?
-                self.__config = Config(root_dir_a=dir_a, root_dir_b=dir_b, **kwargs)
+                self.config = Config(root_dir_a=dir_a, root_dir_b=dir_b, **kwargs)
 
         # check if the db path is overridden and if the db should exist
         p = self.config.db_path if self.config.db_path is not None else os.path.join(dir_a, ".fast_diff.db")
