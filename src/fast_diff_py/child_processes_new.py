@@ -68,7 +68,7 @@ class ChildProcess(GracefulWorker):
             if arg is None:
                 self.res_queue.put(None)
                 self.logger.info("Received None. Shutting down")
-                self.print_stats()
+                self.logger.debug(f"{self.get_stats()}")
                 return
 
             # Batching support via lists
@@ -87,7 +87,7 @@ class ChildProcess(GracefulWorker):
             self.res_queue.put(None)
             self.logger.warning("Timeout reached. Shutting down")
 
-        self.print_stats()
+        self.logger.debug(f"{self.get_stats()}")
 
     def set_processing_function(self):
         """
