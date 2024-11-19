@@ -1262,7 +1262,7 @@ class FastDifPy(GracefulWorker):
         results: List[BatchCompareResult] = []
 
         while (not self.result_queue.empty()
-               and (self._dequeue_counter + self.config.batch_size_max * len(self.handles) < self._enqueue_counter
+               and (self._dequeue_counter + self.config.second_loop.batch_size * len(self.handles) < self._enqueue_counter
                     or drain)):
             res: Union[BatchCompareResult, None] = self.result_queue.get()
 
