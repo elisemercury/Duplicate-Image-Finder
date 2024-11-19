@@ -1203,8 +1203,12 @@ class FastDifPy(GracefulWorker):
                                     path_b=path_b))
         # Submit or return the args
         if submit:
-            for a in wrapped_args:
-                self.cmd_queue.put(a)
+            for i in range(0, len(wrapped_args), self.config.second_loop.batch_size):
+                if len(wrapped_args[i:i + self.config.second_loop.batch_size]) == self.config.second_loop.batch_args:
+                    self.cmd_queue.put(wrapped_args[i:i + self.config.second_loop.batch_size])
+                else:
+                    for a in wrapped_args[i:i + self.config.second_loop.batch_size]:
+                        self.cmd_queue.put(a)
             self._enqueue_counter += len(wrapped_args)
         else:
             self.config.second_loop.cache_index += 1
