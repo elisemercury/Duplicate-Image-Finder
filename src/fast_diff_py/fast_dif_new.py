@@ -523,7 +523,7 @@ class FastDifPy(GracefulWorker):
             rtc.batch_size = None
 
         else:
-            rtc.batch_size = min(self.config.batch_size_max, int(todo / 4 / os.cpu_count()))
+            rtc.batch_size = min(self.config.batch_size_max_fl, int(todo / 4 / os.cpu_count()))
             self.logger.debug(f"Batch size set to: {rtc.batch_size}")
 
         return rtc
