@@ -23,7 +23,8 @@ def hash_file(path) -> str:
     return result
 
 
-def load_std_image(img_path: str, target_size: Tuple[int, int], resize: bool = True) -> np.ndarray[np.uint8]:
+def load_std_image(img_path: str, target_size: Tuple[int, int], resize: bool = True) -> (
+        Tuple)[np.ndarray[np.uint8], Tuple[int, int]]:
     """
     Load an image from a path and return it as a numpy array
 
@@ -44,13 +45,14 @@ def load_std_image(img_path: str, target_size: Tuple[int, int], resize: bool = T
 
     # Squash the image to 3 channels
     img = img[..., 0:3]
+    aspect = (img.shape[0], img.shape[1])
 
     if img.shape[0] != target_size[0] or img.shape[1] != target_size[1]:
         if resize:
             img = cv2.resize(img, dsize=target_size, interpolation=cv2.INTER_CUBIC)
         else:
             raise ValueError(f"Image {img_path} is not the correct size")
-    return img
+    return img, aspect
 
 
 def compute_img_hashes(image_mat: np.ndarray,
