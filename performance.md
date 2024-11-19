@@ -36,3 +36,23 @@ Item Processing, RAM Cache, Compressed Images, took 242.806917
 Item Processing, RAM Cache, Uncompressed Images, took -1s
 Item Processing, Disk Cache, Compressed Images, took 495.819392
 Item Processing, Disk Cache, Uncompressed Images, took -1s
+
+# Size of 4000, batched submission, 4 gpu, 14 cpu
+Batched Processing, RAM Cache, Compressed Images, took 267.546793
+Batched Processing, RAM Cache, Uncompressed Images, took -1s
+Batched Processing, Disk Cache, Compressed Images, took 630.154396
+Batched Processing, Disk Cache, Uncompressed Images, took -1s
+Item Processing, RAM Cache, Compressed Images, took 289.922815
+Item Processing, RAM Cache, Uncompressed Images, took -1s
+Item Processing, Disk Cache, Compressed Images, took 632.633869
+Item Processing, Disk Cache, Uncompressed Images, took -1s
+
+# Size of 4000 batch, batched submission for items, 2 gpu, 14 cpu
+Batched Processing, RAM Cache, Compressed Images, took 263.797665
+Batched Processing, RAM Cache, Uncompressed Images, took -1s
+Batched Processing, Disk Cache, Compressed Images, took 578.785628
+Batched Processing, Disk Cache, Uncompressed Images, took -1s
+Item Processing, RAM Cache, Compressed Images, took 279.641388
+Item Processing, RAM Cache, Uncompressed Images, took -1s
+Item Processing, Disk Cache, Compressed Images, took 581.069106
+Item Processing, Disk Cache, Uncompressed Images, took -1s
