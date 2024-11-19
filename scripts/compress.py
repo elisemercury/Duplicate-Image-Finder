@@ -38,7 +38,7 @@ flc = FirstLoopConfig(compute_hash=False, compress=True)
 # fdo = FastDifPy(dir_a="/home/alisot2000/Desktop/SAMPLE_MIRA/dir_a/", dir_b="/home/alisot2000/Desktop/SAMPLE_MIRA/dir_b", cpu_proc=16)
 # fdo = FastDifPy(dir_a=paths["path_a"], dir_b=paths["path_c"], cpu_proc=16, batch_size=10, first_loop=flc)
 # fdo = FastDifPy(dir_a=paths["path_a"], cpu_proc=1, first_loop=cfg.FirstLoopConfig(compute_hash=False, compress=False))
-fdo = FastDifPy(dir_a=paths["tq-a"], cpu_proc=16, batch_size=100, first_loop=cfg.FirstLoopConfig(compute_hash=True, compress=False))
+fdo = FastDifPy(dir_a=paths["wbl_a"], dir_b=["wbl_b"], cpu_proc=16, batch_size=100, first_loop=cfg.FirstLoopConfig(compute_hash=True, compress=False))
 
 # fdo = FastDifPy(dir_a="/home/alisot2000/Desktop/SAMPLE_MIRA/dir_b/", cpu_proc=16)
 fdo.db.create_directory_table_and_index()
