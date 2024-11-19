@@ -830,7 +830,8 @@ class FastDifPy(GracefulWorker):
             self.config.second_loop = SecondLoopRuntimeConfig.model_validate(self.config.second_loop.model_dump())
 
         # Update the database
-        self.db.prepopulate_diff_table(has_dir_b=self.config.root_dir_b is not None, block_size=self.config.batch_size_max)
+        self.db.prepopulate_diff_table(has_dir_b=self.config.root_dir_b is not None,
+                                       block_size=self.config.second_loop.batch_size)
         self.db.commit()
 
         if self.config.second_loop.parallel is False:
