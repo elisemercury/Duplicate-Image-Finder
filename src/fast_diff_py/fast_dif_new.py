@@ -1108,7 +1108,7 @@ class FastDifPy(GracefulWorker):
         """
         Submit a batch of originals to the second loop
         """
-        assert not self.config.first_loop.compress and self.config.second_loop.batched_processing, \
+        assert not self.config.first_loop.compress and self.config.second_loop.batch_args, \
             "Precondition for batched original block not met"
 
         l_x, l_y, p_x, p_y = self.db.get_cache_block_original(block_key=self.config.second_loop.cache_index,
