@@ -109,7 +109,7 @@ class ChildProcess(GracefulWorker):
         """
         Print timing statistics needed for debugging
         """
-        return f"Fetching Args took: {self.fetch_arg}\nPutting Results took: {self.put_res}"
+        return f"\nFetching Args took: {self.fetch_arg}\nPutting Results took: {self.put_res}"
 
 
 class FirstLoopWorker(ChildProcess):
