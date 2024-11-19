@@ -33,9 +33,10 @@ class ImageCache:
         """
         for i in range(self.size):
             try:
-                self.data[i] = imgp.load_std_image(img_path=os.path.join(thumbnail_dir, f"{i+self.offset}.png"),
+                img, aspect = imgp.load_std_image(img_path=os.path.join(thumbnail_dir, f"{i+self.offset}.png"),
                                                    target_size=(self.img_shape[0], self.img_shape[1]),
                                                    resize=False)
+                self.data[i] = img
             # We encountered a value error -> The image didn't have the right shape when loaded.
             except ValueError as e:
                 print(f"Thumbnail is not of correct size {i+self.offset}")
@@ -58,9 +59,10 @@ class ImageCache:
 
         for i in range(self.size):
             try:
-                self.data[i] = imgp.load_std_image(img_path=paths[i],
+                img, aspect = imgp.load_std_image(img_path=paths[i],
                                                    target_size=(self.img_shape[0], self.img_shape[1]),
                                                    resize=True)
+                self.data[i] = img
             except Exception as e:
                 print(f"Error loading image {i+self.offset}: {e}")
                 self.data[i] = np.zeros(self.img_shape, dtype=np.uint8)
