@@ -105,12 +105,11 @@ class ChildProcess(GracefulWorker):
         q_handler = QueueHandler(q)
         self.logger.addHandler(q_handler)
 
-    def print_stats(self):
+    def get_stats(self):
         """
         Print timing statistics needed for debugging
         """
-        self.logger.info(f"Fetching Args took: {self.fetch_arg}")
-        self.logger.info(f"Putting Results took: {self.put_res}")
+        return f"Fetching Args took: {self.fetch_arg}\nPutting Results took: {self.put_res}"
 
 
 class FirstLoopWorker(ChildProcess):
@@ -568,10 +567,10 @@ class SecondLoopWorker(ChildProcess):
         self.logger.addHandler(q_handler)
 
 
-    def print_stats(self):
+    def get_stats(self):
         """
         Print Timing Statistics for Debugging
         """
-        super().print_stats()
-        self.logger.info(f"Fetching X Took: {self.fetch_x}")
-        self.logger.info(f"Fetching Y Took: {self.fetch_y}")
+        b = super().get_stats()
+        b += f"\nFetching X Took: {self.fetch_x}\nFetching Y Took: {self.fetch_y}"
+        return b
