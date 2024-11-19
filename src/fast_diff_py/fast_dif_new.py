@@ -281,7 +281,7 @@ class FastDifPy(GracefulWorker):
         # reset counters
         self.exit_counter = 0
         if first_loop:
-            self.cmd_queue = mp.Queue(maxsize=self.config.batch_size_max)
+            self.cmd_queue = mp.Queue(maxsize=self.config.batch_size_max_fl)
         else:
             self.cmd_queue = mp.Queue()
 
@@ -291,7 +291,7 @@ class FastDifPy(GracefulWorker):
         # Create Worker Objects
         if first_loop:
             workers = []
-            for i in range(self.config.cpu_proc):
+            for i in range(self.config.first_loop.cpu_proc):
                 workers.append(FirstLoopWorker(
                     identifier=i,
                     compress=self.config.first_loop.compress,
@@ -317,14 +317,14 @@ class FastDifPy(GracefulWorker):
                 import fast_diff_py.img_processing_gpu as imgpg
                 self.gpu_diff = imgpg.mse_gpu
 
-            for i in range(self.config.cpu_proc + self.config.second_loop.gpu_proc):
+            for i in range(self.config.second_loop.cpu_proc + self.config.second_loop.gpu_proc):
                 workers.append(SecondLoopWorker(
                     identifier=i,
                     cmd_queue=self.cmd_queue,
                     res_queue=self.result_queue,
                     log_queue=self.logging_queue,
                     is_compressed=self.config.first_loop.compress,
-                    compare_fn=self.cpu_diff if i < self.config.cpu_proc else self.gpu_diff,
+                    compare_fn=self.cpu_diff if i < self.config.second_loop.cpu_proc else self.gpu_diff,
                     target_size=(self.config.compression_target_x, self.config.compression_target_y),
                     log_level=self.config.log_level_children,
                     timeout=self.config.child_proc_timeout,
@@ -332,7 +332,7 @@ class FastDifPy(GracefulWorker):
                     plot_dir=self.config.second_loop.plot_output_dir,
                     ram_cache=self.ram_cache,
                     thumb_dir=self.config.thumb_dir if self.config.first_loop.compress else None,
-                    batched_args=self.config.second_loop.batched_processing,
+                    batched_args=self.config.second_loop.batch_args,
                     plot_threshold=self.config.second_loop.diff_threshold))
 
             self.handles = [mp.Process(target=w.main) for w in workers]
