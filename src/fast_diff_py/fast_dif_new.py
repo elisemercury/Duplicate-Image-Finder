@@ -391,6 +391,7 @@ class FastDifPy(GracefulWorker):
         """
         enqueue_time = 0
         dequeue_time = 0
+        task = "Images" if first_iteration else "Pairs"
 
         self._enqueue_counter = 0
         self._dequeue_counter = 0
@@ -417,8 +418,8 @@ class FastDifPy(GracefulWorker):
                 enqueue_time += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
 
                 if self._dequeue_counter > self._last_dequeue_counter + self.config.batch_size_max / 4:
-                    self.logger.info(f"Enqueued: {self._enqueue_counter} images")
-                    self.logger.info(f"Done with {self._dequeue_counter} images")
+                    self.logger.info(f"Enqueued: {self._enqueue_counter} {task}")
+                    self.logger.info(f"Done with {self._dequeue_counter} {task}")
                     self._last_dequeue_counter = self._dequeue_counter
 
                 # Precondition -> Two times batch-size has been submitted to the queue
@@ -437,8 +438,8 @@ class FastDifPy(GracefulWorker):
                 dequeue_time += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
 
                 if self._dequeue_counter > self._last_dequeue_counter + self.config.batch_size_max / 4:
-                    self.logger.info(f"Enqueued: {self._enqueue_counter} images")
-                    self.logger.info(f"Done with {self._dequeue_counter} images")
+                    self.logger.info(f"Enqueued: {self._enqueue_counter} {task}")
+                    self.logger.info(f"Done with {self._dequeue_counter} {task}")
                     self._last_dequeue_counter = self._dequeue_counter
 
                 self.db.commit()
@@ -463,8 +464,8 @@ class FastDifPy(GracefulWorker):
                 break
 
             if self._dequeue_counter > self._last_dequeue_counter + self.config.batch_size_max / 4:
-                self.logger.info(f"Enqueued: {self._enqueue_counter} images")
-                self.logger.info(f"Done with {self._dequeue_counter} images")
+                self.logger.info(f"Enqueued: {self._enqueue_counter} {task}")
+                self.logger.info(f"Done with {self._dequeue_counter} {task}")
                 self._last_dequeue_counter = self._dequeue_counter
 
             # Precondition -> Two times batch-size has been submitted to the queue
@@ -479,8 +480,8 @@ class FastDifPy(GracefulWorker):
             dequeue_fn(drain=True)
 
             if self._dequeue_counter > self._last_dequeue_counter + self.config.batch_size_max / 4:
-                self.logger.info(f"Enqueued: {self._enqueue_counter} images")
-                self.logger.info(f"Done with {self._dequeue_counter} images")
+                self.logger.info(f"Enqueued: {self._enqueue_counter} {task}")
+                self.logger.info(f"Done with {self._dequeue_counter} {task}")
                 self._last_dequeue_counter = self._dequeue_counter
 
             self.db.commit()
