@@ -757,6 +757,10 @@ class FastDifPy(GracefulWorker):
                 self.logger.error("Cannot make diff plots with batched processing")
                 return False
 
+        if cfg.cpu_proc + cfg.gpu_proc < 1:
+            self.logger.error("Need at least one process to run the second loop")
+            return False
+
         return True
 
     @staticmethod
