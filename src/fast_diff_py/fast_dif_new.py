@@ -859,7 +859,7 @@ class FastDifPy(GracefulWorker):
         """
         Set the function to be used to load a batch of tasks for the workers.
         """
-        batch, cache, thumb = (self.config.second_loop.batched_processing,
+        batch, cache, thumb = (self.config.second_loop.batch_args,
                                self.config.second_loop.use_ram_cache,
                                self.config.first_loop.compress)
 
