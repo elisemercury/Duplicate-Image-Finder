@@ -1065,7 +1065,7 @@ class FastDifPy(GracefulWorker):
         """
         Submit a batch of thumbnails. Depending on whether we have a cache or not, we're going to also build a cache
         """
-        assert self.config.first_loop.compress and self.config.second_loop.batched_processing, \
+        assert self.config.first_loop.compress and self.config.second_loop.batch_args, \
             "Precondition for batched thumb block not met"
 
         l_x, l_y, s_x, s_y = self.db.get_cache_block_thumb(block_key=self.config.second_loop.cache_index,
