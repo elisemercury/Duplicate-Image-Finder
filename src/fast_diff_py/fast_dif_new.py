@@ -1154,7 +1154,7 @@ class FastDifPy(GracefulWorker):
 
         :param submit: Whether to submit the items to the queue or return them (for sequential implementation)
         """
-        assert self.config.second_loop.batched_processing is False, "Precondition for item block not met"
+        assert self.config.second_loop.batch_args is False, "Precondition for item block not met"
 
         # Build caches if needed
         if self.config.second_loop.use_ram_cache:
