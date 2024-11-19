@@ -363,7 +363,8 @@ class SecondLoopWorker(ChildProcess):
         :return: The image from the thumbnail directory
         """
         p = os.path.join(self.thumb_dir, f"{key}.png")
-        return imgp.load_std_image(img_path=p, target_size=self.target_size, resize=False)
+        image, _ =  imgp.load_std_image(img_path=p, target_size=self.target_size, resize=False)
+        return image
 
     def get_org_from_path(self, path: str, **kwargs) -> np.ndarray[np.uint8]:
         """
@@ -374,7 +375,8 @@ class SecondLoopWorker(ChildProcess):
 
         :return: The image from the path
         """
-        return imgp.load_std_image(img_path=path, target_size=self.target_size, resize=True)
+        image, _ = imgp.load_std_image(img_path=path, target_size=self.target_size, resize=True)
+        return image
 
     def process_batch_paths(self, arg: BatchCompareArgs) -> BatchCompareResult:
         """
