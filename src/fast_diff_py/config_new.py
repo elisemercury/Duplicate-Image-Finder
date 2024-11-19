@@ -134,8 +134,6 @@ class Config(BaseModel):
     second_loop: Union[SecondLoopConfig, SecondLoopRuntimeConfig] = Field(default_factory=lambda: SecondLoopConfig(),
                                                                           description="The config for the second loop")
 
-    cpu_proc: int = Field(default_factory=lambda: os.cpu_count(),
-                          description="The number of CPU to be used")
     child_proc_timeout: int = Field(30,
                                     description="The timeout for the child processes")
 
