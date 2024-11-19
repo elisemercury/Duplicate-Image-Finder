@@ -793,6 +793,19 @@ class FastDifPy(GracefulWorker):
         if gpu_proc is None:
             gpu_proc = 0
 
+        # One direction is constrained beyond the other
+        if batch_size is None:
+            if self.db.get_dir_entry_count(False) < cpu_proc + gpu_proc:
+                # Very small case, we don't need full speed.
+                if self.db.get_dir_entry_count(True) < cpu_proc + gpu_proc:
+                    parallel = False
+
+                batch_size = min(self.db.get_dir_entry_count(True) // 4, self.config.batch_size_max_sl)
+            else:
+                batch_size = min(self.db.get_dir_entry_count(True),
+                                 self.db.get_dir_entry_count(False),
+                                 self.config.batch_size_max_sl)
+
         args = {"cpu_proc": cpu_proc,
                 "gpu_proc": gpu_proc,
                 "skip_matching_hash": skip_matching_hash,
