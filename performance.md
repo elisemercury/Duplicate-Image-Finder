@@ -26,3 +26,13 @@ Item Processing, RAM Cache, Compressed Images, took 252.462715
 Item Processing, RAM Cache, Uncompressed Images, took -1s
 Item Processing, Disk Cache, Compressed Images, took 471.199621
 Item Processing, Disk Cache, Uncompressed Images, took -1s
+
+# Size of 4000 batch, batched submission for items
+Batched Processing, RAM Cache, Compressed Images, took 244.14075
+Batched Processing, RAM Cache, Uncompressed Images, took -1s
+Batched Processing, Disk Cache, Compressed Images, took 480.714968
+Batched Processing, Disk Cache, Uncompressed Images, took -1s
+Item Processing, RAM Cache, Compressed Images, took 242.806917
+Item Processing, RAM Cache, Uncompressed Images, took -1s
+Item Processing, Disk Cache, Compressed Images, took 495.819392
+Item Processing, Disk Cache, Uncompressed Images, took -1s
