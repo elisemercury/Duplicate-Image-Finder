@@ -573,7 +573,7 @@ class FastDifPy(GracefulWorker):
 
         while self.run:
             # Get the next batch
-            args = self.db.batch_of_preprocessing_args(batch_size=self.config.batch_size_max)
+            args = self.db.batch_of_preprocessing_args(batch_size=self.config.first_loop.batch_size)
 
             # No more arguments
             if len(args) == 0:
