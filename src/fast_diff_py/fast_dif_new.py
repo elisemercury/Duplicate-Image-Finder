@@ -1022,7 +1022,7 @@ class FastDifPy(GracefulWorker):
             bc = BatchCache(x=x, y=y)
 
         # In batched mode, we need to submit the block progress
-        if self.config.second_loop.batched_processing:
+        if self.config.second_loop.batch_args:
             # Prep the block progress dict
             bp = {i + l_x: False for i in range(len(p_x))}
             self.block_progress_dict[self.config.second_loop.cache_index] = bp
