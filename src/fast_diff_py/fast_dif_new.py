@@ -240,13 +240,13 @@ class FastDifPy(GracefulWorker):
                     files.append(file_name)
 
             # let the number of files grow to a batch size
-            if len(files) > self.config.batch_size_max:
+            if len(files) > self.config.batch_size_dir:
                 # Store files in the db
                 self.db.bulk_insert_file(path, files, not dir_a)
                 files = []
 
             # Start recursion early, if there is too much in RAM
-            if len(dirs) + dir_count > self.config.batch_size_max:
+            if len(dirs) + dir_count > self.config.batch_size_dir:
                 # Dump the files
                 self.db.bulk_insert_file(path, files, not dir_a)
                 files = []

@@ -104,6 +104,9 @@ class Config(BaseModel):
 
     batch_size_max: int = Field(100,
                                 description="The batch size for the second loop")
+    batch_size_dir: int = Field(1000,
+                                description="The batch size for the directory processing. "
+                                            "Once the batch size is reached, data is written to the db")
 
     db_path: Optional[str] = Field(None,
                                    description="Override for the path to the db file")
