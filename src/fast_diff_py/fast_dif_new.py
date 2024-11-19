@@ -814,6 +814,7 @@ class FastDifPy(GracefulWorker):
                 "plot_output_dir": plot_output_dir,
                 "diff_threshold": diff_threshold,
                 "batched_processing": batched_processing,
+                "batch_size": batch_size,
                 "use_ram_cache": use_ram_cache,
                 "parallel": parallel}
 
