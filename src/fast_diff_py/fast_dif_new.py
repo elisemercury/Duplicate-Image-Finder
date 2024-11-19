@@ -744,7 +744,7 @@ class FastDifPy(GracefulWorker):
 
         # Check constraint on optimizations
         if cfg.match_aspect_by != -1.0 or cfg.skip_matching_hash:
-            if cfg.batched_processing:
+            if cfg.batch_args:
                 self.logger.error("Cannot skip matching hash or non-matching aspect ratio with batched processing")
                 return False
 
@@ -753,7 +753,7 @@ class FastDifPy(GracefulWorker):
                 self.logger.error("Need plot output directory and diff threshold to make diff plots")
                 return False
 
-            if cfg.batched_processing:
+            if cfg.batch_args:
                 self.logger.error("Cannot make diff plots with batched processing")
                 return False
 
