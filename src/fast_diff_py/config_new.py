@@ -40,6 +40,8 @@ class FirstLoopRuntimeConfig(FirstLoopConfig):
     """
     batch_size: Optional[int] = Field(None,
                                         description="The batch size for the first loop")
+    cpu_proc: int = Field(default_factory=lambda: os.cpu_count(),
+                            description="The number of CPU processes to use for the first loop")
 
 class SecondLoopConfig(BaseModel):
     # Because of batching this doesn't make much sense.
@@ -72,6 +74,8 @@ class SecondLoopConfig(BaseModel):
                                     description="The threshold for similarity between images")
     gpu_proc: int = Field(0,
                           description="The number of GPU processes to use for the second loop")
+    cpu_proc: int = Field(default_factory=lambda: os.cpu_count(),
+                            description="The number of CPU processes to use for the second loop")
 
 class SecondLoopRuntimeConfig(SecondLoopConfig):
     cache_index: int = Field(1,
@@ -102,11 +106,15 @@ class Config(BaseModel):
     allowed_file_extensions: List[str] = Field([".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".gif", ".webp"],
                                                description="The allowed file extensions for the images")
 
-    batch_size_max: int = Field(100,
-                                description="The batch size for the second loop")
     batch_size_dir: int = Field(1000,
                                 description="The batch size for the directory processing. "
                                             "Once the batch size is reached, data is written to the db")
+
+    batch_size_max_fl: int = Field(100,
+                                description="Maximum Batch Size for the First Loop")
+
+    batch_size_max_sl: int = Field(os.cpu_count() * 250,
+                                   description="Maximum Batch Size for the Second Loop")
 
     db_path: Optional[str] = Field(None,
                                    description="Override for the path to the db file")
