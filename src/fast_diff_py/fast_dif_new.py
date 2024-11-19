@@ -497,7 +497,7 @@ class FastDifPy(GracefulWorker):
     # First Loop
     # ==================================================================================================================
 
-    def build_first_loop_rt_cfg(self, cfg: FirstLoopConfig):
+    def build_first_loop_runtime_config(self, cfg: FirstLoopConfig):
         """
         Check the configuration for the first loop
 
@@ -614,7 +614,7 @@ class FastDifPy(GracefulWorker):
             self.config.first_loop = config
 
         if isinstance(self.config.first_loop, FirstLoopConfig):
-            self.config.first_loop = self.build_first_loop_rt_cfg(self.config.first_loop)
+            self.config.first_loop = self.build_first_loop_runtime_config(self.config.first_loop)
 
         # No computation required. Skip it.
         if not (self.config.first_loop.compress or self.config.first_loop.compute_hash):
