@@ -185,7 +185,7 @@ class FirstLoopWorker(ChildProcess):
         :param arg: The PreprocessArg containing the file path
         """
         try:
-            img: np.ndarray = imgp.load_std_image(img_path=arg.file_path, target_size=self.target_size, resize=True)
+            img, sz = imgp.load_std_image(img_path=arg.file_path, target_size=self.target_size, resize=True)
             h0, h90, h180, h270 = imgp.compute_img_hashes(image_mat=img,
                                                           temp_dir=self.thumb_dir,
                                                           temp_name=f"{self.identifier}_temp.png",
@@ -193,7 +193,7 @@ class FirstLoopWorker(ChildProcess):
                                                           hash_fn=self.hash_fn)
 
             return PreprocessResult(key=arg.key, hash_0=h0, hash_90=h90, hash_180=h180, hash_270=h270,
-                                    org_x=img.shape[0], org_y=img.shape[1])
+                                    org_x=sz[0], org_y=sz[1])
         except Exception as e:
             self.logger.error(f"Error in processing batch: {e}")
             tb = traceback.format_exc()
@@ -206,9 +206,9 @@ class FirstLoopWorker(ChildProcess):
         :param arg: The PreprocessArg containing the file path
         """
         try:
-            img: np.ndarray = imgp.load_std_image(img_path=arg.file_path, target_size=self.target_size, resize=True)
+            img, sz = imgp.load_std_image(img_path=arg.file_path, target_size=self.target_size, resize=True)
             imgp.store_image(img, os.path.join(self.thumb_dir, f"{arg.key}.png"))
-            return PreprocessResult(key=arg.key, org_x=img.shape[0], org_y=img.shape[1])
+            return PreprocessResult(key=arg.key, org_x=sz[0], org_y=sz[1])
         except Exception as e:
             self.logger.error(f"Error in processing batch: {e}")
             tb = traceback.format_exc()
@@ -221,7 +221,7 @@ class FirstLoopWorker(ChildProcess):
         :param arg: The PreprocessArg containing the file path
         """
         try:
-            img: np.ndarray = imgp.load_std_image(img_path=arg.file_path, target_size=self.target_size, resize=True)
+            img, sz = imgp.load_std_image(img_path=arg.file_path, target_size=self.target_size, resize=True)
             hash_0, hash_90, hash_180, hash_270 = imgp.compute_img_hashes(image_mat=img,
                                                                           temp_dir=self.thumb_dir,
                                                                           temp_name=f"{self.identifier}_temp.png",
@@ -230,7 +230,7 @@ class FirstLoopWorker(ChildProcess):
             imgp.store_image(img, os.path.join(self.thumb_dir, f"{arg.key}.png"))
 
             return PreprocessResult(key=arg.key,
-                                    org_x=img.shape[0], org_y=img.shape[1],
+                                    org_x=sz[0], org_y=sz[1],
                                     hash_0=hash_0, hash_90=hash_90, hash_180=hash_180, hash_270=hash_270)
         except Exception as e:
             self.logger.error(f"Error in processing batch: {e}")
