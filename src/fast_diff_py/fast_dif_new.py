@@ -20,7 +20,7 @@ from fast_diff_py.utils import sizeof_fmt
 
 class FastDifPy(GracefulWorker):
     db: SQLiteDB
-    __config: Config
+    config: Config
     logger: logging.Logger
 
     handles: Union[List[mp.Process], None] = None
@@ -62,18 +62,6 @@ class FastDifPy(GracefulWorker):
         """
         if self.ql is not None:
             self.ql.stop()
-
-    @property
-    def config(self):
-        # TODO write the config to the file
-
-        return self.__config
-
-    @config.setter
-    def config(self, value: Config):
-        # TODO write config to file
-
-        self.__config = value
 
     def start_logging(self):
         handler = logging.StreamHandler()
