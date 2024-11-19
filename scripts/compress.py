@@ -11,7 +11,9 @@ paths = {"path_a": "/home/alisot2000/Desktop/SAMPLE_MIRA/dir_a/",
          "tq-a": "/media/alisot2000/MacBeth/TQ-Picture-Benchmark",
          "imdb": "/media/alisot2000/MacBeth/IMDB-Bench",
          "wb_a": "/media/alisot2000/MacBeth/workbench/dir_a/",
-         "wb_b": "/media/alisot2000/MacBeth/workbench/dir_b/"}
+         "wb_b": "/media/alisot2000/MacBeth/workbench/dir_b/",
+         "wbl_a": "/media/alisot2000/MacBeth/workbench_large/dir_a/",
+         "wbl_b": "/media/alisot2000/MacBeth/workbench_large/dir_b/"}
 
 for p in paths.values():
     try:
