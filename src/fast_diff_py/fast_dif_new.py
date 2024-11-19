@@ -751,6 +751,10 @@ class FastDifPy(GracefulWorker):
             self.logger.error("Need at least one process to run the second loop")
             return False
 
+        if self.config.first_loop.compress is False:
+            self.logger.error("Cannot run the second loop without compression")
+            return False
+
         return True
 
     def second_loop_arg(self,
