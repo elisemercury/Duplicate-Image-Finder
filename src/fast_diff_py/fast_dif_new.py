@@ -763,9 +763,10 @@ class FastDifPy(GracefulWorker):
 
         return True
 
-    @staticmethod
-    def second_loop_arg(cpu_proc: int = None,
+    def second_loop_arg(self,
+                        cpu_proc: int = None,
                         gpu_proc: int = None,
+                        batch_size: int = None,
                         skip_matching_hash: bool = None,
                         match_aspect_by: float = None,
                         make_diff_plots: bool = None,
