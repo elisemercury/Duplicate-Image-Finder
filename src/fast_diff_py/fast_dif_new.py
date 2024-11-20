@@ -766,7 +766,7 @@ class FastDifPy(GracefulWorker):
             # Reset the config
             self.config.first_loop = FirstLoopRuntimeConfig.model_validate(self.config.first_loop.model_dump())
 
-    def first_loop(self, config: Union[FirstLoopConfig, FirstLoopRuntimeConfig] = None):
+    def first_loop(self, config: Union[FirstLoopConfig, FirstLoopRuntimeConfig] = None, chain: bool = False):
         """
         Run the first loop
 
@@ -776,6 +776,7 @@ class FastDifPy(GracefulWorker):
         if config is not None:
             self.config.first_loop = config
 
+        # Build runtime config if necessary
         if isinstance(self.config.first_loop, FirstLoopConfig):
             self.config.first_loop = self.build_first_loop_runtime_config(self.config.first_loop)
 
@@ -783,6 +784,10 @@ class FastDifPy(GracefulWorker):
         if not (self.config.first_loop.compress or self.config.first_loop.compute_hash):
             self.logger.info("No computation required. Skipping first loop")
             return
+
+        # Create hash table if necessary
+        if self.config.first_loop.compute_hash:
+            self.db.create_hash_table_and_index()
 
         # Sequential First Loop requested
         if not self.config.first_loop.parallel:
