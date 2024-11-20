@@ -4,6 +4,7 @@ import numpy as np
 import json
 import base64
 from typing import Any, Union
+import pickle
 
 
 """
@@ -18,8 +19,8 @@ def hash_np(mat: np.ndarray) -> str:
     :param mat: multidimensional numpy array.
     :return: hash
     """
-    sha256_hash = hashlib.sha256()
-    sha256_hash.update(mat.data)
+    sha256_hash = hashlib.sha1()
+    sha256_hash.update(pickle.dumps(mat))
     return sha256_hash.hexdigest()
 
 
