@@ -126,8 +126,8 @@ class FastDifPy(GracefulWorker):
             os.makedirs(thumb_path)
         self.config.thumb_dir = thumb_path
 
-        self.cmd_queue = mp.Queue()
         self.result_queue = mp.Queue()
+        self.register_interrupts()
 
     # ==================================================================================================================
     # Indexing
