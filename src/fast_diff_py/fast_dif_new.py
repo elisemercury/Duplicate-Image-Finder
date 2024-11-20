@@ -155,6 +155,10 @@ class FastDifPy(GracefulWorker):
             # TODO perform cleanup
             raise ValueError("The two provided subdirectories are subdirectories of each other. Cannot proceed")
 
+        self._enqueue_counter = 0
+        self._dequeue_counter = 0
+        self._last_dequeue_counter = 0
+
         # Index the directories
         self.__recursive_index(path=self.config.root_dir_a, dir_a=True)
         if self.config.root_dir_b is not None:
