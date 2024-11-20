@@ -549,6 +549,7 @@ class FastDifPy(GracefulWorker):
 
         if dir_b_count > 0 and do_print:
             self.logger.info(f"Entries in {self.config.root_dir_b}: {dir_b_count}")
+            self.logger.info(f"Total Entries: {dir_a_count + dir_b_count}")
 
         total = (dir_a_count + dir_b_count) * self.config.compression_target_x * self.config.compression_target_y * 3
         if do_print:
