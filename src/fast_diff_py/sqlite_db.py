@@ -627,3 +627,10 @@ class SQLiteDB(BaseSQliteDB):
                 head = int_head
                 acc = [row]
 
+    def get_min_cache_key(self):
+        """
+        For a restart of the second loop, get the cache key that is the smallest and
+        doesn't have all the values filled in
+        """
+        self.debug_execute("SELECT MIN(batch_key) FROM cache_table WHERE success = -1")
+        return self.sq_cur.fetchone()[0]
