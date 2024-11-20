@@ -562,6 +562,7 @@ class FastDifPy(GracefulWorker):
         Run the first loop sequentially
         """
         # Update the state
+        self.cmd_queue = mp.Queue()
         self.config.state = Progress.FIRST_LOOP_IN_PROGRESS
         self._enqueue_counter = 0
         self._dequeue_counter = 0
