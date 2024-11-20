@@ -154,48 +154,46 @@ class FastDifPy(GracefulWorker):
 
         # Step 1:
         # Determine if there is already something in progress:
-        default_cfg_path = os.path.join(dir_a, ".task.json") if default_cfg_path is None else default_cfg_path
-        if os.path.exists(default_cfg_path):
-            with open(default_cfg_path, "r") as f:
+        self.config_path = os.path.join(dir_a, ".task.json") if default_cfg_path is None else default_cfg_path
+        if os.path.exists(self.config_path) and not purge:
+            with open(self.config_path, "r") as f:
                 cfg = Config.model_validate_json(f.read())
 
+            # Set the config
             self.config = cfg
 
+            # Perform progress recovery
             self.recover_from_config()
             return
 
-        # TODO create directories if they do not exist
-
-        # check if the config exists
-        if config is not None:
-            self.config = config
+        # Step 2:
+        # Create a new config
+        if config is None:
+            self.config = Config(root_dir_a=dir_a, root_dir_b=dir_b)
         else:
-            cfg_path = os.path.join(dir_a, ".task.json")
+            self.config = config
 
-            # Check and fetch the config
-            if os.path.exists(cfg_path):
-                with open(cfg_path, "r") as f:
-                    # load the config
-                    self.config = Config.model_validate_json(f.read())
-                    # TODO restart from config
-            else:
-                # TODO what happens with children like first loop and second loop?
-                self.config = Config(root_dir_a=dir_a, root_dir_b=dir_b)
-
-        # check if the db path is overridden and if the db should exist
+        # Step 3
+        # Path to the DB:
         p = self.config.db_path if self.config.db_path is not None else os.path.join(dir_a, ".fast_diff.db")
-        if self.config.state not in (Progress.SECOND_LOOP_DONE, Progress.INIT):
-            if not os.path.exists(p):
-                raise ValueError(f"Database does not exist at {p}")
+        if os.path.exists(p) and not purge:
+            raise ValueError(f"Database already exists at {p}")
+
+        elif os.path.exists(p) and purge:
+            self.logger.info(f"Purging DB at {p}")
+            shutil.rmtree(p)
 
         # Connect to the db.
-        self.db = SQLiteDB(p, debug=True)
+        self.db = SQLiteDB(p, debug=__debug__)
+        self.config.db_path = p
 
-        # Set some variables
-        thumb_path = os.path.join(dir_a, ".temp_thumb")
-        if not os.path.exists(thumb_path):
-            os.makedirs(thumb_path)
-        self.config.thumb_dir = thumb_path
+        # Populate Thumb dir, if not exists
+        if self.config.thumb_dir is None:
+            self.config.thumb_dir = os.path.join(dir_a, ".temp_thumb")
+
+        # Make directory if not exists
+        if not os.path.exists(self.config.thumb_dir):
+            os.makedirs(self.config.thumb_dir)
 
         self.result_queue = mp.Queue()
         self.register_interrupts()
