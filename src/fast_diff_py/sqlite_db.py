@@ -57,6 +57,13 @@ class SQLiteDB(BaseSQliteDB):
         if not temp:
             self.create_directory_indexes()
 
+    def drop_directory_table(self):
+        """
+        Drop the directory table
+        """
+        self.debug_execute("DROP TABLE IF EXISTS directory")
+        self.debug_execute("DROP TABLE IF EXISTS directory_temp")
+
     def create_directory_indexes(self):
         """
         Create the indexes on the directory table
