@@ -1,4 +1,5 @@
 import os.path
+import shutil
 from typing import List, Dict, Set, Tuple, Union
 
 from fast_diff_py.datatransfer_new import PreprocessArg, PreprocessResult
@@ -634,3 +635,18 @@ class SQLiteDB(BaseSQliteDB):
         """
         self.debug_execute("SELECT MIN(batch_key) FROM cache_table WHERE success = -1")
         return self.sq_cur.fetchone()[0]
+
+    def drop_diff(self, threshold: float):
+        """
+        Drop all diffs above a certain threshold
+        """
+        self.debug_execute("DELETE FROM dif_table WHERE dif > ?", (threshold,))
+
+    def make_backup(self, backup_path: str):
+        """
+        Make a backup of the database
+        """
+        self.commit()
+        self.close()
+        shutil.copy(self.db_path, backup_path)
+        self.connect(self.db_path)
