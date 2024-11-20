@@ -756,6 +756,9 @@ class FastDifPy(GracefulWorker):
         if isinstance(cfg, SecondLoopConfig):
             cfg = SecondLoopRuntimeConfig.model_validate(cfg.model_dump())
 
+        if self.config.do_second_loop:
+            return False
+
         # Check constraint on optimizations
         if cfg.match_aspect_by != -1.0 or cfg.skip_matching_hash:
             if cfg.batch_args:
