@@ -115,6 +115,8 @@ class Config(BaseModel):
 
     db_path: Optional[str] = Field(None,
                                    description="Override for the path to the db file")
+    config_path: Optional[str] = Field(None,
+                                        description="Override for the path to the config file")
     log_level: int = Field(logging.INFO,
                           description="Whether to print verbose output")
     log_level_children: int = Field(logging.INFO,
@@ -130,6 +132,8 @@ class Config(BaseModel):
                                                                        description="The config for the first loop")
     second_loop: Union[SecondLoopConfig, SecondLoopRuntimeConfig] = Field(default_factory=lambda: SecondLoopConfig(),
                                                                           description="The config for the second loop")
+    do_second_loop: bool = Field(True,
+                                description="Whether to do the second loop")
 
     child_proc_timeout: int = Field(30,
                                     description="The timeout for the child processes")
