@@ -6,6 +6,20 @@ CPUs:
 - 128: `41.4836961` (utilization ~360%)
 
 
+# Pure Compression time
+# No batched queue
+Time taken for first loop: 349.204719 seconds
+# 30 Batched queue
+Time taken for first loop: 334.229981 seconds
+# 50 batched queue
+Time taken for first loop: 323.895515 seconds
+# 100 batched queue
+Time taken for first loop: 320.250131 seconds
+Time taken for first loop: 309.254996 seconds
+# 250
+Time taken for first loop: 330.104581 seconds
+
+
 # Size of 1000 batch, single submission for items
 Batched Processing, RAM Cache, Compressed Images, took 293.026221
 Batched Processing, RAM Cache, Uncompressed Images, took -1s
@@ -56,3 +70,10 @@ Item Processing, RAM Cache, Compressed Images, took 279.641388
 Item Processing, RAM Cache, Uncompressed Images, took -1s
 Item Processing, Disk Cache, Compressed Images, took 581.069106
 Item Processing, Disk Cache, Uncompressed Images, took -1s
+
+# Stats large workbench -> Too large. Takes about one week:
+Dir_a, Dir_b, dups
+(193216, 192742, 3905)
+
+# Stats with a 40'000 x 40'000 images benchmark
+(41318, 41586, 857)
