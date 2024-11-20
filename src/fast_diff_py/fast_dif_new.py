@@ -326,6 +326,7 @@ class FastDifPy(GracefulWorker):
             self.__recursive_index(path=self.config.root_dir_b, dir_a=False)
 
         self.config.state = Progress.INDEXED_DIRS
+        self.commit()
 
     def cond_switch_a_b(self):
         """
