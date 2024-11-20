@@ -158,3 +158,11 @@ class BaseSQliteDB:
         Commit the changes
         """
         self.sq_con.commit()
+
+    def close(self):
+        """
+        Close the connection
+        """
+        self.sq_con.close()
+        self.sq_con = None
+        self.sq_cur = None
