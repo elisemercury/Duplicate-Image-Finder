@@ -871,7 +871,63 @@ class FastDifPy(GracefulWorker):
         """
         Sequential implementation of the second loop
         """
-        ...
+        # Set the MSE function
+        if self.cpu_diff is None:
+            import fast_diff_py.img_processing as imgp
+            self.cpu_diff = imgp.mse
+
+        self.config.state = Progress.SECOND_LOOP_IN_PROGRESS
+
+        # Set the counters
+        self._enqueue_counter = 0
+        self._dequeue_counter = 0
+        self._last_dequeue_counter = 0
+
+        # Set up the worker
+        self.cmd_queue = mp.Queue()
+        self.ram_cache = {}
+
+        slw = SecondLoopWorker(
+            identifier=1,
+            cmd_queue=self.cmd_queue,
+            res_queue=self.result_queue,
+            log_queue=self.logging_queue,
+            is_compressed=self.config.first_loop.compress,
+            compare_fn=self.cpu_diff,
+            target_size=(self.config.compression_target_x, self.config.compression_target_y),
+            has_dir_b=self.config.root_dir_b is not None,
+            ram_cache=self.ram_cache,
+            plot_dir=self.config.second_loop.plot_output_dir,
+            batched_args=self.config.second_loop.batch_args,
+            thumb_dir=self.config.thumb_dir,
+            plot_threshold=self.config.second_loop.diff_threshold,
+            log_level=self.config.log_level_children,
+            timeout=self.config.child_proc_timeout)
+
+        while self.run:
+            # Get the next batch
+            args = self.__item_block(submit=False)
+
+            # Done?
+            if len(args) == 0:
+                break
+
+            # Process the batch
+            results = [slw.process_item(a) for a in args]
+
+            # Update count
+            self._enqueue_counter += len(args)
+            self._dequeue_counter += len(args)
+
+            # Update info
+            self.logger.info("Done with {self._dequeue_counter} Pairs")
+
+            # Store the results
+            self.store_item_second_loop(results)
+
+        self.config.state = Progress.SECOND_LOOP_DONE
+
+        self.cmd_queue = None
 
     def set_load_batch(self):
         """
