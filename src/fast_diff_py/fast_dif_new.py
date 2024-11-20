@@ -139,7 +139,8 @@ class FastDifPy(GracefulWorker):
         self.ql = QueueListener(self.logging_queue, handler, respect_handler_level=True)
         self.ql.start()
 
-    def __init__(self, dir_a: str, dir_b: str = None, config: Config = None, default_cfg_path: str = None):
+    def __init__(self, dir_a: str, dir_b: str = None, config: Config = None,
+                 default_cfg_path: str = None, purge: bool = False):
         """
         Initialize the FastDifPy object.
         """
