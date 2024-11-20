@@ -14,6 +14,11 @@ class GracefulWorker:
         :param identifier: identifier of this class
         """
         self.identifier = identifier
+
+    def register_interrupts(self):
+        """
+        Register the interrupts
+        """
         signal.signal(signal.SIGINT, self.handle_interrupt)
         signal.signal(signal.SIGTERM, self.handle_interrupt)
 
