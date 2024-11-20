@@ -804,7 +804,10 @@ class FastDifPy(GracefulWorker):
             self.config.state = Progress.FIRST_LOOP_DONE
 
             # Reset the config
-            self.config.first_loop = FirstLoopRuntimeConfig.model_validate(self.config.first_loop.model_dump())
+            self.config.first_loop = FirstLoopConfig.model_validate(self.config.first_loop.model_dump())
+
+        if chain:
+            self.second_loop()
 
     def submit_batch_first_loop(self) -> bool:
         """
