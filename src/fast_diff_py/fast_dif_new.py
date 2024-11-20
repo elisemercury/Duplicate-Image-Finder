@@ -78,10 +78,10 @@ class FastDifPy(GracefulWorker):
         handler = logging.StreamHandler()
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         handler.setFormatter(formatter)
-        self.ql = QueueListener(self.logging_queue, handler)
+        self.ql = QueueListener(self.logging_queue, handler, respect_handler_level=True)
         self.ql.start()
 
-    def __init__(self, dir_a: str, dir_b: str = None, config: Config = None, **kwargs):
+    def __init__(self, dir_a: str, dir_b: str = None, config: Config = None, default_cfg_path: str = None):
         """
         Initialize the FastDifPy object.
         """
