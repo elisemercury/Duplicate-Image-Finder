@@ -55,6 +55,43 @@ def load_std_image(img_path: str, target_size: Tuple[int, int], resize: bool = T
     return img, aspect
 
 
+def hash_np_array(image_mat: np.ndarray,
+                  hash_fn: Callable[[np.ndarray[np.uint8]], str],
+                  shift_amount: int = 0) -> Tuple[str, str, str, str]:
+    """
+    Compute a hash of an image matrix
+
+    :param image_mat: The image matrix to compute the hash for
+    :param hash_fn: The hash function to use
+    :param shift_amount: The amount to shift the image before computing the hash (default 0)
+
+    :return: The hash of the image matrix
+    """
+    assert 8 > shift_amount > -8, "amount exceeding range"
+
+    # shift only if the amount is non-zero
+    if shift_amount > 0:
+        image_mat = np.right_shift(image_mat, shift_amount)
+    elif shift_amount < 0:
+        image_mat = np.left_shift(image_mat, abs(shift_amount))
+
+    hash_0 = hash_fn(image_mat)
+
+    # Rot 90
+    image_mat = np.rot90(image_mat, k=1, axes=(0, 1))
+    hash_90 = hash_fn(image_mat)
+
+    # Rot 180
+    image_mat = np.rot90(image_mat, k=1, axes=(0, 1))
+    hash_180 = hash_fn(image_mat)
+
+    # Rot 270
+    image_mat = np.rot90(image_mat, k=1, axes=(0, 1))
+    hash_270 = hash_fn(image_mat)
+
+    return hash_0, hash_90, hash_180, hash_270
+
+
 def compute_img_hashes(image_mat: np.ndarray,
                        temp_dir: str,
                        temp_name: str,
