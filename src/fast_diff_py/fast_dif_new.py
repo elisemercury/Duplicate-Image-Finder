@@ -608,6 +608,7 @@ class FastDifPy(GracefulWorker):
             # Store the results
             self.store_batch_first_loop(results)
 
+        self.cmd_queue = None
         if self.run:
             self.config.state = Progress.FIRST_LOOP_DONE
 
