@@ -136,6 +136,14 @@ class SQLiteDB(BaseSQliteDB):
     # Dir Table
     # ==================================================================================================================
 
+    def dir_table_exists(self):
+        """
+        Check if the directory table exists
+        """
+        stmt = "SELECT name FROM sqlite_master WHERE type='table' AND name='directory'"
+        self.debug_execute(stmt)
+        return self.sq_cur.fetchone() is not None
+
     def bulk_insert_file(self, path: str, filenames: List[str], dir_b: bool = False):
         """
         Insert a folder of files into the database
