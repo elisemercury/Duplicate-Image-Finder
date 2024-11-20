@@ -93,6 +93,18 @@ class FastDifPy(GracefulWorker):
         self.logger.addHandler(qh)
         self.start_logging()
 
+        # Step 1:
+        # Determine if there is already something in progress:
+        default_cfg_path = os.path.join(dir_a, ".task.json") if default_cfg_path is None else default_cfg_path
+        if os.path.exists(default_cfg_path):
+            with open(default_cfg_path, "r") as f:
+                cfg = Config.model_validate_json(f.read())
+
+            self.config = cfg
+
+            self.recover_from_config()
+            return
+
         # TODO create directories if they do not exist
 
         # check if the config exists
