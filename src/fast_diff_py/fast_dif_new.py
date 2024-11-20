@@ -73,6 +73,46 @@ class FastDifPy(GracefulWorker):
         with open(path, "w") as file:
             file.write(cfg)
 
+    def get_diff_pairs(self, delta: float) -> List[Tuple[str, str, float]]:
+        """
+        Get the diff pairs from the database. Wrapper for db.get_duplicate_pairs.
+
+        :param delta: The threshold for the difference
+
+        INFO: Needs the db to exist and be connected
+
+        :return: A list of tuples of the form (file_a, file_b, diff)
+        """
+        for p in self.db.get_duplicate_pairs(delta):
+            yield p
+
+    def get_diff_clusters(self, delta: float, dir_a: bool = True) -> List[str, Dict[str, float]]:
+        """
+        Get a Cluster of Duplicates. Wrapper for db.get_cluster.
+
+        A Cluster is characterized by a common image in either dir_a or dir_b.
+
+        :param delta: The threshold for the difference
+        :param dir_a: Whether to get the cluster for dir_a or dir_b
+
+        INFO: Needs the db to exist and be connected
+
+        :return: A list of tuples of the form (common_file, {file: diff})
+            where common_file is either always in dir_a or dir_b and the files in the dict are in the opposite directory
+        """
+        for h, d in self.db.get_cluster(delta, dir_a):
+            yield h, d
+
+    def reduce_diff(self, threshold: float):
+        """
+        Reduce the diff table based on the threshold provided. All pairs with a higher threshold are removed.
+
+        Wrapper for db.drop_diff
+
+        :param threshold: The threshold for the difference
+        """
+        self.db.drop_diff(threshold)
+
     def cleanup(self):
         """
         Clean up the FastDifPy object, stopping the logging queue,
