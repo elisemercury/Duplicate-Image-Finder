@@ -60,6 +60,9 @@ class FastDifPy(GracefulWorker):
     # ==================================================================================================================
 
     def commit(self):
+        """
+        Commit the db and the config
+        """
         self.db.commit()
         cfg = self.config.model_dump_json()
         if self.config.config_path is None:
