@@ -28,7 +28,7 @@ def remove_prefix(text, prefix):
         return text[len(prefix):]
     return text
 
-def partition(source: str, dir_a: str, dir_b: str,pd: float = 0.001, pb: float = 0.5, sym: bool = False) -> Tuple[int, int, int]:
+def partition(source: str, dir_a: str, dir_b: str,pd: float = 0.001, pb: float = 0.5, sym: bool = False, limit: int = 40000) -> Tuple[int, int, int]:
     """
     Partition mode to generate duplicates. Uses Symlinks in dir_a and dir_b to link to the files in the src directory
 
@@ -40,7 +40,8 @@ def partition(source: str, dir_a: str, dir_b: str,pd: float = 0.001, pb: float =
     :return: Number of files in dir a, number of files in dir b, number of duplicates
     """
 
-    def partition_internal(src: str, cur: str, dir_a: str, dir_b: str, pd: float, pb: float, sym: bool) -> Tuple[int, int, int]:
+    def partition_internal(src: str, cur: str, dir_a: str, dir_b: str, pd: float, pb: float, sym: bool, limit: int) \
+            -> Tuple[int, int, int]:
         a, b, d = 0, 0, 0
         abs_src = os.path.abspath(src)
         abs_a = os.path.abspath(dir_a)
@@ -50,6 +51,9 @@ def partition(source: str, dir_a: str, dir_b: str,pd: float = 0.001, pb: float =
         cb = os.path.join(abs_b, cur)
 
         for f in os.listdir(cp):
+            if a > limit and b > limit:
+                return a, b, d
+
             # If it's a directory, we need to recurse
             if os.path.isdir(os.path.join(cp, f)):
                 na, nb, nd = partition_internal(src, os.path.join(cur, f), dir_a, dir_b, pd, pb, sym)
