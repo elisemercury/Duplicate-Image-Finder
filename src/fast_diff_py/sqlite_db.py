@@ -141,6 +141,12 @@ class SQLiteDB(BaseSQliteDB):
         tgt = [(os.path.join(path, f), f, _dir_b) for f in filenames]
         self.debug_execute_many(stmt, tgt)
 
+    def reset_preprocessing(self):
+        """
+        Reset the Preprocessing flag of -2 in the dir table
+        """
+        self.debug_execute("UPDATE directory SET success = -1 WHERE success = -2")
+
     def batch_of_preprocessing_args(self, batch_size: int) -> List[PreprocessArg]:
         """
         Get a batch of preprocessing args
