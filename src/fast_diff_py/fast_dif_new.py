@@ -806,6 +806,14 @@ class FastDifPy(GracefulWorker):
             if batch_args is True:
                 raise ValueError("Cannot make diff plots with batched processing")
 
+
+        if not parallel:
+            if use_ram_cache is not None and use_ram_cache is False:
+                raise ValueError("Cannot run without parallel processing and without ram cache")
+
+            if batch_args is not None and batch_args is True:
+                raise ValueError("Cannot run without parallel processing and with batched processing")
+
         if cpu_proc is None:
             cpu_proc = os.cpu_count()
         if gpu_proc is None:
