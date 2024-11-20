@@ -1021,9 +1021,11 @@ class FastDifPy(GracefulWorker):
             self.config.second_loop = SecondLoopRuntimeConfig.model_validate(self.config.second_loop.model_dump())
 
         # Update the database
+        self.logger.info("Prepopulating the diff table. Do not Interrupt")
         self.db.prepopulate_diff_table(has_dir_b=self.config.root_dir_b is not None,
                                        block_size=self.config.second_loop.batch_size)
         self.db.commit()
+        self.logger.info(f"Done with prepopulating the diff table")
 
         if self.config.second_loop.parallel is False:
             self.sequential_second_loop()
