@@ -56,6 +56,17 @@ class FastDifPy(GracefulWorker):
     # Util
     # ==================================================================================================================
 
+    def commit(self):
+        self.db.commit()
+        cfg = self.config.model_dump_json()
+        if self.config.config_path is None:
+            path = os.path.join(self.config.root_dir_a, ".task.json")
+        else:
+            path = self.config.config_path
+
+        with open(path, "w") as file:
+            file.write(cfg)
+
     def cleanup(self):
         """
         Clean up the FastDifPy object, stopping the logging queue,
