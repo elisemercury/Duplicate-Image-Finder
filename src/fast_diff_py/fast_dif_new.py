@@ -117,6 +117,18 @@ class FastDifPy(GracefulWorker):
         """
         Clean up the FastDifPy object, stopping the logging queue,
         """
+        if self.config.delete_db:
+            self.logger.info(f"Closing DB and deleting DB at {self.config.db_path}")
+            self.db.close()
+            os.remove(self.config.db_path)
+
+        if self.config.delete_thumb:
+            self.logger.info(f"Deleting Thumbnail Directory at {self.config.thumb_dir}")
+            shutil.rmtree(self.config.thumb_dir)
+
+        self.logger.info("Removing Task File")
+        shutil.rmtree(self.config.thumb_dir)
+
         if self.ql is not None:
             self.ql.stop()
 
