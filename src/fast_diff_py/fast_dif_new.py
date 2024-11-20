@@ -206,8 +206,13 @@ class FastDifPy(GracefulWorker):
         if not os.path.exists(self.config.db_path):
             raise ValueError(f"Database does not exist at {self.config.db_path}")
 
-        # Connect to the DB
-        self.db = SQLiteDB(self.config.db_path, debug=__debug__)
+        try:
+            # Connect to the DB
+            self.db = SQLiteDB(self.config.db_path, debug=__debug__)
+        except Exception as e:
+            if not self.config.state != Progress.SECOND_LOOP_POPULATING:
+                self.logger.exception("Exception while connecting to the database", exc_info=e)
+            self.db = None
 
         # Check the root dir a
         if not os.path.exists(self.config.root_dir_a):
