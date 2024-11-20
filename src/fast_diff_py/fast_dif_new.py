@@ -436,7 +436,7 @@ class FastDifPy(GracefulWorker):
                 s = datetime.datetime.now(datetime.UTC)
                 dequeue_fn()
                 dequeue_time += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
-                self.db.commit()
+                self.commit()
 
             # Send the stop signal
             self.send_stop_signal()
@@ -453,9 +453,9 @@ class FastDifPy(GracefulWorker):
                     self.logger.info(f"Done with {self._dequeue_counter} {task}")
                     self._last_dequeue_counter = self._dequeue_counter
 
-                self.db.commit()
+                self.commit()
 
-            self.db.commit()
+            self.commit()
             self.multiprocessing_epilogue()
 
             end = datetime.datetime.now(datetime.UTC)
@@ -482,7 +482,7 @@ class FastDifPy(GracefulWorker):
 
             # Precondition -> Two times batch-size has been submitted to the queue
             dequeue_fn()
-            self.db.commit()
+            self.commit()
 
         # Send the stop signal
         self.send_stop_signal()
@@ -497,9 +497,9 @@ class FastDifPy(GracefulWorker):
                 self.logger.info(f"Done with {self._dequeue_counter} {task}")
                 self._last_dequeue_counter = self._dequeue_counter
 
-            self.db.commit()
+            self.commit()
 
-        self.db.commit()
+        self.commit()
         self.multiprocessing_epilogue()
 
     # ==================================================================================================================
