@@ -235,11 +235,15 @@ class FastDifPy(GracefulWorker):
             if len(files) > self.config.batch_size_dir:
                 # Store files in the db
                 self.db.bulk_insert_file(path, files, not dir_a)
+                self._enqueue_counter += len(files)
+                self.logger.info(f"Indexed {self._enqueue_counter} files")
                 files = []
 
             # Start recursion early, if there is too much in RAM
             if len(dirs) + dir_count > self.config.batch_size_dir:
                 # Dump the files
+                self._enqueue_counter += len(files)
+                self.logger.info(f"Indexed {self._enqueue_counter} files")
                 self.db.bulk_insert_file(path, files, not dir_a)
                 files = []
 
@@ -252,6 +256,8 @@ class FastDifPy(GracefulWorker):
                                            dir_count=dir_count + len(dirs))
 
         # Store files in the db
+        self._enqueue_counter += len(files)
+        self.logger.info(f"Indexed {self._enqueue_counter} files")
         self.db.bulk_insert_file(path, files, not dir_a)
 
         # Recurse through the directories
