@@ -50,6 +50,7 @@ class ChildProcess(GracefulWorker):
         """
         Main function to run the child process
         """
+        self.register_interrupts()
         self.set_processing_function()
 
         count = 0
