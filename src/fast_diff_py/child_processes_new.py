@@ -248,7 +248,7 @@ class FirstLoopWorker(ChildProcess):
 
             return PreprocessResult(key=arg.key,
                                     org_x=sz[0], org_y=sz[1],
-                                    hash_0=hash_0, hash_90=hash_90, hash_180=hash_180, hash_270=hash_270)
+                                    hash_0=h0, hash_90=h90, hash_180=h180, hash_270=h270)
         except Exception as e:
             self.logger.error(f"Error in processing batch: {e}")
             tb = traceback.format_exc()
