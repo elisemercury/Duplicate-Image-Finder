@@ -490,8 +490,14 @@ class SQLiteDB(BaseSQliteDB):
         """
         Insert the error of the diff into the database
         """
-        args = [(to_b64(value), key) for key, value in errors.items()]
-        stmt = "UPDATE dif_table SET error = ?, dif = -1.0, success = 0 WHERE key = ?"
+        # Set errors in the dif_table
+        args = [(key,) for key, value in errors.items()]
+        stmt = "UPDATE dif_table SET success = 0 WHERE key = ?"
+        self.debug_execute_many(stmt, args)
+
+        # Insert the errors
+        args = [(key, to_b64(value)) for key, value in errors.items()]
+        stmt = "INSERT INTO dif_error_table (key, error) VALUES (?, ?)"
         self.debug_execute_many(stmt, args)
 
     def get_item_block(self, block_key: int, include_block_key: bool = False) -> \
