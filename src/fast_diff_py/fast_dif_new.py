@@ -790,20 +790,20 @@ class FastDifPy(GracefulWorker):
                         make_diff_plots: bool = None,
                         plot_output_dir: str = None,
                         diff_threshold: float = None,
-                        batched_processing: bool = None,
+                        batch_args: bool = None,
                         use_ram_cache: bool = None,
                         parallel: bool = None,
                         ) -> SecondLoopRuntimeConfig:
 
         if skip_matching_hash is not None or match_aspect_by is not None:
-            if batched_processing is True:
+            if batch_args is True:
                 raise ValueError("Cannot skip matching hash or non-matching aspect ratio with batched processing")
 
         if make_diff_plots is not None:
             if plot_output_dir is None or diff_threshold is None:
                 raise ValueError("Need plot output directory and diff threshold to make diff plots")
 
-            if batched_processing is True:
+            if batch_args is True:
                 raise ValueError("Cannot make diff plots with batched processing")
 
         if cpu_proc is None:
@@ -831,7 +831,7 @@ class FastDifPy(GracefulWorker):
                 "make_diff_plots": make_diff_plots,
                 "plot_output_dir": plot_output_dir,
                 "diff_threshold": diff_threshold,
-                "batched_processing": batched_processing,
+                "batch_args": batch_args,
                 "batch_size": batch_size,
                 "use_ram_cache": use_ram_cache,
                 "parallel": parallel}
