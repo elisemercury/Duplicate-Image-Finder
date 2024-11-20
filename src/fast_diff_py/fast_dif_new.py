@@ -812,6 +812,10 @@ class FastDifPy(GracefulWorker):
             self.logger.error("Cannot run the second loop without compression")
             return False
 
+        # Create the plot output directory
+        if not os.path.exists(cfg.plot_output_dir):
+            os.makedirs(cfg.plot_output_dir)
+
         return True
 
     def second_loop_arg(self,
