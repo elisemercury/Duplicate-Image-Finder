@@ -313,7 +313,7 @@ class FastDifPy(GracefulWorker):
         # Check if the directories are subdirectories of each other
         if self.check_directories():
 
-            # TODO perform cleanup
+            self.cleanup()
             raise ValueError("The two provided subdirectories are subdirectories of each other. Cannot proceed")
 
         self._enqueue_counter = 0
