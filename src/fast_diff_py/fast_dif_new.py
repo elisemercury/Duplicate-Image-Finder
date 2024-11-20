@@ -141,6 +141,24 @@ class FastDifPy(GracefulWorker):
         self.result_queue = mp.Queue()
         self.register_interrupts()
 
+    def recover_from_config(self):
+        """
+        Recover the FastDifPy object from the config
+        """
+        # Check the DB
+        if not os.path.exists(self.config.db_path):
+            raise ValueError(f"Database does not exist at {self.config.db_path}")
+
+        if not os.path.exists(self.config.root_dir_a):
+            raise ValueError(f"Directory A does not exist at {self.config.root_dir_a}")
+
+        if self.config.root_dir_b is not None and not os.path.exists(self.config.root_dir_b):
+            raise ValueError(f"Directory B does not exist at {self.config.root_dir_b}")
+
+        if self.config.second_loop.make_diff_plots and not os.path.exists(self.config.second_loop.plot_output_dir):
+            os.makedirs(self.config.second_loop.plot_output_dir)
+
+
     # ==================================================================================================================
     # Indexing
     # ==================================================================================================================
