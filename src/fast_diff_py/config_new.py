@@ -96,9 +96,6 @@ class Config(BaseModel):
     thumb_dir: Optional[str] = Field(None,
                             description="The directory to store the thumbnails")
 
-    similarity_threshold: float = Field(200.0,
-                                        description="The threshold for similarity between images")
-
     ignore_names: List[str] = Field([],
                                     description="The names of the directories or files to ignore")
     ignore_paths: List[str] = Field([],
