@@ -56,7 +56,7 @@ def partition(source: str, dir_a: str, dir_b: str,pd: float = 0.001, pb: float =
 
             # If it's a directory, we need to recurse
             if os.path.isdir(os.path.join(cp, f)):
-                na, nb, nd = partition_internal(src, os.path.join(cur, f), dir_a, dir_b, pd, pb, sym)
+                na, nb, nd = partition_internal(src, os.path.join(cur, f), dir_a, dir_b, pd, pb, sym, limit)
                 a += na
                 b += nb
                 d += nd
@@ -107,7 +107,8 @@ def partition(source: str, dir_a: str, dir_b: str,pd: float = 0.001, pb: float =
 
         return a, b, d
 
-    return partition_internal(source, "", dir_a, dir_b, pd, pb, sym=sym)
+    return partition_internal(source, "", dir_a, dir_b, pd, pb, sym=sym, limit=limit)
+
 
 def duplicate(src: str, dst: str, pc: float = 0.5) -> Tuple[int, int]:
     """
@@ -123,4 +124,6 @@ def duplicate(src: str, dst: str, pc: float = 0.5) -> Tuple[int, int]:
 
 
 if __name__ == "__main__":
-    print(partition(source="/media/alisot2000/MacBeth/dedup_benchmarks/TQ-Picture-Benchmark/", dir_a="/media/alisot2000/MacBeth/workbench/dir_a", dir_b="/media/alisot2000/MacBeth/workbench/dir_b", pd=0.01, pb=0.5))
+    print(partition(source="/media/alisot2000/MacBeth/dedup_benchmarks/IMDB-Bench/",
+                    dir_a="/media/alisot2000/MacBeth/workbench_large/dir_a",
+                    dir_b="/media/alisot2000/MacBeth/workbench_large//dir_b", pd=0.01, pb=0.5))
