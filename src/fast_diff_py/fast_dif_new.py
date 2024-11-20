@@ -262,6 +262,27 @@ class FastDifPy(GracefulWorker):
     # Indexing
     # ==================================================================================================================
 
+    def full_index(self, chain: bool = False):
+        """
+        Full index performs all actions associated with indexing the files
+        """
+        # Create the table
+        self.db.create_directory_table_and_index()
+
+        # Index the directories
+        self.perform_index()
+
+        # Switch the directories if necessary
+        self.cond_switch_a_b()
+
+        # Set the keys to zero index
+        self.db.set_keys_zero_index()
+
+        self.commit()
+
+        if chain:
+            self.first_loop(chain=True)
+
     def check_directories(self) -> bool:
         """
         Check they if they are subdirectories of each other.
