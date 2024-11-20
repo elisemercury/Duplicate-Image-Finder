@@ -1,10 +1,11 @@
+import datetime
 import logging
 import multiprocessing as mp
 import os.path
+import shutil
 import time
-import datetime
 from logging.handlers import QueueListener
-from typing import List, Union, Callable, Dict, Optional
+from typing import List, Union, Callable, Dict, Optional, Tuple
 
 import numpy as np
 
@@ -18,8 +19,10 @@ from fast_diff_py.datatransfer_new import (PreprocessResult, BatchCompareArgs, I
 from fast_diff_py.sqlite_db import SQLiteDB
 from fast_diff_py.utils import sizeof_fmt
 
+
 class FastDifPy(GracefulWorker):
     db: SQLiteDB
+    config_path: str
     config: Config
     logger: logging.Logger
 
