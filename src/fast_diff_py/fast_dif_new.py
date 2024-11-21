@@ -98,7 +98,7 @@ class FastDifPy(GracefulWorker):
         for p in self.db.get_duplicate_pairs(delta):
             yield p
 
-    def get_diff_clusters(self, delta: float, dir_a: bool = True) -> Tuple[str, Dict[str, float]]:
+    def get_diff_clusters(self, delta: float = None, dir_a: bool = True) -> Tuple[str, Dict[str, float]]:
         """
         Get a Cluster of Duplicates. Wrapper for db.get_cluster.
 
@@ -112,6 +112,12 @@ class FastDifPy(GracefulWorker):
         :return: A list of tuples of the form (common_file, {file: diff})
             where common_file is either always in dir_a or dir_b and the files in the dict are in the opposite directory
         """
+        if delta is not None and delta is not None and delta > self.config.second_loop.diff_threshold:
+            self.logger.warning("Delta is greater than the threshold. Result may not include all pairs")
+
+        if delta is None:
+            delta = self.config.second_loop.diff_threshold
+
         for h, d in self.db.get_cluster(delta, dir_a):
             yield h, d
 
