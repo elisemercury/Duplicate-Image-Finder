@@ -66,10 +66,8 @@ class SecondLoopConfig(BaseModel):
 
     batch_size: Optional[int] = Field(None,
                                         description="The batch size for the second loop")
-    batch_args: bool = Field(True,
-                             description="Whether to do blocking in the second loop, if False, the second loop "
-                                                 "will use item submission")
-    diff_threshold: Optional[float] = Field(None,
+
+    diff_threshold: float = Field(200.0,
                                     description="The threshold for similarity between images")
     gpu_proc: int = Field(0,
                           description="The number of GPU processes to use for the second loop")
