@@ -328,13 +328,18 @@ class SecondLoopWorker(ChildProcess):
             self.cache_key = cache_key
             self.cache = copy.deepcopy(self.ram_cache[self.cache_key])
 
-    def generic_fetch_image(self, key: int = None, path: str = None, is_x: bool = True) -> np.ndarray[np.uint8]:
+    def match_aspect_ratio_by(self, x: Tuple[int, int], y: Tuple[int, int]) -> bool:
         """
-        Generic function to fetch an image
+        Matches the aspect ratio within a certain interval
         """
-        raise NotImplementedError("This function needs to be implemented in the child class")
+        xa = x[0] / x[1] if x[0] > x[1] else x[1] / x[0]
+        ya = y[0] / y[1] if y[0] > y[1] else y[1] / y[0]
+
+        assert xa >= 1, "Aspect Ratio is less than 1"
+        assert ya >= 1, "Aspect Ratio is less than 1"
 
     def get_image_from_cache(self, key: int, is_x: bool = True, **kwargs) -> np.ndarray[np.uint8]:
+        return xa * self.match_aspect_by >= ya >= xa / self.match_aspect_by
         """
         Get an image from the cache
 
