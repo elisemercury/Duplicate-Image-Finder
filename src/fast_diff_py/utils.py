@@ -113,112 +113,40 @@ def sizeof_fmt(num: Union[int, float], suffix: str = "B", base2: bool = False) -
         return f"{num:.1f}Y{suffix}"
 
 
-
-def h(x: int, unit: str, base2: bool = False) -> str:
+def build_start_blocks_ab(a_size: int, b_size: int, block: int):
     """
-    Convert an integer representing a byte number into a human-readable format. I.e. 3 digits of precision.
+    Build a list that contains the upper left corner of each block for blocking matrix multiplication. (None Symmetric)
 
-    :param x: number to convert
-    :param unit: unit to use (e.g. "B" for bytes)
-    :param base2: use base 2 (1024) or base 10 (1000) for conversion
+    :param a_size: Number of rows
+    :param b_size: Number of columns
+    :param block: size of blocks into which to partition the matrix
     """
+    a_start = [a for a in range(0, a_size, block)]
+    b_start = [b for b in range(0, b_size, block)]
+    start_vtx = []
 
-    if x == 0:
-        return f"{x} {unit}"
+    for elm in itertools.product(a_start, b_start):
+        start_vtx.append(BlockProgress(x=elm[0], y=elm[1]))
 
-    if base2:
-        digits = math.log2(x) / 10
+    return start_vtx
 
-        # Quetti-sth (Quetta)
-        if digits > 30:
-            return f"{x / 2 ** 300:.3f} Qi{unit}"
 
-        # Ronni-sth (Ronna)
-        elif digits > 27:
-            return f"{x / 2 ** 270:.3f} Ri{unit}"
+def build_start_blocks_a(a_size: int, block: int):
+    """
+    Build a list that contains the upper left corner of each block for blocking matrix multiplication. (Symmetric)
 
-        # Yotti-sth (Yotta)
-        elif digits > 24:
-            return f"{x / 2 ** 240:.3f} Yi{unit}"
+    :param a_size: Size of Matrix in rows and columns
+    :param block: size of blocks into which to partiton the matrix
+    """
+    a_start = [a for a in range(0, a_size, block)]
+    start_vtx = []
 
-        # Zetti-sth (Zetta)
-        elif digits > 21:
-            return f"{x / 2 ** 210:.3f} Zi{unit}"
+    for elm in itertools.product(a_start, a_start):
+        if elm[0] <= elm[1]:
+            start_vtx.append(BlockProgress(x=elm[0], y=elm[1]))
+    start_vtx.sort(key=lambda b: (b.y> - b.x, b.x + b.y))
 
-        # Exi-sth (Exa)
-        elif digits > 18:
-            return f"{x / 2 ** 180:.3f} Ei{unit}"
-
-        # Petti-sth (Peta)
-        elif digits > 15:
-            return f"{x / 2 ** 150:.3f} Pi{unit}"
-
-        # Tetti-sth (Tera)
-        elif digits > 12:
-            return f"{x / 2 ** 120:.3f} Ti{unit}"
-
-        # Gigi-sth (Giga)
-        elif digits > 9:
-            return f"{x / 2 ** 90:.3f} Gi{unit}"
-
-        # Megi-sth (Mega)
-        elif digits > 6:
-            return f"{x / 2 ** 60:.3f} Mi{unit}"
-
-        # Kili-sth (Kilo)
-        elif digits > 3:
-            return f"{x / 2 ** 30:.3f} Ki{unit}"
-
-        # Default
-        else:
-            return f"{x} {unit}"
-
-    else:
-        digits = math.log10(x)
-
-        # Quetta-sth (Quetta)
-        if digits > 30:
-            return f"{x / 10 ** 30:.3f} Q{unit}"
-
-        # Ronna-sth (Ronna)
-        elif digits > 27:
-            return f"{x / 10 ** 27:.3f} R{unit}"
-
-        # Yotta-sth (Yotta)
-        elif digits > 24:
-            return f"{x / 10 ** 24:.3f} Y{unit}"
-
-        # Zetta-sth (Zetta)
-        elif digits > 21:
-            return f"{x / 10 ** 21:.3f} Z{unit}"
-
-        # Exa-sth (Exa)
-        elif digits > 18:
-            return f"{x / 10 ** 18:.3f} E{unit}"
-
-        # Petta-sth (Peta)
-        elif digits > 15:
-            return f"{x / 10 ** 15:.3f} P{unit}"
-
-        # Tetta-sth (Tera)
-        elif digits > 12:
-            return f"{x / 10 ** 12:.3f} T{unit}"
-
-        # Giga-sth (Giga)
-        elif digits > 9:
-            return f"{x / 10 ** 9:.3f} G{unit}"
-
-        # Mega-sth (Mega)
-        elif digits > 6:
-            return f"{x / 10 ** 6:.3f} M{unit}"
-
-        # Kilo-sth (Kilo)
-        elif digits > 3:
-            return f"{x / 10 ** 3:.3f} K{unit}"
-
-        # Default
-        else:
-            return f"{x} {unit}"
+    return start_vtx
 
 
 def to_b64(to_encode: Any):
