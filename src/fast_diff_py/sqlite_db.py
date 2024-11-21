@@ -397,75 +397,6 @@ class SQLiteDB(BaseSQliteDB):
     # Diff Table
     # ==================================================================================================================
 
-    def prepopulate_diff_table(self, block_size: int, has_dir_b: bool = False):
-        """
-        Prepopulate the diff table with the keys
-
-        :param block_size: The block size for cache optimization
-        :param has_dir_b: Whether the table has a dir_b column
-        """
-        # Populate the Table with all diff entries that will exist
-        if has_dir_b:
-            stmt = ("INSERT INTO dif_table (key_a, key_b) "
-                    "SELECT a.key, b.key FROM directory AS a CROSS JOIN directory AS b "
-                    "WHERE a.dir_b = 0 AND b.dir_b = 1 "
-                    "ORDER BY a.key, b.key")
-        else:
-            stmt = ("INSERT INTO dif_table (key_a, key_b) "
-                    "SELECT a.key, b.key FROM directory AS a CROSS JOIN directory AS b "
-                    "WHERE a.key < b.key "
-                    "ORDER BY a.key, b.key")
-
-        # Prepopulating the table
-        self.debug_execute(stmt)
-
-        # Set the blocks
-        if has_dir_b:
-            stmt = ("UPDATE dif_table "
-                    "SET block_a = key_a / ?, "
-                    "block_b = (key_b - (SELECT MIN(key) FROM directory WHERE dir_b = 1)) / ?")
-
-        else:
-            stmt = ("UPDATE dif_table "
-                    "SET block_a = key_a / ?, "
-                    "block_b = key_b / ?")
-
-        # We get the blocks
-        self.debug_execute(stmt, (block_size, block_size))
-
-        # -- Convert the blocks to block keys --
-        # Drop table if it exists
-        self.debug_execute("DROP TABLE IF EXISTS block_key_temp")
-
-        # Create a temporary table
-        stmt = ("CREATE TABLE block_key_temp "
-                "(key INTEGER PRIMARY KEY AUTOINCREMENT, "
-                "block_a INTEGER, "
-                "block_b INTEGER, "
-                "UNIQUE (block_a, block_b))")
-        self.debug_execute(stmt)
-
-        # Insert the block keys
-        if has_dir_b:
-            # Indexing along x and y
-            stmt = ("INSERT INTO block_key_temp (block_a, block_b) "
-                    "SELECT DISTINCT block_a, block_b FROM dif_table ORDER BY block_a, block_b;")
-        else:
-            # Indexing along the diagonals
-            stmt = ("INSERT INTO block_key_temp (block_a, block_b) "
-                    "SELECT DISTINCT block_a, block_b FROM dif_table ORDER BY (block_b - block_a), (block_b + block_a);")
-
-        self.debug_execute(stmt)
-
-        # Update the block_keys from the temp table
-        stmt = ("UPDATE dif_table "
-                "SET block_key = (SELECT key FROM block_key_temp "
-                "                 WHERE block_a = dif_table.block_a AND block_b = dif_table.block_b);")
-        self.debug_execute(stmt)
-
-        # Drop the temporary table
-        self.debug_execute("DROP TABLE block_key_temp")
-
     # TODO:
     #  Add a function which short circuits hash and aspect ratio comparison
 
@@ -723,25 +654,8 @@ class SQLiteDB(BaseSQliteDB):
                 head = int_head
                 acc = [row]
 
-    def get_min_cache_key(self):
-        """
-        For a restart of the second loop, get the cache key that is the smallest and
-        doesn't have all the values filled in
-        """
-        self.debug_execute("SELECT MIN(batch_key) FROM cache_table WHERE success = -1")
-        return self.sq_cur.fetchone()[0]
-
     def drop_diff(self, threshold: float):
         """
         Drop all diffs above a certain threshold
         """
         self.debug_execute("DELETE FROM dif_table WHERE dif > ?", (threshold,))
-
-    def make_backup(self, backup_path: str):
-        """
-        Make a backup of the database
-        """
-        self.commit()
-        self.close()
-        shutil.copy(self.db_path, backup_path)
-        self.connect(self.db_path)
