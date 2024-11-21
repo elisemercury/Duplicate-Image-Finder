@@ -156,6 +156,13 @@ class FastDifPy(GracefulWorker):
         self.logger.addHandler(qh)
         self.start_logging()
 
+        # Try to recover from the config
+        if config is not None:
+            self.config = config
+
+            self.recover_from_config(abort_recover)
+            return
+
         # Step 1:
         # Determine if there is already something in progress:
         self.config_path = os.path.join(dir_a, ".task.json") if default_cfg_path is None else default_cfg_path
