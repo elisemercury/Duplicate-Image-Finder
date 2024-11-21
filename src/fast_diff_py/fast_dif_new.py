@@ -90,7 +90,7 @@ class FastDifPy(GracefulWorker):
         for p in self.db.get_duplicate_pairs(delta):
             yield p
 
-    def get_diff_clusters(self, delta: float, dir_a: bool = True) -> List[str, Dict[str, float]]:
+    def get_diff_clusters(self, delta: float, dir_a: bool = True) -> Tuple[str, Dict[str, float]]:
         """
         Get a Cluster of Duplicates. Wrapper for db.get_cluster.
 
