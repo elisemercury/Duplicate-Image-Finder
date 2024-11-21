@@ -174,15 +174,13 @@ class FastDifPy(GracefulWorker):
             self.config = cfg
 
             # Perform progress recovery
-            self.recover_from_config()
+            self.recover_from_config(abort_recover)
             return
 
         # Step 2:
-        # Create a new config
-        if config is None:
-            self.config = Config(root_dir_a=dir_a, root_dir_b=dir_b)
-        else:
-            self.config = config
+        # Create a new config and start fresh
+        assert config is None, "Config should be None"
+        self.config = Config(root_dir_a=dir_a, root_dir_b=dir_b)
 
         # Step 3
         # Path to the DB:
