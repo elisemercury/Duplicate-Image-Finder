@@ -145,7 +145,8 @@ class FastDifPy(GracefulWorker):
             shutil.rmtree(self.config.thumb_dir)
 
         self.logger.info("Removing Task File")
-        shutil.rmtree(self.config.thumb_dir)
+        if os.path.exists(self.config_path):
+            os.remove(self.config_path)
 
         if self.ql is not None:
             self.ql.stop()
