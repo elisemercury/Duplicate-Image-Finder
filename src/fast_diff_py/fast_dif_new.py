@@ -49,7 +49,10 @@ class FastDifPy(GracefulWorker):
     #
     # If they have, we move to the next block, drop the current cache index, and decrement the progress_counter by the
     # number of keys in the dict we're about to delete
+    blocks: List[BlockProgress] = []
     block_progress_dict: Dict[int, Dict[int, bool]] = {}
+    dir_a_count: Optional[int] = None
+    dir_b_count: Optional[int] = None
 
     hash_fn: Callable = None
     cpu_diff: Callable[[np.ndarray[np.uint8], np.ndarray[np.uint8]], float] = None
