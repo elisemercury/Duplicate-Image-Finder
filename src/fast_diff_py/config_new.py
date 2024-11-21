@@ -60,8 +60,7 @@ class SecondLoopConfig(BaseModel):
     plot_output_dir: Optional[str] = Field(None,
                                            description="the directory to store the diff plots"
                                                        "\n Must be set in conjunction with the make_diff_plots flag")
-    use_ram_cache: bool = Field(True,
-                                description="Whether to use the RAM cache for the second loop")
+
     parallel: bool = Field(True,
                            description="Whether to run the second loop in parallel")
 
