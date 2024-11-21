@@ -14,7 +14,6 @@ class Progress(str, Enum):
     INDEXED_DIRS = "indexed_dirs"
     FIRST_LOOP_IN_PROGRESS = "first_loop_in_progress"
     FIRST_LOOP_DONE = "first_loop_done"
-    SECOND_LOOP_POPULATING = "second_loop_populating"
     SECOND_LOOP_IN_PROGRESS = "second_loop_in_progress"
     SECOND_LOOP_DONE = "second_loop_done"
 
