@@ -255,6 +255,9 @@ class FastDifPy(GracefulWorker):
         if not os.path.exists(self.config.thumb_dir):
             os.makedirs(self.config.thumb_dir)
 
+        if abort:
+            return
+
         # Drop the directory table and perform index again
         if self.config.state == Progress.INIT and self.db.dir_table_exists():
             self.logger.info(f"We're in the INIT state, but the directory table exists. Dropping the table")
