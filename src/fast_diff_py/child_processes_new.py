@@ -300,13 +300,11 @@ class SecondLoopWorker(ChildProcess):
                          timeout=timeout)
 
         # Flags
-        self.is_compressed = is_compressed
         self.has_dir_b = has_dir_b
         self.target_size = target_size
         self.ram_cache = ram_cache
         self.plot_dir = plot_dir
         self.plot_threshold = plot_threshold
-        self.batched_args = batched_args
         self.thumb_dir = thumb_dir
 
         self.delta_fn = compare_fn
