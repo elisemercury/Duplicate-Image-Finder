@@ -83,10 +83,9 @@ class SecondLoopRuntimeConfig(SecondLoopConfig):
                                 description="The index of the cache")
 
 class Config(BaseModel):
-    compression_target_x: int = Field(64,
-                                      description="The target width for the compressed images")
-    compression_target_y: int = Field(64,
-                                      description="The target height for the compressed images")
+    compression_target: int = Field(64,
+                                    description="The target size of compressed images i.e. "
+                                                "size = (compression_target * compression_target)")
 
     root_dir_a: str = Field(...,
                             description="The root directory of the first set of images")

@@ -480,7 +480,7 @@ class FastDifPy(GracefulWorker):
                     identifier=i,
                     compress=self.config.first_loop.compress,
                     do_hash=self.config.first_loop.compute_hash,
-                    target_size=(self.config.compression_target_x, self.config.compression_target_y),
+                    target_size=(self.config.compression_target, self.config.compression_target),
                     cmd_queue=self.cmd_queue,
                     res_queue=self.result_queue,
                     log_queue=self.logging_queue,
@@ -509,7 +509,7 @@ class FastDifPy(GracefulWorker):
                     log_queue=self.logging_queue,
                     is_compressed=self.config.first_loop.compress,
                     compare_fn=self.cpu_diff if i < self.config.second_loop.cpu_proc else self.gpu_diff,
-                    target_size=(self.config.compression_target_x, self.config.compression_target_y),
+                    target_size=(self.config.compression_target, self.config.compression_target),
                     log_level=self.config.log_level_children,
                     timeout=self.config.child_proc_timeout,
                     has_dir_b=self.config.root_dir_b is not None,
@@ -726,7 +726,7 @@ class FastDifPy(GracefulWorker):
             self.logger.info(f"Entries in {self.config.root_dir_b}: {dir_b_count}")
             self.logger.info(f"Total Entries: {dir_a_count + dir_b_count}")
 
-        total = (dir_a_count + dir_b_count) * self.config.compression_target_x * self.config.compression_target_y * 3
+        total = (dir_a_count + dir_b_count) * self.config.compression_target * self.config.compression_target * 3
         if do_print:
             self.logger.info(f"Total Storage Usage: {sizeof_fmt(total)}")
 
@@ -747,7 +747,7 @@ class FastDifPy(GracefulWorker):
             identifier=-1,
             compress=self.config.first_loop.compress,
             do_hash=self.config.first_loop.compute_hash,
-            target_size=(self.config.compression_target_x, self.config.compression_target_y),
+            target_size=(self.config.compression_target, self.config.compression_target),
             cmd_queue=self.cmd_queue,
             res_queue=self.result_queue,
             log_queue=self.logging_queue,
@@ -1093,7 +1093,7 @@ class FastDifPy(GracefulWorker):
             log_queue=self.logging_queue,
             is_compressed=self.config.first_loop.compress,
             compare_fn=self.cpu_diff,
-            target_size=(self.config.compression_target_x, self.config.compression_target_y),
+            target_size=(self.config.compression_target, self.config.compression_target),
             has_dir_b=self.config.root_dir_b is not None,
             ram_cache=self.ram_cache,
             plot_dir=self.config.second_loop.plot_output_dir,
@@ -1214,7 +1214,7 @@ class FastDifPy(GracefulWorker):
 
             cache = ImageCache(offset=l,
                                size=s,
-                               img_shape=(self.config.compression_target_x, self.config.compression_target_y, 3))
+                               img_shape=(self.config.compression_target, self.config.compression_target, 3))
 
             # Load the cache
             cache.fill_thumbnails(thumbnail_dir=self.config.thumb_dir)
@@ -1226,11 +1226,11 @@ class FastDifPy(GracefulWorker):
             # We're not on the diagonal
             x = ImageCache(offset=l_x,
                            size=s_x,
-                           img_shape=(self.config.compression_target_x, self.config.compression_target_y, 3))
+                           img_shape=(self.config.compression_target, self.config.compression_target, 3))
 
             y = ImageCache(offset=l_y,
                            size=s_y,
-                           img_shape=(self.config.compression_target_x, self.config.compression_target_y, 3))
+                           img_shape=(self.config.compression_target, self.config.compression_target, 3))
 
             # Load the cache
             x.fill_thumbnails(thumbnail_dir=self.config.thumb_dir)
@@ -1269,7 +1269,7 @@ class FastDifPy(GracefulWorker):
             l = l_x
             cache = ImageCache(offset=l,
                                size=s,
-                               img_shape=(self.config.compression_target_x, self.config.compression_target_y, 3))
+                               img_shape=(self.config.compression_target, self.config.compression_target, 3))
 
             # Load the cache
             cache.fill_original(p)
@@ -1281,11 +1281,11 @@ class FastDifPy(GracefulWorker):
             # We're not on the diagonal
             x = ImageCache(offset=l_x,
                            size=len(p_x),
-                           img_shape=(self.config.compression_target_x, self.config.compression_target_y, 3))
+                           img_shape=(self.config.compression_target, self.config.compression_target, 3))
 
             y = ImageCache(offset=l_y,
                            size=len(p_y),
-                           img_shape=(self.config.compression_target_x, self.config.compression_target_y, 3))
+                           img_shape=(self.config.compression_target, self.config.compression_target, 3))
 
             # Load the cache
             x.fill_original(p_x)
