@@ -257,10 +257,13 @@ class SecondLoopWorker(ChildProcess):
     has_dir_b: bool
     target_size: Optional[Tuple[int, int]] = None
 
-    ram_cache: Optional[Dict[int, BatchCache]] = None
+    ram_cache: Dict[int, BatchCache]
+    make_plots: bool = False
     plot_dir: Optional[str] = None
     plot_threshold: Optional[float] = None
     delta_fn: Callable[[np.ndarray[np.uint8], np.ndarray[np.uint8]], float]
+    match_aspect_by: Optional[float] = None
+    match_hash: bool = False
 
     key_a: int = -1
     key_b: int = -1
@@ -288,6 +291,9 @@ class SecondLoopWorker(ChildProcess):
                  plot_dir: str = None,
                  thumb_dir: str = None,
                  plot_threshold: float = None,
+                 hash_short_circuit: bool = False,
+                 match_aspect_by: Optional[float] = None,
+                 make_plots: bool = False,
 
                  log_level: int = logging.DEBUG,
                  timeout: int = 30):
@@ -306,8 +312,11 @@ class SecondLoopWorker(ChildProcess):
         self.plot_dir = plot_dir
         self.plot_threshold = plot_threshold
         self.thumb_dir = thumb_dir
+        self.make_plots = make_plots
 
         self.delta_fn = compare_fn
+        self.match_hash = hash_short_circuit
+        self.match_aspect_by = match_aspect_by
 
         self.fetch_x = 0
         self.fetch_y = 0
