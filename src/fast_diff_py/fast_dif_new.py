@@ -80,7 +80,7 @@ class FastDifPy(GracefulWorker):
         with open(path, "w") as file:
             file.write(cfg)
 
-    def get_diff_pairs(self, delta: float) -> List[Tuple[str, str, float]]:
+    def get_diff_pairs(self, delta: float = None) -> List[Tuple[str, str, float]]:
         """
         Get the diff pairs from the database. Wrapper for db.get_duplicate_pairs.
 
@@ -90,6 +90,12 @@ class FastDifPy(GracefulWorker):
 
         :return: A list of tuples of the form (file_a, file_b, diff)
         """
+        if delta is not None and delta > self.config.second_loop.diff_threshold:
+            self.logger.warning("Delta is greater than the threshold. Result may not include all pairs")
+
+        if delta is None:
+            delta = self.config.second_loop.diff_threshold
+
         for p in self.db.get_duplicate_pairs(delta):
             yield p
 
