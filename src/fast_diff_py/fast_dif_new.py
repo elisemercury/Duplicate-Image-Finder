@@ -65,6 +65,10 @@ class FastDifPy(GracefulWorker):
         """
         self.db.commit()
         cfg = self.config.model_dump_json()
+
+        if not self.config.retain_progress:
+            return
+
         if self.config.config_path is None:
             path = os.path.join(self.config.root_dir_a, ".task.json")
         else:
