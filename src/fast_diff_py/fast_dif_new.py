@@ -31,7 +31,7 @@ class FastDifPy(GracefulWorker):
 
     # Child process perspective
     cmd_queue: Optional[mp.Queue] = None
-    result_queue: mp.Queue
+    result_queue: mp.Queue = mp.Queue()
     logging_queue: mp.Queue = mp.Queue()
     ql: logging.handlers.QueueListener = None
 
