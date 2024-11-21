@@ -147,6 +147,12 @@ class FastDifPy(GracefulWorker):
                  default_cfg_path: str = None, purge: bool = False, abort_recover: bool = True):
         """
         Initialize the FastDifPy object.
+
+        Initialization follows the following structure:
+        - First source of truth is the config parameter. If it is provided, the object isinitialized with the config.
+        - Second source of truth is the default_cfg_path. If it is provided, the object is initialized with the config
+        - Third source of truth is the .task.json file in the directory. If it is present, the object is initialized with
+            the config.
         """
         super().__init__(0)
         self.logger = logging.getLogger("FastDiffPy_Main")
