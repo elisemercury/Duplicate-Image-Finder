@@ -1,6 +1,5 @@
 import os.path
-import shutil
-from typing import List, Dict, Set, Tuple, Union
+from typing import List, Dict, Set, Tuple
 
 from fast_diff_py.datatransfer_new import PreprocessArg, PreprocessResult
 from fast_diff_py.sqlite_wrapper import BaseSQliteDB
