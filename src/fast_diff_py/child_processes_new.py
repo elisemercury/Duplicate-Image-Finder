@@ -269,9 +269,7 @@ class SecondLoopWorker(ChildProcess):
     cache_key: Optional[int] = None
     cache: Optional[BatchCache] = None
 
-    processing_fn: Union[
-        Callable[[BatchCompareArgs], BatchCompareResult],
-        Callable[[ItemCompareArgs], ItemCompareResult]]
+    processing_fn: Callable[[SecondLoopArgs], SecondLoopResults] = None
 
     def __init__(self,
                  identifier: int,
