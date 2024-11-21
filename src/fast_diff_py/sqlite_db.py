@@ -269,6 +269,95 @@ class SQLiteDB(BaseSQliteDB):
         self.drop_directory_index()
         self.create_directory_indexes()
 
+    def get_rows_directory(self, start: int, size: int, dir_b: bool = False,
+                           do_hash: bool = False, aspect: bool = False, path: bool = False) \
+            -> Tuple[List[str], List[Tuple[int, int, int, int]], List[Tuple[int, int]], List[int]]:
+        """
+        Get the rows from the directory table
+
+        :param start: The start index
+        :param size: The size of the batch
+        :param dir_b: Whether to get the rows from the dir_b table or not
+        :param do_hash: Whether to get the hash values or not
+        :param aspect: Whether to get the aspect ratio or not
+        :param path: Whether to get the path or not
+        """
+
+
+        # We want everything
+        dir_b_i = 1 if dir_b else 0
+        if do_hash and aspect and path:
+            stmt = ("SELECT key, path, hash_0, hash_90, hash_180, hash_270, px, py "
+                    "FROM directory WHERE dir_b = ? LIMIT ? OFFSET ?")
+        elif do_hash and aspect and not path:
+            stmt = ("SELECT key, hash_0, hash_90, hash_180, hash_270, px, py FROM directory "
+                    "WHERE dir_b = ? LIMIT ? OFFSET ?")
+        elif do_hash and not aspect and path:
+            stmt = ("SELECT key, path, hash_0, hash_90, hash_180, hash_270 FROM directory "
+                    "WHERE dir_b = ? LIMIT ? OFFSET ?")
+        elif do_hash and not aspect and not path:
+            stmt = "SELECT key, hash_0, hash_90, hash_180, hash_270 FROM directory WHERE dir_b = ? LIMIT ? OFFSET ?"
+        elif not do_hash and aspect and path:
+            stmt = "SELECT key, path, px, py FROM directory WHERE dir_b = ? LIMIT ? OFFSET ?"
+        elif not do_hash and aspect and not path:
+            stmt = "SELECT key, px, py FROM directory WHERE dir_b = ? LIMIT ? OFFSET ?"
+        elif not do_hash and not aspect and path:
+            stmt = "SELECT key, path FROM directory WHERE dir_b = ? LIMIT ? OFFSET ?"
+        elif not do_hash and not aspect and not path:
+            stmt = "SELECT key FROM directory WHERE dir_b = ? LIMIT ? OFFSET ?"
+            # return [], [], []
+        else:
+            raise ValueError("Tertiem Non Datur")
+
+        self.debug_execute(stmt, (dir_b, size, start))
+        rows = self.sq_cur.fetchall()
+        keys = []
+        paths = []
+        hashes = []
+        aspects = []
+
+        for row in rows:
+            if do_hash and aspect and path:
+                # stmt = "SELECT key, path, hash_0, hash_90, hash_180, hash_270, px, py FROM directory LIMIT ? OFFSET ?"
+                keys.append(row[0])
+                paths.append(row[1])
+                hashes.append((row[2], row[3], row[4], row[5]))
+                aspects.append((row[6], row[7]))
+            elif do_hash and aspect and not path:
+                # stmt = "SELECT key, hash_0, hash_90, hash_180, hash_270, px, py FROM directory LIMIT ? OFFSET ?"
+                keys.append(row[0])
+                hashes.append((row[1], row[2], row[3], row[4]))
+                aspects.append((row[5], row[6]))
+            elif do_hash and not aspect and path:
+                # stmt = "SELECT key, path, hash_0, hash_90, hash_180, hash_270 FROM directory LIMIT ? OFFSET ?"
+                keys.append(row[0])
+                paths.append(row[1])
+                hashes.append((row[2], row[3], row[4], row[5]))
+            elif do_hash and not aspect and not path:
+                # stmt = "SELECT key, hash_0, hash_90, hash_180, hash_270 FROM directory LIMIT ? OFFSET ?"
+                keys.append(row[0])
+                hashes.append((row[1], row[2], row[3], row[4]))
+            elif not do_hash and aspect and path:
+                # stmt = "SELECT key, path, px, py FROM directory LIMIT ? OFFSET ?"
+                keys.append(row[0])
+                paths.append(row[1])
+                aspects.append((row[2], row[3]))
+            elif not do_hash and aspect and not path:
+                # stmt = "SELECT key, px, py FROM directory LIMIT ? OFFSET ?"
+                keys.append(row[0])
+                aspects.append((row[1], row[2]))
+            elif not do_hash and not aspect and path:
+                # stmt = "SELECT key, path FROM directory LIMIT ? OFFSET ?"
+                keys.append(row[0])
+                paths.append(row[1])
+            elif not do_hash and not aspect and not path:
+                # stmt = "SELECT key FROM directory LIMIT ? OFFSET ?"
+                keys.append(row[0])
+            else:
+                raise ValueError("Tertiem Non Datur")
+
+        return paths, hashes, aspects, keys
+
     # ==================================================================================================================
     # Hash Table
     # ==================================================================================================================
