@@ -404,76 +404,16 @@ class SQLiteDB(BaseSQliteDB):
         """
         Insert the results of the diff into the database
         """
-        args = [(results[i], min_key_x, max_key_y - i) for i in range(len(results))]
-        stmt = "UPDATE dif_table SET dif = ?,  success = 1 WHERE key_a = ? AND key_b = ?"
+        stmt = "INSERT INTO dif_table (key_a, key_b, success, dif) VALUES (?, ?, ?, ?)"
         self.debug_execute_many(stmt, args)
 
-    def insert_batch_diff_item_result(self, key: List[int], res: List[float]):
-        """
-        Insert the results of the diff into the database
-        """
-        args = [(res[i], key[i]) for i in range(len(key))]
-        stmt = "UPDATE dif_table SET dif = ?, success = 1 WHERE key = ?"
-        self.debug_execute_many(stmt, args)
-
-    def insert_batch_diff_error(self, errors: Dict[int, str]):
+    def bulk_insert_diff_error(self, args: List[Tuple[int, int, str]]):
         """
         Insert the error of the diff into the database
         """
-        # Set errors in the dif_table
-        args = [(key,) for key, value in errors.items()]
-        stmt = "UPDATE dif_table SET success = 0 WHERE key = ?"
-        self.debug_execute_many(stmt, args)
-
-        # Insert the errors
-        args = [(key, to_b64(value)) for key, value in errors.items()]
-        stmt = "INSERT INTO dif_error_table (key, error) VALUES (?, ?)"
-        self.debug_execute_many(stmt, args)
-
-    def get_item_block(self, block_key: int, include_block_key: bool = False) -> \
-            Union[List[Tuple[int, int, int, str, str, int]], List[Tuple[int, int, int, str, str]]]:
-        """
-        Get the information for a block of items. So it can be ensured that the cache can be used. If we want to use a
-        cache, we need to include the block_key, otherwise we don't need that.
-
-        :param block_key: The block key
-        :param include_block_key: Whether to include the block key or not
-
-        :returns List of tuples with the following information:
-            - key
-            - key_a
-            - key_b
-            - path_a
-            - path_b
-            - block_key (if include_block_key is True) otherwise, this is not included
-        """
-        if include_block_key:
-            stmt = ("SELECT d.key, d.key_a, d.key_b, a.path, b.path, d.block_key "
-                    "FROM dif_table AS d JOIN directory AS a ON key_a = a.key JOIN directory AS b ON key_b = b.key "
-                    "WHERE block_key = ? AND d.success = -1")
-        else:
-            stmt = ("SELECT d.key, d.key_a, key_b, a.path, b.path "
-                    "FROM dif_table AS d JOIN directory AS a ON key_a = a.key JOIN directory AS b ON key_b = b.key "
-                    "WHERE block_key = ? AND d.success = -1")
-
-        self.debug_execute(stmt, (block_key,))
-        return self.sq_cur.fetchall()
-
-    def verify_item_block(self, block_key: int):
-        """
-        Make sure all entries in the block have been computed.
-
-        :param block_key: The block key
-
-        :return: True if all entries have been computed, False otherwise
-        """
-        stmt = "SELECT COUNT(*) FROM dif_table WHERE block_key = ? AND success = -1"
-        self.debug_execute(stmt, (block_key,))
-
-        res = self.sq_cur.fetchone()
-        assert res is not None, "Block not found"
-
-        return res[0] == 0
+        restructured_args = [(key_a, key_b, to_b64(error)) for key_a, key_b, error in args]
+        stmt = "INSERT INTO  dif_table (key_a, key_b, success, error) VALUES (?, ?, 0, ?)"
+        self.debug_execute_many(stmt, restructured_args)
 
     def get_pair_count_diff(self):
         """
