@@ -144,7 +144,7 @@ class FastDifPy(GracefulWorker):
         self.ql.start()
 
     def __init__(self, dir_a: str, dir_b: str = None, config: Config = None,
-                 default_cfg_path: str = None, purge: bool = False):
+                 default_cfg_path: str = None, purge: bool = False, abort_recover: bool = True):
         """
         Initialize the FastDifPy object.
         """
