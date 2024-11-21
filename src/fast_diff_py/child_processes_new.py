@@ -265,11 +265,6 @@ class SecondLoopWorker(ChildProcess):
     match_aspect_by: Optional[float] = None
     match_hash: bool = False
 
-    key_a: int = -1
-    key_b: int = -1
-
-    img_a_mat: Optional[np.ndarray] = None
-    img_b_mat: Optional[np.ndarray] = None
 
     cache_key: Optional[int] = None
     cache: Optional[BatchCache] = None
@@ -317,6 +312,10 @@ class SecondLoopWorker(ChildProcess):
         self.delta_fn = compare_fn
         self.match_hash = hash_short_circuit
         self.match_aspect_by = match_aspect_by
+
+        if make_plots:
+            if plot_threshold is not None or plot_dir is not None:
+                raise ValueError("Plot Threshold and Plot dir needed for plotting.")
 
         self.fetch_x = 0
         self.fetch_y = 0
