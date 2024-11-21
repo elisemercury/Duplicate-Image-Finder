@@ -212,9 +212,11 @@ class FastDifPy(GracefulWorker):
 
         self.register_interrupts()
 
-    def recover_from_config(self):
+    def recover_from_config(self, abort: bool = False):
         """
         Recover the FastDifPy object from the config
+
+        :param abort: Do not continue computation after loading config
         """
         # Check the DB
         if not os.path.exists(self.config.db_path):
