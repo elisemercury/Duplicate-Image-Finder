@@ -105,22 +105,14 @@ class SQLiteDB(BaseSQliteDB):
                 "key_a INTEGER NOT NULL, "
                 "key_b INTEGER NOT NULL, "
                 "dif REAL CHECK (dif_table.dif >= -1) DEFAULT -1, "
-                "success INT CHECK (dif_table.success IN (-1, 0, 1, 2, 3)) DEFAULT -1, "
-                "block_a INTEGER, "
-                "block_b INTEGER, "
-                "block_key INTEGER,"
+                "success INT CHECK (dif_table.success IN (-1, 0, 1, 2, 3)) DEFAULT -1, " # 2, matching hash # 3, matching aspect
+                "error TEXT, "
                 "UNIQUE (key_a, key_b)) ")
 
         self.debug_execute(stmt)
 
-        stmt = "CREATE TABLE dif_error_table (key INTEGER PRIMARY KEY, error TEXT)"
-        self.debug_execute(stmt)
-
-        self.debug_execute("CREATE INDEX err_table_key ON dif_error_table (key)")
-
         self.debug_execute("CREATE INDEX dif_table_key_index ON dif_table (key)")
         self.debug_execute("CREATE INDEX dif_table_key_a_key_b_index ON dif_table (key_a, key_b)")
-        self.debug_execute("CREATE INDEX dif_table_block_key ON dif_table (block_key)")
 
     def create_hash_indexes(self):
         """
