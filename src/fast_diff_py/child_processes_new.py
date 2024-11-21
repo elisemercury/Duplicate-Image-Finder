@@ -386,100 +386,77 @@ class SecondLoopWorker(ChildProcess):
 
         # Get the size we need to walk for the batch
         if self.has_dir_b:
-            size = arg.max_size_b
+            start = arg.y
         else:
-            size = min(arg.key_b - arg.key_a, arg.max_size_b)
+            start = arg.x + 1 if arg.y <= arg.x else arg.y
+
+        limit = arg.y + arg.y_batch
 
         # Prepare the diffs and errors
         diffs = []
-        errors = {}
+        errors = []
 
         try:
             s = datetime.datetime.now(datetime.UTC)
-            img_a = self.generic_fetch_image(key=arg.key_a, path=arg.path_a, is_x=True)
+            img_a = self.get_image_from_cache(key=arg.x, is_x=True)
             self.fetch_x += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
 
-            for i in range(size):
-                d_key = arg.key - i
-                thumb_key = arg.key_b - i
-
+            for i in range(start, limit):
                 try:
                     s = datetime.datetime.now(datetime.UTC)
-                    img_b = self.generic_fetch_image(key=thumb_key, is_x=False, path="")
+                    img_b = self.get_image_from_cache(key=i, is_x=False)
                     self.fetch_y += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
+
+                    # Check hash
+                    if self.match_hash is not None and self.match_hash:
+                        if self.determine_hash_match(arg.x_hashes, arg.y_hashes[i]):
+                            diffs.append((arg.x, i, 2, 0.0))
+                            continue
+
+                    # We have 0.0 -> means match the pixels
+                    if self.match_aspect_by is not None and self.match_aspect_by == 0.0:
+                        if not self.match_px(arg.x_size, arg.y_size[i]):
+                            diffs.append((arg.x, i, 3, -1.0))
+                            continue
+
+                    if self.match_aspect_by is not None and self.match_aspect_by > 1.0:
+                        if not self.match_aspect_ratio_by(arg.x_size, arg.y_size[i]):
+                            diffs.append((arg.x, i, 3, -1.0))
+                            continue
+
+                    # Compute the diff and add it to the results
                     diff = self.delta_fn(img_a, img_b)
-                    diffs.append(diff)
+
+                    # Make a plot if necessary
+                    if self.make_plots and diff < self.plot_threshold:
+                        imgp.make_dif_plot(min_diff=diff,
+                                           img_a=os.path.basename(arg.x_path),
+                                           img_b=os.path.basename(arg.y_path[i]),
+                                           mat_a=img_a,
+                                           mat_b=img_b,
+                                           store_path=os.path.join(self.plot_dir, f"{arg.x}_{i}.png"))
+
+                    diffs.append((arg.x, i, 1, diff))
+
                 except Exception as e:
-                    self.logger.exception(f"Error in processing Tuple: {arg.key_a}, {thumb_key}", exc_info=e)
+                    self.logger.exception(f"Error in processing Tuple: {arg.x}, {i}", exc_info=e)
                     tb = traceback.format_exc()
                     diffs.append(-1)
-                    errors[d_key] = tb
+                    errors.append((arg.x, i, tb))
 
-            return BatchCompareResult(key=arg.key,
-                                      key_a=arg.key_a, key_b=arg.key_b,
-                                      diff=diffs, errors=errors,
-                                      cache_key=arg.cache_key)
+            return SecondLoopResults(x=arg.x,
+                                     cache_key=arg.cache_key,
+                                     success=diffs,
+                                     errors=errors)
 
         except Exception as e:
-            self.logger.error(f"Error with image a in batch {arg.key_a}: {e}", exc_info=e)
+            self.logger.error(f"Error with image x in batch {arg.x}: {arg.cache_key}", exc_info=e)
             tb = traceback.format_exc()
-            diffs = [-1 for _ in range(size)]
-            errors = {arg.key - i: tb for i in range(size)}
-            return BatchCompareResult(key=arg.key,
-                                      key_a=arg.key_a, key_b=arg.key_b,
-                                      diff=diffs, errors=errors,
-                                      cache_key=arg.cache_key)
-
-    def process_item(self, arg: ItemCompareArgs) -> ItemCompareResult:
-        """
-        Process a single item
-        """
-        diff = -1
-        try:
-            self.prepare_cache(arg.cache_key)
-
-            # Fetch the images
-            if self.key_a != arg.key_a:
-                s = datetime.datetime.now(datetime.UTC)
-                self.key_a = arg.key_a
-                self.img_a_mat = self.generic_fetch_image(key=arg.key_a, path=arg.path_a, is_x=True)
-                self.fetch_x += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
-
-            if self.key_b != arg.key_b:
-                s = datetime.datetime.now(datetime.UTC)
-                self.key_b = arg.key_b
-                self.img_b_mat = self.generic_fetch_image(key=arg.key_b, path=arg.path_b, is_x=False)
-                self.fetch_y += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
-            # Typing override
-            self.img_a_mat: np.ndarray[np.uint8]
-            self.img_b_mat: np.ndarray[np.uint8]
-
-            # Compute the difference
-            diff = self.delta_fn(self.img_a_mat, self.img_b_mat)
-            res = ItemCompareResult(key=arg.key, diff=diff)
-        except Exception as e:
-            self.logger.error(f"Error in processing item: {e}")
-            tb = traceback.format_exc()
-            res = ItemCompareResult(key=arg.key, error=tb, diff=diff)
-
-        # Optionally, make plot
-        if self.plot_dir is not None and diff < self.plot_threshold:
-            try:
-                if self.is_compressed:
-                    img_a = imgp.load_std_image(img_path=arg.path_a, target_size=self.target_size, resize=False)
-                    img_b = imgp.load_std_image(img_path=arg.path_b, target_size=self.target_size, resize=False)
-                else:
-                    img_a = self.img_a_mat
-                    img_b = self.img_b_mat
-
-                imgp.make_dif_plot(min_diff=diff,
-                                   img_a=os.path.basename(arg.path_a), img_b=os.path.basename(arg.path_b),
-                                   mat_a=img_a, mat_b=img_b,
-                                   store_path=os.path.join(self.plot_dir, f"{arg.key}.png"))
-            except Exception as e:
-                self.logger.exception(f"Error in making plot: {e}", exc_info=e)
-
-        return res
+            errors = [(arg.x, -1, tb)]
+            return SecondLoopResults(x=arg.x,
+                                     cache_key=arg.cache_key,
+                                     success=[],
+                                     errors=errors)
 
     def set_processing_function(self):
         """
