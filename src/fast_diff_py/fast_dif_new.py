@@ -210,7 +210,6 @@ class FastDifPy(GracefulWorker):
         if not os.path.exists(self.config.thumb_dir):
             os.makedirs(self.config.thumb_dir)
 
-        self.result_queue = mp.Queue()
         self.register_interrupts()
 
     def recover_from_config(self):
