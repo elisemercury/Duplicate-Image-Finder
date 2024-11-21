@@ -44,89 +44,56 @@ class PreprocessResult(BaseModel):
         populate_by_name=True
     )
 
-class BatchCompareArgs(BaseModel):
-    key: int = Field(...,
-                        description="The key in the db of the end of that diff row.")
 
-    key_a: int = Field(...,
-                        description="Key in dir table of start image a")
-    key_b: int = Field(...,
-                        description="Key in dir table of end image b")
-
-    max_size_b: int = Field(...,
-                            description="Maximum distance we can move to the left")
-
-    cache_key: Optional[int] = Field(None,
-                                        description="The key in the cache table")
-
-    path_a: Optional[str] = Field(None,
-                                    description="The path to the original image a - when there's no RAM Cache")
-    path_b: Optional[List[str]] = Field(None,
-                                        description="The path to the original set of image b - "
-                                                    "when there's no RAM Cache")
-
-class BatchCompareResult(BaseModel):
+class SecondLoopArgs(BaseModel):
     """
-    Return type for the batch compare function
+    The next iteration of the second loop model
     """
-    key: int = Field(...,
-                     description="The key in the db of the end of that diff row. (In theory for diff-plots)")
+    x: int = Field(...,
+                   description="The x image of the batch")
+    y: int = Field(...,
+                   description="The lowest y value of the batch")
+    y_batch: int = Field(...,
+                        description="The size of the batch")
 
-    key_a: int = Field(...,
-                       description="Key in dir table of start image a")
-    key_b: int = Field(...,
-                       description="Key in dir table of end image b")
+    # paths
+    x_path: Optional[str] = Field(None,
+                                  description="Path to the x image")
+    y_path: Optional[List[str]] = Field(None,
+                                        description="List of Paths to y images")
 
-    # diff: List[Tuple[int, float]] = Field(...,
-    #                     description="First element, key in the dif table, "
-    #                                 "second element the difference between the images")
-    diff: List[float] = Field(...,
-                        description="The difference between the images")
+    # Sizes
+    x_size: Optional[Tuple[int, int]] = Field(None,
+                                              description="Image Size of the x image")
+    y_size: Optional[List[Tuple[int, int]]] = Field(None,
+                                                    description="List of Sizes of the y images")
 
-    # Make lookup from the key in the dif table, so relative to the key parameter in the function, so it can be
-    # unwrapped and inserted easily
-    # errors: List[Tuple[int, str]] = Field(...,
-    #                                 description="First element, key in the dif table, "
-    #                                             "second element the error message")
-    errors: Dict[int, str] = Field(...,
-                                   description="The error message if the function failed")
+    # Hashes
+    x_hashes: Optional[Tuple[int, int, int, int]] = Field(None,
+                                                          description="Hashes of x image")
+    y_hashes: Optional[List[Tuple[int, int, int, int]]] = Field(None,
+                                                                description="List of Hashes of the y images")
 
-    cache_key: Optional[int] = Field(None,
-                                        description="The key in the cache table")
+    cache_key: int = Field(...,
+                           description="The key of the cache to copy")
 
     model_config = ConfigDict(
         populate_by_name=True
     )
 
 
-class ItemCompareArgs(BaseModel):
-    key: int = Field(...,
-                        description="The key in the db of the start of that diff row. (In theory for diff-plots)")
+class SecondLoopResults(BaseModel):
+    cache_key: int = Field(...,
+                           description="The cache key, to update the progress dict")
+    x: int = Field(...,
+                   description="The row to mark as done in the progress dict")
 
-    key_a: int = Field(...,
-                        description="Key in dir table of start image a")
-    key_b: int = Field(...,
-                        description="Key in dir table of start image b")
-
-    path_a: str = Field(...,
-                        description="The path to the original image a")
-    path_b: str = Field(...,
-                        description="The path to the original image b")
-
-    cache_key: Optional[int] = Field(None,
-                                        description="The key in the cache table")
+    errors: List[Tuple[int, int, str]] = Field([],
+                                               description="All Errors encountered while processing, key_x, key_y, tb")
+    success: List[Tuple[int, int, int, float]] = Field([],
+                                                       description="Success of the comparison,"
+                                                                   " key_x, key_y, success_type, diff")
 
     model_config = ConfigDict(
         populate_by_name=True
     )
-
-
-class ItemCompareResult(BaseModel):
-    key: int = Field(...,
-                     description="The key in the db of the start of that diff row. (In theory for diff-plots)")
-
-    diff: float = Field(...,
-                        description="The difference between the images")
-
-    error: Optional[str] = Field(None,
-                                    description="The error message if the function failed")
