@@ -77,6 +77,8 @@ class SecondLoopConfig(BaseModel):
 class SecondLoopRuntimeConfig(SecondLoopConfig):
     cache_index: int = Field(0,
                                 description="The index of the cache")
+    finished_cache_index: Optional[int] = Field(None,
+                                                description="Index of the cache field we're done with")
 
 class Config(BaseModel):
     compression_target: int = Field(64,
