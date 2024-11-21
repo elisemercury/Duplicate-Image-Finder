@@ -14,6 +14,13 @@ nice to have.
 """
 
 
+@dataclass
+class BlockProgress:
+    x: int
+    y: int
+    done: bool = False
+
+
 def hash_np(mat: np.ndarray) -> str:
     """
     Hashes a np array by performing a hash of its underlying buffer.
