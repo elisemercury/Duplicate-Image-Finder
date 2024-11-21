@@ -75,7 +75,7 @@ class SecondLoopConfig(BaseModel):
                             description="The number of CPU processes to use for the second loop")
 
 class SecondLoopRuntimeConfig(SecondLoopConfig):
-    cache_index: int = Field(1,
+    cache_index: int = Field(0,
                                 description="The index of the cache")
 
 class Config(BaseModel):
