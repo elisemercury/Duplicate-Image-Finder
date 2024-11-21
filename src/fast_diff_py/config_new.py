@@ -50,11 +50,10 @@ class SecondLoopConfig(BaseModel):
                                      description="whether to skip the comparison if the hash matches\n"
                                                  "This forces the second loop algorithm to run with item submission"
                                                  " instead of batch submission")
-    match_aspect_by: float = Field(-1.0,
-                                           description="whether to skip the comparison if the aspect ratio does not "
-                                                       "match\n"
-                                                       "Forces the second loop algorithm to run with item submission"
-                                                       " instead of batch submission")
+    match_aspect_by: Optional[float] = Field(None,
+                                             description="Matches the aspect ratio of the image. Either pixel by pixel"
+                                                         " or the aspect ratio needs to be in"
+                                                         " the interval a * diff > b > a / diff")
     make_diff_plots: bool = Field(False,
                                   description="whether to make diff plots and store them in the output directory\n"
                                               "This forces the second loop algorithm to run with item submission")
