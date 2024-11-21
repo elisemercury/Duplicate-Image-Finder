@@ -84,9 +84,9 @@ class ChildProcess(GracefulWorker):
                 self.put_res += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
 
         if count >= self.timeout:
-            self.res_queue.put(None)
             self.logger.warning("Timeout reached. Shutting down")
 
+        self.res_queue.put(None)
         self.logger.debug(f"{self.get_stats()}")
 
     def set_processing_function(self):
