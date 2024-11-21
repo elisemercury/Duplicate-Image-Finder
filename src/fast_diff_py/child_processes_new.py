@@ -254,9 +254,7 @@ class FirstLoopWorker(ChildProcess):
 
 
 class SecondLoopWorker(ChildProcess):
-    is_compressed: bool
     has_dir_b: bool
-    batched_args: bool
     target_size: Optional[Tuple[int, int]] = None
 
     ram_cache: Optional[Dict[int, BatchCache]] = None
@@ -283,13 +281,11 @@ class SecondLoopWorker(ChildProcess):
                  res_queue: mp.Queue,
                  log_queue: mp.Queue,
 
-                 is_compressed: bool,
                  compare_fn: Callable[[np.ndarray[np.uint8], np.ndarray[np.uint8]], float],
                  target_size: Tuple[int, int],
                  has_dir_b: bool = False,
                  ram_cache: Dict[int, BatchCache] = None,
                  plot_dir: str = None,
-                 batched_args: bool = True,
                  thumb_dir: str = None,
                  plot_threshold: float = None,
 
