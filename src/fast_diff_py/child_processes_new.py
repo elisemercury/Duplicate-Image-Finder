@@ -318,22 +318,6 @@ class SecondLoopWorker(ChildProcess):
         self.fetch_x = 0
         self.fetch_y = 0
 
-        # Checks on arguments
-        if plot_dir is not None and batched_args:
-            raise ValueError("Cannot make plots with batched arguments")
-
-        # Set the processing function
-        if self.ram_cache is not None and self.thumb_dir is not None:
-            self.generic_fetch_image = self.get_image_from_cache
-        elif self.ram_cache is not None and self.thumb_dir is None:
-            self.generic_fetch_image = self.get_image_from_cache
-        elif self.ram_cache is None and self.thumb_dir is not None:
-            self.generic_fetch_image = self.get_thumb_path
-        elif self.ram_cache is None and self.thumb_dir is None:
-            self.generic_fetch_image = self.get_org_from_path
-        else:
-            raise ValueError("Tertiem Non Datur. This should not happen")
-
         self.set_processing_function()
 
     def prepare_cache(self, cache_key: Union[int, None]):
