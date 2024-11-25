@@ -1310,9 +1310,10 @@ class FastDifPy(GracefulWorker):
         self._enqueue_counter += len(kx)
         self.config.second_loop.cache_index = start_key + 1
 
-        # Increment cache index
-        self.config.second_loop.cache_index += 1
-        self._enqueue_counter += len(args)
+        # Handle the return value
+        if not submit:
+            return args
+
         return True
 
     def __batched_org_block(self):
