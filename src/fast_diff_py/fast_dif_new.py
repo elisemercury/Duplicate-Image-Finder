@@ -1323,60 +1323,29 @@ class FastDifPy(GracefulWorker):
         :param drain: Whether to drain the queue (disregard the diff between the enqueue and dequeue counters)
 
         """
-        results: List[BatchCompareResult] = []
+        success = []
+        error: List[Tuple[int, int, str]] = []
 
         while (not self.result_queue.empty()
                and (self._dequeue_counter + self.config.second_loop.batch_size * len(self.handles) < self._enqueue_counter
                     or drain)):
-            res: Union[BatchCompareResult, None] = self.result_queue.get()
+            res: Union[SecondLoopResults, None] = self.result_queue.get()
 
             # Handle the cases, when result is None -> indicating a process is exiting
             if res is None:
                 self.exit_counter += 1
                 continue
 
-            results.append(res)
+            # Update the progress dict
+            self.block_progress_dict[res.cache_key][res.x] = True
+
             self._dequeue_counter += 1
+            success.extend(res.success)
+            error.extend(res.errors)
 
-        self.store_batch_second_loop(results)
+        success = list(filter(lambda x: x[3] < self.config.second_loop.diff_threshold, success))
 
-    def store_batch_second_loop(self, results: List[BatchCompareResult]):
-        """
-        Store the results of the second loop in the database
-        """
-        for res in results:
-            self.db.insert_batch_diff_block_result(min_key_x=res.key_a,
-                                                   max_key_y=res.key_b,
-                                                   results=res.diff)
+        self.db.bulk_insert_diff_success(success)
+        self.db.bulk_insert_diff_error(error)
 
-            if len(res.errors) > 0:
-                self.db.insert_batch_diff_error(errors=res.errors)
-
-            # Update the progress
-            if self.config.second_loop.use_ram_cache:
-                self.block_progress_dict[res.cache_key][res.key_a] = True
-
-        if self.config.second_loop.use_ram_cache:
-            self.prune_cache_batch()
-
-    def store_item_second_loop(self, results: List[ItemCompareResult]):
-        """
-        Store the results of the second loop in the database
-        """
-        key_success: List[int] = []
-        diff_success = []
-
-        errors = {}
-
-        for r in results:
-            if r.diff == -1:
-                errors[r.key] = r.error
-            else:
-                key_success.append(r.key)
-                diff_success.append(r.diff)
-
-        self.db.insert_batch_diff_item_result(key=key_success, res=diff_success)
-        self.db.insert_batch_diff_error(errors=errors)
-
-        if self.config.second_loop.use_ram_cache:
-            self.prune_cache_item()
+        self.prune_cache_batch()
