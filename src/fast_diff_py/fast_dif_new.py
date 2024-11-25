@@ -978,10 +978,7 @@ class FastDifPy(GracefulWorker):
             return
 
         # Need to populate the cache before the second loop workers are instantiated
-        if self.config.second_loop.use_ram_cache:
-            self.ram_cache = self.manager.dict()
-        else:
-            self.ram_cache = None
+        self.ram_cache = self.manager.dict()
 
         # Run the second loop
         self.internal_second_loop()
