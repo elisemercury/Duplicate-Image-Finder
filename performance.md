@@ -82,4 +82,6 @@ Dir_a, Dir_b, dups
 (193216, 192742, 3905)
 
 # Stats with a 40'000 x 40'000 images benchmark
+Dir_a, Dir_b, dups
 (41318, 41586, 857)
+
