@@ -167,10 +167,19 @@ class FastDifPy(GracefulWorker):
         Initialize the FastDifPy object.
 
         Initialization follows the following structure:
-        - First source of truth is the config parameter. If it is provided, the object isinitialized with the config.
+        - First source of truth is the config parameter. If it is provided, the object is initialized with the config.
         - Second source of truth is the default_cfg_path. If it is provided, the object is initialized with the config
-        - Third source of truth is the .task.json file in the directory. If it is present, the object is initialized with
-            the config.
+        - Third source of truth is the .task.json file in the a root directory. If it is present, the object is
+        initialized with the config.
+
+        :param dir_a: The first directory to compare (if no config and default_cfg_path is provided,
+            task is searched there)
+        :param dir_b: The second directory to compare
+        :param config: The config override in case we want to use a specific config
+        :param default_cfg_path: The path to the config if it's supposed to be loaded from a file
+        :param purge: Whether to purge the existing progress and start anew (has only effect for first and third source)
+
+        :kwargs: Additional arguments to be passed to the Config object. Check out the config objects for more details.
         """
         super().__init__(0)
         self.logger = logging.getLogger("FastDiffPy_Main")
