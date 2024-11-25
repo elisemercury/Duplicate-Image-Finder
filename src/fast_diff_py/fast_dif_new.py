@@ -1195,8 +1195,7 @@ class FastDifPy(GracefulWorker):
         Build the thumbnail cache for cases when we're using ram cache
         """
         # Using ram cache, we need to prepare the caches
-        assert self.config.second_loop.use_ram_cache and self.config.first_loop.compress, \
-            "Precondition for building thumbnail cache not met"
+        assert self.config.first_loop.compress, "Precondition for building thumbnail cache not met"
 
         # check we're on the diagonal
         if l_x + 1 == l_y:
