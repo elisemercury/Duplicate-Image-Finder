@@ -912,7 +912,7 @@ class FastDifPy(GracefulWorker):
         results = []
 
         while (not self.result_queue.empty()
-               and (self._dequeue_counter + self.config.first_loop.batch_size * 2 < self._enqueue_counter or drain)):
+               and (self._dequeue_counter + self.config.batch_size_max_fl * 2 < self._enqueue_counter or drain)):
             res = self.result_queue.get()
 
             # Handle the cases, when result is None -> indicating a process is exiting
