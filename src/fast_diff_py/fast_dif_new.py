@@ -1131,44 +1131,59 @@ class FastDifPy(GracefulWorker):
             cmd_queue=self.cmd_queue,
             res_queue=self.result_queue,
             log_queue=self.logging_queue,
-            is_compressed=self.config.first_loop.compress,
             compare_fn=self.cpu_diff,
             target_size=(self.config.compression_target, self.config.compression_target),
             has_dir_b=self.config.root_dir_b is not None,
             ram_cache=self.ram_cache,
             plot_dir=self.config.second_loop.plot_output_dir,
-            batched_args=self.config.second_loop.batch_args,
             thumb_dir=self.config.thumb_dir,
+            hash_short_circuit=self.config.second_loop.skip_matching_hash,
+            match_aspect_by=self.config.second_loop.match_aspect_by,
             plot_threshold=self.config.second_loop.diff_threshold,
             log_level=self.config.log_level_children,
-            timeout=self.config.child_proc_timeout)
+            timeout=self.config.child_proc_timeout,
+            make_plots=self.config.second_loop.make_diff_plots)
 
         while self.run:
             # Get the next batch
-            args = self.__item_block(submit=False)
+            args = self.enqueue_batch_second_loop(submit=False)
 
             # Done?
-            if len(args) == 0:
+            if not args or  len(args) == 0:
                 break
 
             # Process the batch
-            results = [slw.process_item(a) for a in args]
+            results = [slw.process_batch_thumb(a) for a in args]
 
             # Update count
             self._enqueue_counter += len(args)
             self._dequeue_counter += len(args)
 
             # Update info
-            self.logger.info("Done with {self._dequeue_counter} Pairs")
+            self.logger.info(f"Done with {self._dequeue_counter} Pairs")
 
             # Store the results
-            self.store_item_second_loop(results)
+            # Update the progress dict
+            success = []
+            error = []
+
+            for res in results:
+                self.block_progress_dict[res.cache_key][res.x] = True
+
+                self._dequeue_counter += 1
+                success.extend(res.success)
+                error.extend(res.errors)
+
+            success = list(filter(lambda x: x[3] < self.config.second_loop.diff_threshold, success))
+
+            self.db.bulk_insert_diff_success(success)
+            self.db.bulk_insert_diff_error(error)
+
+            self.prune_cache_batch()
 
         self.config.state = Progress.SECOND_LOOP_DONE
 
         self.cmd_queue = None
-
-    def set_load_batch(self):
         """
         Set the function to be used to load a batch of tasks for the workers.
         """
@@ -1229,6 +1244,7 @@ class FastDifPy(GracefulWorker):
         """
         raise NotImplementedError("Function pointer to be called for load_batch needs to call set_load_batch for "
                                   "it to be set")
+        self.ram_cache = None
 
     # ==================================================================================================================
     # Second Loop Cache Functions
