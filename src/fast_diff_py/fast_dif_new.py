@@ -1257,43 +1257,58 @@ class FastDifPy(GracefulWorker):
     # Build Second Loop Args
     # ==================================================================================================================
 
-    def __batched_thumb_block(self):
+    def enqueue_batch_second_loop(self, submit: bool = True):
         """
-        Submit a batch of thumbnails. Depending on whether we have a cache or not, we're going to also build a cache
+        Enqueue a batch of second loop arguments
         """
-        assert self.config.first_loop.compress and self.config.second_loop.batch_args, \
-            "Precondition for batched thumb block not met"
+        # Get the start key for the cache block we need to look at
+        start_key = self.config.second_loop.cache_index
 
-        l_x, l_y, s_x, s_y = self.db.get_cache_block_thumb(block_key=self.config.second_loop.cache_index,
-                                                           has_dir_b=self.config.root_dir_b is not None)
-        self.logger.debug(f"lower_x: {l_x}, lower_y: {l_y}, Cache_Key:  {self.config.second_loop.cache_index}")
-        # Stopping criterion
-        if (l_x, l_y, s_x, s_y) == (-1, -1, -1, -1):
+        if len(self.blocks) <= start_key:
             return False
 
-        # Retrieving the args
-        args = self.db.get_task_block_key(block_key=self.config.second_loop.cache_index)
+        block = self.blocks[start_key]
 
-        if self.config.second_loop.use_ram_cache:
-            self.__build_thumb_cache(l_x, l_y, s_x, s_y)
+        # Case when we have a dir_b
+        px, hx, ax, kx = self.db.get_rows_directory(start=block.x,
+                                                    size=self.config.second_loop.batch_size,
+                                                    dir_b=False,
+                                                    do_hash=self.config.second_loop.skip_matching_hash,
+                                                    aspect=self.config.second_loop.match_aspect_by is not None,
+                                                    path=self.config.second_loop.make_diff_plots)
 
-            # Build and submit the Args with cache index
-            for key, min_key_a, max_key_b in args:
-                self.cmd_queue.put(
-                    BatchCompareArgs(key=key,
-                                     key_a=min_key_a,
-                                     key_b=max_key_b,
-                                     max_size_b=s_y,
-                                     cache_key=self.config.second_loop.cache_index))
+        py, hy, ay, ky = self.db.get_rows_directory(start=block.y,
+                                                    size=self.config.second_loop.batch_size,
+                                                    dir_b=self.config.root_dir_b is not None,
+                                                    do_hash=self.config.second_loop.skip_matching_hash,
+                                                    aspect=self.config.second_loop.match_aspect_by is not None,
+                                                    path=self.config.second_loop.make_diff_plots)
 
-        else:
-            # Build args without cache index
-            for key, min_key_a, max_key_b in args:
-                self.cmd_queue.put(
-                    BatchCompareArgs(key=key,
-                                     key_a=min_key_a,
-                                     key_b=max_key_b,
-                                     max_size_b=s_y))
+        # Build the ram_cache
+        self.__build_thumb_cache(l_x=kx[0], l_y=ky[0], s_x=len(kx), s_y=len(ky))
+
+        # Submit the block
+        args = []
+        for i in range(len(kx)):
+            tfo = SecondLoopArgs(x=kx[i],
+                                 y=ky[0],
+                                 y_batch=len(ky),
+                                 x_path=px[i] if len(px) == len(kx) else None,
+                                 y_path=py if len(py) > 0 else None,
+                                 x_hashes=hx[i] if len(hx) == len(kx) else None,
+                                 y_hashes=hy if len(hy) > 0 else None,
+                                 x_size=ax[i] if len(ax) == len(kx) else None,
+                                 y_size=ay if len(ay) > 0 else None,
+                                 cache_key=self.config.second_loop.cache_index
+                                 )
+            if not submit:
+                args.append(tfo)
+            else:
+                self.cmd_queue.put(tfo)
+
+        # Update variables
+        self._enqueue_counter += len(kx)
+        self.config.second_loop.cache_index = start_key + 1
 
         # Increment cache index
         self.config.second_loop.cache_index += 1
