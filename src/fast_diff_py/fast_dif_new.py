@@ -143,9 +143,10 @@ class FastDifPy(GracefulWorker):
             self.logger.info(f"Deleting Thumbnail Directory at {self.config.thumb_dir}")
             shutil.rmtree(self.config.thumb_dir)
 
-        self.logger.info("Removing Task File")
-        if os.path.exists(self.config_path):
-            os.remove(self.config_path)
+        if not self.config.retain_progress:
+            if os.path.exists(self.config.config_path):
+                self.logger.info("Removing Task File")
+                os.remove(self.config.config_path)
 
         if self.ql is not None:
             self.ql.stop()
