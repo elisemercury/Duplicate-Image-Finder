@@ -421,6 +421,9 @@ class FastDifPy(GracefulWorker):
 
         :return:
         """
+        if not self.run:
+            return
+
         # load the path to index from
         if path is None:
             path = self.config.root_dir_a if dir_a else self.config.root_dir_b
