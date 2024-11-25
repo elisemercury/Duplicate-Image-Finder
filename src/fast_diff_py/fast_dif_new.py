@@ -987,25 +987,19 @@ class FastDifPy(GracefulWorker):
         """
         Check if the configured parameters are actually compatible
         """
-        if isinstance(cfg, SecondLoopConfig):
+        if not isinstance(cfg, SecondLoopRuntimeConfig):
             cfg = SecondLoopRuntimeConfig.model_validate(cfg.model_dump())
 
-        if self.config.do_second_loop:
+        if not self.config.do_second_loop:
             return False
 
-        # Check constraint on optimizations
-        if cfg.match_aspect_by != -1.0 or cfg.skip_matching_hash:
-            if cfg.batch_args:
-                self.logger.error("Cannot skip matching hash or non-matching aspect ratio with batched processing")
-                return False
+        if self.config.second_loop.skip_matching_hash and not self.config.first_loop.compute_hash:
+            self.logger.error("Cannot skip matching hash without computing hash")
+            return False
 
         if cfg.make_diff_plots:
             if cfg.plot_output_dir is None or cfg.diff_threshold is None:
                 self.logger.error("Need plot output directory and diff threshold to make diff plots")
-                return False
-
-            if cfg.batch_args:
-                self.logger.error("Cannot make diff plots with batched processing")
                 return False
 
         if cfg.cpu_proc + cfg.gpu_proc < 1:
@@ -1017,8 +1011,9 @@ class FastDifPy(GracefulWorker):
             return False
 
         # Create the plot output directory
-        if not os.path.exists(cfg.plot_output_dir):
-            os.makedirs(cfg.plot_output_dir)
+        if self.config.second_loop.make_diff_plots:
+            if not os.path.exists(cfg.plot_output_dir):
+                os.makedirs(cfg.plot_output_dir)
 
         return True
 
