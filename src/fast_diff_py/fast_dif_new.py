@@ -1026,28 +1026,15 @@ class FastDifPy(GracefulWorker):
                         make_diff_plots: bool = None,
                         plot_output_dir: str = None,
                         diff_threshold: float = None,
-                        batch_args: bool = None,
-                        use_ram_cache: bool = None,
                         parallel: bool = None,
                         ) -> SecondLoopRuntimeConfig:
 
-        if skip_matching_hash is not None or match_aspect_by is not None:
-            if batch_args is True:
-                raise ValueError("Cannot skip matching hash or non-matching aspect ratio with batched processing")
+        if not self.config.first_loop.compress:
+            raise ValueError("SecondLoop relies on pre compressed images from first loop")
 
         if make_diff_plots is not None:
             if plot_output_dir is None or diff_threshold is None:
                 raise ValueError("Need plot output directory and diff threshold to make diff plots")
-
-            if batch_args is True:
-                raise ValueError("Cannot make diff plots with batched processing")
-
-        if not parallel:
-            if use_ram_cache is not None and use_ram_cache is False:
-                raise ValueError("Cannot run without parallel processing and without ram cache")
-
-            if batch_args is not None and batch_args is True:
-                raise ValueError("Cannot run without parallel processing and with batched processing")
 
         if cpu_proc is None:
             cpu_proc = os.cpu_count()
