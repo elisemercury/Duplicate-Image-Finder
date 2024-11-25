@@ -376,12 +376,15 @@ class FastDifPy(GracefulWorker):
         self._dequeue_counter = 0
         self._last_dequeue_counter = 0
 
+        self.logger.debug("Beginning indexing")
+
         # Index the directories
         self.__recursive_index(path=self.config.root_dir_a, dir_a=True)
         if self.config.root_dir_b is not None:
             self.__recursive_index(path=self.config.root_dir_b, dir_a=False)
 
         self.config.state = Progress.INDEXED_DIRS
+        self.logger.info("Done Indexing Directories")
         self.commit()
 
     def cond_switch_a_b(self):
