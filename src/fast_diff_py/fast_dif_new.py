@@ -1075,21 +1075,30 @@ class FastDifPy(GracefulWorker):
         if not isinstance(self.config.second_loop, SecondLoopRuntimeConfig):
             self.config.second_loop = SecondLoopRuntimeConfig.model_validate(self.config.second_loop.model_dump())
 
-        # Update the database
-        self.logger.info("Prepopulating the diff table. Do not Interrupt")
-        self.db.prepopulate_diff_table(has_dir_b=self.config.root_dir_b is not None,
-                                       block_size=self.config.second_loop.batch_size)
-        self.db.commit()
-        self.logger.info(f"Done with prepopulating the diff table")
+        # Prepare the blocks according to the config
+        if self.config.root_dir_b is not None:
+            self.dir_a_count = self.db.get_dir_entry_count(False)
+            self.dir_b_count = self.db.get_dir_entry_count(True)
+            self.blocks = build_start_blocks_ab(self.dir_a_count, self.dir_b_count, self.config.second_loop.batch_size)
+        else:
+            self.dir_a_count = self.db.get_dir_entry_count(False)
+            self.blocks = build_start_blocks_a(self.dir_a_count, self.config.second_loop.batch_size)
+
+        # Reset the progress if we're coming from a in progress loop.
+        if self.config.state == Progress.SECOND_LOOP_IN_PROGRESS:
+            self.config.second_loop.cache_index = self.config.second_loop.finished_cache_index + 1
+
+        # We're coming regular
+        if self.config.state == Progress.FIRST_LOOP_DONE:
+
+            # Create a db backup
+            self.db.create_diff_table_and_index()
+            self.commit()
 
         if self.config.second_loop.parallel is False:
             self.sequential_second_loop()
 
-        # Set the function pointers
-        self.set_dequeue_second_loop()
-        self.set_load_batch()
         self.config.state = Progress.SECOND_LOOP_IN_PROGRESS
-        self.logger.info(f"Number of Pairs to Compare for Second Loop: {self.db.get_pair_count_diff()}")
 
         # Run the second loop
         self.generic_mp_loop(first_iteration=False, benchmark=False)
