@@ -1061,9 +1061,7 @@ class FastDifPy(GracefulWorker):
                 "make_diff_plots": make_diff_plots,
                 "plot_output_dir": plot_output_dir,
                 "diff_threshold": diff_threshold,
-                "batch_args": batch_args,
                 "batch_size": batch_size,
-                "use_ram_cache": use_ram_cache,
                 "parallel": parallel}
 
         non_empty = {k: v for k, v in args.items() if v is not None}
