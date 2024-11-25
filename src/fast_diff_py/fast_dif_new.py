@@ -16,7 +16,7 @@ from fast_diff_py.config_new import Config, Progress, FirstLoopConfig, SecondLoo
     FirstLoopRuntimeConfig
 from fast_diff_py.datatransfer_new import (PreprocessResult, SecondLoopArgs, SecondLoopResults)
 from fast_diff_py.sqlite_db import SQLiteDB
-from fast_diff_py.utils import sizeof_fmt, BlockProgress, build_start_blocks_a, build_start_blocks_ab, to_b64
+from fast_diff_py.utils import sizeof_fmt, BlockProgress, build_start_blocks_a, build_start_blocks_ab
 
 
 class FastDifPy(GracefulWorker):
