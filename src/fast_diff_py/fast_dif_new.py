@@ -1251,19 +1251,7 @@ class FastDifPy(GracefulWorker):
         if all(self.block_progress_dict[lowest_key].values()):
             self.ram_cache.pop(lowest_key)
             self.block_progress_dict.pop(lowest_key)
-
-    def prune_cache_item(self):
-        """
-        Prune the cache when we're comparing items
-        """
-        # Guard since we're min doesn't like empty lists
-        if len(self.ram_cache.keys()) == 0:
-            return
-        lowest_key = min(self.ram_cache.keys())
-
-        # Check if all keys in the block progress dict are True
-        if self.db.verify_item_block(lowest_key):
-            self.ram_cache.pop(lowest_key)
+            self.config.second_loop.finished_cache_index = lowest_key
 
     # ==================================================================================================================
     # Build Second Loop Args
