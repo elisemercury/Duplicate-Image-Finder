@@ -885,7 +885,10 @@ class FastDifPy(GracefulWorker):
         """
         Submit up to a batch of files to the first loop
         """
-        args = self.db.batch_of_preprocessing_args(batch_size=self.config.first_loop.batch_size)
+        if self.config.first_loop.batch_size is not None:
+            args = self.db.batch_of_preprocessing_args(batch_size=self.config.first_loop.batch_size)
+        else:
+            args = self.db.batch_of_preprocessing_args(batch_size=self.config.batch_size_max_fl)
 
         # Submit the arguments
         if self.config.first_loop.batch_size is not None:
