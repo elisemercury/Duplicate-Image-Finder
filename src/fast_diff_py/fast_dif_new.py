@@ -265,21 +265,28 @@ class FastDifPy(GracefulWorker):
 
     def clean_and_init(self):
         """
-        Recover the FastDifPy object from the config
-
-        :param abort: Do not continue computation after loading config
+        Cleanly instantiates everything needed for the FastDifPy object
         """
-        # Check the DB
-        if not os.path.exists(self.config.db_path):
-            raise ValueError(f"Database does not exist at {self.config.db_path}")
+        # DB Path
+        if os.path.exists(self.config.db_path):
+            self.logger.info("Removing preexisting DB")
+            os.remove(self.config.db_path)
 
-        try:
-            # Connect to the DB
-            self.db = SQLiteDB(self.config.db_path, debug=__debug__)
-        except Exception as e:
-            if not self.config.state != Progress.SECOND_LOOP_POPULATING:
-                self.logger.exception("Exception while connecting to the database", exc_info=e)
-            self.db = None
+        self.db = SQLiteDB(self.config.db_path, debug=__debug__)
+
+        # Config Path
+        if os.path.exists(self.config.config_path):
+            self.logger.info("Removing preexisting Config File")
+            os.remove(self.config.config_path)
+
+        self.commit()
+
+        # Thumbnail Directory
+        if os.path.exists(self.config.thumb_dir):
+            self.logger.info("Removing preexisting Thumbnail Directory")
+            shutil.rmtree(self.config.thumb_dir)
+
+        os.makedirs(self.config.thumb_dir)
 
         # Check the root dir a
         if not os.path.exists(self.config.root_dir_a):
