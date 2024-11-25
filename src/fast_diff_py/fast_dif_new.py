@@ -152,6 +152,9 @@ class FastDifPy(GracefulWorker):
             self.ql.stop()
 
     def start_logging(self):
+        """
+        Start the logging process. This is done by starting the QueueListener
+        """
         handler = logging.StreamHandler()
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         handler.setFormatter(formatter)
