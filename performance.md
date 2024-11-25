@@ -6,6 +6,8 @@ CPUs:
 - 128: `41.4836961` (utilization ~360%)
 
 
+# Blocking from the db is not fast. We need only to store the indexes.
+
 # Pure Compression time
 # No batched queue
 Time taken for first loop: 349.204719 seconds
@@ -19,6 +21,10 @@ Time taken for first loop: 309.254996 seconds
 # 250
 Time taken for first loop: 330.104581 seconds
 
+# INFO:
+We found, that running with uncompressed images is soo slow, that all child processes exit before the first batch is 
+done. As such, we've put in a error in case you attempt to run the second loop without having the first loop compress
+the images.
 
 # Size of 1000 batch, single submission for items
 Batched Processing, RAM Cache, Compressed Images, took 293.026221
