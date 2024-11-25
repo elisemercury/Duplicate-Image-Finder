@@ -244,7 +244,26 @@ class FastDifPy(GracefulWorker):
 
         self.register_interrupts()
 
-    def recover_from_config(self, abort: bool = False):
+    def add_defaults_to_config(self):
+        """
+        Add default paths to config if they are not provided. Those being:
+        - db_path
+        - thumb_dir
+        - config_path
+        """
+        if self.config.db_path is None:
+            self.config.db_path = os.path.join(self.config.root_dir_a, ".fast_diff.db")
+            self.logger.info(f"DB Path not provided. Using {self.config.db_path}")
+
+        if self.config.thumb_dir is None:
+            self.config.thumb_dir = os.path.join(self.config.root_dir_a, ".temp_thumb")
+            self.logger.info(f"Thumbnail Directory not provided. Using {self.config.thumb_dir}")
+
+        if self.config.config_path is None:
+            self.config.config_path = os.path.join(self.config.root_dir_a, ".task.json")
+            self.logger.info(f"Config Path not provided. Using {self.config.config_path}")
+
+    def clean_and_init(self):
         """
         Recover the FastDifPy object from the config
 
