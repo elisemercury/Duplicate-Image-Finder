@@ -650,7 +650,6 @@ class FastDifPy(GracefulWorker):
 
                 enqueue_time += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
 
-                bs = self.config.first_loop.batch_size if first_iteration else self.config.second_loop.batch_size
                 if self._dequeue_counter > self._last_dequeue_counter + bs / 4:
                     self.logger.info(f"Enqueued: {self._enqueue_counter} {task}")
                     self.logger.info(f"Done with {self._dequeue_counter} {task}")
@@ -671,7 +670,6 @@ class FastDifPy(GracefulWorker):
                 dequeue_fn(drain=True)
                 dequeue_time += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
 
-                bs = self.config.first_loop.batch_size if first_iteration else self.config.second_loop.batch_size
                 if self._dequeue_counter > self._last_dequeue_counter + bs / 4:
                     self.logger.info(f"Enqueued: {self._enqueue_counter} {task}")
                     self.logger.info(f"Done with {self._dequeue_counter} {task}")
@@ -698,7 +696,6 @@ class FastDifPy(GracefulWorker):
             if not submit_fn():
                 break
 
-            bs = self.config.first_loop.batch_size if first_iteration else self.config.second_loop.batch_size
             if self._dequeue_counter > self._last_dequeue_counter + bs / 4:
                 self.logger.info(f"Enqueued: {self._enqueue_counter} {task}")
                 self.logger.info(f"Done with {self._dequeue_counter} {task}")
@@ -715,7 +712,6 @@ class FastDifPy(GracefulWorker):
         while self.exit_counter < len(self.handles):
             dequeue_fn(drain=True)
 
-            bs = self.config.first_loop.batch_size if first_iteration else self.config.second_loop.batch_size
             if self._dequeue_counter > self._last_dequeue_counter + bs / 4:
                 self.logger.info(f"Enqueued: {self._enqueue_counter} {task}")
                 self.logger.info(f"Done with {self._dequeue_counter} {task}")
