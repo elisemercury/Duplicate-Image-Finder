@@ -964,6 +964,9 @@ class FastDifPy(GracefulWorker):
         """
         Run the second loop
         """
+        if not self.run:
+            return
+
         # Set the configuration
         if "config" in kwargs:
             self.config.second_loop = SecondLoopRuntimeConfig.model_validate(kwargs["config"])
