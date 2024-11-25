@@ -841,12 +841,15 @@ class FastDifPy(GracefulWorker):
 
         :param config: The configuration for the first loop
         """
+        if not self.run:
+            return
+
         # Set the config
         if config is not None:
             self.config.first_loop = config
 
         # Build runtime config if necessary
-        if isinstance(self.config.first_loop, FirstLoopConfig):
+        if not isinstance(self.config.first_loop, FirstLoopRuntimeConfig):
             self.config.first_loop = self.build_first_loop_runtime_config(self.config.first_loop)
 
         # No computation required. Skip it.
