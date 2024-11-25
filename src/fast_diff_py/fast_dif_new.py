@@ -1184,66 +1184,6 @@ class FastDifPy(GracefulWorker):
         self.config.state = Progress.SECOND_LOOP_DONE
 
         self.cmd_queue = None
-        """
-        Set the function to be used to load a batch of tasks for the workers.
-        """
-        batch, cache, thumb = (self.config.second_loop.batch_args,
-                               self.config.second_loop.use_ram_cache,
-                               self.config.first_loop.compress)
-
-        if batch and cache and thumb:
-            self.second_loop_load_batch = self.__batched_thumb_block
-        elif batch and cache and not thumb:
-            self.second_loop_load_batch = self.__batched_org_block
-        elif batch and not cache and thumb:
-            self.second_loop_load_batch = self.__batched_thumb_block
-        elif batch and not cache and not thumb:
-            self.second_loop_load_batch = self.__batched_org_block
-
-        elif not batch and cache and thumb:
-            self.second_loop_load_batch = lambda: self.__item_block(submit=True)
-        elif not batch and cache and not thumb:
-            self.second_loop_load_batch = lambda: self.__item_block(submit=True)
-        elif not batch and not cache and thumb:
-            self.second_loop_load_batch = lambda: self.__item_block(submit=True)
-        elif not batch and not cache and not thumb:
-            self.second_loop_load_batch = lambda: self.__item_block(submit=True)
-        else:
-            raise ValueError("Tertiem Non Datur - This should not be possible")
-
-    def dequeue_second_loop(self):
-        """
-        Placeholder for the dequeue function. The function is set using the set_dequeue_second_loop.
-
-        If set_dequeue_second_loop is not called, this function will raise a NotImplementedError
-        """
-        raise NotImplementedError("Function pointer to be called for dequeue_second_loop"
-                                  " need to call set_dequeue_second_loop")
-
-    def set_dequeue_second_loop(self):
-        """
-        Set the dequeue function for the second loop
-        """
-        if self.config.second_loop.batch_args:
-            self.dequeue_second_loop = self.dequeue_second_loop_batch
-        else:
-            self.dequeue_second_loop = self.dequeue_second_loop_item
-
-    def second_loop_load_batch(self) -> bool:
-        """
-        This function loads the next batch of images into the cache.
-        It populates the command queue with the matching args and returns whether new images successfully enqueued
-        or if we're done.
-
-        - The function distinguishes between cases when we have precomputed thumbnails and when not
-        - The function distinguishes when we're able to submit batch-jobs and when we're able to submit single jobs
-
-        This is a placeholder function. set_load_batch needs to be called to set the function pointer.
-
-        :return: True if we loaded a block, False if we're done
-        """
-        raise NotImplementedError("Function pointer to be called for load_batch needs to call set_load_batch for "
-                                  "it to be set")
         self.ram_cache = None
 
     # ==================================================================================================================
