@@ -545,7 +545,8 @@ class FastDifPy(GracefulWorker):
                     cmd_queue=self.cmd_queue,
                     res_queue=self.result_queue,
                     log_queue=self.logging_queue,
-                    is_compressed=self.config.first_loop.compress,
+                    hash_short_circuit=self.config.second_loop.skip_matching_hash,
+                    match_aspect_by=self.config.second_loop.match_aspect_by,
                     compare_fn=self.cpu_diff if i < self.config.second_loop.cpu_proc else self.gpu_diff,
                     target_size=(self.config.compression_target, self.config.compression_target),
                     log_level=self.config.log_level_children,
@@ -554,8 +555,8 @@ class FastDifPy(GracefulWorker):
                     plot_dir=self.config.second_loop.plot_output_dir,
                     ram_cache=self.ram_cache,
                     thumb_dir=self.config.thumb_dir if self.config.first_loop.compress else None,
-                    batched_args=self.config.second_loop.batch_args,
-                    plot_threshold=self.config.second_loop.diff_threshold))
+                    plot_threshold=self.config.second_loop.diff_threshold,
+                    make_plots=self.config.second_loop.make_diff_plots))
 
             self.handles = [mp.Process(target=w.main) for w in workers]
 
