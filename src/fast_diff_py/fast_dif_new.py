@@ -189,53 +189,58 @@ class FastDifPy(GracefulWorker):
         self.logger.addHandler(qh)
         self.start_logging()
 
-        # Try to recover from the config
+        # First Source of Truth - config
         if config is not None:
             self.config = config
 
-            self.recover_from_config(abort_recover)
-            return
+            self.logger.info("Using Provided Config")
 
-        # Step 1:
-        # Determine if there is already something in progress:
-        self.config_path = os.path.join(dir_a, ".task.json") if default_cfg_path is None else default_cfg_path
-        if os.path.exists(self.config_path) and not purge:
-            with open(self.config_path, "r") as f:
-                cfg = Config.model_validate_json(f.read())
+            # Populate on empty
+            self.add_defaults_to_config()
 
-            # Set the config
-            self.config = cfg
+            if purge:
+                self.logger.info("Purging any preexisting progress and using provided config")
+                self.clean_and_init()
 
-            # Perform progress recovery
-            self.recover_from_config(abort_recover)
-            return
+            else:
+                self.logger.info("Connecting to existing progress and using provided config")
+                self.reconnect_to_existing()
 
-        # Step 2:
-        # Create a new config and start fresh
-        assert config is None, "Config should be None"
-        self.config = Config(root_dir_a=dir_a, root_dir_b=dir_b)
+        # Second Source of Truth - default_cfg_path
+        elif default_cfg_path is not None:
+            self.logger.info("Using provided Default Config Path")
+            if not os.path.exists(default_cfg_path):
+                raise FileNotFoundError(f"Config Path {default_cfg_path} does not exist")
 
-        # Step 3
-        # Path to the DB:
-        p = self.config.db_path if self.config.db_path is not None else os.path.join(dir_a, ".fast_diff.db")
-        if os.path.exists(p) and not purge:
-            raise ValueError(f"Database already exists at {p}")
+            with open(default_cfg_path, "r") as file:
+                self.config = Config.model_validate_json(file.read())
 
-        elif os.path.exists(p) and purge:
-            self.logger.info(f"Purging DB at {p}")
-            shutil.rmtree(p)
+            self.config.config_path = default_cfg_path
 
-        # Connect to the db.
-        self.db = SQLiteDB(p, debug=__debug__)
-        self.config.db_path = p
+            self.add_defaults_to_config()
 
-        # Populate Thumb dir, if not exists
-        if self.config.thumb_dir is None:
-            self.config.thumb_dir = os.path.join(dir_a, ".temp_thumb")
+            self.reconnect_to_existing()
 
-        # Make directory if not exists
-        if not os.path.exists(self.config.thumb_dir):
-            os.makedirs(self.config.thumb_dir)
+        # Third Source of Truth - .task.json in the directory
+        elif dir_a is not None:
+            config_path = os.path.join(dir_a, ".task.json")
+
+            if os.path.exists(config_path) and not purge:
+                self.logger.info("Using Existing Config File in dir_a")
+                with open(config_path, "r") as file:
+                    self.config = Config.model_validate_json(file.read())
+
+                self.config.config_path = config_path
+                self.add_defaults_to_config()
+                self.reconnect_to_existing()
+
+            else:
+                self.config = Config(root_dir_a=dir_a, root_dir_b=dir_b, **kwargs)
+                self.add_defaults_to_config()
+                self.clean_and_init()
+
+        else:
+            raise ValueError("Not enough arguments are provided to initialize the FastDifPy object")
 
         self.register_interrupts()
 
