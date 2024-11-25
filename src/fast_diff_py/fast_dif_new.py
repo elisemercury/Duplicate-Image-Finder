@@ -1237,61 +1237,6 @@ class FastDifPy(GracefulWorker):
 
         self.ram_cache[self.config.second_loop.cache_index] = bc
 
-    def __build_org_cache(self, l_x: int, l_y: int, p_x: List[str], p_y: List[str]):
-        """
-        Build the original cache for cases when we're using ram cache
-        """
-        # Using ram cache, we need to prepare the caches
-        assert self.config.second_loop.use_ram_cache and not self.config.first_loop.compress, \
-            "Precondition for building original cache not met"
-
-        # check we're on the diagonal
-        if l_x + 1 == l_y:
-
-            # Perform sanity check
-            if not len(p_x) == len(p_y):
-                raise ValueError("The block is not a square")
-
-            assert set([p_x[0]] + p_y) == set(p_x) | set(p_y), "The paths are not the same"
-
-            p = [p_x[0]] + p_y
-            s = len(p)
-            l = l_x
-            cache = ImageCache(offset=l,
-                               size=s,
-                               img_shape=(self.config.compression_target, self.config.compression_target, 3))
-
-            # Load the cache
-            cache.fill_original(p)
-
-            # Create the x-y cache object
-            bc = BatchCache(x=cache, y=cache)
-
-        else:
-            # We're not on the diagonal
-            x = ImageCache(offset=l_x,
-                           size=len(p_x),
-                           img_shape=(self.config.compression_target, self.config.compression_target, 3))
-
-            y = ImageCache(offset=l_y,
-                           size=len(p_y),
-                           img_shape=(self.config.compression_target, self.config.compression_target, 3))
-
-            # Load the cache
-            x.fill_original(p_x)
-            y.fill_original(p_y)
-
-            # Create the x-y cache object
-            bc = BatchCache(x=x, y=y)
-
-        # In batched mode, we need to submit the block progress
-        if self.config.second_loop.batch_args:
-            # Prep the block progress dict
-            bp = {i + l_x: False for i in range(len(p_x))}
-            self.block_progress_dict[self.config.second_loop.cache_index] = bp
-
-        self.ram_cache[self.config.second_loop.cache_index] = bc
-
     def prune_cache_batch(self):
         """
         Go through the ram cache and remove the cache who's results are complete.
