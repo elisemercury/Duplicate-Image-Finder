@@ -588,6 +588,10 @@ class FastDifPy(GracefulWorker):
                     one_alive = True
                     break
 
+            # Skip waiting
+            if not one_alive:
+                break
+
             # Wait until timeout
             time.sleep(1)
             timeout -= 1
