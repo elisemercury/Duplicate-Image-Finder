@@ -288,57 +288,31 @@ class FastDifPy(GracefulWorker):
 
         os.makedirs(self.config.thumb_dir)
 
-        # Check the root dir a
+    def reconnect_to_existing(self):
+        """
+        Reconnect to existing progress, config, db, etc.
+
+        Verifies:
+        - dir_a
+        - dir_b if provided
+        - db_path
+        - thumb_dir
+
+        :raises FileNotFoundError: If any of the paths do not exist
+        """
         if not os.path.exists(self.config.root_dir_a):
-            raise ValueError(f"Directory A does not exist at {self.config.root_dir_a}")
+            raise FileNotFoundError(f"Directory {self.config.root_dir_a} does not exist")
 
-        # Check the root dir b
         if self.config.root_dir_b is not None and not os.path.exists(self.config.root_dir_b):
-            raise ValueError(f"Directory B does not exist at {self.config.root_dir_b}")
+            raise FileNotFoundError(f"Directory {self.config.root_dir_b} does not exist")
 
-        # Check and create plot dir
-        if self.config.second_loop.make_diff_plots and not os.path.exists(self.config.second_loop.plot_output_dir):
-            os.makedirs(self.config.second_loop.plot_output_dir)
+        if not os.path.exists(self.config.db_path):
+            raise FileNotFoundError(f"DB Path {self.config.db_path} does not exist")
+        else:
+            self.db = SQLiteDB(self.config.db_path, debug=__debug__)
 
-        # Check the thumb dir
-        if not os.path.exists(self.config.thumb_dir) \
-            and self.config.state in (Progress.FIRST_LOOP_IN_PROGRESS,
-                                      Progress.FIRST_LOOP_DONE,
-                                      Progress.SECOND_LOOP_IN_PROGRESS,
-                                      Progress.SECOND_LOOP_DONE) \
-            and self.config.first_loop.compress:
-                raise ValueError(f"Thumbnail directory does not exist at {self.config.thumb_dir}")
-
-        # Make the directory otherwise
         if not os.path.exists(self.config.thumb_dir):
-            os.makedirs(self.config.thumb_dir)
-
-        if abort:
-            return
-
-        # Drop the directory table and perform index again
-        if self.config.state == Progress.INIT and self.db.dir_table_exists():
-            self.logger.info(f"We're in the INIT state, but the directory table exists. Dropping the table")
-            self.db.drop_directory_table()
-            self.full_index(True)
-            return
-
-        elif self.config.state == Progress.INDEXED_DIRS:
-            self.logger.info(f"Recovering from INDEXED_DIRS, checking switch of dir a and b")
-            self.cond_switch_a_b()
-            self.db.set_keys_zero_index()
-
-            self.first_loop(chain=True)
-            return
-
-        elif self.config.state == Progress.FIRST_LOOP_IN_PROGRESS:
-            self.logger.info(f"Recovering from FIRST_LOOP_IN_PROGRESS")
-            self.db.reset_preprocessing()
-            self.first_loop(chain=True)
-
-
-
-
+            raise FileNotFoundError(f"Thumbnail Directory {self.config.thumb_dir} does not exist")
 
     # ==================================================================================================================
     # Indexing
