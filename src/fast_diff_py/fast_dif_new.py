@@ -1198,17 +1198,14 @@ class FastDifPy(GracefulWorker):
         assert self.config.first_loop.compress, "Precondition for building thumbnail cache not met"
 
         # check we're on the diagonal
-        if l_x + 1 == l_y:
+        if l_x == l_y:
 
             # Perform sanity check
             if not s_x == s_y:
                 raise ValueError("The block is not a square")
 
-            l = l_x
-            s = s_x + 1
-
-            cache = ImageCache(offset=l,
-                               size=s,
+            cache = ImageCache(offset=l_x,
+                               size=s_x,
                                img_shape=(self.config.compression_target, self.config.compression_target, 3))
 
             # Load the cache
@@ -1234,11 +1231,9 @@ class FastDifPy(GracefulWorker):
             # Create the x-y cache object
             bc = BatchCache(x=x, y=y)
 
-        # In batched mode, we need to submit the block progress
-        if self.config.second_loop.batch_args:
-            # Prep the block progress dict
-            bp = {i + l_x: False for i in range(s_x)}
-            self.block_progress_dict[self.config.second_loop.cache_index] = bp
+        # Prep the block progress dict
+        bp = {i + l_x: False for i in range(s_x)}
+        self.block_progress_dict[self.config.second_loop.cache_index] = bp
 
         self.ram_cache[self.config.second_loop.cache_index] = bc
 
