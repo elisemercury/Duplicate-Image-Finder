@@ -313,7 +313,7 @@ class SecondLoopWorker(ChildProcess):
         self.match_aspect_by = match_aspect_by
 
         if make_plots:
-            if plot_threshold is not None or plot_dir is not None:
+            if plot_threshold is None or plot_dir is None:
                 raise ValueError("Plot Threshold and Plot dir needed for plotting.")
 
         self.fetch_x = 0
