@@ -1347,7 +1347,7 @@ class FastDifPy(GracefulWorker):
         :param drain: Whether to drain the queue (disregard the diff between the enqueue and dequeue counters)
 
         """
-        success = []
+        success: List[Tuple[int, int, int, float]] = []
         error: List[Tuple[int, int, str]] = []
 
         while (not self.result_queue.empty()
