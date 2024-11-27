@@ -1006,7 +1006,7 @@ class FastDifPy(GracefulWorker):
             return False
 
         if cfg.make_diff_plots:
-            if cfg.plot_output_dir is None or cfg.diff_threshold is None:
+            if cfg.plot_output_dir is None or cfg.plot_threshold is None:
                 self.logger.error("Need plot output directory and diff threshold to make diff plots")
                 return False
 
