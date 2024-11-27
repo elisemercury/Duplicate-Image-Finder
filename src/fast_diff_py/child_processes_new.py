@@ -11,6 +11,7 @@ from typing import Tuple, Callable, Dict, Optional, Union
 import numpy as np
 
 import fast_diff_py.img_processing as imgp
+import fast_diff_py.utils as util
 from fast_diff_py.base_process import GracefulWorker
 from fast_diff_py.cache import BatchCache
 from fast_diff_py.datatransfer_new import PreprocessArg, PreprocessResult, SecondLoopArgs, SecondLoopResults
