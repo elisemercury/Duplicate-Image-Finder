@@ -383,6 +383,29 @@ class SecondLoopWorker(ChildProcess):
         else:
             return self.cache.y.get_image(key)
 
+    def make_plot(self, diff: float, x_path: str, y_path: str, x: int, y: int):
+        """
+        Make a plot for a given set of images
+
+        :param diff: The difference between the images
+        :param x_path: The path to the first image
+        :param y_path: The path to the second image
+        :param x: key of x image
+        :param y: key of y images
+
+        :return: None
+        """
+        img_a_org = imgp.load_org_image(path=x_path)
+
+        img_b_org = imgp.load_org_image(path=y_path)
+
+        imgp.make_dif_plot(min_diff=diff,
+                           img_a=os.path.basename(x_path),
+                           img_b=os.path.basename(y_path),
+                           mat_a=img_a_org,
+                           mat_b=img_b_org,
+                           store_path=os.path.join(self.plot_dir, f"{x}_{y}.png"))
+
     def process_batch_thumb(self, arg: SecondLoopArgs) -> SecondLoopResults:
         """
         Process a batch of images and return the results in the BatchCompareResult format
