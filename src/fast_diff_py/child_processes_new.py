@@ -441,7 +441,7 @@ class SecondLoopWorker(ChildProcess):
 
                     # Check hash
                     if self.match_hash is not None and self.match_hash:
-                        if self.determine_hash_match(arg.x_hashes, arg.y_hashes[i]):
+                        if self.determine_hash_match(arg.x_hashes, arg.y_hashes[i - start]):
                             diffs.append((arg.x, i, 2, 0.0))
 
                             self.make_plot(diff=0,
@@ -454,12 +454,12 @@ class SecondLoopWorker(ChildProcess):
 
                     # We have 0.0 -> means match the pixels
                     if self.match_aspect_by is not None and self.match_aspect_by == 0.0:
-                        if not self.match_px(arg.x_size, arg.y_size[i]):
+                        if not self.match_px(arg.x_size, arg.y_size[i - start]):
                             diffs.append((arg.x, i, 3, -1.0))
                             continue
 
                     if self.match_aspect_by is not None and self.match_aspect_by > 1.0:
-                        if not self.match_aspect_ratio_by(arg.x_size, arg.y_size[i]):
+                        if not self.match_aspect_ratio_by(arg.x_size, arg.y_size[i - start]):
                             diffs.append((arg.x, i, 3, -1.0))
                             continue
 
