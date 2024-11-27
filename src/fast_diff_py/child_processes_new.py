@@ -49,7 +49,9 @@ class ChildProcess(GracefulWorker):
         """
         Main function to run the child process
         """
-        self.register_interrupts()
+        # INFO: Registering interrupts leads to a dead lock when exiting. So only have the main process
+        #  intercept the interrupt
+        # self.register_interrupts()
         self.set_processing_function()
 
         count = 0
