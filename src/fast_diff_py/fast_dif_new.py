@@ -558,7 +558,7 @@ class FastDifPy(GracefulWorker):
                     plot_dir=self.config.second_loop.plot_output_dir,
                     ram_cache=self.ram_cache,
                     thumb_dir=self.config.thumb_dir if self.config.first_loop.compress else None,
-                    plot_threshold=self.config.second_loop.diff_threshold,
+                    plot_threshold=self.config.second_loop.plot_threshold,
                     make_plots=self.config.second_loop.make_diff_plots))
 
             self.handles = [mp.Process(target=w.main) for w in workers]
@@ -1144,7 +1144,7 @@ class FastDifPy(GracefulWorker):
             thumb_dir=self.config.thumb_dir,
             hash_short_circuit=self.config.second_loop.skip_matching_hash,
             match_aspect_by=self.config.second_loop.match_aspect_by,
-            plot_threshold=self.config.second_loop.diff_threshold,
+            plot_threshold=self.config.second_loop.plot_threshold,
             log_level=self.config.log_level_children,
             timeout=self.config.child_proc_timeout,
             make_plots=self.config.second_loop.make_diff_plots)
