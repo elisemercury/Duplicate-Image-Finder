@@ -78,11 +78,12 @@ class FastDifPy(GracefulWorker):
         with open(path, "w") as file:
             file.write(cfg)
 
-    def get_diff_pairs(self, delta: float = None) -> List[Tuple[str, str, float]]:
+    def get_diff_pairs(self, delta: float = None, matching_hash: bool = False) -> List[Tuple[str, str, float]]:
         """
         Get the diff pairs from the database. Wrapper for db.get_duplicate_pairs.
 
         :param delta: The threshold for the difference
+        :param matching_hash: Whether to include pairs with diff = 0 because their hashes matched
 
         INFO: Needs the db to exist and be connected
 
@@ -94,7 +95,7 @@ class FastDifPy(GracefulWorker):
         if delta is None:
             delta = self.config.second_loop.diff_threshold
 
-        for p in self.db.get_duplicate_pairs(delta):
+        for p in self.db.get_duplicate_pairs(delta, include_hash_match=matching_hash):
             yield p
 
     def get_diff_clusters(self, delta: float = None, dir_a: bool = True) -> Tuple[str, Dict[str, float]]:
