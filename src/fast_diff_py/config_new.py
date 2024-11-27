@@ -61,6 +61,9 @@ class SecondLoopConfig(BaseModel):
                                            description="the directory to store the diff plots"
                                                        "\n Must be set in conjunction with the make_diff_plots flag")
 
+    plot_threshold: Optional[float] = Field(None,
+                                            description="Threshold for generating a plot, defaults to diff_threshold")
+
     parallel: bool = Field(True,
                            description="Whether to run the second loop in parallel")
 
