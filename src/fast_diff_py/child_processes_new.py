@@ -339,7 +339,9 @@ class SecondLoopWorker(ChildProcess):
         assert xa >= 1, "Aspect Ratio is less than 1"
         assert ya >= 1, "Aspect Ratio is less than 1"
 
-        return xa * self.match_aspect_by >= ya >= xa / self.match_aspect_by
+        match = xa * self.match_aspect_by >= ya >= xa / self.match_aspect_by
+        # return xa * self.match_aspect_by >= ya >= xa / self.match_aspect_by
+        return match
 
     @staticmethod
     def match_px(x: Tuple[int, int], y: Tuple[int, int]) -> bool:
@@ -348,14 +350,20 @@ class SecondLoopWorker(ChildProcess):
 
         :returns True if the pixel size matches
         """
-        return (x[0] == y[0] and x[1] == y[1]) or (x[1] == y[0] and x[0] == y[1])
+        a = x[0] == y[0] and x[1] == y[1]
+        b = x[1] == y[0] and x[0] == y[1]
+        r = a or b
+        # return (x[0] == y[0] and x[1] == y[1]) or (x[1] == y[0] and x[0] == y[1])
+        return r
 
     @staticmethod
     def determine_hash_match(x: Tuple[int, int, int, int], y: Tuple[int, int, int, int]) -> bool:
         """
         Short circuit if the hashes match
         """
-        return len(set(x) & set(y)) > 0
+        l = len(set(x) & set(y))
+        # return len(set(x) & set(y)) > 0
+        return l > 0
 
     def get_image_from_cache(self, key: int, is_x: bool = True) -> np.ndarray[np.uint8]:
         """
