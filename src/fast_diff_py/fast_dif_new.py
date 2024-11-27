@@ -835,6 +835,7 @@ class FastDifPy(GracefulWorker):
             self.commit()
 
         self.cmd_queue = None
+
         if self.run:
             self.config.state = Progress.FIRST_LOOP_DONE
 
