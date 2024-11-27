@@ -877,6 +877,10 @@ class FastDifPy(GracefulWorker):
         if self.config.first_loop.compute_hash:
             self.db.create_hash_table_and_index()
 
+        if self.config.state == Progress.FIRST_LOOP_IN_PROGRESS:
+            self.logger.info("Resetting in progress pictures")
+            self.db.reset_preprocessing()
+
         # Sequential First Loop requested
         if not self.config.first_loop.parallel:
             self.sequential_first_loop()
