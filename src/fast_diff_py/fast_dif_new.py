@@ -245,6 +245,8 @@ class FastDifPy(GracefulWorker):
         else:
             raise ValueError("Not enough arguments are provided to initialize the FastDifPy object")
 
+        self.logger.setLevel(self.config.log_level)
+
         self.register_interrupts()
 
     def add_defaults_to_config(self):
