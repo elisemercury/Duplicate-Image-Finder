@@ -3,24 +3,6 @@ import numpy as np
 import skimage
 from typing import Tuple, Callable
 import os
-import hashlib
-
-
-def hash_file(path) -> str:
-    """
-    Hashes a file with sha256
-    :param path: file_path to hash
-    :return:
-    """
-    sha256_hash = hashlib.sha1()
-
-    with open(path, "rb") as f:
-        # Read and update hash string value in blocks of 4K
-        for byte_block in iter(lambda: f.read(4096), b""):
-            sha256_hash.update(byte_block)
-
-        result = sha256_hash.hexdigest()
-    return result
 
 
 def load_std_image(img_path: str, target_size: Tuple[int, int], resize: bool = True) -> (
