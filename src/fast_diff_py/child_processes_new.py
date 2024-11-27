@@ -468,12 +468,11 @@ class SecondLoopWorker(ChildProcess):
 
                     # Make a plot if necessary
                     if self.make_plots and diff < self.plot_threshold:
-                        imgp.make_dif_plot(min_diff=diff,
-                                           img_a=os.path.basename(arg.x_path),
-                                           img_b=os.path.basename(arg.y_path[i]),
-                                           mat_a=img_a,
-                                           mat_b=img_b,
-                                           store_path=os.path.join(self.plot_dir, f"{arg.x}_{i}.png"))
+                        self.make_plot(diff=0,
+                                       x_path=arg.x_path,
+                                       y_path=arg.y_path[i - start],
+                                       x=arg.x,
+                                       y=i)
 
                     diffs.append((arg.x, i, 1, diff))
 
