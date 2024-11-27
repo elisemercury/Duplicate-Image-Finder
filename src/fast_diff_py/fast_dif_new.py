@@ -333,6 +333,9 @@ class FastDifPy(GracefulWorker):
         # Index the directories
         self.perform_index()
 
+        if not self.run:
+            return
+
         # Switch the directories if necessary
         self.cond_switch_a_b()
 
