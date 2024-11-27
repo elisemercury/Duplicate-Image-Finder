@@ -50,7 +50,7 @@ class SecondLoopConfig(BaseModel):
                                      description="whether to skip the comparison if the hash matches\n"
                                                  "This forces the second loop algorithm to run with item submission"
                                                  " instead of batch submission")
-    match_aspect_by: Union[Annotated[float, Ge(1.0)], Literal[0]] = (
+    match_aspect_by: Optional[Union[Annotated[float, Ge(1.0)], Literal[0]]] = (
         Field(None,
               description="Matches the aspect ratio of the image. Either pixel by pixel in case of 0.0 or "
                           "the aspect ratio needs to be in  the interval a * factor > b > a / factor "))
