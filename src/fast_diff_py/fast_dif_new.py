@@ -1072,9 +1072,13 @@ class FastDifPy(GracefulWorker):
 
                 batch_size = min(self.db.get_dir_entry_count(True) // 4, self.config.batch_size_max_sl)
             else:
-                batch_size = min(self.db.get_dir_entry_count(True),
-                                 self.db.get_dir_entry_count(False),
-                                 self.config.batch_size_max_sl)
+                if self.config.root_dir_b is not None:
+                    batch_size = min(self.db.get_dir_entry_count(True),
+                                     self.db.get_dir_entry_count(False),
+                                     self.config.batch_size_max_sl)
+                else:
+                    batch_size = min(self.db.get_dir_entry_count(False),
+                                     self.config.batch_size_max_sl)
 
         args = {"cpu_proc": cpu_proc,
                 "gpu_proc": gpu_proc,
