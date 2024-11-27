@@ -76,6 +76,10 @@ class SecondLoopConfig(BaseModel):
                           description="The number of GPU processes to use for the second loop")
     cpu_proc: int = Field(default_factory=lambda: os.cpu_count(),
                             description="The number of CPU processes to use for the second loop")
+    keep_non_matching_aspects: bool = Field(False,
+                                            description="Whether to keep non matching aspects in the database for "
+                                                        "the diffs. This is useful for debugging purposes")
+
 
 class SecondLoopRuntimeConfig(SecondLoopConfig):
     cache_index: int = Field(0,
