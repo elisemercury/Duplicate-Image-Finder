@@ -1195,15 +1195,20 @@ class FastDifPy(GracefulWorker):
 
             success = list(filter(lambda x: x[3] < self.config.second_loop.diff_threshold, success))
 
+            if not self.config.second_loop.keep_non_matching_aspects:
+                success = list(filter(lambda x: x[2] != 3, success))
+
             self.db.bulk_insert_diff_success(success)
             self.db.bulk_insert_diff_error(error)
 
             self.prune_cache_batch()
+            self.commit()
 
         self.config.state = Progress.SECOND_LOOP_DONE
 
         self.cmd_queue = None
         self.ram_cache = None
+        self.commit()
 
     # ==================================================================================================================
     # Second Loop Cache Functions
