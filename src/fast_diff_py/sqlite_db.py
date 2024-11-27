@@ -452,25 +452,29 @@ class SQLiteDB(BaseSQliteDB):
         for row in self.sq_cur.fetchall():
             yield row
 
-    def get_cluster(self, delta: float, group_a: bool = True) -> Tuple[str, Dict[str, float]]:
+    def get_cluster(self, delta: float, group_a: bool = True, include_hash_match: bool = False) \
+            -> Tuple[str, Dict[str, float]]:
         """
         Get clusters of images that have a difference below the threshold.
 
         :param delta: The threshold for the difference
         :param group_a: Either group by directory a or directory b.
+        :param include_hash_match: Whether to include diffs of 0 that were a result of having matching hashes
         """
-        if group_a:
-            stmt = ("SELECT a.path, b.path, d.dif "
+        stmt = ("SELECT a.path, b.path, d.dif "
                 "FROM dif_table AS d "
                 "JOIN directory AS a ON a.key = d.key_a "
-                "JOIN directory AS b ON b.key=d.key_b "
-                "WHERE dif < ? AND d.success = 1 ORDER BY d.key_a, d.key_b")
+                "JOIN directory AS b ON b.key = d.key_b ")
+
+        if include_hash_match:
+            stmt += " WHERE dif < ? AND d.success IN (1, 2) "
         else:
-            stmt = ("SELECT a.path, b.path, d.dif "
-                "FROM dif_table AS d "
-                "JOIN directory AS a ON a.key = d.key_a "
-                "JOIN directory AS b ON b.key=d.key_b "
-                "WHERE dif < ? AND d.success = 1 ORDER BY d.key_b, d.key_a")
+            stmt += " WHERE dif < ? AND d.success = 1 "
+
+        if group_a:
+            stmt += "ORDER BY d.key_a, d.key_b"
+        else:
+            stmt += "ORDER BY d.key_b, d.key_a"
 
         self.debug_execute(stmt, (delta,))
 
