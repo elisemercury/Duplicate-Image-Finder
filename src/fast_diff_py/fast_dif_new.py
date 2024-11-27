@@ -29,7 +29,7 @@ class FastDifPy(GracefulWorker):
 
     # Child process perspective
     cmd_queue: Optional[mp.Queue] = None
-    result_queue: mp.Queue = mp.Queue()
+    result_queue: Optional[mp.Queue] = None
     logging_queue: mp.Queue = mp.Queue()
     ql: logging.handlers.QueueListener = None
 
@@ -510,6 +510,8 @@ class FastDifPy(GracefulWorker):
         else:
             self.cmd_queue = mp.Queue()
 
+        self.result_queue = mp.Queue()
+
         # Prefill the command queue
         prefill()
 
@@ -614,6 +616,7 @@ class FastDifPy(GracefulWorker):
         # Reset the handles
         self.handles = None
         self.cmd_queue = None
+        self.result_queue = None
 
     def generic_mp_loop(self, first_iteration: bool = True, benchmark: bool = False):
         """
@@ -786,6 +789,7 @@ class FastDifPy(GracefulWorker):
         """
         # Update the state
         self.cmd_queue = mp.Queue()
+        self.result_queue = mp.Queue()
         self.config.state = Progress.FIRST_LOOP_IN_PROGRESS
         self._enqueue_counter = 0
         self._dequeue_counter = 0
@@ -835,6 +839,7 @@ class FastDifPy(GracefulWorker):
             self.commit()
 
         self.cmd_queue = None
+        self.result_queue = None
 
         if self.run:
             self.config.state = Progress.FIRST_LOOP_DONE
@@ -1143,6 +1148,7 @@ class FastDifPy(GracefulWorker):
 
         # Set up the worker
         self.cmd_queue = mp.Queue()
+        self.result_queue = mp.Queue()
         self.ram_cache = {}
 
         slw = SecondLoopWorker(
@@ -1207,6 +1213,7 @@ class FastDifPy(GracefulWorker):
         self.config.state = Progress.SECOND_LOOP_DONE
 
         self.cmd_queue = None
+        self.result_queue = None
         self.ram_cache = None
         self.commit()
 
