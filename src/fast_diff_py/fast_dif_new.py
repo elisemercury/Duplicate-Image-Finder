@@ -1115,6 +1115,7 @@ class FastDifPy(GracefulWorker):
 
         if self.config.second_loop.parallel is False:
             self.sequential_second_loop()
+            return
 
         self.config.state = Progress.SECOND_LOOP_IN_PROGRESS
 
