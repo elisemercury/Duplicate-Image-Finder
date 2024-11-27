@@ -388,8 +388,9 @@ class FastDifPy(GracefulWorker):
         if self.config.root_dir_b is not None:
             self.__recursive_index(path=self.config.root_dir_b, dir_a=False)
 
-        self.config.state = Progress.INDEXED_DIRS
-        self.logger.info("Done Indexing Directories")
+        if self.run:
+            self.config.state = Progress.INDEXED_DIRS
+            self.logger.info("Done Indexing Directories")
         self.commit()
 
     def cond_switch_a_b(self):
