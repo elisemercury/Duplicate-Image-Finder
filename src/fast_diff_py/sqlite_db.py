@@ -423,22 +423,30 @@ class SQLiteDB(BaseSQliteDB):
         self.debug_execute(stmt)
         return self.sq_cur.fetchone()[0]
 
-    def get_duplicate_pairs(self, delta: float) -> List[Tuple[str, str, float]]:
+    def get_duplicate_pairs(self, delta: float, include_hash_match: bool = False) -> List[Tuple[str, str, float]]:
         """
         Get all Pairs of images that are below the threshold from the table.
 
         :param delta: The threshold for the difference
+        :param include_hash_match: Whether to include diffs of 0 that were a result of having matching hashes
 
         :return: List of tuples with the following information:
         - path_a
         - path_b
         - dif
         """
-        stmt = ("SELECT a.path, b.path, d.dif "
-                "FROM dif_table AS d "
-                "JOIN directory AS a ON a.key = d.key_a "
-                "JOIN directory AS b ON b.key = d.key_b "
-                "WHERE dif < ? AND d.success = 1 ORDER BY d.key_a, d.key_b")
+        if include_hash_match:
+            stmt = ("SELECT a.path, b.path, d.dif "
+                    "FROM dif_table AS d "
+                    "JOIN directory AS a ON a.key = d.key_a "
+                    "JOIN directory AS b ON b.key = d.key_b "
+                    "WHERE dif < ? AND d.success IN (1, 2) ORDER BY d.key_a, d.key_b")
+        else:
+            stmt = ("SELECT a.path, b.path, d.dif "
+                    "FROM dif_table AS d "
+                    "JOIN directory AS a ON a.key = d.key_a "
+                    "JOIN directory AS b ON b.key = d.key_b "
+                    "WHERE dif < ? AND d.success = 1 ORDER BY d.key_a, d.key_b")
 
         self.debug_execute(stmt, (delta,))
         for row in self.sq_cur.fetchall():
