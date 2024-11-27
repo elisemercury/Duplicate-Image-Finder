@@ -832,6 +832,7 @@ class FastDifPy(GracefulWorker):
 
             # Store the results
             self.store_batch_first_loop(results)
+            self.commit()
 
         self.cmd_queue = None
         if self.run:
@@ -839,6 +840,7 @@ class FastDifPy(GracefulWorker):
 
             # Reset the config
             self.config.first_loop = FirstLoopRuntimeConfig.model_validate(self.config.first_loop.model_dump())
+            self.commit()
 
     def first_loop(self, config: Union[FirstLoopConfig, FirstLoopRuntimeConfig] = None, chain: bool = False):
         """
