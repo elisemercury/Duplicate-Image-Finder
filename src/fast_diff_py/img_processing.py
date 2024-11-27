@@ -5,6 +5,24 @@ from typing import Tuple, Callable
 import os
 
 
+def load_org_image(path: str) -> np.ndarray[np.uint8]:
+    """
+    Get an original image from a path, do not resize
+
+    :param path: Path to the image
+
+    :return: The image as a numpy array
+    """
+    # Load the image
+    img = cv2.imdecode(np.fromfile(path, dtype=np.uint8), cv2.IMREAD_COLOR)
+
+    # Check the image is not grayscale
+    if len(img.shape) == 2:
+        img = skimage.color.gray2rgb(img)
+
+    return img
+
+
 def load_std_image(img_path: str, target_size: Tuple[int, int], resize: bool = True) -> (
         Tuple)[np.ndarray[np.uint8], Tuple[int, int]]:
     """
@@ -18,15 +36,8 @@ def load_std_image(img_path: str, target_size: Tuple[int, int], resize: bool = T
 
     :raises ValueError: If the image is not the correct size and resize is False
     """
-    # Load the image
-    img = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8), cv2.IMREAD_COLOR)
 
-    # Check the image is not grayscale
-    if len(img.shape) == 2:
-        img = skimage.color.gray2rgb(img)
-
-    # Squash the image to 3 channels
-    img = img[..., 0:3]
+    img = load_org_image(img_path)
     aspect = (img.shape[0], img.shape[1])
 
     if img.shape[0] != target_size[0] or img.shape[1] != target_size[1]:
