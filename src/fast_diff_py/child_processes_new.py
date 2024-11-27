@@ -155,9 +155,9 @@ class FirstLoopWorker(ChildProcess):
             self.hash_fn = hash_fn
         else:
             if self.old:
-                self.hash_fn = imgp.hash_file
+                self.hash_fn = util.hash_file
             else:
-                self.hash_fn = imgp.hash_np_array
+                self.hash_fn = util.hash_np
 
     def prep_logging(self, level: int = logging.DEBUG, q: mp.Queue = None):
         """
