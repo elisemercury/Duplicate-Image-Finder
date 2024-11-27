@@ -443,6 +443,13 @@ class SecondLoopWorker(ChildProcess):
                     if self.match_hash is not None and self.match_hash:
                         if self.determine_hash_match(arg.x_hashes, arg.y_hashes[i]):
                             diffs.append((arg.x, i, 2, 0.0))
+
+                            self.make_plot(diff=0,
+                                           x_path=arg.x_path,
+                                           y_path=arg.y_path[i - start],
+                                           x=arg.x,
+                                           y=i)
+
                             continue
 
                     # We have 0.0 -> means match the pixels
