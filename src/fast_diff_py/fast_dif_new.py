@@ -323,7 +323,7 @@ class FastDifPy(GracefulWorker):
     # Indexing
     # ==================================================================================================================
 
-    def full_index(self, chain: bool = False):
+    def full_index(self):
         """
         Full index performs all actions associated with indexing the files
         """
@@ -340,9 +340,6 @@ class FastDifPy(GracefulWorker):
         self.db.set_keys_zero_index()
 
         self.commit()
-
-        if chain:
-            self.first_loop(chain=True)
 
     def check_directories(self) -> bool:
         """
