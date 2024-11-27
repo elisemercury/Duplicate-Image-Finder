@@ -98,7 +98,8 @@ class FastDifPy(GracefulWorker):
         for p in self.db.get_duplicate_pairs(delta, include_hash_match=matching_hash):
             yield p
 
-    def get_diff_clusters(self, delta: float = None, dir_a: bool = True) -> Tuple[str, Dict[str, float]]:
+    def get_diff_clusters(self, delta: float = None, dir_a: bool = True, matching_hash: bool = False) \
+            -> Tuple[str, Dict[str, float]]:
         """
         Get a Cluster of Duplicates. Wrapper for db.get_cluster.
 
@@ -106,6 +107,7 @@ class FastDifPy(GracefulWorker):
 
         :param delta: The threshold for the difference
         :param dir_a: Whether to get the cluster for dir_a or dir_b
+        :param matching_hash: Whether to include pairs with diff = 0 because their hashes matched
 
         INFO: Needs the db to exist and be connected
 
@@ -118,7 +120,7 @@ class FastDifPy(GracefulWorker):
         if delta is None:
             delta = self.config.second_loop.diff_threshold
 
-        for h, d in self.db.get_cluster(delta, dir_a):
+        for h, d in self.db.get_cluster(delta, dir_a, matching_hash):
             yield h, d
 
     def reduce_diff(self, threshold: float):
