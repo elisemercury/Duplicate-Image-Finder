@@ -1034,15 +1034,20 @@ class FastDifPy(GracefulWorker):
                         make_diff_plots: bool = None,
                         plot_output_dir: str = None,
                         diff_threshold: float = None,
+                        plot_threshold: float = None,
                         parallel: bool = None,
                         ) -> SecondLoopRuntimeConfig:
+        set_plot_threshold = False
 
         if not self.config.first_loop.compress:
             raise ValueError("SecondLoop relies on pre compressed images from first loop")
 
         if make_diff_plots is not None:
-            if plot_output_dir is None or diff_threshold is None:
+            if plot_output_dir is None:
                 raise ValueError("Need plot output directory and diff threshold to make diff plots")
+            if plot_threshold is None:
+                self.logger.info("Plot Threshold not provided, defaulting to diff_threshold")
+                set_plot_threshold = True
 
         if cpu_proc is None:
             cpu_proc = os.cpu_count()
@@ -1070,10 +1075,15 @@ class FastDifPy(GracefulWorker):
                 "plot_output_dir": plot_output_dir,
                 "diff_threshold": diff_threshold,
                 "batch_size": batch_size,
+                "plot_threshold": plot_threshold,
                 "parallel": parallel}
 
         non_empty = {k: v for k, v in args.items() if v is not None}
-        return SecondLoopRuntimeConfig.model_validate(non_empty)
+        r = SecondLoopRuntimeConfig.model_validate(non_empty)
+        if set_plot_threshold:
+            r.plot_threshold = r.diff_threshold
+
+        return r
 
     def internal_second_loop(self):
         """
