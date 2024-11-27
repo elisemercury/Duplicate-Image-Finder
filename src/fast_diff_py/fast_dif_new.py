@@ -1168,7 +1168,7 @@ class FastDifPy(GracefulWorker):
             args = self.enqueue_batch_second_loop(submit=False)
 
             # Done?
-            if not args or  len(args) == 0:
+            if not args or len(args) == 0:
                 break
 
             # Process the batch
