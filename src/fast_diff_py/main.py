@@ -1,6 +1,6 @@
-import fast_diff_py.config_new as cfg
-import fast_diff_py.fast_dif_new as fdn
-from fast_diff_py.fast_dif_new import FastDifPy
+import fast_diff_py.config as cfg
+import fast_diff_py.fast_dif as fdn
+from fast_diff_py.fast_dif import FastDifPy
 import shutil
 import os
 
