@@ -413,7 +413,8 @@ class SQLiteDB(BaseSQliteDB):
         Insert the error of the diff into the database
         """
         restructured_args = [(key_a, key_b, to_b64(error)) for key_a, key_b, error in args]
-        stmt = "INSERT INTO  dif_table (key_a, key_b, success, error) VALUES (?, ?, 0, ?)"
+        stmt = ("INSERT INTO  dif_table (key_a, key_b, success, error) VALUES (?, ?, 0, ?) "
+                "ON CONFLICT(key_a, key_b) DO NOTHING")
         self.debug_execute_many(stmt, restructured_args)
 
     def get_pair_count_diff(self):
