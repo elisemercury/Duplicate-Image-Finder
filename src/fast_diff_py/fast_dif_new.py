@@ -984,13 +984,6 @@ class FastDifPy(GracefulWorker):
 
         self.db.batch_of_first_loop_results(results, has_hash=self.config.first_loop.compute_hash)
 
-    def can_submit_first_loop(self):
-        """
-        Check if we moved along far enough for us to submit more in the first loop queue.
-        """
-        val = self._dequeue_counter + self.config.batch_size_max_fl * 2 >= self._enqueue_counter
-        return val
-
     # ==================================================================================================================
     # Second Loop
     # ==================================================================================================================
