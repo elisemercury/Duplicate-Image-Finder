@@ -1241,6 +1241,7 @@ class FastDifPy(GracefulWorker):
             self.commit()
 
         self.config.state = Progress.SECOND_LOOP_DONE
+        self.config.second_loop = SecondLoopConfig.model_validate(self.config.second_loop.model_dump())
 
         self.cmd_queue = None
         self.result_queue = None
