@@ -642,6 +642,7 @@ class FastDifPy(GracefulWorker):
         # defining the two main functions for the loop
         submit_fn = self.submit_batch_first_loop if first_iteration else self.enqueue_batch_second_loop
         dequeue_fn = self.dequeue_results_first_loop if first_iteration else self.dequeue_second_loop_batch
+        can_submit_fn = self.can_submit_first_loop if first_iteration else self.can_submit_second_loop
 
         # Set up the multiprocessing environment
         self.multiprocessing_preamble(submit_fn, first_loop=first_iteration)
@@ -653,11 +654,11 @@ class FastDifPy(GracefulWorker):
             start = datetime.datetime.now(datetime.UTC)
             while self.run:
                 # Nothing left to submit
-                s = datetime.datetime.now(datetime.UTC)
-                if not submit_fn():
-                    break
-
-                enqueue_time += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
+                if can_submit_fn:
+                    s = datetime.datetime.now(datetime.UTC)
+                    if not submit_fn():
+                        break
+                    enqueue_time += (datetime.datetime.now(datetime.UTC) - s).total_seconds()
 
                 if self._dequeue_counter > self._last_dequeue_counter + bs / 4:
                     self.logger.info(f"Enqueued: {self._enqueue_counter} {task}")
@@ -702,8 +703,9 @@ class FastDifPy(GracefulWorker):
         # Normal implementation
         # ==============================================================================================================
         while self.run:
-            if not submit_fn():
-                break
+            if can_submit_fn():
+                if not submit_fn():
+                    break
 
             if self._dequeue_counter > self._last_dequeue_counter + bs / 4:
                 self.logger.info(f"Enqueued: {self._enqueue_counter} {task}")
