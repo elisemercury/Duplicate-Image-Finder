@@ -53,7 +53,7 @@ fdo.db.debug_execute("DROP TABLE IF EXISTS dif_table")
 # fdo = FastDifPy(dir_a=paths["wb_a"], dir_b=paths["wb_b"])
 # fdo.full_index()
 # fdo.first_loop()
-fdo.second_loop(parallel=False, skip_matching_hash=True, match_aspect_by=1.01,
+fdo.second_loop(parallel=True, skip_matching_hash=True, match_aspect_by=1.01,
                 make_diff_plots=True,
                 plot_output_dir="/home/alisot2000/Desktop/SAMPLE_MIRA/dir_a/diff_plot")
 print("-"*120)
