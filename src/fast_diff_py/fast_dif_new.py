@@ -627,7 +627,7 @@ class FastDifPy(GracefulWorker):
         """
         enqueue_time = 0
         dequeue_time = 0
-        task = "Images" if first_iteration else "Pairs"
+        task = "Images" if first_iteration else "Stripes"
 
         if first_iteration:
             bs = self.config.first_loop.batch_size \
@@ -642,7 +642,7 @@ class FastDifPy(GracefulWorker):
         # defining the two main functions for the loop
         submit_fn = self.submit_batch_first_loop if first_iteration else self.enqueue_batch_second_loop
         dequeue_fn = self.dequeue_results_first_loop if first_iteration else self.dequeue_second_loop_batch
-        can_submit_fn = self.can_submit_first_loop if first_iteration else self.can_submit_second_loop
+        can_submit_fn = lambda: True if first_iteration else self.can_submit_second_loop
 
         # Set up the multiprocessing environment
         self.multiprocessing_preamble(submit_fn, first_loop=first_iteration)
