@@ -1250,8 +1250,12 @@ class FastDifPy(GracefulWorker):
             self.prune_cache_batch()
             self.commit()
 
-        self.config.state = Progress.SECOND_LOOP_DONE
-        self.config.second_loop = SecondLoopConfig.model_validate(self.config.second_loop.model_dump())
+        if self.run:
+            self.config.state = Progress.SECOND_LOOP_DONE
+            self.config.second_loop = SecondLoopConfig.model_validate(self.config.second_loop.model_dump())
+            self.logger.info("Done with Second Loop")
+        else:
+            self.logger.info("Exiting Second Loop after Interrupt")
 
         self.cmd_queue = None
         self.result_queue = None
