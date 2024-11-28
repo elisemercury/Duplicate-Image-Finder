@@ -1140,11 +1140,11 @@ class FastDifPy(GracefulWorker):
             self.dir_a_count = self.db.get_dir_entry_count(False)
             self.dir_b_count = self.db.get_dir_entry_count(True)
             self.blocks = build_start_blocks_ab(self.dir_a_count, self.dir_b_count, self.config.second_loop.batch_size)
-            self.logger.debug(f"Created Blocks for A and B, number of blocks: {len(self.blocks)}")
+            self.logger.info(f"Created Blocks for A and B, number of blocks: {len(self.blocks)}")
         else:
             self.dir_a_count = self.db.get_dir_entry_count(False)
             self.blocks = build_start_blocks_a(self.dir_a_count, self.config.second_loop.batch_size)
-            self.logger.debug(f"Created Blocks for A , number of blocks: {len(self.blocks)}")
+            self.logger.info(f"Created Blocks for A , number of blocks: {len(self.blocks)}")
 
 
         # Reset the progress if we're coming from a in progress loop.
@@ -1324,7 +1324,7 @@ class FastDifPy(GracefulWorker):
         bp = {i + l_x: False for i in range(s_x)}
         self.block_progress_dict[self.config.second_loop.cache_index] = bp
 
-        self.logger.debug(f"Created Cache with key: {self.config.second_loop.cache_index}")
+        self.logger.info(f"Created Cache with key: {self.config.second_loop.cache_index}")
 
         self.ram_cache[self.config.second_loop.cache_index] = bc
 
@@ -1340,7 +1340,7 @@ class FastDifPy(GracefulWorker):
 
         # Check if all keys in the block progress dict are True
         if all(self.block_progress_dict[lowest_key].values()):
-            self.logger.debug(f"Pruning cache key: {lowest_key}")
+            self.logger.info(f"Pruning cache key: {lowest_key}")
             self.ram_cache.pop(lowest_key)
             self.block_progress_dict.pop(lowest_key)
             self.config.second_loop.finished_cache_index = lowest_key
