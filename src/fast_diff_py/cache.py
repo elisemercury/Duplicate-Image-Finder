@@ -76,6 +76,7 @@ class ImageCache:
                 print(f"Error loading image {i+self.offset}: {e}")
                 self.data[i] = np.zeros(self.img_shape, dtype=np.uint8)
 
+
 @dataclass
 class BatchCache:
     x: ImageCache
