@@ -904,6 +904,10 @@ class FastDifPy(GracefulWorker):
 
             # Reset the config
             self.config.first_loop = FirstLoopConfig.model_validate(self.config.first_loop.model_dump())
+            self.logger.info("Done with First Loop")
+            return
+
+        self.logger.info("Exiting First Loop after Interrupt")
 
     def submit_batch_first_loop(self) -> bool:
         """
