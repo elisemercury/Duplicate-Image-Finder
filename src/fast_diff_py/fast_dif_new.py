@@ -1285,7 +1285,9 @@ class FastDifPy(GracefulWorker):
                                img_shape=(self.config.compression_target, self.config.compression_target, 3))
 
             # Load the cache
+            cache.logger = self.logger
             cache.fill_thumbnails(thumbnail_dir=self.config.thumb_dir)
+            cache.logger = None
 
             # Create the x-y cache object
             bc = BatchCache(x=cache, y=cache)
@@ -1300,9 +1302,13 @@ class FastDifPy(GracefulWorker):
                            size=s_y,
                            img_shape=(self.config.compression_target, self.config.compression_target, 3))
 
+            y.logger = x.logger = self.logger
+
             # Load the cache
             x.fill_thumbnails(thumbnail_dir=self.config.thumb_dir)
             y.fill_thumbnails(thumbnail_dir=self.config.thumb_dir)
+
+            y.logger = x.logger = None
 
             # Create the x-y cache object
             bc = BatchCache(x=x, y=y)
