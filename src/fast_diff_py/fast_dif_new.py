@@ -654,7 +654,7 @@ class FastDifPy(GracefulWorker):
             start = datetime.datetime.now(datetime.UTC)
             while self.run:
                 # Nothing left to submit
-                if can_submit_fn:
+                if can_submit_fn():
                     s = datetime.datetime.now(datetime.UTC)
                     if not submit_fn():
                         break
