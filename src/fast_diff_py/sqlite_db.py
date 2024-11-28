@@ -1,7 +1,7 @@
 import os.path
 from typing import List, Dict, Set, Tuple
 
-from fast_diff_py.datatransfer_new import PreprocessArg, PreprocessResult
+from fast_diff_py.datatransfer import PreprocessArg, PreprocessResult
 from fast_diff_py.sqlite_wrapper import BaseSQliteDB
 from fast_diff_py.utils import to_b64
 
