@@ -1000,6 +1000,8 @@ class FastDifPy(GracefulWorker):
         """
         Run the second loop
         """
+        self.logger.info("Beginning Second Loop")
+
         if not self.run:
             return
 
