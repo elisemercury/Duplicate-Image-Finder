@@ -1001,11 +1001,12 @@ class FastDifPy(GracefulWorker):
         if not self.run:
             return
 
-        # Set the configuration
-        if "config" in kwargs:
-            self.config.second_loop = SecondLoopRuntimeConfig.model_validate(kwargs["config"])
-        else:
-            self.config.second_loop = self.second_loop_arg(**kwargs)
+        if not isinstance(self.config.second_loop, SecondLoopRuntimeConfig):
+            # Set the configuration
+            if "config" in kwargs:
+                self.config.second_loop = SecondLoopRuntimeConfig.model_validate(kwargs["config"])
+            else:
+                self.config.second_loop = self.second_loop_arg(**kwargs)
 
         # Check the configuration
         if not self.check_second_loop_config(self.config.second_loop):
