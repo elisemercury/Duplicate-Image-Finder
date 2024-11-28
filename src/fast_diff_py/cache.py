@@ -13,6 +13,7 @@ class ImageCache:
     img_shape: Tuple[int, int, int]
     data: np.ndarray[np.uint8]
     size: int
+    logger: Optional[logging.Logger] = None
 
     def __init__(self, offset: int, size: int, img_shape: Tuple[int, int, int]):
         """
@@ -41,11 +42,17 @@ class ImageCache:
                 self.data[i] = img
             # We encountered a value error -> The image didn't have the right shape when loaded.
             except ValueError as e:
-                print(f"Thumbnail is not of correct size {i+self.offset}")
+                if self.logger is None:
+                    print(f"Thumbnail is not of correct size {i+self.offset}")
+                else:
+                    self.logger.error(f"Thumbnail is not of correct size {i+self.offset}")
                 raise e
 
             except Exception as e:
-                print(f"Error loading image {i+self.offset}: {e}")
+                if self.logger is None:
+                    print(f"Error loading image {i+self.offset}: {e}")
+                else:
+                    self.logger.exception(f"Error loading image {i+self.offset}:", exc_info=e)
                 self.data[i] = np.zeros(self.img_shape, dtype=np.uint8)
 
     def fill_original(self, paths: List[str]):
