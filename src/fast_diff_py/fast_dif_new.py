@@ -1160,9 +1160,15 @@ class FastDifPy(GracefulWorker):
         # Run the second loop
         self.generic_mp_loop(first_iteration=False, benchmark=False)
 
+        self.ram_cache = None
+
         if self.run:
             self.config.state = Progress.SECOND_LOOP_DONE
             self.config.second_loop = SecondLoopConfig.model_validate(self.config.second_loop.model_dump())
+            self.logger.info("Done with Second Loop")
+            return
+
+        self.logger.info("Exiting Second Loop after Interrupt")
 
     def sequential_second_loop(self):
         """
