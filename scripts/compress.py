@@ -1,8 +1,8 @@
 import os.path
 
-import fast_diff_py.config_new as cfg
-from fast_diff_py.config_new import FirstLoopConfig
-from fast_diff_py.fast_dif_new import FastDifPy
+import fast_diff_py.config as cfg
+from fast_diff_py.config import FirstLoopConfig
+from fast_diff_py.fast_dif import FastDifPy
 import shutil
 
 paths = {"path_a": "/home/alisot2000/Desktop/SAMPLE_MIRA/dir_a/",

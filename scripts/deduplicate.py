@@ -2,9 +2,9 @@ import datetime
 import os.path
 import time
 
-import fast_diff_py.config_new as cfg
-from fast_diff_py.config_new import FirstLoopConfig
-from fast_diff_py.fast_dif_new import FastDifPy
+import fast_diff_py.config as cfg
+from fast_diff_py.config import FirstLoopConfig
+from fast_diff_py.fast_dif import FastDifPy
 import shutil
 
 # while datetime.datetime.now().hour < 3 and datetime.datetime.now().minute < 59:
