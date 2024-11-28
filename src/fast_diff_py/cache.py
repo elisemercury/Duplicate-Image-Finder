@@ -1,6 +1,8 @@
+import logging
 import os.path
-from typing import Tuple, List
 from dataclasses import dataclass
+from typing import Tuple, List, Optional
+
 import numpy as np
 
 import fast_diff_py.img_processing as imgp
