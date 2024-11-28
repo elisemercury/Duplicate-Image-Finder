@@ -642,7 +642,7 @@ class FastDifPy(GracefulWorker):
         # defining the two main functions for the loop
         submit_fn = self.submit_batch_first_loop if first_iteration else self.enqueue_batch_second_loop
         dequeue_fn = self.dequeue_results_first_loop if first_iteration else self.dequeue_second_loop_batch
-        can_submit_fn = lambda: True if first_iteration else self.can_submit_second_loop
+        can_submit_fn = self.can_submit_first_loop if first_iteration else self.can_submit_second_loop
 
         # Set up the multiprocessing environment
         self.multiprocessing_preamble(submit_fn, first_loop=first_iteration)
@@ -983,6 +983,13 @@ class FastDifPy(GracefulWorker):
                 res.hash_270 = lookup[res.hash_270]
 
         self.db.batch_of_first_loop_results(results, has_hash=self.config.first_loop.compute_hash)
+
+    @staticmethod
+    def can_submit_first_loop():
+        """
+        Function determines if we can submit for first loop. Is True, because we have limited Queue Size
+        """
+        return True
 
     # ==================================================================================================================
     # Second Loop
