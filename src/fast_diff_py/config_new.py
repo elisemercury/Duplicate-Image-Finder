@@ -79,6 +79,9 @@ class SecondLoopConfig(BaseModel):
     keep_non_matching_aspects: bool = Field(False,
                                             description="Whether to keep non matching aspects in the database for "
                                                         "the diffs. This is useful for debugging purposes")
+    preload_count: int = Field(4,
+                               description="Number of caches to prepare in advance. Tune this variable to ensure "
+                                           "you don't run into a memory overflow")
 
 
 class SecondLoopRuntimeConfig(SecondLoopConfig):
