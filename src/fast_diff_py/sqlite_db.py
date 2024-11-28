@@ -404,7 +404,8 @@ class SQLiteDB(BaseSQliteDB):
         """
         Insert the results of the diff into the database
         """
-        stmt = "INSERT INTO dif_table (key_a, key_b, success, dif) VALUES (?, ?, ?, ?)"
+        stmt = ("INSERT INTO dif_table (key_a, key_b, success, dif) VALUES (?, ?, ?, ?) "
+                "ON CONFLICT(key_a, key_b) DO NOTHING")
         self.debug_execute_many(stmt, args)
 
     def bulk_insert_diff_error(self, args: List[Tuple[int, int, str]]):
