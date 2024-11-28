@@ -1158,6 +1158,7 @@ class FastDifPy(GracefulWorker):
 
         if self.run:
             self.config.state = Progress.SECOND_LOOP_DONE
+            self.config.second_loop = SecondLoopConfig.model_validate(self.config.second_loop.model_dump())
 
     def sequential_second_loop(self):
         """
