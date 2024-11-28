@@ -852,6 +852,10 @@ class FastDifPy(GracefulWorker):
             # Reset the config
             self.config.first_loop = FirstLoopRuntimeConfig.model_validate(self.config.first_loop.model_dump())
             self.commit()
+            self.logger.info("Done with First Loop")
+            return
+
+        self.logger.info("Exiting First Loop after Interrupt")
 
     def first_loop(self, config: Union[FirstLoopConfig, FirstLoopRuntimeConfig] = None):
         """
@@ -859,6 +863,7 @@ class FastDifPy(GracefulWorker):
 
         :param config: The configuration for the first loop
         """
+        self.logger.info("Beginning First Loop")
         if not self.run:
             return
 
