@@ -1391,8 +1391,10 @@ class FastDifPy(GracefulWorker):
         success: List[Tuple[int, int, int, float]] = []
         error: List[Tuple[int, int, str]] = []
 
+        offset = self.config.second_loop.batch_size * self.config.second_loop.preload_count
+
         while (not self.result_queue.empty()
-               and (self._dequeue_counter + self.config.second_loop.batch_size * len(self.handles) < self._enqueue_counter
+               and (self._dequeue_counter + offset < self._enqueue_counter
                     or drain)):
             res: Union[SecondLoopResults, None] = self.result_queue.get()
 
