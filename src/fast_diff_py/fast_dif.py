@@ -11,10 +11,10 @@ import numpy as np
 
 from fast_diff_py.base_process import GracefulWorker
 from fast_diff_py.cache import ImageCache, BatchCache
-from fast_diff_py.child_processes_new import FirstLoopWorker, SecondLoopWorker
-from fast_diff_py.config_new import Config, Progress, FirstLoopConfig, SecondLoopConfig, SecondLoopRuntimeConfig, \
+from fast_diff_py.child_processes import FirstLoopWorker, SecondLoopWorker
+from fast_diff_py.config import Config, Progress, FirstLoopConfig, SecondLoopConfig, SecondLoopRuntimeConfig, \
     FirstLoopRuntimeConfig
-from fast_diff_py.datatransfer_new import (PreprocessResult, SecondLoopArgs, SecondLoopResults)
+from fast_diff_py.datatransfer import (PreprocessResult, SecondLoopArgs, SecondLoopResults)
 from fast_diff_py.sqlite_db import SQLiteDB
 from fast_diff_py.utils import sizeof_fmt, BlockProgress, build_start_blocks_a, build_start_blocks_ab
 
