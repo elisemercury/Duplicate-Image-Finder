@@ -1,2 +1,3 @@
-from fast_diff_py.sql_database import SQLiteDatabase
-from fast_diff_py.fastDif import FastDifPy, FastDiffPyConfig
+from fast_diff_py.config import Config, FirstLoopConfig, FirstLoopRuntimeConfig, SecondLoopConfig, SecondLoopRuntimeConfig
+from fast_diff_py.fast_dif import FastDifPy
+from fast_diff_py.sqlite_db import SQLiteDB
