@@ -85,3 +85,7 @@ Dir_a, Dir_b, dups
 Dir_a, Dir_b, dups
 (41318, 41586, 857)
 
+
+Workbench tiny 5000 Images
+- 4min 38s dif.py
+- 3min 58s fast-difpy
