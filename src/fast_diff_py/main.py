@@ -1,72 +1,122 @@
 import fast_diff_py.config as cfg
-import fast_diff_py.fast_dif as fdn
 from fast_diff_py.fast_dif import FastDifPy
-import shutil
-import os
 
-from fast_diff_py.img_processing import make_dif_plot
 
-paths = {"path_a": "/home/alisot2000/Desktop/SAMPLE_MIRA/dir_a/",
-     "path_b": "/home/alisot2000/Desktop/SAMPLE_MIRA/dir_b/",
-     "path_c": "/home/alisot2000/Desktop/SAMPLE_MIRA/dir_c/",
-         "tq-a": "/media/alisot2000/MacBeth/TQ-Picture-Benchmark",
-         "imdb": "/media/alisot2000/MacBeth/IMDB-Bench",
-         "wb_a": "/media/alisot2000/MacBeth/workbench/dir_a/",
-         "wb_b": "/media/alisot2000/MacBeth/workbench/dir_b/",
-         # "wbl_a": "/media/alisot2000/MacBeth/workbench_large/dir_a/",
-         # "wbl_b": "/media/alisot2000/MacBeth/workbench_large/dir_b/"
-         }
+# TODO finish implementation of this code
 
-if False:
-    for p in paths.values():
-        try:
-            shutil.rmtree(path=os.path.join(p, ".temp_thumb"))
-        except FileNotFoundError:
-            print("thumbs already deleted")
+def dif(dir_a: str, dir_b: str, purge: bool = False, **kwargs):
+    """
+    kwargs are all attributes of the Config class, except for root_dir_a and root_dir_b
 
-        try:
-            os.remove(path=os.path.join(p, ".fast_diff.db"))
-        except FileNotFoundError:
-            print("temp db already deleted")
+    :param dir_a: The first directory to compare
+    :param dir_b: The second directory to compare
+    :param purge: Delete any existing progress should it exist
 
-        try:
-            shutil.rmtree(path=os.path.join(p, "diff_plot"))
-        except FileNotFoundError:
-            print("diff_plot folder already deleted")
+    :return: FastDifPy object
+    """
+    fdo = FastDifPy(dir_a=dir_a, dir_b=dir_b, purge=purge, **kwargs)
 
-        try:
-            os.remove(path=os.path.join(p, ".task.json"))
-        except FileNotFoundError:
-            print("task already deleted")
+    # Keep progress, we're not done
+    fdo.config.retain_progress = True
+    fdo.config.delete_db = False
+    fdo.config.delete_thumb = False
 
-flc = cfg.FirstLoopConfig(compute_hash=True, compress=True)
-config = cfg.Config(delete_db=False, delete_thumb=False, first_loop=flc,
-                    root_dir_a=paths["path_a"],
-                    state=cfg.Progress.FIRST_LOOP_DONE,
-                    db_path="/home/alisot2000/Desktop/SAMPLE_MIRA/dir_a/.fast_diff.db",
-                    thumb_dir="/home/alisot2000/Desktop/SAMPLE_MIRA/dir_a/.temp_thumb",
-                    retain_progress=False)
+    # Run the index
+    if fdo.config.state == cfg.Progress.INIT:
+        if fdo.db.dir_table_exists():
+            fdo.db.drop_directory_table()
 
-fdo = FastDifPy(config=config)
-fdo.db.debug_execute("DROP TABLE IF EXISTS dif_table")
-# fdo = FastDifPy(dir_a=paths["path_a"], dir_b=paths["path_c"])
-# fdo = FastDifPy(dir_a=paths["wb_a"], dir_b=paths["wb_b"])
-# fdo.full_index()
-# fdo.first_loop()
-fdo.second_loop(parallel=True, skip_matching_hash=True, match_aspect_by=1.01,
-                make_diff_plots=True,
-                plot_output_dir="/home/alisot2000/Desktop/SAMPLE_MIRA/dir_a/diff_plot")
-print("-"*120)
-for x in fdo.get_diff_pairs(matching_hash=True):
-    print(x)
-print("-"*120)
+        fdo.full_index()
 
-for x in fdo.get_diff_clusters(dir_a=True, matching_hash=True):
-    print(x)
-print("-"*120)
+    # Exit in sigint
+    if not fdo.run:
+        fdo.commit()
+        fdo.cleanup()
+        return
 
-for x in fdo.get_diff_clusters(dir_a=False, matching_hash=True):
-    print(x)
-print("-"*120)
-fdo.commit()
-fdo.cleanup()
+    # Run the first loop
+    if fdo.config.state in (cfg.Progress.INDEXED_DIRS, cfg.Progress.FIRST_LOOP_IN_PROGRESS):
+        fdo.first_loop()
+
+    # Exit on sigint
+    if not fdo.run:
+        print("First Loop Exited")
+        fdo.commit()
+        fdo.cleanup()
+        return
+
+    # Run the second loop
+    if fdo.config.state in (cfg.Progress.SECOND_LOOP_IN_PROGRESS, cfg.Progress.FIRST_LOOP_DONE):
+        fdo.second_loop()
+
+    if not fdo.run:
+        fdo.commit()
+        fdo.cleanup()
+        return
+
+    # We're done, clean up
+    fdo.config.retain_progress = False
+    fdo.config.delete_db = True
+    fdo.config.delete_thumb = True
+
+    return fdo
+
+    # Keep progress, we're not done
+    fdo.config.retain_progress = True
+    fdo.config.delete_db = False
+    fdo.config.delete_thumb = False
+
+    # Run the index
+    if fdo.config.state == cfg.Progress.INIT:
+        if fdo.db.dir_table_exists():
+            fdo.db.drop_directory_table()
+
+        fdo.full_index()
+
+    # Exit in sigint
+    if not fdo.run:
+        fdo.commit()
+        fdo.cleanup()
+        return
+
+    # Run the first loop
+    if fdo.config.state in (cfg.Progress.INDEXED_DIRS, cfg.Progress.FIRST_LOOP_IN_PROGRESS):
+        fdo.first_loop()
+
+    # Exit on sigint
+    if not fdo.run:
+        print("First Loop Exited")
+        fdo.commit()
+        fdo.cleanup()
+        return
+
+    # Run the second loop
+    if fdo.config.state in (cfg.Progress.SECOND_LOOP_IN_PROGRESS, cfg.Progress.FIRST_LOOP_DONE):
+        fdo.second_loop()
+
+    if not fdo.run:
+        fdo.commit()
+        fdo.cleanup()
+        return
+
+    # We're done, clean up
+    fdo.config.retain_progress = False
+    fdo.config.delete_db = True
+    fdo.config.delete_thumb = True
+
+    return fdo
+
+
+if __name__ == "__main__":
+    o = dif(dir_a="/home/alisot2000/Desktop/workbench_tiny/dir_a",
+            dir_b="/home/alisot2000/Desktop/workbench_tiny/dir_b", purge=False)
+    for p in o.get_diff_pairs():
+        print(p)
+
+    for c in o.get_diff_clusters(dir_a=True):
+        print(c)
+
+    for c in o.get_diff_clusters(dir_a=False):
+        print(c)
+
+    o.cleanup()
