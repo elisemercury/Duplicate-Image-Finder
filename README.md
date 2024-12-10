@@ -20,7 +20,7 @@
 pip install difPy
 ```
 
-> ✨🚀 **Join the [difPy Pro beta tester](https://difpy.app/) program and be among to first to test the new difPy Pro desktop app!**
+> ✨🚀 **Join the [difPy for Desktop beta tester](https://difpy.app/) program and be among to first to test the new difPy desktop app!**
 
 > :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://difpy.readthedocs.io/en/latest/contributing.html) for more information.
 
@@ -44,7 +44,7 @@ difPy leverages Python's **multiprocessing capabilities** and is therefore able 
 2. [Output](https://github.com/elisemercury/Duplicate-Image-Finder#output)
 3. [Additional Parameters](https://github.com/elisemercury/Duplicate-Image-Finder#additional-parameters)
 4. [CLI Usage](https://github.com/elisemercury/Duplicate-Image-Finder#cli-usage)
-5. [difPy Pro for Desktop](https://github.com/elisemercury/Duplicate-Image-Finder#difpy-pro-for-desktop)
+5. [difPy for Desktop](https://github.com/elisemercury/Duplicate-Image-Finder#difpy-for-desktop)
 
 ## Basic Usage
 To make difPy search for duplicates **within one folder**:
@@ -200,11 +200,11 @@ difPy_xxx_stats.json
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
-## difPy Pro for Desktop
+## difPy for Desktop
 
 The new difPy Pro app brings difPy directly to your desktop. We now accept beta tester sign ups and will soon be starting our first tester access wave.
 
-✨🚀 **Join the [difPy Pro beta tester](https://difpy.app/) program now and be among to first to test the new difPy Pro desktop app!**
+✨🚀 **Join the [difPy for Desktop beta tester](https://difpy.app/) program now and be among to first to test the new difPy desktop app!**
 
 -------
 
