@@ -202,7 +202,7 @@ difPy_xxx_stats.json
 
 ## difPy for Desktop
 
-The new difPy Pro app brings difPy directly to your desktop. We now accept beta tester sign ups and will soon be starting our first tester access wave.
+The new difPy desktop app brings difPy directly to your desktop. We now accept beta tester sign ups and will soon be starting our first tester access wave.
 
 ✨🚀 **Join the [difPy for Desktop beta tester](https://difpy.app/) program now and be among to first to test the new difPy desktop app!**
 
