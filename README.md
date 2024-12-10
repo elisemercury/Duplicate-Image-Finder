@@ -1,5 +1,3 @@
-> ✨🚀 **Join the [difPy Pro beta tester](https://difpy.app/) program** and be among to first to test the new difPy Pro desktop app! 
-
 <p align="center">
   <img src="static/difPy_logo_3.png" width="300" title="Example Output: Duplicate Image Finder">
 </p>
@@ -22,7 +20,7 @@
 pip install difPy
 ```
 
-> :point_right: :new: **difPy v4** is out! difPy v4 comes with up to **10x more performance** than previous difPy versions. Check out the [release notes](https://github.com/elisemercury/Duplicate-Image-Finder/releases/) for details. 
+> ✨🚀 **Join the [difPy Pro beta tester](https://difpy.app/) program and be among to first to test the new difPy Pro desktop app!**
 
 > :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://difpy.readthedocs.io/en/latest/contributing.html) for more information.
 
