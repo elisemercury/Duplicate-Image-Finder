@@ -44,7 +44,7 @@ difPy leverages Python's **multiprocessing capabilities** and is therefore able 
 2. [Output](https://github.com/elisemercury/Duplicate-Image-Finder#output)
 3. [Additional Parameters](https://github.com/elisemercury/Duplicate-Image-Finder#additional-parameters)
 4. [CLI Usage](https://github.com/elisemercury/Duplicate-Image-Finder#cli-usage)
-5. [difPy Web App](https://github.com/elisemercury/Duplicate-Image-Finder#difpy-web-app)
+5. [difPy Pro for desktop](https://github.com/elisemercury/Duplicate-Image-Finder#difpy-pro)
 
 ## Basic Usage
 To make difPy search for duplicates **within one folder**:
@@ -200,15 +200,11 @@ difPy_xxx_stats.json
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
-## difPy Web App
+## difPy Pro
 
-difPy can also be accessed via a browser. With difPy Web, you can compare **up to 200 images** and download a **deduplicated ZIP file** - all powered by difPy. [Read more](https://github.com/elisemercury/difPy-app). 
+The new difPy Pro app brings difPy directly to your desktop. We now accept beta tester sign ups and will soon be starting our first tester access wave.
 
-:iphone: **Try the new [difPy Web App](https://difpy.app/)**!
-
-<p align="center">
-  <a href="https://difpy.app/"><img src="docs/static/assets/difPyweb_demo.gif" width="700" title="Demo: difPy Web App"></a>
-</p>
+✨🚀 **Join the [difPy Pro beta tester](https://difpy.app/) program now and be among to first to test the new difPy Pro desktop app!**
 
 -------
 
