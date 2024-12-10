@@ -44,7 +44,7 @@ difPy leverages Python's **multiprocessing capabilities** and is therefore able 
 2. [Output](https://github.com/elisemercury/Duplicate-Image-Finder#output)
 3. [Additional Parameters](https://github.com/elisemercury/Duplicate-Image-Finder#additional-parameters)
 4. [CLI Usage](https://github.com/elisemercury/Duplicate-Image-Finder#cli-usage)
-5. [difPy Pro for desktop](https://github.com/elisemercury/Duplicate-Image-Finder#difpy-pro)
+5. [difPy Pro for Desktop](https://github.com/elisemercury/Duplicate-Image-Finder#difpy-pro-for-desktop)
 
 ## Basic Usage
 To make difPy search for duplicates **within one folder**:
@@ -200,7 +200,7 @@ difPy_xxx_stats.json
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
 
-## difPy Pro
+## difPy Pro for Desktop
 
 The new difPy Pro app brings difPy directly to your desktop. We now accept beta tester sign ups and will soon be starting our first tester access wave.
 
