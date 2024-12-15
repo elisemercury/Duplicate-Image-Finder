@@ -20,12 +20,11 @@ difPy Guide
 
    /methods/build
    /methods/search
-   /methods/search_delete
    /methods/search_moveto
+   /methods/search_delete
 
 .. toctree::
    :maxdepth: 2
-   :hidden:
    :caption: Contributing to difPy
 
    /contributing
