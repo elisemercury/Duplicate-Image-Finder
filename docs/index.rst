@@ -12,18 +12,16 @@ difPy Guide
    /getting_started/basic_usage
    /getting_started/cli_usage
    /getting_started/output
-   /build/build
 
 .. toctree::
    :maxdepth: 2
    :hidden:
    :caption: Methods and parameters
 
-   /build
-   /build/build
-   /search/search
-   /search_delete/search_delete
-   /search_moveto/search_moveto
+   /methods/build
+   /methods/search
+   /methods/search_delete
+   /methods/search_moveto
 
 .. toctree::
    :maxdepth: 2

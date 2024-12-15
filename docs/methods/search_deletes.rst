@@ -27,4 +27,11 @@ The images are deleted based on the ``lower_quality`` output as described under 
 
 .. _silent_del:
 
-.. include:: /parameters/silent_del.rst
+silent_del (bool)
+++++++++++++
+
+.. note::
+
+   Please use with care, as this cannot be undone.
+
+When set to ``True``, the user confirmation for :ref:`search.delete` is skipped and the lower resolution matched images that were found by difPy are automatically deleted from their folder(s).

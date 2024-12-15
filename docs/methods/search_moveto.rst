@@ -19,4 +19,7 @@ difPy can automatically move the lower quality duplicate/similar images it found
 
 .. _destination_path:
 
-.. include:: /parameters/destination_path.rst
+destination_path (str)
+++++++++++++
+
+Directory of where the lower quality files should me moved. Should be given as Python ``string``.
