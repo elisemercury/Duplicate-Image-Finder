@@ -27,15 +27,15 @@ difPy Guide
    :maxdepth: 2
    :caption: Contributing to difPy
 
-   /contributing
-   /support
+   /contributing/contributing
+   /contributing/support
 
 .. toctree::
    :maxdepth: 2
    :hidden:
    :caption: Further Resources
 
-   /faq
+   /resources/faq
 
 .. image:: https://img.shields.io/badge/dif-Py-blue?style=flat&logo=python&labelColor=white&logoWidth=20.svg/"
    :target: https://github.com/elisemercury/Duplicate-Image-Finder
