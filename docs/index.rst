@@ -12,7 +12,6 @@ difPy Guide
    /getting_started/basic_usage
    /getting_started/cli_usage
    /getting_started/output
-   /getting_started/output/output
    /build/build
 
 .. toctree::
