@@ -3,6 +3,41 @@ difPy Guide
 
 .. _difPy:
 
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Getting started
+
+   /getting_started/installation
+   /getting_started/basic_usage
+   /getting_started/cli_usage
+   /getting_started/output
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Methods & parameters
+
+   /build/build
+   /search/search
+   /search_delete/search_delete
+   /search_moveto/search_moveto
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Contributing to difPy
+
+   /contributing
+   /support
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Further Resources
+
+   /faq
+
 .. image:: https://img.shields.io/badge/dif-Py-blue?style=flat&logo=python&labelColor=white&logoWidth=20.svg/"
    :target: https://github.com/elisemercury/Duplicate-Image-Finder
 

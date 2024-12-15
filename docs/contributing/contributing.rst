@@ -3,8 +3,6 @@ Contributing to difPy
 
 .. _Contributing:
 
-.. include:: /misc/support_difpy.rst
-
 difPy is constantly updated with code improvements, new features and requests from the community. Contributions are a good way to give feedback and to improve the functionalities and quality of the package.
 
 **Do you feel like difPy is missing a certain feature? Or do you have an idea of how to improve difPy?**
@@ -36,7 +34,3 @@ Your pull request and implementation will be reviewed and approved if it passes 
 👉 comment your code |br|
 👉 follow the code style of the project, including indentation |br|
 👉 update the `README.md <https://github.com/elisemercury/Duplicate-Image-Finder/blob/main/README.md>`_ instructions
-
-------------
-
-.. include:: /misc/support_difpy.rst
