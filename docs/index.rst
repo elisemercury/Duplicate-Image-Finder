@@ -16,10 +16,8 @@ difPy Guide
 
 .. toctree::
    :maxdepth: 2
-   :hidden:
    :caption: Methods and parameters
 
-   /build
    /build/build
    /search/search
    /search_delete/search_delete
