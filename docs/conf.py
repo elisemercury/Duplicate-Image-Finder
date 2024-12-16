@@ -18,10 +18,10 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
     'sphinx_rtd_theme',
-    #-- 'sphinxcontrib.googleanalytics'
+    'sphinxcontrib.googleanalytics'
 ]
 
-# -- googleanalytics_id = 'G-X002SSZTWC'
+googleanalytics_id = 'G-X002SSZTWC'
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
