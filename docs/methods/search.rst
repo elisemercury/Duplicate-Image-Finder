@@ -1,6 +1,6 @@
 .. _difPy.search:
 
-Invoke Search
+difPy.search
 ^^^^^^^^^^
 
 After the ``dif`` object has been built using :ref:`difPy.build`, the search can be initiated with ``difPy.search``. 
