@@ -7,7 +7,7 @@
    /getting_started/basic_usage
    /getting_started/cli_usage
    /getting_started/output
-   
+
 .. toctree::
    :maxdepth: 2
    :hidden:
@@ -20,6 +20,7 @@
 
 .. toctree::
    :maxdepth: 2
+   :hidden:
    :caption: Contributing
 
    /contributing/contributing
