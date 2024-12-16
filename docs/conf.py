@@ -39,7 +39,7 @@ html_static_path = ['_static']
 html_logo = "static/logos/logo.png"
 html_theme_options = {
     'logo_only': True,
-    'display_version': False,
+    'display_version': True,
 }
 
 # -- Options for EPUB output
