@@ -52,16 +52,6 @@ difPy leverages Python's multiprocessing capabilities and is therefore able to p
 
 Learn more about difPy, View difPy on `GitHub <https://github.com/elisemercury/Duplicate-Image-Finder>`_ and `PyPi <https://pypi.org/project/difPy/>`_.
 
-Guide Content
---------
-
-.. toctree::
-   :maxdepth: 3
-
-   usage
-   contributing
-   faq
-
 ------------
 
 .. include:: /misc/support_difpy.rst
