@@ -1,6 +1,6 @@
 .. _difPy.build:
 
-difPy.build
+difpy.build
 ^^^^^^^^^^
 
 Before difPy can perform any search, it needs to build its image repository and transform the images in the provided directory into tensors. This is what is done when ``difPy.build()`` is invoked.

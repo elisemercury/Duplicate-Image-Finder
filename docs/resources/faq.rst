@@ -14,7 +14,7 @@ Starting with `v4.1.0`_, difPy handles small and larger datasets differently. Si
 
 When difPy receives a **"small" dataset** (<= 5k images), it uses its classic algorithm and compares **all image combinations at once**, hence all of the image data is loaded into memory. This can speed up the comparison processing time, but in turn is heavier on memory consumption. Therefore, this algorithm is only used on smaller datasets.
 
-.. figure:: static/assets/simple_algorithm.png
+.. figure:: ./static/assets/simple_algorithm.png
    :width: 480
    :height: 170
    :alt: Simple algorithm visualized
