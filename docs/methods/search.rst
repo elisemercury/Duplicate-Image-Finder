@@ -89,7 +89,7 @@ By default, difPy will rotate the images on comparison. In total, 3 rotations ar
 show_progress (bool)
 ++++++++++++
 
-.. include:: /parameters/show_progress.rst
+See :ref:`show_progress`.
 
 processes (int)
 ++++++++++++
