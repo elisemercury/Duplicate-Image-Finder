@@ -35,6 +35,13 @@ templates_path = ['_templates']
 
 html_theme = 'sphinx_rtd_theme'
 
+html_static_path = ['_static']
+html_logo = "static/logos/logo.svg"
+html_theme_options = {
+    'logo_only': True,
+    'display_version': False,
+}
+
 # -- Options for EPUB output
 epub_show_urls = 'footnote'
 
