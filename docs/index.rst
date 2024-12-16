@@ -1,8 +1,3 @@
-difPy Guide
-===================================
-
-.. _difPy:
-
 .. toctree::
    :maxdepth: 2
    :hidden:
@@ -12,7 +7,7 @@ difPy Guide
    /getting_started/basic_usage
    /getting_started/cli_usage
    /getting_started/output
-
+   
 .. toctree::
    :maxdepth: 2
    :hidden:
@@ -38,6 +33,11 @@ difPy Guide
    /resources/large_datasets
    /resources/supported_filetypes
    /resources/report_bug
+
+difPy Guide
+===================================
+
+.. _difPy:
 
 .. image:: https://img.shields.io/badge/dif-Py-blue?style=flat&logo=python&labelColor=white&logoWidth=20.svg/"
    :target: https://github.com/elisemercury/Duplicate-Image-Finder
