@@ -19,7 +19,7 @@ difPy for desktop is available as beta version for Windows and Mac.
 Basic Usage
 ^^^^^^^^^^
 
-The difPy search process is divided into two steps: import and search. First folders need to be selected an imported, and then the search must be configured and can be started. 
+The difPy search process is divided into two steps: (1) import and (2) search. First folders need to be selected an imported, and then the search must be configured and can be started. 
 
 A new search can be started by clicking the "New Search" button in the center of the screen. 
 
@@ -29,8 +29,11 @@ Import Folders
 You can import one or more folders at once by clicking the "Browse" button. You can also paste folder paths (separated by ";") directly into the text box.
 
 When importing, you can select the following import modes:
+
 * Recursive
+
 * In-folder
+
 * Pixel size (recommended not to change)
 
 **Recursive**: defines whether difPy should search through the subfolders of the selected folders. If checked, difPy will search for matches in all subfolders.
@@ -43,7 +46,9 @@ Configure Search
 ++++++++++++
 
 The difPy search can be configured to search for:
+
 * duplicate or
+
 * similar images
 
 **Duplicate**: When difPy searches for duplicates, it searches foe exact matches and the mean squared error (MSE) is set to 0. The result will only contain matches of images that are exact duplicates of each other. Whenever you are searching for duplicate images with different file formats (i. e. imageA.png is a duplicate of imageB.jpg), it is recommended to set the search similarity to "similar".
@@ -54,6 +59,14 @@ The difPy search can be configured to search for:
     Currently the similarity MSE value can not be customized in the desktop app. If you need a different MSE value, please use the command line version of difPy.
 
 **Rotate**: When configuring the search, you can also select whether to **rotate** the images on comparison or not. If selected, difPy will rotate the images by 90°, 180°, or 270° at each comparison.
+
+Search Results
+++++++++++++
+
+
+Image Viewer
+++++++++++++
+
 
 Advanced Settings
 ^^^^^^^^^^
