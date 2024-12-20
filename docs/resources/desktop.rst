@@ -12,8 +12,9 @@ Installation
 
 difPy for desktop is available as beta version for Windows and Mac.
 
-➡️ Download difPy v1.0-beta for Windows (currently only available for beta testers)
-➡️ Download difPy v1.0-beta for MacOs (currently only available for beta testers)
+➡️ Download the difPy v1.0-beta app for Windows (*currently only available for beta testers*)
+
+➡️ Download the difPy v1.0-beta app for MacOs (*currently only available for beta testers*)
 
 Basic Usage
 ^^^^^^^^^^
@@ -77,7 +78,7 @@ Limitations
 
 * The desktop app is currently in beta and may contain bugs. If you encounter any issues, please report them on the GitHub repository.
 
-Give Reedback / Report Bug
+Give Feedback / Report Bug
 ^^^^^^^^^^
 
 Did you encounter an issue with the difPy desktop app? 🐞 Please report it `here <https://github.com/elisemercury/difpy-for-desktop/issues/new`_.
