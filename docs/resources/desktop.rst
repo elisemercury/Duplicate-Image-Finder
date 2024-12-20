@@ -94,6 +94,6 @@ Limitations
 Give Feedback / Report Bug
 ^^^^^^^^^^
 
-Did you encounter an issue with the difPy desktop app? 🐞 Please report it `here <https://github.com/elisemercury/difpy-for-desktop/issues/new`_.
+Did you encounter an issue with the difPy desktop app? 🐞 Please report it `here <https://github.com/elisemercury/difpy-for-desktop/issues/new>`_.
 
 Do you have feedback about the difPy desktop app? Anything you think could be improved? 🗨️ Share your feedback with us `here <https://github.com/elisemercury/difpy-for-desktop/discussions/new?category=feedback>`_.
