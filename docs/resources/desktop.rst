@@ -63,10 +63,24 @@ The difPy search can be configured to search for:
 Search Results
 ++++++++++++
 
+When difPy has completed the search, the results will be displayed, incl. the number of duplicate and/or similar matches it found.
+
+You can either:
+
+* **View the Search Logs** for more information about the search process
+
+* **View the Search Results** and manage your duplicate images in the difPy **Image Viewer**. See :ref:`image_viewer` for more information.
+
+.. _image_viewer:
 
 Image Viewer
-++++++++++++
+^^^^^^^^^^
 
+The difPy image viewer allows you to view the duplicate images and easily manage them. The Image Viewer lets you go through each group of matches, see the resolutions of each of the images so that you know which ones are safe to delete. 
+
+For each image, you you have the option to open it, move them it a new folder, or delete it.
+
+If you want to delete all lower resolution matches at once, you can use the "Bulk Actions..." dropdown menu and select the bulk action you would like to take.
 
 Advanced Settings
 ^^^^^^^^^^
