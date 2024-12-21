@@ -1,11 +1,14 @@
 .. _desktop:
 
+.. note::
+    ✨🚀  `Join the difPy for Desktop beta tester program <https://difpy.short.gy/desktop-beta-rtd>`_ now and be among to first to test the new difPy desktop app!
+
 difPy for Desktop
 ----------------
 
 difPy for Desktop brings image deduplication as an easy to use app to your desktop. We are now accepting beta tester sign ups and will soon be starting our first tester access wave.
 
-✨🚀  `Join the difPy for Desktop beta tester program <https://difpy.short.gy/desktop-beta-rtd>`_ now and be among to first to test the new difPy desktop app!
+.. _dsk_installation:
 
 Installation
 ^^^^^^^^^^
@@ -16,12 +19,16 @@ difPy for desktop is available as beta version for Windows and Mac.
 
 ➡️ Download the difPy v1.0-beta app for MacOs (*currently only available for beta testers*)
 
+.. _dsk_basic_usage:
+
 Basic Usage
 ^^^^^^^^^^
 
 The difPy search process is divided into two steps: (1) import and (2) search. First folders need to be selected an imported, and then the search must be configured and can be started. 
 
 A new search can be started by clicking the "New Search" button in the center of the screen. 
+
+.. _dsk_import:
 
 Import Folders
 ++++++++++++
@@ -42,6 +49,8 @@ When importing, you can select the following import modes:
 
 **Pixel size**: recommended not to change default value. Defines the width and height to which the images are compressed to before the search. The higher, the more precise but the slower the search. Default value is 50. If more precision is needed, incrementing in small steps of 50, starting with 100.
 
+.. _dsk_search:
+
 Configure Search
 ++++++++++++
 
@@ -53,12 +62,11 @@ The difPy search can be configured to search for:
 
 **Duplicate**: When difPy searches for duplicates, it searches foe exact matches and the mean squared error (MSE) is set to 0. The result will only contain matches of images that are exact duplicates of each other. Whenever you are searching for duplicate images with different file formats (i. e. imageA.png is a duplicate of imageB.jpg), it is recommended to set the search similarity to "similar".
 
-**Similar**: When searching for similar images, the MSE is set to 5. The results will contain images that have a MSE of 5 or less (i. e. it will include duplicate matches and similar matches). 
-
-.. note::
-    Currently the similarity MSE value can not be customized in the desktop app. If you need a different MSE value, please use the command line version of difPy.
+**Similar**: When searching for similar images, the MSE is set to 5. The results will contain images that have a MSE of 5 or less (i. e. it will include duplicate matches and similar matches). Currently the similarity MSE value can not be customized in the desktop app. If you need a different MSE value, please use the command line version of difPy.
 
 **Rotate**: When configuring the search, you can also select whether to **rotate** the images on comparison or not. If selected, difPy will rotate the images by 90°, 180°, or 270° at each comparison.
+
+.. _dsk_results:
 
 Search Results
 ++++++++++++
@@ -82,6 +90,8 @@ For each image, you you have the option to open it, move them it a new folder, o
 
 If you want to delete all lower resolution matches at once, you can use the "Bulk Actions..." dropdown menu and select the bulk action you would like to take.
 
+.. _dsk_advanced_settings:
+
 Advanced Settings
 ^^^^^^^^^^
 
@@ -96,6 +106,8 @@ From the difPy settings on the main menu, you can access advances search setting
 
 The ``process`` and ``chunksize`` are only used when difPy receives more than 5k images to process. With large datasets, it can make sense to adjust these parameters. For example, in order to lower the overall CPU overhead, you could lower ``processes``. In order to decrease memory usage, you could decrease ``chunksize``. The higher both parameters, the more performance you will gain, but the more resources the app will use.
 
+.. _dsk_limitations:
+
 Limitations
 ^^^^^^^^^^
 
@@ -104,6 +116,8 @@ Limitations
 * The desktop app is currently only available for Windows and Mac.
 
 * The desktop app is currently in beta and may contain bugs. If you encounter any issues, please report them on the GitHub repository.
+
+.. _dsk_feedback:
 
 Give Feedback / Report Bug
 ^^^^^^^^^^
