@@ -77,18 +77,18 @@ You can either:
 
 * **View the Search Logs** for more information about the search process
 
-* **View the Search Results** and manage your duplicate images in the difPy **Image Viewer**. See :ref:`image_viewer` for more information.
+* **View the Search Results** and manage your duplicate images in the difPy **Image Viewer**. See :ref:`dsk_image_viewer` for more information.
 
-.. _image_viewer:
+.. _dsk_image_viewer:
 
 Image Viewer
 ^^^^^^^^^^
 
-The difPy image viewer allows you to view the duplicate images and easily manage them. The Image Viewer lets you go through each group of matches, see the resolutions of each of the images so that you know which ones are safe to delete. 
+The difPy image viewer allows you to view the duplicate images and easily manage them. The Image Viewer lets you go through each group of matches, see the resolutions of each of the images so that you know which ones are safe to be deleted. 
 
-For each image, you you have the option to open it, move them it a new folder, or delete it.
+For each image, you have the option to open it, move it a new location, or delete it.
 
-If you want to delete all lower resolution matches at once, you can use the "Bulk Actions..." dropdown menu and select the bulk action you would like to take.
+If you want to move or delete all lower resolution matches at once, you can use the "Bulk Actions..." dropdown menu and select the bulk action you would like to take.
 
 .. _dsk_advanced_settings:
 
@@ -115,7 +115,7 @@ Limitations
 
 * The desktop app is currently only available for Windows and Mac.
 
-* The desktop app is currently in beta and may contain bugs. If you encounter any issues, please report them on the GitHub repository.
+* The desktop app is currently in beta and may contain bugs. If you encounter any issues, please report it. See :ref:`dsk_feedback`.
 
 .. _dsk_feedback:
 
