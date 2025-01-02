@@ -100,7 +100,7 @@ From the difPy settings on the main menu, you can access advanced search setting
 .. warning::
     It is not recommended to change the advanced settings unless you know what you are doing.
 
-**Proceses**: defines the maximum number of worker processes (i. e. parallel tasks) to perform when multiprocessing. The more processes, the faster the search, but the more processing power the app will use. See :ref:`processes` for more information.
+**Processes**: defines the maximum number of worker processes (i. e. parallel tasks) to perform when multiprocessing. The more processes, the faster the search, but the more processing power the app will use. See :ref:`processes` for more information.
 
 **Chunksize**: defines the number of image sets that should be compared at once per process. The higher the chunksize, the faster the search, but the more memory the app will use. See :ref:`chunksize` for more information.
 
