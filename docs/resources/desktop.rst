@@ -124,4 +124,4 @@ Give Feedback / Report Bug
 
 🐞 Did you encounter an issue with the difPy desktop app? Please report it `here <https://go.difpy.app/desktop-bug>`_.
 
-🗨️ Do you have feedback about the difPy desktop app? Anything you think could be improved? Share your feedback with us `here <https://go.difpy.app/desktop-feedback>`_.
+🗨️ Do you have feedback about the difPy desktop app? Share your feedback with us `here <https://go.difpy.app/desktop-feedback>`_.
