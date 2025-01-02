@@ -1,7 +1,7 @@
 .. _desktop:
 
 .. note::
-    ✨🚀  `Join the difPy for Desktop beta tester program <https://difpy.short.gy/desktop-beta-rtd>`_ now and be among to first to test the new difPy desktop app!
+    ✨🚀  `Join the difPy for Desktop beta tester program <https://go.difpy.app/desktop-beta-form>`_ now and be among to first to test the new difPy desktop app!
 
 difPy for Desktop
 ----------------
@@ -13,11 +13,11 @@ difPy for Desktop brings image deduplication as an easy to use app to your deskt
 Installation
 ^^^^^^^^^^
 
-difPy for desktop is available as beta version for Windows and Mac.
+difPy for desktop is available as beta version for Windows.
 
 ➡️ Download the difPy v1.0-beta app for Windows (*currently only available for beta testers*)
 
-➡️ Download the difPy v1.0-beta app for MacOs (*currently only available for beta testers*)
+➡️ Download the difPy v1.0-beta app for MacOs (*coming soon*)
 
 .. _dsk_basic_usage:
 
@@ -122,6 +122,6 @@ Limitations
 Give Feedback / Report Bug
 ^^^^^^^^^^
 
-Did you encounter an issue with the difPy desktop app? 🐞 Please report it `here <https://github.com/elisemercury/difpy-for-desktop/issues/new>`_.
+Did you encounter an issue with the difPy desktop app? 🐞 Please report it `here <https://go.difpy.app/desktop-bug>`_.
 
-Do you have feedback about the difPy desktop app? Anything you think could be improved? 🗨️ Share your feedback with us `here <https://github.com/elisemercury/difpy-for-desktop/discussions/new?category=feedback>`_.
+Do you have feedback about the difPy desktop app? Anything you think could be improved? 🗨️ Share your feedback with us `here <https://go.difpy.app/desktop-feedback>`_.
