@@ -26,7 +26,7 @@ After the search is completed, further actions can be performed using :ref:`sear
    :ref:`rotate`,``bool``,``True``,``False``
    :ref:`show_progress`,``bool``,``True``,``False``
    :ref:`processes`,``int``,``os.cpu_count()``, any ``int``
-   :ref:`chunksize`,``int``,``None``, any ``int``
+   :ref:`chunksize`,``int``,``None``, any ``int`` or ``float``
 
 .. _difPy_obj:
 
@@ -94,7 +94,7 @@ See :ref:`processes`.
 
 .. _chunksize:
 
-chunksize (int)
+chunksize (int, float)
 ++++++++++++
 
 .. warning::
@@ -108,4 +108,4 @@ The ``chunksize`` parameter is already **automatically set to an optimal value**
 
 By default, ``chunksize`` is set to ``None`` which implies: ``1'000'000 / number of images in dataset``. Parameter can only be >= 1.
 
-**Manual setting**: ``chunksize`` can be manually adjusted by setting it to any ``int`` >= 1.
+**Manual setting**: ``chunksize`` can be manually adjusted by setting it to any ``int`` or ``float`` >= 1.
