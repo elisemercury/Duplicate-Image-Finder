@@ -85,7 +85,7 @@ class build:
             _help._progress_bar(count, total_count, task='preparing files')
         
         # generate build statistics
-        stats = _generate_stats().build(start_time=start_time, end_time=end_time, total_files=len(filename_dictionary), invalid_files=invalid_files, skipped_files=skipped_files, directory=self.__directory, recursive=self.__recursive, in_folder=self.__in_folder, limit_extensions=self.__limit_extensions, px_size=self.__px_size, processes=self.__processes)
+        stats = _generate_stats.build(total_files=len(filename_dictionary), invalid_files=invalid_files, skipped_files=skipped_files, directory=self.__directory, start_time=start_time, end_time=end_time, recursive=self.__recursive, in_folder=self.__in_folder, limit_extensions=self.__limit_extensions, px_size=self.__px_size, processes=self.__processes)
 
         if self.__show_progress:
             count += 1
@@ -309,7 +309,7 @@ class search:
         end_time = datetime.now()
 
         # generate process stats
-        stats = _generate_stats().search(build_stats=self.__difpy_obj.stats, start_time=start_time, end_time=end_time, similarity = self.__similarity, rotate=self.__rotate, same_dim=self.__same_dim, processes=self.__processes, files_searched=len(self.__difpy_obj._tensor_dictionary), duplicate_count=duplicate_count, similar_count=similar_count, chunksize=self.__chunksize)
+        stats = _generate_stats.search(build_stats=self.__difpy_obj.stats, start_time=start_time, end_time=end_time, similarity = self.__similarity, rotate=self.__rotate, same_dim=self.__same_dim, processes=self.__processes, files_searched=len(self.__difpy_obj._tensor_dictionary), duplicate_count=duplicate_count, similar_count=similar_count, chunksize=self.__chunksize)
 
         return result, lower_quality, stats
 
@@ -745,60 +745,64 @@ class _generate_stats:
     '''
     A class for generating statistics on the difPy processes
     '''   
-    def __init__(self):
-        # Initialize the stats dict
-        self.stats = dict()
-
-    def build(self, **kwargs):
+    def build(**kwargs):
         # Function that generates stats for the Build process
-        seconds_elapsed = np.round((kwargs['end_time'] - kwargs['start_time']).total_seconds(), 4)
+        directory = kwargs['directory']
         total_files = kwargs['total_files']
         invalid_files = kwargs['invalid_files']
         for file in kwargs['skipped_files']:
             invalid_files.update({str(Path(file)) : 'Unsupported file type'})
-        self.stats.update({'directory' : kwargs['directory']})
-        
-        self.stats.update({'process' : {'build': {}}})   
-        self.stats['process']['build'].update({'duration' : {'start': kwargs['start_time'].isoformat(),
-                                                        'end' : kwargs['end_time'].isoformat(),
-                                                        'seconds_elapsed' : seconds_elapsed
-                                                       }})
-        self.stats['process']['build'].update({'parameters': {'recursive' : kwargs['recursive'],
-                                                         'in_folder' : kwargs['in_folder'],
-                                                         'limit_extensions' : kwargs['limit_extensions'],
-                                                         'px_size' : kwargs['px_size'],
-                                                         'processes' : kwargs['processes']
-                                                        }})
-        self.stats.update({'total_files' : total_files+len(invalid_files)})   
-        self.stats.update({'invalid_files': {'count' : len(invalid_files),
-                                               'logs' : invalid_files}})
-        
-        return self.stats
 
-    def search(self, **kwargs):
-        # Function that generates stats for the Search process
-        stats = kwargs['build_stats']
-        seconds_elapsed = np.round((kwargs['end_time'] - kwargs['start_time']).total_seconds(), 4)
-        stats['process'].update({'search' : {}})
-        stats['process']['search'].update({'duration' : {'start': kwargs['start_time'].isoformat(),
-                                                         'end' : kwargs['end_time'].isoformat(),
-                                                         'seconds_elapsed' : seconds_elapsed 
-                                                        }})
-        stats['process']['search'].update({'parameters' : {'similarity_mse': kwargs['similarity'],
-                                                           'rotate' : kwargs['rotate'],
-                                                           'same_dim' : kwargs['same_dim'],
-                                                           'processes' : kwargs['processes'],
-                                                           'chunksize' : kwargs['chunksize']                                                         
-                                                          }})
-        stats['process']['search'].update({'files_searched' : kwargs['files_searched']})
-        if kwargs['similarity'] == 0:
-            matches_output = {'duplicates': kwargs['duplicate_count']}
-        else:
-            matches_output = {'duplicates': kwargs['duplicate_count'],
-                              'similar' : kwargs['similar_count']}
+        build_stats = {
+            'directory' : directory,
+            'total_files' : total_files+len(invalid_files),
+            'invalid_files' : {
+                'count' : len(invalid_files),
+                'logs' : invalid_files
+            },
+            'process': {
+                'build' : {
+                    'duration' : {
+                        'start' : kwargs['start_time'].isoformat(),
+                        'end' : kwargs['end_time'].isoformat(),
+                        'seconds_elapsed' : np.round((kwargs['end_time'] - kwargs['start_time']).total_seconds(), 4),
+                    },
+                    'parameters' : {
+                        'recursive' : kwargs['recursive'],
+                        'in_folder' : kwargs['in_folder'],
+                        'limit_extensions' : kwargs['limit_extensions'],
+                        'px_size' : kwargs['px_size'],
+                        'processes' : kwargs['processes'],
+                    }
+                }
+            }
+        }
+        return build_stats
 
-        stats['process']['search'].update({'matches_found' : matches_output})        
-        return stats
+    def search(**kwargs):
+        # Function that generates stats for the Search process  
+        search_stats = {
+            'search' : {
+                'duration' : {
+                    'start' : kwargs['start_time'].isoformat(),
+                    'end' : kwargs['end_time'].isoformat(),
+                    'seconds_elapsed' : np.round((kwargs['end_time'] - kwargs['start_time']).total_seconds(), 4),
+                },
+                'parameters' : {
+                    'similarity_mse' : kwargs['similarity'],
+                    'rotate' : kwargs['rotate'],
+                    'same_dim' : kwargs['same_dim'],
+                    'processes' : kwargs['processes'],
+                    'chunksize' : kwargs['chunksize']
+                },
+                'files_searched' : kwargs['files_searched'],
+                'matches_found' : {
+                    'duplicates': kwargs['duplicate_count'],
+                    'similar' : kwargs['similar_count']}
+            }
+        }
+        kwargs['build_stats']['process'].update(search_stats)
+        return kwargs['build_stats']
 
 class _validate_param:
     '''
