@@ -25,7 +25,7 @@ After the search is completed, further actions can be performed using :ref:`sear
    :ref:`same_dim`,``bool``,``True``,``False``
    :ref:`rotate`,``bool``,``True``,``False``
    :ref:`show_progress2`,``bool``,``True``,``False``
-   :ref:`processes`,``int``,``None`` (``os.cpu_count()``), any ``int``
+   :ref:`processes`,``int``,``os.cpu_count()``, any ``int``
    :ref:`chunksize`,``int``,``None``, any ``int``
 
 .. _difPy_obj:

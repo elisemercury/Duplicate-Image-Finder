@@ -24,7 +24,7 @@ Upon completion, ``difPy.build()`` returns a ``dif`` object that can be used in 
    :ref:`limit_extensions`,``bool``,``True``,``False``
    :ref:`px_size`,"``int``, ``float``",50, ``int``
    :ref:`show_progress`,``bool``,``True``,``False``
-   :ref:`processes`,``int``,``None`` (``os.cpu_count()``), ``int``
+   :ref:`processes`,``int``,``os.cpu_count()``, ``int``
 
 .. note::
 
