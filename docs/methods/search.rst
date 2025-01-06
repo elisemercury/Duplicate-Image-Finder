@@ -24,7 +24,7 @@ After the search is completed, further actions can be performed using :ref:`sear
    :ref:`similarity`,"``str``, ``int``",``'duplicates'``, "``'similar'``, any ``int`` or ``float``"
    :ref:`same_dim`,``bool``,``True``,``False``
    :ref:`rotate`,``bool``,``True``,``False``
-   :ref:`show_progress2`,``bool``,``True``,``False``
+   :ref:`show_progress`,``bool``,``True``,``False``
    :ref:`processes`,``int``,``os.cpu_count()``, any ``int``
    :ref:`chunksize`,``int``,``None``, any ``int``
 
