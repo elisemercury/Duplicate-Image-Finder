@@ -990,26 +990,14 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--logs', type=lambda x: bool(_help._strtobool(x)), help='(Deprecated) Collect statistics during the process.', required=False, choices=[True, False], default=None)
     parser.add_argument('-la', '--lazy', type=lambda x: bool(_help._strtobool(x)), help='(Deprecated) Only compare image having the same dimensions (width x height).', required=False, choices=[True, False], default=None)    
 
-
     args = parser.parse_args()
 
+    # validate input arguments
     if args.logs != None:
         _validate_param._kwargs(["logs"])
 
     if args.lazy != None:
         _validate_param._kwargs(["lazy"])
-
-    # initialize difPy
-    dif = build(args.directory, recursive=args.recursive, in_folder=args.in_folder, limit_extensions=args.limit_extensions, px_size=args.px_size, show_progress=args.show_progress, processes=args.processes, )
-    
-    # perform search
-    se = search(dif, similarity=args.similarity, rotate=args.rotate, same_dim=args.same_dim, processes=args.processes, chunksize=args.chunksize)
-
-    # create filenames for the output files
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    result_file = f'difPy_{timestamp}_results.json'
-    lq_file = f'difPy_{timestamp}_lower_quality.txt'
-    stats_file = f'difPy_{timestamp}_stats.json'
 
     # check if 'output_directory' parameter exists
     if args.output_directory != None:
@@ -1019,22 +1007,34 @@ if __name__ == '__main__':
     else:
         dir = os.getcwd()
 
+    # check if 'move_to' and 'delete' are both given
+    if args.move_to != None and args.delete != None:
+        raise Exception(f'"move_to" and "delete" parameter are mutually exclusive. Please select one of them.')
+
+    # run difPy
+    dif = build(args.directory, recursive=args.recursive, in_folder=args.in_folder, limit_extensions=args.limit_extensions, px_size=args.px_size, show_progress=args.show_progress, processes=args.processes, )
+    se = search(dif, similarity=args.similarity, rotate=args.rotate, same_dim=args.same_dim, processes=args.processes, chunksize=args.chunksize)
+
+    # create filenames for the output files
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    result_file = f'difPy_{timestamp}_results.json'
+    lq_file = f'difPy_{timestamp}_lower_quality.txt'
+    stats_file = f'difPy_{timestamp}_stats.json'
+
     # output 'search.results' to file
     with open(os.path.join(dir, result_file), 'w') as file:
         json.dump(se.result, file)
-
     # output 'search.stats' to file
     with open(os.path.join(dir, stats_file), 'w') as file:
         json.dump(se.stats, file)
+    # output 'search.lower_quality' to file
+    with open(os.path.join(dir, lq_file), 'w') as file:
+        json.dump(se.lower_quality, file)
 
     # check 'move_to' parameter
     if args.move_to != None:
         # move lower quality files
         se.move_to(args.move_to)
-
-    # output 'search.lower_quality' to file
-    with open(os.path.join(dir, lq_file), 'w') as file:
-        json.dump(se.lower_quality, file)
 
     # check 'delete' parameter
     if args.delete:
