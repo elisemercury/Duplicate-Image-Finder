@@ -61,14 +61,16 @@ In these cases, the MSE between the two image tensors might not be exactly == 0,
 same_dim (bool)
 ++++++++++++
 
-By default, when searching for matches, difPy assumes images to have **the same dimensions** (width x height). To search for images with different dimensions (f. e. if images are cropped versions of one another), set this parameter to ``False``.
+By default, when searching for matches, difPy assumes images to have **the same dimensions** (width x height).
 
 ``True`` = (default) assumes matches have the same dimensions
 
 ``False`` = assumes matches can have different dimensions
 
-.. warning::
-   Assuming that image matches have the same dimensions is suitable for most use cases. Nonetheless, if you are searching for duplicate/similar images that have different **file types** (i. e. imageA.png is a duplicate of imageA.jpg), ``same_dim`` should be set to ``False``.
+.. note::
+   ``same_dim`` should be set to ``False`` if you are searching for image matches that have:
+   * different **file types** (i. e. imageA.png is a duplicate of imageA.jpg)
+   * different **dimensions** (f. e. if images are cropped versions of one another)
 
 .. _rotate:
 
