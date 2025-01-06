@@ -344,7 +344,6 @@ class search:
                         result_raw = result_raw + output
                     self.__count += 1  
                     if self.__show_progress:
-                        print(self.__count, end="\r")
                         _help._progress_bar(self.__count, len(self.__difpy_obj._tensor_dictionary.keys())-1, task=f'searching files')     
 
         # format the end result
