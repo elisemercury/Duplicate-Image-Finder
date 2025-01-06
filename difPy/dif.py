@@ -95,7 +95,7 @@ class build:
 
     def _get_files(self):
         # Function that searches for files in the input directories
-        valid_files_all = np.array([], dtype=object)  # Initialize as empty numpy array
+        valid_files_all = np.array([], dtype=object)
         skipped_files_all = np.array([], dtype=object)
         
         if self.__in_folder:
