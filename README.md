@@ -127,7 +127,7 @@ search.stats
                                      'seconds_elapsed': 5.14},
                         'parameters': {'similarity_mse': 0,
                                        'rotate': True,
-                                       'lazy': True,
+                                       'same_dim': True,
                                        'processes': 5,
                                        'chunksize': None},
                         'files_searched': 3232,
@@ -143,12 +143,12 @@ difPy supports the following parameters:
 
 ```python
 difPy.build(*directory, recursive=True, in_folder=False, limit_extensions=True, px_size=50, 
-            show_progress=True, processes=None)
+            show_progress=True, processes=os.cpu_count())
 ```
 
 ```python
-difPy.search(difpy_obj, similarity='duplicates', rotate=True, lazy=True, show_progress=True, 
-             processes=None, chunksize=None)
+difPy.search(difpy_obj, similarity='duplicates', rotate=True, same_dim=True, show_progress=True, 
+             processes=os.cpu_count(), chunksize=None)
 ```
 
 :notebook: For a **detailed usage guide**, please view the official **[difPy Usage Documentation](https://difpy.readthedocs.io/)**.
@@ -172,14 +172,14 @@ difPy CLI supports the following arguments:
 dif.py [-h] [-D DIRECTORY [DIRECTORY ...]] [-Z OUTPUT_DIRECTORY] 
        [-r {True,False}] [-i {True,False}] [-le {True,False}] 
        [-px PX_SIZE]  [-s SIMILARITY] [-ro {True,False}]
-       [-la {True,False}] [-proc PROCESSES] [-ch CHUNKSIZE] 
+       [-dim {True,False}] [-proc PROCESSES] [-ch CHUNKSIZE] 
        [-mv MOVE_TO] [-d {True,False}] [-sd {True,False}]
        [-p {True,False}]
 ```
 
 | | Parameter | | Parameter |
 | :---: | ------ | :---: | ------ | 
-| `-D` | directory | `-la` | lazy |
+| `-D` | directory | `-dim` | same_dim |
 | `-Z` | output_directory | `-proc` | processes | 
 | `-r`| recursive | `-ch` | chunksize |
 | `-i`| in_folder | `-mv` | move_to |
