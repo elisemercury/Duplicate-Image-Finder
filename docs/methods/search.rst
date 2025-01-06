@@ -11,7 +11,7 @@ After the search is completed, further actions can be performed using :ref:`sear
 
 .. code-block:: python
 
-   difPy.search(difPy_obj, similarity='duplicates', lazy=True, rotate=True, processes=None, chunksize=None, show_progress=False, logs=True)
+   difPy.search(difPy_obj, similarity='duplicates', same_dim=True, rotate=True, processes=None, chunksize=None, show_progress=False, logs=True)
 
 ``difPy.search`` supports the following parameters:
  
@@ -22,7 +22,7 @@ After the search is completed, further actions can be performed using :ref:`sear
 
    :ref:`difPy_obj`,"``difPy_obj``",,
    :ref:`similarity`,"``str``, ``int``",``'duplicates'``, "``'similar'``, any ``int`` or ``float``"
-   :ref:`lazy`,``bool``,``True``,``False``
+   :ref:`same_dim`,``bool``,``True``,``False``
    :ref:`rotate`,``bool``,``True``,``False``
    :ref:`show_progress2`,``bool``,``True``,``False``
    :ref:`processes`,``int``,``None`` (``os.cpu_count()``), any ``int``
@@ -46,34 +46,29 @@ difPy compares the images to find duplicates or similarities, based on the MSE (
 
 ``"similar"`` = searches for similar images. MSE threshold is set to ``5``.
 
-The search for similar images can be useful when searching for duplicate files that might have different file **types** (i. e. imageA.png has a duplicate imageA.jpg) and/or different file **sizes** (f. e. imageA.png (100MB) has a duplicate imageA.png (50MB)). In these cases, the MSE between the two image tensors might not be exactly == 0, hence they would not be classified as being duplicates even though in reality they are. Setting ``similarity`` to ``"similar"`` searches for duplicates with a certain tolerance, increasing the likelihood of finding duplicate images of different file types and sizes. Depending on which ``similarity`` level is chosen, the ``lazy`` parameter should be adjusted accordingly (see :ref:`lazy`).
+The search for similar images can be useful when searching for duplicate files that:
 
-.. figure:: docs/static/assets/choosing_similarity.png
-   :width: 540
-   :height: 390
-   :alt: Setting the "similarity" & "lazy" Parameter
-   :align: center
+* are different file **types** (f. e. imageA.png has a duplicate imageA.jpg) 
+* have different file **sizes** (f. e. imageA.png (100MB) has a duplicate imageA.png (50MB))
+* are cropped version of one another (f. e. imageA.png is a cropped version of imageB.png) (in this case, :ref:`same_dim` should be set to ``False``)
 
-   Setting the "similarity" and "lazy" parameter
+In these cases, the MSE between the two image tensors might not be exactly == 0, hence they would not be classified as being duplicates even though in reality they are. Setting ``similarity`` to ``"similar"`` searches for duplicates with a certain tolerance, increasing the likelihood of finding duplicate images of different file types and sizes. 
 
 **Manual setting**: the match MSE threshold can be adjusted manually by setting the ``similarity`` parameter to any ``int`` or ``float``. difPy will then search for images that match an MSE threshold **equal to or lower than** the one specified.
    
-.. _lazy:
+.. _same_dim:
 
-lazy (bool)
+same_dim (bool)
 ++++++++++++
 
-By default, difPy searches using a Lazy algorithm. This algorithm assumes that the image matches we are looking for have **the same dimensions**, i. e.duplicate images have the same width and height. If two images do not have the same dimensions, they are automatically assumed to not be duplicates. Therefore, because these images are skipped, this algorithm can provide a significant **improvement in performance**.
+By default, when searching for matches, difPy assumes images to have **the same dimensions** (width x height). To search for images with different dimensions (f. e. if images are cropped versions of one another), set this parameter to ``False``.
 
-``True`` = (default) applies the Lazy algorithm
+``True`` = (default) assumes matches have the same dimensions
 
-``False`` = regular algorithm is used
+``False`` = assumes matches can have different dimensions
 
-**When should the Lazy algorithm not be used?**
-The Lazy algorithm can speed up the comparison process significantly. Nonetheless, the algorithm might not be suited for your use case and might result in missing some matches. Depending on which ``similarity`` level is chosen, the ``lazy`` parameter should be adjusted accordingly (see :ref:`similarity`). Set ``lazy = False`` if you are searching for duplicate images with:
-
-*  different **file types** (i. e. imageA.png is a duplicate of imageA.jpg)
-*  and/or different **file sizes** (i. e. imageA.png (100MB) is a duplicate of imageA_compressed.png (50MB))
+.. warning::
+   Assuming that image matches have the same dimensions is suitable for most use cases. Nonetheless, if you are searching for duplicate/similar images that have different **file types** (i. e. imageA.png is a duplicate of imageA.jpg), ``same_dim`` should be set to ``False``.
 
 .. _rotate:
 
