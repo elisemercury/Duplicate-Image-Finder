@@ -251,7 +251,7 @@ class search:
     '''
     A class used to search for matches in a difPy image repository
     '''
-    def __init__(self, difpy_obj, similarity='duplicates', rotate=True, lazy=True, show_progress=True, processes=None, chunksize=None, **kwargs):
+    def __init__(self, difpy_obj, similarity='duplicates', rotate=True, same_dim=True, show_progress=True, processes=None, chunksize=None, **kwargs):
         '''
         Parameters
         ----------
@@ -261,7 +261,7 @@ class search:
             Image comparison similarity threshold (mse) (default is 'duplicates', 0)
         rotate : bool (optional)
             Rotates images on comparison (default is True)
-        lazy : bool (optional)
+        same_dim : bool (optional)
             Only searches for duplicate/similar images that have the same dimensions (width x height in pixels) (default is True)
         show_progress : bool (optional)
             Show the difPy progress bar in console (default is True)
@@ -275,7 +275,7 @@ class search:
         self.__difpy_obj = difpy_obj
         self.__similarity = _validate_param._similarity(similarity)
         self.__rotate = _validate_param._rotate(rotate)
-        self.__lazy = _validate_param._lazy(lazy, self.__similarity)
+        self.__same_dim = _validate_param._same_dim(same_dim, self.__similarity)
         self.__show_progress = _validate_param._show_progress(show_progress)
         self.__processes = _validate_param._processes(processes)
         self.__chunksize = _validate_param._chunksize(chunksize)
@@ -309,7 +309,7 @@ class search:
         end_time = datetime.now()
 
         # generate process stats
-        stats = _generate_stats().search(build_stats=self.__difpy_obj.stats, start_time=start_time, end_time=end_time, similarity = self.__similarity, rotate=self.__rotate, lazy=self.__lazy, processes=self.__processes, files_searched=len(self.__difpy_obj._tensor_dictionary), duplicate_count=duplicate_count, similar_count=similar_count, chunksize=self.__chunksize)
+        stats = _generate_stats().search(build_stats=self.__difpy_obj.stats, start_time=start_time, end_time=end_time, similarity = self.__similarity, rotate=self.__rotate, same_dim=self.__same_dim, processes=self.__processes, files_searched=len(self.__difpy_obj._tensor_dictionary), duplicate_count=duplicate_count, similar_count=similar_count, chunksize=self.__chunksize)
 
         return result, lower_quality, stats
 
@@ -438,7 +438,7 @@ class search:
         tensor_shape_A = self.__difpy_obj._id_to_shape_dictionary[id_A]
         tensor_shape_B = self.__difpy_obj._id_to_shape_dictionary[id_B]
 
-        if self.__lazy:
+        if self.__same_dim:
             # check if two tensors have the same dimensions
             if _compare_imgs._compare_shape(tensor_shape_A, tensor_shape_B): 
                 # check if two tensors are equal
@@ -469,7 +469,7 @@ class search:
         ids_B_list = np.asarray([x[1] for x in ids])
         tensor_B_list = np.asarray([self.__difpy_obj._tensor_dictionary[x[1]] for x in ids])
 
-        if self.__lazy:
+        if self.__same_dim:
             # compare only those that have the same shape
             shape_A_list = [sorted(self.__difpy_obj._id_to_shape_dictionary[id_A])]*len(ids)
             shape_B_list = [sorted(self.__difpy_obj._id_to_shape_dictionary[id_B]) for id_B in ids_B_list]
@@ -786,7 +786,7 @@ class _generate_stats:
                                                         }})
         stats['process']['search'].update({'parameters' : {'similarity_mse': kwargs['similarity'],
                                                            'rotate' : kwargs['rotate'],
-                                                           'lazy' : kwargs['lazy'],
+                                                           'same_dim' : kwargs['same_dim'],
                                                            'processes' : kwargs['processes'],
                                                            'chunksize' : kwargs['chunksize']                                                         
                                                           }})
@@ -883,14 +883,14 @@ class _validate_param:
             raise Exception('Invalid value for "rotate" parameter: must be of type BOOL.')
         return rotate         
 
-    def _lazy(lazy, similarity):
-        # Function that validates the 'lazy' input parameter
-        if not isinstance(lazy, bool):
-            raise Exception('Invalid value for "lazy" parameter: must be of type BOOL.')
-        if lazy:
+    def _same_dim(same_dim, similarity):
+        # Function that validates the 'same_dim' input parameter
+        if not isinstance(same_dim, bool):
+            raise Exception('Invalid value for "same_dim" parameter: must be of type BOOL.')
+        if same_dim:
             if similarity > 0:
-                lazy = False
-        return lazy
+                same_dim = False
+        return same_dim
 
     def _show_progress(show_progress):
         # Function that validates the 'show_progress' input parameter
@@ -940,6 +940,9 @@ class _validate_param:
     def _kwargs(kwargs):
         if "logs" in kwargs:
             warnings.warn('Parameter "logs" was deprecated with difPy v4.1. Using it might lead to an exception in future versions. Consider updating your script.', FutureWarning, stacklevel=2)
+        if "lazy" in kwargs:
+            warnings.warn('Parameter "lazy" was deprecated with difPy v4.2. Using it might lead to an exception in future versions. Consider updating your script.', FutureWarning, stacklevel=2)
+
 
 class _help:
     '''
@@ -976,7 +979,7 @@ if __name__ == '__main__':
     parser.add_argument('-px', '--px_size', type=int, help='Compression size of images in pixels.', required=False, default=50)
     parser.add_argument('-s', '--similarity', type=_help._convert_str_to_int, help='Similarity grade (mse).', required=False, default='duplicates')
     parser.add_argument('-ro', '--rotate', type=lambda x: bool(_help._strtobool(x)), help='Rotate images during comparison process.', required=False, choices=[True, False], default=True)    
-    parser.add_argument('-la', '--lazy', type=lambda x: bool(_help._strtobool(x)), help='Compares image dimensions before comparison process.', required=False, choices=[True, False], default=True)    
+    parser.add_argument('-di', '--same_dim', type=lambda x: bool(_help._strtobool(x)), help='Only compare image having the same dimensions (width x height)', required=False, choices=[True, False], default=True)    
     parser.add_argument('-mv', '--move_to', type=str, help='Output directory path of lower quality images among matches.', required=False, default=None)
     parser.add_argument('-d', '--delete', type=lambda x: bool(_help._strtobool(x)), help='Delete lower quality images among matches.', required=False, choices=[True, False], default=False)
     parser.add_argument('-sd', '--silent_del', type=lambda x: bool(_help._strtobool(x)), help='Suppress the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
@@ -984,17 +987,22 @@ if __name__ == '__main__':
     parser.add_argument('-proc', '--processes', type=_help._convert_str_to_int, help=' Number of worker processes for multiprocessing.', required=False, default=None)
     parser.add_argument('-ch', '--chunksize', type=_help._convert_str_to_int, help='Only relevant when dataset > 5k images. Sets the batch size at which the job is simultaneously processed when multiprocessing.', required=False, default=None)
     parser.add_argument('-l', '--logs', type=lambda x: bool(_help._strtobool(x)), help='(Deprecated) Collect statistics during the process.', required=False, choices=[True, False], default=None)
+    parser.add_argument('-la', '--lazy', type=lambda x: bool(_help._strtobool(x)), help='(Deprecated) Only compare image having the same dimensions (width x height).', required=False, choices=[True, False], default=None)    
+
 
     args = parser.parse_args()
 
     if args.logs != None:
         _validate_param._kwargs(["logs"])
 
+    if args.lazy != None:
+        _validate_param._kwargs(["lazy"])
+
     # initialize difPy
     dif = build(args.directory, recursive=args.recursive, in_folder=args.in_folder, limit_extensions=args.limit_extensions, px_size=args.px_size, show_progress=args.show_progress, processes=args.processes, )
     
     # perform search
-    se = search(dif, similarity=args.similarity, rotate=args.rotate, lazy=args.lazy, processes=args.processes, chunksize=args.chunksize)
+    se = search(dif, similarity=args.similarity, rotate=args.rotate, same_dim=args.same_dim, processes=args.processes, chunksize=args.chunksize)
 
     # create filenames for the output files
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
