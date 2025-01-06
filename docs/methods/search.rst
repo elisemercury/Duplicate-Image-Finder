@@ -68,9 +68,8 @@ By default, when searching for matches, difPy assumes images to have **the same 
 ``False`` = assumes matches can have different dimensions
 
 .. note::
-   ``same_dim`` should be set to ``False`` if you are searching for image matches that have:
-   * different **file types** (i. e. imageA.png is a duplicate of imageA.jpg)
-   * different **dimensions** (f. e. if images are cropped versions of one another)
+   ``same_dim`` should be set to ``False`` if you are searching for image matches that have different **file types** (i. e. imageA.png is a duplicate of imageA.jpg)
+   and/or if images are **cropped** versions of one another.
 
 .. _rotate:
 
