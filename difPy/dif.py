@@ -980,7 +980,7 @@ if __name__ == '__main__':
     parser.add_argument('-px', '--px_size', type=int, help='Compression size of images in pixels.', required=False, default=50)
     parser.add_argument('-s', '--similarity', type=_help._convert_str_to_int, help='Similarity grade (mse).', required=False, default='duplicates')
     parser.add_argument('-ro', '--rotate', type=lambda x: bool(_help._strtobool(x)), help='Rotate images during comparison process.', required=False, choices=[True, False], default=True)    
-    parser.add_argument('-di', '--same_dim', type=lambda x: bool(_help._strtobool(x)), help='Only compare image having the same dimensions (width x height)', required=False, choices=[True, False], default=True)    
+    parser.add_argument('-dim', '--same_dim', type=lambda x: bool(_help._strtobool(x)), help='Only compare image having the same dimensions (width x height)', required=False, choices=[True, False], default=True)    
     parser.add_argument('-mv', '--move_to', type=str, help='Output directory path of lower quality images among matches.', required=False, default=None)
     parser.add_argument('-d', '--delete', type=lambda x: bool(_help._strtobool(x)), help='Delete lower quality images among matches.', required=False, choices=[True, False], default=False)
     parser.add_argument('-sd', '--silent_del', type=lambda x: bool(_help._strtobool(x)), help='Suppress the user confirmation when deleting images.', required=False, choices=[True, False], default=False)
