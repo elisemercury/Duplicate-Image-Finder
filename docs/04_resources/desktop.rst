@@ -98,13 +98,13 @@ Advanced Settings
 From the difPy settings on the main menu, you can access advanced search settings. 
 
 .. warning::
-    It is not recommended to change the advanced settings unless you know what you are doing.
+    It is not recommended to change these settings unless you know what you are doing. See :ref:`Adjusting processes and chunksize`.
 
-**Processes**: defines the maximum number of worker processes (i. e. parallel tasks) to perform when multiprocessing. The more processes, the faster the search, but the more processing power the app will use. See :ref:`processes` for more information.
+**Processes**: defines the maximum number of worker processes (i. e. parallel tasks) to perform when multiprocessing. The more processes, the faster the search, but the more processing power (CPU) the app will use. See :ref:`processes` for more information.
 
-**Chunksize**: defines the number of image sets that should be compared at once per process. The higher the chunksize, the faster the search, but the more memory the app will use. See :ref:`chunksize` for more information.
+**Chunksize**: defines the number of image sets that should be compared at once per process. The higher the chunksize, the faster the search, but the more memory (RAM) the app will use. See :ref:`chunksize` for more information.
 
-The ``process`` and ``chunksize`` are only used when difPy receives more than 5k images to process. With large datasets, it can make sense to adjust these parameters. For example, in order to lower the overall CPU overhead, you could lower ``processes``. In order to decrease memory usage, you could decrease ``chunksize``. The higher both parameters, the more performance you will gain, but the more resources the app will use.
+The ``process`` and ``chunksize`` become relevant if difPy received more than 5k images to process. With large datasets, it can make sense to adjust these parameters. For example, in order to lower the overall CPU overhead, you could lower ``processes``. In order to decrease memory usage, you could decrease ``chunksize``. The higher both parameters, the more performance you will gain, but the more resources the app will use. See :ref:`Adjusting processes and chunksize` for more information.
 
 .. _dsk_limitations:
 
