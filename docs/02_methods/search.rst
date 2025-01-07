@@ -37,7 +37,7 @@ The required ``difPy_obj`` parameter should be pointing to the ``dif`` object th
 
 .. _similarity: 
 
-similarity (str, int)
+similarity (str, int, float)
 ++++++++++++
 
 difPy compares the images to find duplicates or similarities, based on the MSE (Mean Squared Error) between both image tensors. The target similarity rate i. e. MSE value is set with the ``similarity`` parameter. 
