@@ -31,4 +31,19 @@ When difPy receives a **"large" dataset** (> 5k images), a different algorithm i
 
 The picture above visualizes how chunks are processed by the chunking algorithm. Each of the image columns represent a chunk. 
 
-The ``chunksize`` parameter defines **how many of these chunks will be processed at once** (see :ref:`chunksize`). By default, ``chunksize`` is set to ``None`` which implies: ``1'000'000 / number of images in dataset``. This ratio is used to automatically size the ``chunksize`` according to the size of the dataset, with the goal of keeping memory consumption low. This is a good technique for datasets smaller than 1 million images. As soon as the number of images will reach more, then heavier memory consumption increase will become inevitable, as the number of potential image combinations (matches) becomes increasingly large. **It is not recommended to adjust this parameter manually**.
+The ``chunksize`` parameter defines **how many of these chunks will be processed at once** (see :ref:`chunksize`). By default, ``chunksize`` is set to ``None`` which implies: ``1'000'000 / number of images in dataset``. This ratio is used to automatically size the ``chunksize`` according to the size of the dataset, with the goal of keeping memory consumption low. This is a good technique for datasets smaller than 1 million images. As soon as the number of images will reach more, then heavier memory consumption increase will become inevitable, as the number of potential image combinations (matches) becomes increasingly large. **It is not recommended to adjust this parameter manually except if you know what you are doing**.
+
+Adjusting the 'processes' and 'chunksize'
+^^^^^^^^^^
+
+If you are working with  **"large" datasets** (> 5k images), it can make sense to adjust the :ref:`processes` and :ref:`chunksize` parameters. 
+
+difPy will consume as much memory and processing power as is can get in order to process the dataset as fast as possible. Depending on the specs of your machine, this can lead to a **big spike in CPU usage and memory usage** for large datasets. In case you want to avoid such spikes, it is recommended to make the following adjustments:
+
+* To lower the overhead on your CPU, reduce the ``processes`` parameter. 
+
+* To lower the overhead on your RAM, decrease the ``chunksize`` parameter.
+
+.. note::
+   Example:\n
+   You have a dataset of 10k images. Your machine has 16 cores and 32GB of RAM. For this scenario, the default value for ``processes`` is ``16`` and ``chunksize`` is ``1'000'000 / number of images in dataset = 100``. To reduce the overhead on your CPU, you could set ``processes`` to ``10``. To reduce the overhead on your RAM, you could set ``chunksize`` to ``80``. This will imply longer processing times, but will keep your CPU and RAM usage low.
