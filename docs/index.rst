@@ -3,38 +3,38 @@
    :hidden:
    :caption: Getting started
 
-   /getting_started/installation
-   /getting_started/basic_usage
-   /getting_started/cli_usage
-   /getting_started/output
+   /01_getting_started/installation
+   /01_getting_started/basic_usage
+   /01_getting_started/cli_usage
+   /01_getting_started/output
 
 .. toctree::
    :maxdepth: 2
    :hidden:
    :caption: Methods and parameters
 
-   /methods/build
-   /methods/search
-   /methods/search_moveto
-   /methods/search_delete
+   /02_methods/build
+   /02_methods/search
+   /02_methods/search_moveto
+   /02_methods/search_delete
 
 .. toctree::
    :maxdepth: 2
    :hidden:
    :caption: Contributing
 
-   /contributing/contributing
-   /contributing/support
+   /03_contributing/contributing
+   /03_contributing/support
 
 .. toctree::
    :maxdepth: 2
    :hidden:
    :caption: Further Resources
 
-   /resources/desktop
-   /resources/large_datasets
-   /resources/supported_filetypes
-   /resources/report_bug
+   /04_resources/desktop
+   /04_resources/large_datasets
+   /04_resources/supported_filetypes
+   /04_resources/report_bug
 
 difPy Guide
 ===================================
