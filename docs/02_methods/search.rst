@@ -21,7 +21,7 @@ After the search is completed, further actions can be performed using :ref:`sear
    :class: tight-table
 
    :ref:`difPy_obj`,"``difPy_obj``",,
-   :ref:`similarity`,"``str``, ``int``",``'duplicates'``, "``'similar'``, any ``int`` >= 0"
+   :ref:`similarity`,"``str``, ``int``, ``float``",``'duplicates'``, "``'similar'``, any ``int`` or ``float`` >= 0"
    :ref:`same_dim`,``bool``,``True``,``False``
    :ref:`rotate`,``bool``,``True``,``False``
    :ref:`show_progress`,``bool``,``True``,``False``
