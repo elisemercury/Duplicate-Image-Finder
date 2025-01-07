@@ -963,11 +963,15 @@ class _help:
         except:
             return x
         
-    def _strtobool(value: str) -> bool:
-        value = value.lower()
-        if value in ("y", "yes", "on", "1", "true", "t"):
+    def _strtobool(v):
+        if isinstance(v, bool):
+            return v
+        if v.lower() in ('yes', 'true', 't', 'y', '1'):
             return True
-        return False
+        elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+            return False
+        else:
+            raise argparse.ArgumentTypeError('Boolean value expected')
         
 if __name__ == '__main__':
     # Parameters for when launching difPy via CLI
@@ -987,7 +991,6 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--show_progress', type=lambda x: bool(_help._strtobool(x)), help='Show the real-time progress of difPy.', required=False, choices=[True, False], default=True)
     parser.add_argument('-proc', '--processes', type=_help._convert_str_to_int, help=' Number of worker processes for multiprocessing.', required=False, default=os.cpu_count())
     parser.add_argument('-ch', '--chunksize', type=_help._convert_str_to_int, help='Only relevant when dataset > 5k images. Sets the batch size at which the job is simultaneously processed when multiprocessing.', required=False, default=None)
-    parser.add_argument('-l', '--logs', type=lambda x: bool(_help._strtobool(x)), help='(Deprecated) Collect statistics during the process.', required=False, choices=[True, False], default=None)
     parser.add_argument('-la', '--lazy', type=lambda x: bool(_help._strtobool(x)), help='(Deprecated) Only compare image having the same dimensions (width x height).', required=False, choices=[True, False], default=None)    
 
     args = parser.parse_args()
