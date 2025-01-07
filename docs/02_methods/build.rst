@@ -20,11 +20,11 @@ Upon completion, ``difPy.build()`` returns a ``dif`` object that can be used in 
 
    :ref:`directory`,"``str``, ``list``",,
    :ref:`recursive`,``bool``,``True``,``False``
-   :ref:`in_folder`,"``bool``, ``False``",``True``
+   :ref:`in_folder`,``bool``,``True``,``False``
    :ref:`limit_extensions`,``bool``,``True``,``False``
-   :ref:`px_size`,"``int``, ``float``",50, ``int``
+   :ref:`px_size`,``int``,50, "``int`` >= 10 and <= 5000"
    :ref:`show_progress`,``bool``,``True``,``False``
-   :ref:`processes`,``int``,``None`` (``os.cpu_count()``), ``int``
+   :ref:`processes`,``int``,``os.cpu_count()``, "``int`` >= 1 and <= ``os.cpu_count()``"
 
 .. note::
 
@@ -131,7 +131,7 @@ processes (int)
 ++++++++++++
 
 .. warning::
-   Recommended not to change default value. Only adjust this value if you know what you are doing.
+   Recommended not to change default value. Only adjust this value if you know what you are doing. See :ref:`Adjusting processes and chunksize`.
 
 difPy leverages `Multiprocessing`_ to speed up the image comparison process, meaning multiple comparison tasks will be performed in parallel. The ``processes`` parameter defines the maximum number of worker processes (i. e. parallel tasks) to perform when multiprocessing. The higher the parameter, the more performance can be achieved, but in turn, the more computing resources will be required. To learn more, please refer to the `Python Multiprocessing documentation`_. 
 

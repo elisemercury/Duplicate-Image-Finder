@@ -24,7 +24,7 @@ difPy in the CLI supports the following arguments:
    dif.py [-h] [-D DIRECTORY [DIRECTORY ...]] [-Z OUTPUT_DIRECTORY] 
           [-r {True,False}] [-i {True,False}] [-le {True,False}] 
           [-px PX_SIZE]  [-s SIMILARITY] [-ro {True,False}]
-          [-la {True,False}] [-proc PROCESSES] [-ch CHUNKSIZE] 
+          [-dim {True,False}] [-proc PROCESSES] [-ch CHUNKSIZE] 
           [-mv MOVE_TO] [-d {True,False}] [-sd {True,False}]
           [-p {True,False}]
 
@@ -33,7 +33,7 @@ difPy in the CLI supports the following arguments:
    :widths: 5, 10, 5, 10
    :class: tight-table
 
-   ``-D``,:ref:`directory`,``-la``,:ref:`lazy`
+   ``-D``,:ref:`directory`,``-la``,:ref:`same_dim`
    ``-Z``,output_directory,``-proc``,:ref:`processes`
    ``-r``,:ref:`recursive`,``-ch``,:ref:`chunksize`
    ``-i``,:ref:`in_folder`,``-mv``,move_to (see :ref:`search.move_to`)

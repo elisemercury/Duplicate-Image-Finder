@@ -24,7 +24,7 @@ Installation
 Basic Usage
 ^^^^^^^^^^
 
-To start a new search, open the difPy for Desktop app and click the "New Search". The search process is divided into two steps: (1) import folders and (2) configure search.
+To start a new search, open the difPy for Desktop app and click the "New Search" button on the main menu. The search process is divided into two steps: (1) import folders and (2) configure search.
 
 .. _dsk_import:
 
@@ -60,7 +60,8 @@ After importing the folder(s), you can configure what type of similarity search 
 
 .. note::
     **How does similarity search work?**
-    difPy compares the images pixel by pixel and calculates the Mean Squared Error (MSE) between the images. The MSE is a measure of the similarity between two images. The lower the MSE value, the more similar the images are. When similarity is set to "duplicates", difPy will only return matches with an MSE value of 0. When similarity is set to "similar", difPy will return matches with an MSE value of 5 or lower. Currently the similarity MSE value can not be customized in the desktop app. If you need a different MSE value, please use the `difPy Python package / Command Line Version <https://pypi.org/project/difPy/>`_.
+
+    difPy compares the images pixel by pixel and calculates the Mean Squared Error (MSE) between the images. The MSE is a measure of the similarity between two images. The lower the MSE value, the more similar the images are. When similarity is set to "duplicates", difPy will only return matches with an MSE value of 0. When similarity is set to "similar", difPy will return matches with an MSE value of 5 or lower. Currently the similarity MSE value can not be customized in the desktop app. If you need a different MSE value, please use the `difPy Python package <https://pypi.org/project/difPy/>`_.
 
 Additionally, you can configure the following advanced search settings:
 
@@ -98,20 +99,20 @@ Advanced Settings
 From the difPy settings on the main menu, you can access advanced search settings. 
 
 .. warning::
-    It is not recommended to change the advanced settings unless you know what you are doing.
+    It is not recommended to change these settings unless you know what you are doing. See :ref:`Adjusting processes and chunksize`.
 
-**Processes**: defines the maximum number of worker processes (i. e. parallel tasks) to perform when multiprocessing. The more processes, the faster the search, but the more processing power the app will use. See :ref:`processes` for more information.
+**Processes**: defines the maximum number of worker processes (i. e. parallel tasks) to perform when multiprocessing. The more processes, the faster the search, but the more processing power (CPU) the app will use. See :ref:`processes` for more information.
 
-**Chunksize**: defines the number of image sets that should be compared at once per process. The higher the chunksize, the faster the search, but the more memory the app will use. See :ref:`chunksize` for more information.
+**Chunksize**: defines the number of image sets that should be compared at once per process. The higher the chunksize, the faster the search, but the more memory (RAM) the app will use. See :ref:`chunksize` for more information.
 
-The ``process`` and ``chunksize`` are only used when difPy receives more than 5k images to process. With large datasets, it can make sense to adjust these parameters. For example, in order to lower the overall CPU overhead, you could lower ``processes``. In order to decrease memory usage, you could decrease ``chunksize``. The higher both parameters, the more performance you will gain, but the more resources the app will use.
+The ``process`` and ``chunksize`` become relevant if difPy received more than 5k images to process. With large datasets, it can make sense to adjust these parameters. For example, in order to lower the overall CPU overhead, you could lower ``processes``. In order to decrease memory usage, you could decrease ``chunksize``. The higher both parameters, the more performance you will gain, but the more resources the app will use. See :ref:`Adjusting processes and chunksize` for more information.
 
 .. _dsk_limitations:
 
 Limitations
 ^^^^^^^^^^
 
-* Using the difPy desktop app for large datasets can lead to slower processing times. For better performance, with large datasets (> 10k images) it is recommended to use the `difPy Python package / Command Line Version <https://pypi.org/project/difPy/>`_. instead.
+* Using the difPy desktop app for large datasets can lead to slower processing times. For better performance, with large datasets (> 10k images) it is recommended to use the `difPy Python package <https://pypi.org/project/difPy/>`_ instead.
 
 * The desktop app is currently only available to beta testers on Windows.
 
@@ -122,6 +123,6 @@ Limitations
 Give Feedback / Report Bug
 ^^^^^^^^^^
 
-🐞 Did you encounter an issue with the difPy desktop app? Please report it `here <https://go.difpy.app/desktop-bug>`_.
+🐞 Did you encounter an issue with the difPy desktop app? `Report it here <https://go.difpy.app/desktop-bug>`_.
 
-🗨️ Do you have feedback about the difPy desktop app? Share your feedback with us `here <https://go.difpy.app/desktop-feedback>`_.
+🗨️ Do you have feedback about the difPy desktop app? `Share your feedback here <https://go.difpy.app/desktop-feedback>`_.

@@ -92,7 +92,7 @@ A **JSON formatted collection** with statistics on the completed difPy process:
                                         'seconds_elapsed': 5.14},
                            'parameters': {'similarity_mse': 0,
                                           'rotate': True,
-                                          'lazy': True,
+                                          'same_dim': True,
                                           'processes': 5,
                                           'chunksize': None},
                            'files_searched': 3228,
