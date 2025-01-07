@@ -112,7 +112,7 @@ The ``process`` and ``chunksize`` become relevant if difPy received more than 5k
 Limitations
 ^^^^^^^^^^
 
-* Using the difPy desktop app for large datasets can lead to slower processing times. For better performance, with large datasets (> 10k images) it is recommended to use the `difPy Python package <https://pypi.org/project/difPy/>`_. instead.
+* Using the difPy desktop app for large datasets can lead to slower processing times. For better performance, with large datasets (> 10k images) it is recommended to use the `difPy Python package <https://pypi.org/project/difPy/>`_ instead.
 
 * The desktop app is currently only available to beta testers on Windows.
 
