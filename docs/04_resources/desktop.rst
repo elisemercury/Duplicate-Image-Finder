@@ -60,6 +60,7 @@ After importing the folder(s), you can configure what type of similarity search 
 
 .. note::
     **How does similarity search work?**
+
     difPy compares the images pixel by pixel and calculates the Mean Squared Error (MSE) between the images. The MSE is a measure of the similarity between two images. The lower the MSE value, the more similar the images are. When similarity is set to "duplicates", difPy will only return matches with an MSE value of 0. When similarity is set to "similar", difPy will return matches with an MSE value of 5 or lower. Currently the similarity MSE value can not be customized in the desktop app. If you need a different MSE value, please use the `difPy Python package <https://pypi.org/project/difPy/>`_.
 
 Additionally, you can configure the following advanced search settings:
@@ -122,6 +123,6 @@ Limitations
 Give Feedback / Report Bug
 ^^^^^^^^^^
 
-🐞 Did you encounter an issue with the difPy desktop app? Please report it `here <https://go.difpy.app/desktop-bug>`_.
+🐞 Did you encounter an issue with the difPy desktop app? `Report it here <https://go.difpy.app/desktop-bug>`_.
 
-🗨️ Do you have feedback about the difPy desktop app? Share your feedback with us `here <https://go.difpy.app/desktop-feedback>`_.
+🗨️ Do you have feedback about the difPy desktop app? `Share your feedback here <https://go.difpy.app/desktop-feedback>`_.
