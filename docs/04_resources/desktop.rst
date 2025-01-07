@@ -24,7 +24,7 @@ Installation
 Basic Usage
 ^^^^^^^^^^
 
-To start a new search, open the difPy for Desktop app and click the "New Search". The search process is divided into two steps: (1) import folders and (2) configure search.
+To start a new search, open the difPy for Desktop app and click the "New Search" button on the main menu. The search process is divided into two steps: (1) import folders and (2) configure search.
 
 .. _dsk_import:
 
