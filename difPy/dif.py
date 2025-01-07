@@ -941,10 +941,8 @@ class _validate_param:
         return dir 
 
     def _kwargs(kwargs):
-        if "logs" in kwargs:
-            warnings.warn('Parameter "logs" was deprecated with difPy v4.1. Using it might lead to an exception in future versions. Consider updating your script.', FutureWarning, stacklevel=2)
         if "lazy" in kwargs:
-            warnings.warn('Parameter "lazy" was renamed to "same_dim" with difPy v4.2. Using it might lead to an exception in future versions. Consider updating your script.', FutureWarning, stacklevel=2)
+            raise Exception('Parameter "-la" / "lazy" was renamed to "-dim" / "same_dim" with difPy v4.2. Please update your script.')
 
 
 class _help:
@@ -995,9 +993,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # validate input arguments
-    if args.logs != None:
-        _validate_param._kwargs(["logs"])
-
     if args.lazy != None:
         _validate_param._kwargs(["lazy"])
 
@@ -1015,7 +1010,7 @@ if __name__ == '__main__':
 
     # run difPy
     dif = build(args.directory, recursive=args.recursive, in_folder=args.in_folder, limit_extensions=args.limit_extensions, px_size=args.px_size, show_progress=args.show_progress, processes=args.processes, )
-    se = search(dif, similarity=args.similarity, rotate=args.rotate, same_dim=args.same_dim, processes=args.processes, chunksize=args.chunksize)
+    se = search(dif, similarity=args.similarity, rotate=not args.disable_rotate, same_dim=args.same_dim, processes=args.processes, chunksize=args.chunksize)
 
     # create filenames for the output files
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
