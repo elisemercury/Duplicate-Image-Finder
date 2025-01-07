@@ -26,7 +26,7 @@ After the search is completed, further actions can be performed using :ref:`sear
    :ref:`rotate`,``bool``,``True``,``False``
    :ref:`show_progress`,``bool``,``True``,``False``
    :ref:`processes`,``int``,``os.cpu_count()``, any ``int``
-   :ref:`chunksize`,"``int``, ``float``",``None``, "any ``int`` or ``float``"
+   :ref:`chunksize`,"``int``, ``float``",``None``, "any ``int`` or ``float`` >= 1"
 
 .. _difPy_obj:
 
