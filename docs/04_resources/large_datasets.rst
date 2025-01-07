@@ -45,5 +45,6 @@ difPy will consume as much memory and processing power as is can get in order to
 * To lower the overhead on your RAM, decrease the ``chunksize`` parameter.
 
 .. note::
-   Example:\n
+   Example:
+   
    You have a dataset of 10k images. Your machine has 16 cores and 32GB of RAM. For this scenario, the default value for ``processes`` is ``16`` and ``chunksize`` is ``1'000'000 / number of images in dataset = 100``. To reduce the overhead on your CPU, you could set ``processes`` to ``10``. To reduce the overhead on your RAM, you could set ``chunksize`` to ``80``. This will imply longer processing times, but will keep your CPU and RAM usage low.
