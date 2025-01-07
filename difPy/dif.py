@@ -906,6 +906,8 @@ class _validate_param:
         # Function that validates the 'processes' input parameter
         if not isinstance(processes, int):
             raise Exception('Invalid value for "processes" parameter: must be of type INT.')
+        if processes > os.cpu_count():
+            raise Exception('Invalid value for "processes" parameter: must be <= the number of CPU cores (os.cpu_count()).')
         return processes     
 
     def _chunksize(chunksize):
