@@ -21,11 +21,11 @@ After the search is completed, further actions can be performed using :ref:`sear
    :class: tight-table
 
    :ref:`difPy_obj`,"``difPy_obj``",,
-   :ref:`similarity`,"``str``, ``int``",``'duplicates'``, "``'similar'``, any ``int`` or ``float``"
+   :ref:`similarity`,"``str``, ``int``",``'duplicates'``, "``'similar'``, any ``int`` or ``float`` >= 0"
    :ref:`same_dim`,``bool``,``True``,``False``
    :ref:`rotate`,``bool``,``True``,``False``
    :ref:`show_progress`,``bool``,``True``,``False``
-   :ref:`processes`,``int``,``os.cpu_count()``, any ``int``
+   :ref:`processes`,``int``,``os.cpu_count()``, "any ``int`` >= 1"
    :ref:`chunksize`,"``int``, ``float``",``None``, "any ``int`` or ``float`` >= 1"
 
 .. _difPy_obj:
