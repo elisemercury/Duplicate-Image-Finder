@@ -942,7 +942,7 @@ class _validate_param:
         if "logs" in kwargs:
             warnings.warn('Parameter "logs" was deprecated with difPy v4.1. Using it might lead to an exception in future versions. Consider updating your script.', FutureWarning, stacklevel=2)
         if "lazy" in kwargs:
-            warnings.warn('Parameter "lazy" was deprecated with difPy v4.2. Using it might lead to an exception in future versions. Consider updating your script.', FutureWarning, stacklevel=2)
+            warnings.warn('Parameter "lazy" was renamed to "same_dim" with difPy v4.2. Using it might lead to an exception in future versions. Consider updating your script.', FutureWarning, stacklevel=2)
 
 
 class _help:
