@@ -917,7 +917,7 @@ class _validate_param:
         if not isinstance(chunksize, int):
             if not chunksize == None:
                 raise Exception('Invalid value for "chunksize" parameter: must be of type INT or None.')
-        if chunksize < 1:
+        elif chunksize < 1:
             raise Exception('Invalid value for "chunksize" parameter: must be >= 1.')
         return chunksize        
 
@@ -1010,12 +1010,12 @@ if __name__ == '__main__':
         dir = os.getcwd()
 
     # check if 'move_to' and 'delete' are both given
-    if args.move_to != None and args.delete != None:
+    if args.move_to != None and args.delete != False:
         raise Exception(f'"move_to" and "delete" parameter are mutually exclusive. Please select one of them.')
 
     # run difPy
     dif = build(args.directory, recursive=args.recursive, in_folder=args.in_folder, limit_extensions=args.limit_extensions, px_size=args.px_size, show_progress=args.show_progress, processes=args.processes, )
-    se = search(dif, similarity=args.similarity, rotate=not args.disable_rotate, same_dim=args.same_dim, processes=args.processes, chunksize=args.chunksize)
+    se = search(dif, similarity=args.similarity, rotate=args.rotate, same_dim=args.same_dim, processes=args.processes, chunksize=args.chunksize)
 
     # create filenames for the output files
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -1031,7 +1031,7 @@ if __name__ == '__main__':
         json.dump(se.stats, file)
     # output 'search.lower_quality' to file
     with open(os.path.join(dir, lq_file), 'w') as file:
-        json.dump(se.lower_quality, file)
+        file.write(f"{se.lower_quality}")
 
     # check 'move_to' parameter
     if args.move_to != None:
