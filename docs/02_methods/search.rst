@@ -98,7 +98,7 @@ chunksize (int)
 ++++++++++++
 
 .. warning::
-   Recommended not to change default value. Only adjust this value if you know what you are doing.
+   Recommended not to change default value. Only adjust this value if you know what you are doing. See :ref:`Adjusting processes and chunksize`.
 
 ``chunksize`` is only used when dealing with image datasets of **more than 5k images**. See the ":ref:`Using difPy with Large Datasets`" section for further details.
 

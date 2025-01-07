@@ -131,7 +131,7 @@ processes (int)
 ++++++++++++
 
 .. warning::
-   Recommended not to change default value. Only adjust this value if you know what you are doing.
+   Recommended not to change default value. Only adjust this value if you know what you are doing. See :ref:`Adjusting processes and chunksize`.
 
 difPy leverages `Multiprocessing`_ to speed up the image comparison process, meaning multiple comparison tasks will be performed in parallel. The ``processes`` parameter defines the maximum number of worker processes (i. e. parallel tasks) to perform when multiprocessing. The higher the parameter, the more performance can be achieved, but in turn, the more computing resources will be required. To learn more, please refer to the `Python Multiprocessing documentation`_. 
 
