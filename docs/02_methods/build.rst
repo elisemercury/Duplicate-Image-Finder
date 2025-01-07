@@ -20,11 +20,11 @@ Upon completion, ``difPy.build()`` returns a ``dif`` object that can be used in 
 
    :ref:`directory`,"``str``, ``list``",,
    :ref:`recursive`,``bool``,``True``,``False``
-   :ref:`in_folder`,"``bool``, ``False``",``True``
+   :ref:`in_folder`,``bool``,``True``,``False``
    :ref:`limit_extensions`,``bool``,``True``,``False``
    :ref:`px_size`,``int``,50, "any ``int`` > 10 and < 5000"
    :ref:`show_progress`,``bool``,``True``,``False``
-   :ref:`processes`,``int``,``os.cpu_count()``, ``int``
+   :ref:`processes`,``int``,``os.cpu_count()``, "``int`` <= ``os.cpu_count()``"
 
 .. note::
 
