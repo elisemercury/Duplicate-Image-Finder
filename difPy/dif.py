@@ -891,9 +891,6 @@ class _validate_param:
         # Function that validates the 'same_dim' input parameter
         if not isinstance(same_dim, bool):
             raise Exception('Invalid value for "same_dim" parameter: must be of type BOOL.')
-        if same_dim:
-            if similarity > 0:
-                same_dim = False
         return same_dim
 
     def _show_progress(show_progress):
