@@ -67,6 +67,8 @@ Additionally, you can configure the following advanced search settings:
 
 **Rotate**: if selected, difPy will rotate the images by 90°, 180°, or 270° at each comparison. This is useful if you know that the duplicate/similar images you are looking for are rotated.
 
+**Same dimensions**: if selected, difPy will only compare images with the same dimensions. This is useful if you know that the duplicate/similar images you are looking for are of the same dimensions and will hence speed up the comparison process significantly. Turn this off if you are searching for images that are of different file types (i. e. imageA.png is a duplicate of imageB.jpg).
+
 .. _dsk_results:
 
 Search Results
