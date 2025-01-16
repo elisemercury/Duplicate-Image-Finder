@@ -116,6 +116,8 @@ Limitations
 
 * Using the difPy desktop app for large datasets can lead to slower processing times. For better performance, with large datasets (> 10k images) it is recommended to use the `difPy Python package <https://pypi.org/project/difPy/>`_ instead.
 
+* Depending on the size of your dataset, difPy will require more or less processing power and memory. If you are running difPy on a low-end computer, it may take a while to process a large dataset. It is recommended to have at least 8GB of memory for difPy for Desktop to run smoothly.
+
 * The desktop app is currently only available to beta testers on Windows.
 
 * The desktop app is currently in beta and may contain bugs. If you encounter any issues, please report it. See :ref:`dsk_feedback`.
