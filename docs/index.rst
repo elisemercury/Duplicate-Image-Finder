@@ -3,38 +3,38 @@
    :hidden:
    :caption: Getting started
 
-   /01_getting_started/installation
-   /01_getting_started/basic_usage
-   /01_getting_started/cli_usage
-   /01_getting_started/output
+   /getting_started/installation
+   /getting_started/basic_usage
+   /getting_started/cli_usage
+   /getting_started/output
 
 .. toctree::
    :maxdepth: 2
    :hidden:
    :caption: Methods and parameters
 
-   /02_methods/build
-   /02_methods/search
-   /02_methods/search_moveto
-   /02_methods/search_delete
+   /methods/build
+   /methods/search
+   /methods/search_moveto
+   /methods/search_delete
 
 .. toctree::
    :maxdepth: 2
    :hidden:
    :caption: Contributing
 
-   /03_contributing/contributing
-   /03_contributing/support
+   /contributing/contributing
+   /contributing/support
 
 .. toctree::
    :maxdepth: 2
    :hidden:
    :caption: Further Resources
 
-   /04_resources/desktop
-   /04_resources/large_datasets
-   /04_resources/supported_filetypes
-   /04_resources/report_bug
+   /resources/desktop
+   /resources/large_datasets
+   /resources/supported_filetypes
+   /resources/report_bug
 
 difPy Guide
 ===================================
@@ -53,7 +53,7 @@ difPy does not compare images based on their hashes. It compares them based on t
 difPy leverages Python's multiprocessing capabilities and is therefore able to perform at high performance even on large datasets. 
 
 .. note::
-   ✨ difPy will soon be available as an app for your desktop! `Learn more <https://difpy-dev.readthedocs.io/en/latest/resources/desktop.html>`_.
+   ✨ difPy will soon be available as an **app for your desktop**! `Learn more <https://difpy-dev.readthedocs.io/en/latest/resources/desktop.html>`_.
 
 
 View difPy on `GitHub <https://github.com/elisemercury/Duplicate-Image-Finder>`_ and `PyPi <https://pypi.org/project/difPy/>`_.
