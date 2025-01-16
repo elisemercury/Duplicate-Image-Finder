@@ -53,7 +53,7 @@ difPy does not compare images based on their hashes. It compares them based on t
 difPy leverages Python's multiprocessing capabilities and is therefore able to perform at high performance even on large datasets. 
 
 .. note::
-   ✨ difPy will soon be available as an **app for your desktop**! `Learn more <https://difpy-dev.readthedocs.io/en/latest/resources/desktop.html>`_.
+   ✨ difPy will soon be available as an **app for your desktop**! `Learn more <https://difpy.readthedocs.io/en/latest/resources/desktop.html>`_.
 
 
 View difPy on `GitHub <https://github.com/elisemercury/Duplicate-Image-Finder>`_ and `PyPi <https://pypi.org/project/difPy/>`_.
