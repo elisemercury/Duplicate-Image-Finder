@@ -971,8 +971,8 @@ class _help:
             return False
         else:
             raise argparse.ArgumentTypeError('Boolean value expected')
-        
-if __name__ == '__main__':
+
+def cli():
     # Parameters for when launching difPy via CLI
     parser = argparse.ArgumentParser(description='Find duplicate or similar images with difPy - https://github.com/elisemercury/Duplicate-Image-Finder')
     parser.add_argument('-D', '--directory', type=str, nargs='+', help='Paths of the directories to be searched. Default is working dir.', required=False, default=[os.getcwd()])
@@ -1041,3 +1041,6 @@ if __name__ == '__main__':
         se.delete(silent_del=args.silent_del)
 
     print(f'''\n{result_file}\n{lq_file}\n{stats_file}\n\nsaved in '{dir}'.''')
+
+if __name__ == '__main__':
+    cli()

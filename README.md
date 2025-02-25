@@ -156,12 +156,22 @@ difPy.search(difpy_obj, similarity='duplicates', rotate=True, same_dim=True, sho
 ## CLI Usage
 difPy can also be invoked through the CLI by using the following commands:
 
+### From Source
 ```python
 python dif.py #working directory
 
 python dif.py -D 'C:/Path/to/Folder/'
 
 python dif.py -D 'C:/Path/to/Folder_A/' 'C:/Path/to/Folder_B/' 'C:/Path/to/Folder_C/'
+```
+
+### Installed Package
+```shell
+pip install difPy
+
+difpy
+# or
+python -m difpy
 ```
 
 > :point_right: Windows users can add difPy to their [PATH system variables](https://www.computerhope.com/issues/ch000549.htm) by pointing it to their difPy package installation folder containing the [`difPy.bat`](https://github.com/elisemercury/Duplicate-Image-Finder/difPy/difPy.bat) file. This adds `difPy` as a command in the CLI and will allow direct invocation of `difPy` from anywhere on the device.

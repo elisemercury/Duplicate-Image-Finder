@@ -1,0 +1,33 @@
+[project]
+name = "difpy"
+dynamic = ["version"]
+description = "Duplicate Image Finder - Python package for finding duplicate and similar images"
+readme = "README.md"
+keywords = ["duplicate", "image", "finder", "similarity", "pictures"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Build Tools"
+]
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26.4",
+    "pillow>=10.2.0",
+]
+
+[project.urls]
+homepage = "https://github.com/elisemercury/Duplicate-Image-Finder"
+documentation = "https://difpy.readthedocs.io"
+repository = "https://github.com/elisemercury/Duplicate-Image-Finder"
+
+[project.scripts]
+difpy = "difPy.dif:cli"
+
+[tool.setuptools]
+packages = ["difPy"]
+
+[tool.setuptools.dynamic]
+version = {attr = "difPy.version.__version__"}
