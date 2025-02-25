@@ -3,18 +3,28 @@ difPy - Python package for finding duplicate and similar images.
 2024 Elise Landman
 https://github.com/elisemercury/Duplicate-Image-Finder
 '''
+import argparse
+import contextlib
+import json
+import os
+import sys
+import warnings
+from collections import defaultdict
+from datetime import datetime
 from glob import glob
+from itertools import combinations
 from multiprocessing import Pool, current_process, freeze_support
+from pathlib import Path
+
 import numpy as np
 from PIL import Image
-import os
-from datetime import datetime
-from pathlib import Path
-import argparse
-import json
-import warnings
-from itertools import combinations
-from collections import defaultdict
+
+# Optional plugins
+with contextlib.suppress(ImportError):
+    import pillow_jxl
+with contextlib.suppress(ImportError):
+    from pillow_heif import register_heif_opener
+    register_heif_opener()
 
 def _initialize_multiprocessing():
     # Function that initializes multiprocessing
@@ -161,6 +171,12 @@ class build:
     def _filter_extensions(self, directory_files):
         # Function that filters by files with a specific filetype
         valid_extensions = np.array(['apng', 'bw', 'cdf', 'cur', 'dcx', 'dds', 'dib', 'emf', 'eps', 'fli', 'flc', 'fpx', 'ftex', 'fits', 'gd', 'gd2', 'gif', 'gbr', 'icb', 'icns', 'iim', 'ico', 'im', 'imt', 'j2k', 'jfif', 'jfi', 'jif', 'jp2', 'jpe', 'jpeg', 'jpg', 'jpm', 'jpf', 'jpx', 'jpeg', 'mic', 'mpo', 'msp', 'nc', 'pbm', 'pcd', 'pcx', 'pgm', 'png', 'ppm', 'psd', 'pixar', 'ras', 'rgb', 'rgba', 'sgi', 'spi', 'spider', 'sun', 'tga', 'tif', 'tiff', 'vda', 'vst', 'wal', 'webp', 'xbm', 'xpm'])
+        # Add additional extensions from plugins
+        if 'pillow_jxl' in sys.modules:
+            valid_extensions = np.append(valid_extensions, ['jxl'])
+        if 'pillow_heif' in sys.modules:
+            valid_extensions = np.append(valid_extensions, ['heic', 'heif'])
+
         extensions = list()
         for file in directory_files:
             try:

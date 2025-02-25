@@ -18,6 +18,9 @@
 
 ```python
 pip install difPy
+
+# with plugins for additional image formats (HEIC, JPEG-XL, etc.)
+pip install 'difPy[plugins]'
 ```
 
 > ✨🚀 **Join the [difPy for Desktop beta tester](https://difpy.short.gy/desktop-beta-ghb) program and be among to first to test the new difPy desktop app!**
