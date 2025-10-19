@@ -70,10 +70,6 @@ After importing the folder(s), you can configure what type of similarity search 
 
 * similar images
 
-**Duplicate**: when the search is set to "duplicates", difPy searches for **exact image matches**. The result will only contain matches of images that are exact duplicates of each other. Whenever you are searching for duplicate images with different file formats (i. e. imageA.png is a duplicate of imageB.jpg), it is recommended to set the search similarity to "similar".
-
-**Similar**: when the search is set to "similar", the results will include **duplicate and similar image matches**. 
-
 .. figure:: ../static/assets/desktop/search.png
    :width: 317
    :height: 263
@@ -81,6 +77,11 @@ After importing the folder(s), you can configure what type of similarity search 
    :align: center
 
    Configure Search
+
+**Duplicate**: when the search is set to "duplicates", difPy searches for **exact image matches**. The result will only contain matches of images that are exact duplicates of each other. Whenever you are searching for duplicate images with different file formats (i. e. imageA.png is a duplicate of imageB.jpg), it is recommended to set the search similarity to "similar".
+
+**Similar**: when the search is set to "similar", the results will include **duplicate and similar image matches**. 
+
 .. note::
     **How does similarity search work?**
 
