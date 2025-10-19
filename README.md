@@ -20,7 +20,7 @@
 pip install difPy
 ```
 
-> ✨🚀 **Join the [difPy for Desktop beta tester](https://difpy.short.gy/desktop-beta-ghb) program and be among to first to test the new difPy desktop app!**
+> ✨🚀 **difPy for Desktop** is now available for download in the [Microsoft Store](https://go.difpy.app/desktop)!**
 
 > :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://difpy.readthedocs.io/en/latest/03_contributing/contributing.html) for more information.
 
@@ -202,9 +202,9 @@ difPy_xxx_stats.json
 
 ## difPy for Desktop
 
-The new difPy desktop app brings difPy directly to your desktop. We are now accepting beta tester sign ups and will soon be starting our first tester access wave.
+The new difPy desktop app brings difPy directly to your desktop. 
 
-✨🚀 **Join the [difPy for Desktop beta tester](https://difpy.short.gy/desktop-beta-ghb) program now and be among to first to test the new difPy desktop app!**
+✨🚀 **difPy for Desktop** is now available for download in the [Microsoft Store](https://go.difpy.app/desktop)!**
 
 -------
 
