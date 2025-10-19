@@ -15,7 +15,7 @@ Unlike most deduplication software, difPy does **not** compare images based on t
 Installation
 ^^^^^^^^^^
 
-➡️ `Download the difPy v1.0-beta app for **Windows** <https://go.difpy.app/desktop>`_ .
+➡️ `Download the difPy v1.0-beta app for Windows <https://go.difpy.app/desktop>`_ 
 
 ➡️ Download the difPy v1.0-beta app for **MacOS** (*coming soon*)
 
@@ -29,10 +29,10 @@ To start a new search, open the difPy for Desktop app and click the "Start Searc
 .. figure:: ../static/assets/desktop/landing.png
    :width: 317
    :height: 263
-   :alt: difPy Main Menu
+   :alt: difPy for Desktop user interface of main menu
    :align: center
 
-   difPy Main Menu
+   difPy for Desktop Main Menu
 
 .. _dsk_import:
 
@@ -40,6 +40,14 @@ Import Folders
 ++++++++++++
 
 You can import **one or more folders** at once by clicking the "Browse" button. Alternatively, you can also paste folder paths (separated by a semicolon ";") directly into the text box.
+
+.. figure:: ../static/assets/desktop/build_with_folders.png
+   :width: 317
+   :height: 263
+   :alt: difPy for Desktop user interface to import files
+   :align: center
+
+   difPy for Desktop Import Files
 
 The following import modes are supported:
 
@@ -66,6 +74,13 @@ After importing the folder(s), you can configure what type of similarity search 
 
 **Similar**: when the search is set to "similar", the results will include **duplicate and similar image matches**. 
 
+.. figure:: ../static/assets/desktop/search.png
+   :width: 317
+   :height: 263
+   :alt: difPy for Desktop user interface to start search
+   :align: center
+
+   difPy for Desktop Start Search
 .. note::
     **How does similarity search work?**
 
@@ -90,6 +105,15 @@ You can then:
 
 * **View the search logs** for more information about the search process.
 
+.. figure:: ../static/assets/desktop/results.png
+   :width: 317
+   :height: 263
+   :alt: difPy for Desktop user interface with search results
+   :align: center
+
+   difPy for Desktop Search Results
+
+
 .. _dsk_image_viewer:
 
 Image Viewer
@@ -100,6 +124,14 @@ The difPy image viewer allows you to view the duplicate/similar images and easil
 For each image, you have the option to **open it**, **move it** to a new location, or **delete it**.
 
 If you want to **move or delete all** lower resolution matches at once, you can use the "Bulk Actions..." dropdown menu and select the bulk action you would like to take.
+
+.. figure:: ../static/assets/desktop/imageviewer.png
+   :width: 317
+   :height: 263
+   :alt: difPy for Desktop user interface with Image Viewer
+   :align: center
+
+   difPy for Desktop Image Viewer
 
 .. _dsk_advanced_settings:
 
@@ -117,6 +149,15 @@ From the difPy settings on the main menu, you can access advanced search setting
 
 The ``process`` and ``chunksize`` become relevant if difPy received more than 5k images to process. With large datasets, it can make sense to adjust these parameters. For example, in order to lower the overall CPU overhead, you could lower ``processes``. In order to decrease memory usage, you could decrease ``chunksize``. The higher both parameters, the more performance you will gain, but the more resources the app will use. See :ref:`Adjusting processes and chunksize` for more information.
 
+.. figure:: ../static/assets/desktop/settings_2.png
+   :width: 317
+   :height: 263
+   :alt: difPy for Desktop user interface for advanced settings
+   :align: center
+
+   difPy for Desktop Advanced Settings
+
+
 .. _dsk_limitations:
 
 Limitations
@@ -126,7 +167,7 @@ Limitations
 
 * Depending on the size of your dataset, difPy will require more or less processing power and memory. If you are running difPy on a low-end computer, it may take a while to process a large dataset. It is recommended to have at least 8GB of memory for difPy for Desktop to run smoothly.
 
-* The desktop app is currently only available to beta testers on Windows.
+* The desktop app is currently only available on Windows via the Microsoft Store <https://go.difpy.app/desktop>`_.
 
 * The desktop app is currently in beta and may contain bugs. If you encounter any issues, please report it. See :ref:`dsk_feedback`.
 
