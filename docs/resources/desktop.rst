@@ -32,7 +32,7 @@ To start a new search, open the difPy for Desktop app and click the "Start Searc
    :alt: difPy for Desktop user interface of main menu
    :align: center
 
-   difPy for Desktop Main Menu
+   Main Menu
 
 .. _dsk_import:
 
@@ -47,7 +47,7 @@ You can import **one or more folders** at once by clicking the "Browse" button. 
    :alt: difPy for Desktop user interface to import files
    :align: center
 
-   difPy for Desktop Import Files
+   Import Files
 
 The following import modes are supported:
 
@@ -80,7 +80,7 @@ After importing the folder(s), you can configure what type of similarity search 
    :alt: difPy for Desktop user interface to start search
    :align: center
 
-   difPy for Desktop Start Search
+   Configure Search
 .. note::
     **How does similarity search work?**
 
@@ -111,7 +111,7 @@ You can then:
    :alt: difPy for Desktop user interface with search results
    :align: center
 
-   difPy for Desktop Search Results
+   Search Results
 
 
 .. _dsk_image_viewer:
@@ -131,7 +131,7 @@ If you want to **move or delete all** lower resolution matches at once, you can 
    :alt: difPy for Desktop user interface with Image Viewer
    :align: center
 
-   difPy for Desktop Image Viewer
+   Image Viewer
 
 .. _dsk_advanced_settings:
 
@@ -150,12 +150,12 @@ From the difPy settings on the main menu, you can access advanced search setting
 The ``process`` and ``chunksize`` become relevant if difPy received more than 5k images to process. With large datasets, it can make sense to adjust these parameters. For example, in order to lower the overall CPU overhead, you could lower ``processes``. In order to decrease memory usage, you could decrease ``chunksize``. The higher both parameters, the more performance you will gain, but the more resources the app will use. See :ref:`Adjusting processes and chunksize` for more information.
 
 .. figure:: ../static/assets/desktop/settings_2.png
-   :width: 317
-   :height: 263
+   :width: 1000
+   :height: 450
    :alt: difPy for Desktop user interface for advanced settings
    :align: center
 
-   difPy for Desktop Advanced Settings
+   Advanced Settings
 
 
 .. _dsk_limitations:
@@ -167,7 +167,7 @@ Limitations
 
 * Depending on the size of your dataset, difPy will require more or less processing power and memory. If you are running difPy on a low-end computer, it may take a while to process a large dataset. It is recommended to have at least 8GB of memory for difPy for Desktop to run smoothly.
 
-* The desktop app is currently only available on Windows via the Microsoft Store <https://go.difpy.app/desktop>`_.
+* The desktop app is currently only available on Windows via the `Microsoft Store <https://go.difpy.app/desktop>`_.
 
 * The desktop app is currently in beta and may contain bugs. If you encounter any issues, please report it. See :ref:`dsk_feedback`.
 
