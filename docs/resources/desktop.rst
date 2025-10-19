@@ -150,8 +150,8 @@ From the difPy settings on the main menu, you can access advanced search setting
 The ``process`` and ``chunksize`` become relevant if difPy received more than 5k images to process. With large datasets, it can make sense to adjust these parameters. For example, in order to lower the overall CPU overhead, you could lower ``processes``. In order to decrease memory usage, you could decrease ``chunksize``. The higher both parameters, the more performance you will gain, but the more resources the app will use. See :ref:`Adjusting processes and chunksize` for more information.
 
 .. figure:: ../static/assets/desktop/settings_2.png
-   :width: 1000
-   :height: 450
+   :width: 500
+   :height: 225
    :alt: difPy for Desktop user interface for advanced settings
    :align: center
 
