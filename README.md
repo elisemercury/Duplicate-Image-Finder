@@ -20,7 +20,8 @@
 pip install difPy
 ```
 
-> ✨🚀 **difPy for Desktop** is now available for download in the [Microsoft Store](https://go.difpy.app/desktop)!**
+> ✨🚀 [difPy for Desktop](https://go.difpy.app/desktop) is now **available for download** in the [Microsoft Store](https://go.difpy.app/desktop)!
+
 
 > :open_hands: Our motto? We :heart: Open Source! **Contributions and new ideas for difPy are always welcome** - check our [Contributor Guidelines](https://difpy.readthedocs.io/en/latest/03_contributing/contributing.html) for more information.
 
@@ -204,7 +205,7 @@ difPy_xxx_stats.json
 
 The new difPy desktop app brings difPy directly to your desktop. 
 
-✨🚀 **difPy for Desktop** is now available for download in the [Microsoft Store](https://go.difpy.app/desktop)!**
+✨🚀 [difPy for Desktop](https://go.difpy.app/desktop) is now **available for download** in the [Microsoft Store](https://go.difpy.app/desktop)!
 
 -------
 
