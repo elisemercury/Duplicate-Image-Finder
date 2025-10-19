@@ -1,7 +1,7 @@
 .. _desktop:
 
 .. note::
-    ✨🚀 difPy for Desktop (beta) is now available for download in the `Microsoft Store<https://go.difpy.app/desktop>`_!.
+    ✨🚀 difPy for Desktop (beta) is now available for download in the `Microsoft Store <https://go.difpy.app/desktop>`_ !.
 
 difPy for Desktop
 ----------------
@@ -15,7 +15,7 @@ Unlike most deduplication software, difPy does **not** compare images based on t
 Installation
 ^^^^^^^^^^
 
-➡️ `Download the difPy v1.0-beta app for **Windows**<https://go.difpy.app/desktop>`_.
+➡️ `Download the difPy v1.0-beta app for **Windows** <https://go.difpy.app/desktop>`_ .
 
 ➡️ Download the difPy v1.0-beta app for **MacOS** (*coming soon*)
 
