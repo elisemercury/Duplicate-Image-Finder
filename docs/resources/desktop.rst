@@ -1,7 +1,7 @@
 .. _desktop:
 
 .. note::
-    ✨🚀 difPy for Desktop (beta) is now available for download in the `Microsoft Store <https://go.difpy.app/desktop>`_. 
+    ✨🚀 difPy for Desktop (beta) is now available for `download in the Microsoft Store <https://go.difpy.app/desktop>`_. 
 
 difPy for Desktop
 ----------------
@@ -27,8 +27,8 @@ Basic Usage
 To start a new search, open the difPy for Desktop app and click the "Start Search" button on the main menu. The search process is divided into two steps: (1) import folders and (2) configure search.
 
 .. figure:: ../static/assets/desktop/landing.png
-   :width: 480
-   :height: 250
+   :width: 317
+   :height: 263
    :alt: difPy Main Menu
    :align: center
 
