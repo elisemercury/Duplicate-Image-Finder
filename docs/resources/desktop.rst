@@ -1,7 +1,7 @@
 .. _desktop:
 
 .. note::
-    ✨🚀  `Join the difPy for Desktop beta tester program <https://go.difpy.app/desktop-beta-form>`_ now and be among to first to test the new difPy desktop app! We are now accepting beta tester sign ups and will soon be starting our first tester access wave.
+    ✨🚀 difPy for Desktop (beta) is now available for download in the `Microsoft Store<https://go.difpy.app/desktop>`_!.
 
 difPy for Desktop
 ----------------
@@ -15,7 +15,7 @@ Unlike most deduplication software, difPy does **not** compare images based on t
 Installation
 ^^^^^^^^^^
 
-➡️ Download the difPy v1.0-beta app for **Windows** (*currently available for beta testers*)
+➡️ `Download the difPy v1.0-beta app for **Windows**<https://go.difpy.app/desktop>`_.
 
 ➡️ Download the difPy v1.0-beta app for **MacOS** (*coming soon*)
 
@@ -24,7 +24,15 @@ Installation
 Basic Usage
 ^^^^^^^^^^
 
-To start a new search, open the difPy for Desktop app and click the "New Search" button on the main menu. The search process is divided into two steps: (1) import folders and (2) configure search.
+To start a new search, open the difPy for Desktop app and click the "Start Search" button on the main menu. The search process is divided into two steps: (1) import folders and (2) configure search.
+
+.. figure:: ../static/assets/desktop/landing.png
+   :width: 480
+   :height: 250
+   :alt: difPy Main Menu
+   :align: center
+
+   difPy Main Menu
 
 .. _dsk_import:
 
