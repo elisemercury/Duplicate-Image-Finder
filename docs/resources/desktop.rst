@@ -1,7 +1,7 @@
 .. _desktop:
 
 .. note::
-    ✨🚀 difPy for Desktop (beta) is now available for download in the `Microsoft Store <https://go.difpy.app/desktop>`_ !.
+    ✨🚀 difPy for Desktop (beta) is now available for download in the `Microsoft Store <https://go.difpy.app/desktop>`_. 
 
 difPy for Desktop
 ----------------
