@@ -126,8 +126,8 @@ For each image, you have the option to **open it**, **move it** to a new locatio
 If you want to **move or delete all** lower resolution matches at once, you can use the "Bulk Actions..." dropdown menu and select the bulk action you would like to take.
 
 .. figure:: ../static/assets/desktop/imageviewer.png
-   :width: 317
-   :height: 263
+   :width: 490
+   :height: 385
    :alt: difPy for Desktop user interface with Image Viewer
    :align: center
 
