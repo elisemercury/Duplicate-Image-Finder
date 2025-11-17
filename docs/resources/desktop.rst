@@ -51,7 +51,7 @@ The following import modes are supported:
 
 * **Recursive**: defines whether difPy should search through the subfolder(s) of the imported folder. If selected, difPy will search for matches in all subfolders.
 
-* **In-folder**: defines whether difPy should treat each folder as separate and only search for matches among the folder itself. If selected, difPy will treat the folders as separate. **Can only be selected if at least 2 folders have been imported**.
+* **In-folder**: defines whether difPy should search for matches within each folder separately, i.e. treat each folder as isolated. If selected, difPy will treat the folders as separate. **Can only be selected if at least 2 folders have been imported**.
 
 Additionally, you can configure the following advanced import settings:
 
