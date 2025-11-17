@@ -15,9 +15,7 @@ Unlike most deduplication software, difPy does **not** compare images based on t
 Installation
 ^^^^^^^^^^
 
-➡️ `Download the difPy v1.0-beta app for Windows <https://go.difpy.app/desktop>`_ 
-
-➡️ Download the difPy v1.0-beta app for **MacOS** (*coming soon*)
+➡️ `Download the difPy for Desktop app for Windows <https://go.difpy.app/desktop>`_ 
 
 .. _dsk_basic_usage:
 
@@ -180,3 +178,4 @@ Give Feedback / Report Bug
 🐞 Did you encounter an issue with the difPy desktop app? `Report it here <https://go.difpy.app/desktop-bug>`_.
 
 🗨️ Do you have feedback about the difPy desktop app? `Share your feedback here <https://go.difpy.app/desktop-feedback>`_.
+
