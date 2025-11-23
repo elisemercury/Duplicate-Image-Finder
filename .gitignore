@@ -1,0 +1,8 @@
+*.py[oc]
+.DS_Store
+/*.egg-info/
+/dist/
+__pycache__/
+difPy_*.json
+difPy_*_lower_quality.txt
+Thumbs.db
